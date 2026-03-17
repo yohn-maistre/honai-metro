@@ -1,6 +1,5 @@
 {
   "lockfileVersion": 1,
-  "configVersion": 1,
   "workspaces": {
     "": {
       "name": "photon-lemmy",
@@ -21,7 +20,7 @@
         "@types/node": "^25.2.2",
         "@types/nprogress": "^0.2.3",
         "@types/ua-parser-js": "^0.7.39",
-        "@xylightdev/svelte-hero-icons": "^2.2.9",
+        "@xylightdev/svelte-hero-icons": "^2.2.10",
         "eslint": "^9.39.2",
         "eslint-plugin-svelte": "^3.14.0",
         "jsdom": "^22.1.0",
@@ -386,7 +385,7 @@
 
     "@typescript-eslint/visitor-keys": ["@typescript-eslint/visitor-keys@8.54.0", "", { "dependencies": { "@typescript-eslint/types": "8.54.0", "eslint-visitor-keys": "^4.2.1" } }, "sha512-VFlhGSl4opC0bprJiItPQ1RfUhGDIBokcPwaFH4yiBCaNPeld/9VeXbiPO1cLyorQi1G1vL+ecBk1x8o1axORA=="],
 
-    "@xylightdev/svelte-hero-icons": ["@xylightdev/svelte-hero-icons@2.2.9", "", { "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-P3cQPL8e3LNGLq1F4Pltg6/iMMf68wHmO89ovBmNl35WPu3KT3Ne4cv4OWLsQK2W0RgbSpzHbCr5ksBSnXISHA=="],
+    "@xylightdev/svelte-hero-icons": ["@xylightdev/svelte-hero-icons@2.2.10", "", { "peerDependencies": { "svelte": "^5.0.0" } }, "sha512-dQ+U4sBiQrcp1GwNTJTDMrORZMxI9RJPioF+nsqtvzmyjYIUpMaPV9BgggN4JIdc6H+5swpw4aiiizl8JHrO+w=="],
 
     "abab": ["abab@2.0.6", "", {}, "sha512-j2afSsaIENvHZN2B8GOpF566vZ5WVk5opAiMTvWgaQT8DkbOqsTfvNAvHoRGU2zzP8cPoqys+xHTRDWW8L+/BA=="],
 

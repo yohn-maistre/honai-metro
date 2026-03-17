@@ -119,7 +119,7 @@ export const defaultSettings: Settings = {
   },
   defaultSort: {
     sort: (env.PUBLIC_DEFAULT_FEED_SORT ?? 'Active') as SortType,
-    feed: (env.PUBLIC_DEFAULT_FEED ?? 'Local') as ListingType,
+    feed: (env.PUBLIC_DEFAULT_FEED ?? 'All') as ListingType,
     comments: (env.PUBLIC_DEFAULT_COMMENT_SORT ?? 'Hot') as CommentSortType,
   },
   hidePosts: {
@@ -142,7 +142,7 @@ export const defaultSettings: Settings = {
     presets: [
       {
         title: 'Preset 1',
-        content: `Your submission in *"{{post}}"* was removed for {{reason}}.`,
+        content: `Postingan Anda *"{{post}}"* telah dihapus karena {{reason}}.`,
       },
     ],
     defaultRemoveAction: null,

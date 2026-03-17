@@ -1,7 +1,8 @@
 import { env } from '$env/dynamic/public'
 import type { Theme, ThemeColors } from './theme.svelte'
 
-const PHOTON_DEFAULT = {
+// Original Photon 'Mono' colors, preserved as a preset
+const PHOTON_MONO = {
   slate: {
     25: '252 253 254',
     50: '248 250 252',
@@ -40,22 +41,64 @@ const PHOTON_DEFAULT = {
   },
 }
 
+// ETNOS 'Honai Metro' — warm earthy/cream palette inspired by Papuan highlands
+const HONAI_METRO = {
+  slate: {
+    25: '255 245 224',
+    50: '247 236 212',
+    100: '234 220 189',
+    200: '219 201 164',
+    300: '211 190 146',
+    400: '196 175 130',
+    500: '187 164 114',
+    600: '108 94 66',
+    700: '71 60 36',
+    800: '49 40 23',
+    900: '28 7 7',
+    950: '20 5 5',
+  },
+  zinc: {
+    '50': '255 245 224',
+    '100': '247 236 212',
+    '200': '219 201 164',
+    '300': '234 220 189',
+    '400': '219 201 164',
+    '500': '211 190 146',
+    '600': '234 220 189',
+    '700': '13 14 42',
+    '800': '14 14 37',
+    '900': '14 17 32',
+    '925': '7 7 24',
+    '950': '6 6 22',
+  },
+  primary: {
+    100: '255 245 224',
+    900: '11 9 9',
+  },
+  other: {
+    black: '0 0 0',
+    white: '255 252 245',
+  },
+}
+
 export function getDefaultColors(): ThemeColors {
-  return env.PUBLIC_THEME ? JSON.parse(env.PUBLIC_THEME) : PHOTON_DEFAULT
+  return env.PUBLIC_THEME ? JSON.parse(env.PUBLIC_THEME) : HONAI_METRO
 }
 
 export function getDefaultTheme(): Theme {
   return {
     id: 0,
     colors: getDefaultColors(),
-    name: env.PUBLIC_THEME ? 'Instance Default' : 'Mono',
+    name: env.PUBLIC_THEME ? 'Instance Default' : 'Honai Metro',
   }
 }
 
 export const presets: Theme[] = [
   getDefaultTheme(),
+  // Always include Mono (original Photon) as a selectable preset
+  { colors: PHOTON_MONO, id: -10, name: 'Mono' },
   ...(env.PUBLIC_THEME
-    ? [{ colors: PHOTON_DEFAULT, id: -10, name: 'Mono' }]
+    ? [{ colors: HONAI_METRO, id: -11, name: 'Honai Metro' }]
     : []),
   {
     colors: {

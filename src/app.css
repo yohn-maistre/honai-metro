@@ -62,6 +62,18 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Satoshi';
+  src: url('/font/Satoshi.woff2') format('woff2');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Nunito';
+  src: url('/font/Nunito.woff2') format('woff2');
+  font-display: swap;
+}
+
 .font--serifs {
   --font-display: 'Roboto Slab', serif;
   --font-reading: 'Roboto Slab', serif;
@@ -71,6 +83,16 @@
   --font-display: Inter, sans-serif;
   --font-reading: Inter, sans-serif;
   --font-sans: Inter, sans-serif;
+}
+.font--satoshi {
+  --font-display: Satoshi, sans-serif;
+  --font-reading: Satoshi, sans-serif;
+  --font-sans: Satoshi, sans-serif;
+}
+.font--nunito {
+  --font-display: Nunito, sans-serif;
+  --font-reading: Nunito, sans-serif;
+  --font-sans: Nunito, sans-serif;
 }
 .font--system {
   --font-display: system-ui, sans-serif;
@@ -131,4 +153,25 @@ a:focus-visible,
 button:focus-visible {
   outline: none;
   @apply ring-2 ring-offset-1 ring-primary-900 dark:ring-primary-100;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+  padding: 1px;
+}
+
+::-webkit-scrollbar-track {
+  width: 2px;
+  margin: 1px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 9999px;
+  @apply bg-slate-200;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-zinc-800;
 }

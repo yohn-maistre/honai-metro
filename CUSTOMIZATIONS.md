@@ -19,15 +19,22 @@ hangs the app on the loading spinner with no visible errors.
 - `src/lib/feature/post/actions/PostActions.svelte` (line 36)
 - `src/lib/feature/post/actions/PostActionsMenu.svelte` (line 19)
 
-> This should be pushed upstream as a PR — using `.js` extensions is the correct
-> SvelteKit ESM convention and works on all operating systems.
-
 ### Locale fallback in `+layout.ts`
 
 **Problem:** If the browser requests a locale not registered in sveltekit-i18n
 (e.g. `id` for Indonesian), the `loadTranslations()` call may hang indefinitely.
 
 **Fix:** Added a guard in `src/routes/+layout.ts` that falls back to `'en'`.
+
+## i18n: Indonesian + Papuan Malay
+
+| File | What changed |
+|------|-------------|
+| `src/lib/app/i18n/id.json` | [NEW] Indonesian translations (ported from old photon-indo, ~85% coverage) |
+| `src/lib/app/i18n/pmy.json` | [NEW] Papuan Malay translations (copy of id.json, refine later) |
+| `src/lib/app/i18n/index.ts` | Added `id` + `pmy` loaders, commented out all others (marked `// ETNOS:`) |
+| `src/routes/settings/app/+page.svelte` | `localeMap` shows only `en`, `id`, `pmy` (others commented, marked `// ETNOS:`) |
+| `src/lib/app/settings.svelte.ts` | Default language → `'id'` (marked `// ETNOS:`) |
 
 ## Theme & Branding
 
@@ -36,8 +43,16 @@ hangs the app on the loading spinner with no visible errors.
 | `src/lib/app/theme/presets.ts` | Added **Honai Metro** warm earthy palette as default; original Mono preserved as preset |
 | `src/lib/app/settings.svelte.ts` | Indonesian moderation preset, default feed → `All` |
 | `src/app.css` | Satoshi & Nunito `@font-face`, font classes, scrollbar styling |
-| `static/font/Satoshi.woff2` | Added font file |
-| `static/font/Nunito.woff2` | Added font file |
+| `static/font/Satoshi.woff2` | [NEW] Added font file |
+| `static/font/Nunito.woff2` | [NEW] Added font file |
+
+## Custom Pages (ETNOS-only, no upstream conflicts)
+
+| File | What it is |
+|------|-----------|
+| `src/routes/wiki/+page.svelte` | [NEW] Wiki page with placeholder content |
+| `src/routes/dashboard/+page.svelte` | [NEW] Dashboard page with placeholder cards |
+| `src/lib/ui/sidebar/Sidebar.svelte` | Added ETNOS section with Wiki + Dashboard buttons (marked `<!-- ETNOS: -->`) |
 
 ## Instance Configuration
 
@@ -47,17 +62,10 @@ PUBLIC_INSTANCE_URL=lemmy.ml        # Change to your Pyfedi backend for producti
 PUBLIC_LOCK_TO_INSTANCE=true        # Hides instance selector for simpler login
 ```
 
-## Custom Components
-
-Custom components live in `src/lib/etnos/` to stay isolated from upstream.
-
-| Component | Purpose |
-|-----------|---------|
-| *(none yet)* | Wiki page, city dashboard, etc. coming soon |
-
 ## Merge Checklist
 
 When pulling from upstream (`git fetch upstream && git merge upstream/main`):
-1. Check conflicts in the files listed above
-2. Verify Honai Metro colors still render correctly
-3. Re-run `bun run dev` and test
+1. Check conflicts in modified files above (look for `// ETNOS:` markers)
+2. New files (`id.json`, `pmy.json`, wiki/, dashboard/) won't conflict
+3. Verify Honai Metro colors still render correctly
+4. Re-run `bun run dev` and test

@@ -1,0 +1,908 @@
+{
+    "profile": {
+        "profile": "Profil",
+        "inbox": "Kotak Masuk",
+        "saved": "Disimpan",
+        "subscribed": "Langganan"
+    },
+    "nav": {
+        "home": "Beranda",
+        "admin": "Admin",
+        "moderation": "Moderasi",
+        "communities": "Komunitas",
+        "search": "Cari",
+        "create": {
+            "label": "Buat",
+            "post": "Postingan",
+            "community": "Komunitas",
+            "logingate": "Anda harus masuk untuk membuat konten."
+        },
+        "menu": {
+            "label": "Profil",
+            "app": "Aplikasi",
+            "settings": "Pengaturan",
+            "colorscheme": {
+                "label": "Skema Warna",
+                "system": "Sistem",
+                "dark": "Gelap",
+                "light": "Terang"
+            },
+            "theme": "Tema",
+            "about": "Tentang",
+            "source": "Sumber",
+            "donate": "Donasi",
+            "instance": "Instansi"
+        },
+        "commands": {
+            "prompt": "Palet Perintah",
+            "recents": "Terbaru",
+            "content": "Konten",
+            "search": "Cari untuk {{default}}",
+            "main": "Utama",
+            "setView": "Atur tampilan",
+            "setViewTo": "Atur tampilan ke {{default}}",
+            "setColor": "Atur skema warna",
+            "setColorTo": "Atur skema warna ke {{default}}",
+            "feeds": "Umpan",
+            "downloading": "Mengunduh aksi",
+            "setTheme": "Atur tema",
+            "setThemeTo": "Atur tema ke {{default}}",
+            "contextual": "Di halaman ini"
+        }
+    },
+    "account": {
+        "login": "Masuk",
+        "logout": "Keluar",
+        "signup": "Daftar",
+        "accounts": "Akun",
+        "changeinstance": "Ganti Instansi",
+        "resetColor": "Atur Ulang Warna",
+        "addGuest": "Tambah Tamu",
+        "moveUp": "Naikkan",
+        "moveDown": "Turunkan",
+        "guest": "Tamu",
+        "versionGate": "Versi UI ini mendukung instansi yang menjalankan {{version}} atau lebih tinggi."
+    },
+    "filter": {
+        "location": {
+            "label": "Lokasi",
+            "all": "Semua",
+            "local": "Lokal",
+            "subscribed": "Langganan",
+            "moderator": "Moderator",
+            "global": "Global"
+        },
+        "sort": {
+            "label": "Urutkan",
+            "active": "Aktif",
+            "hot": "Populer",
+            "top": {
+                "label": "Teratas",
+                "time": {
+                    "label": "Waktu",
+                    "all": "Semua",
+                    "9months": "9 Bulan",
+                    "6months": "6 Bulan",
+                    "3months": "3 Bulan",
+                    "month": "Bulan",
+                    "week": "Minggu",
+                    "day": "Hari",
+                    "12hours": "12 Jam",
+                    "6hours": "6 Jam",
+                    "hour": "Jam"
+                }
+            },
+            "new": "Baru",
+            "old": "Lama",
+            "controversial": "Kontroversial",
+            "scaled": "Diskalakan",
+            "mostcomments": "Komentar Terbanyak",
+            "newcomments": "Balasan Baru"
+        },
+        "view": {
+            "label": "Tampilan",
+            "cozy": "Nyaman",
+            "list": "Daftar",
+            "compact": "Ringkas",
+            "legacy": "Klasik"
+        },
+        "type": "Tipe",
+        "filter": "Saring",
+        "unread": "Belum Dibaca",
+        "inbox": {
+            "messages": "Pesan",
+            "replies": "Balasan",
+            "mentions": "Mention"
+        }
+    },
+    "form": {
+        "username": "Nama Pengguna",
+        "name": "Nama",
+        "instance": "URL Instansi",
+        "password": "Kata Sandi",
+        "confirmPassword": "Konfirmasi Kata Sandi",
+        "2fa": "Kode 2FA",
+        "forgotpassword": "Lupa Kata Sandi",
+        "submit": "Kirim",
+        "edit": "Edit",
+        "preview": "Pratinjau",
+        "post": {
+            "create": "Buat Postingan",
+            "edit": "Edit Postingan",
+            "community": "Komunitas",
+            "title": "Judul",
+            "url": "URL",
+            "body": "Isi",
+            "nsfw": "NSFW",
+            "generateTitle": "Buat Judul",
+            "uploadImage": "Unggah Gambar",
+            "selectFile": "Pilih file",
+            "altText": "Teks Alternatif",
+            "addUrl": "Tambah URL",
+            "setLanguage": "Atur bahasa",
+            "unset": "Hapus",
+            "readMore": "Baca selengkapnya"
+        },
+        "profile": {
+            "displayName": "Nama Tampilan",
+            "bio": "Bio",
+            "avatar": "Avatar",
+            "banner": "Spanduk",
+            "email": "Email",
+            "matrix": "Pengguna Matrix",
+            "showNSFW": "Tampilkan konten NSFW",
+            "scores": "Tampilkan Skor",
+            "bot": "Akun Bot",
+            "showBots": "Tampilkan Bot",
+            "showRead": "Tampilkan Postingan yang Telah Dibaca",
+            "currentPassword": "Kata Sandi Saat Ini",
+            "newPassword": "Kata Sandi Baru",
+            "verifyNewPassword": "Verifikasi Kata Sandi Baru",
+            "2fa": {
+                "totp": "TOTP",
+                "2fa": "2FA",
+                "paste": "Tempel ini di aplikasi autentikator Anda."
+            },
+            "deleteAccount": {
+                "label": "Hapus akun",
+                "deleteContent": "Hapus konten",
+                "warning": "Ini akan menghapus SEMUA kiriman Anda."
+            }
+        },
+        "email": "Email",
+        "setup": "Pengaturan",
+        "signup": {
+            "title": "Daftar",
+            "description": "Pilih instansi yang menarik bagi Anda, atau ketik URL secara manual.",
+            "info": "Instansi adalah server tempat akun Anda akan dihosting, tetapi Anda tetap dapat mengakses dan berinteraksi dengan konten dari instansi lain.",
+            "chooseInstance": "Pilih instansi",
+            "application": {
+                "label": "Aplikasi",
+                "info": "Untuk bergabung dengan instansi ini, Anda harus mengisi aplikasi ini, dan menunggu untuk diterima. Anda akan menerima email jika aplikasi Anda diterima."
+            },
+            "closed": {
+                "title": "Pendaftaran ditutup",
+                "description": "Instansi ini menutup pendaftaran. Cari instansi lain.",
+                "anotherInstance": "Cari instansi lain"
+            }
+        },
+        "description": "Deskripsi"
+    },
+    "routes": {
+        "frontpage": {
+            "title": "Halaman Depan",
+            "footer": "{{users:number}} aktif {{users; 1:user; default:users;}}",
+            "endFeed": "Anda telah mencapai akhir dari {{community_name; undefined:umpan.; default:{{community_name}}.}}"
+        },
+        "modlog": "Modlog",
+        "instances": "Instansi",
+        "legal": {
+            "title": "Legal",
+            "noLegal": "Instansi ini tidak memiliki informasi hukum."
+        },
+        "profile": {
+            "user": "Pengguna",
+            "settings": "Pengaturan",
+            "blocks": {
+                "title": "Blokiran",
+                "empty": {
+                    "title": "Tidak ada entitas yang diblokir",
+                    "description": "Ketika Anda memblokir sesuatu, itu tidak akan muncul lagi di umpan Anda."
+                }
+            },
+            "credentials": "Kredensial",
+            "moderates": "Moderasi",
+            "favorites": "Favorit",
+            "upvoted": "Disukai",
+            "downvoted": "Tidak Disukai",
+            "media": {
+                "title": "Media",
+                "download": "Unduh"
+            },
+            "logins": "Login",
+            "welcome": "Selamat datang, {{default}}!",
+            "delete": {
+                "title": "Hapus akun",
+                "warning": "Ini permanen. Apakah Anda yakin ingin melakukannya?"
+            },
+            "overview": "Profil",
+            "submissions": "Postingan"
+        },
+        "translators": "Penerjemah",
+        "accounts": "Akun",
+        "communities": {
+            "title": "Komunitas",
+            "trending": "Trending",
+            "search": {
+                "placeholder": "Cari komunitas"
+            }
+        },
+        "search": {
+            "title": "Cari",
+            "federating": "Federasi",
+            "query": "Kata kunci",
+            "noResults": {
+                "title": "Tidak ada hasil",
+                "description": "Tidak ada hasil yang sesuai dengan filter tersebut. Coba perbaiki pencarian Anda.",
+                "alt": "Cari di seluruh fediverse"
+            },
+            "top": "Hasil Teratas",
+            "other": "Hasil Lainnya"
+        },
+        "saved": "Disimpan",
+        "createPost": "Buat Posting",
+        "createCommunity": "Buat Komunitas",
+        "post": {
+            "crosspostCount": "crosspost",
+            "commentCount": "komentar",
+            "addComment": "Tambahkan komentar",
+            "scrollToTop": "Balik ke atas",
+            "instanceWarning": "Postingan ini diminta dari server yang berbeda dari server akun Anda. Banyak tindakan yang mungkin tidak akan berfungsi.",
+            "remoteView": "Tampilan Jarak Jauh",
+            "localView": "Tampilan Lokal",
+            "thread": {
+                "single": "Anda melihat satu utas.",
+                "allComments": "Semua Komentar",
+                "part": "Anda melihat bagian dari utas.",
+                "context": "Tampilkan Konteks"
+            },
+            "emptyComments": {
+                "title": "Tidak ada komentar",
+                "description": "Mulai percakapan!"
+            }
+        },
+        "inbox": {
+            "title": "Kotak Masuk",
+            "markAsRead": "Tandai Semua Dibaca",
+            "empty": {
+                "title": "Tidak ada notifikasi baru",
+                "description": "Pesan, balasan, dan mention akan muncul di sini."
+            },
+            "item": {
+                "reply": "{{user}} membalas Anda di {{post}}",
+                "mention": "{{user}} menyebut Anda di {{post}}",
+                "message": "{{user}} mengirim pesan ke {{recipient}}"
+            }
+        },
+        "moderation": {
+            "title": "Moderasi",
+            "empty": {
+                "title": "Tidak ada laporan baru",
+                "description": "Ketika kiriman dilaporkan, Anda dapat bertindak di sini."
+            },
+            "reason": "Alasan",
+            "resolve": "Selesaikan",
+            "resolved": "Diselesaikan",
+            "unresolve": "Batalkan Penyelesaian",
+            "resolvedBy": "Diselesaikan oleh"
+        },
+        "admin": {
+            "title": "Administrasi",
+            "config": {
+                "title": "Konfigurasi",
+                "sidebar": "Sidebar",
+                "icon": "Ikon",
+                "banner": "Spanduk",
+                "downvotesEnabled": "Aktifkan Downvotes",
+                "nsfwEnabled": "Aktifkan NSFW",
+                "registration": {
+                    "label": "Mode Pendaftaran",
+                    "open": "Terbuka",
+                    "application": "Memerlukan Aplikasi",
+                    "closed": "Tertutup"
+                },
+                "applicationQuestion": "Pertanyaan Aplikasi",
+                "adminCommunityOnly": "Hanya admin yang dapat membuat komunitas",
+                "requireVerifyEmail": "Memerlukan verifikasi email",
+                "emailAdminsOnApplication": "Email admin saat menerima aplikasi baru",
+                "emailAdminsOnReport": "Email admin saat menerima laporan baru",
+                "listingType": {
+                    "label": "Tipe Daftar",
+                    "all": "Semua",
+                    "local": "Lokal"
+                },
+                "private": "Instansi pribadi",
+                "hideModlogModNames": "Sembunyikan nama mod di modlog",
+                "slurFilter": "Regex filter slur",
+                "federation": "Federasi diaktifkan",
+                "federationDebug": "Mode debug federasi",
+                "captcha": {
+                    "enabled": "CAPTCHA Diaktifkan"
+                }
+            },
+            "applications": {
+                "title": "Aplikasi",
+                "empty": {
+                    "title": "Tidak ada aplikasi baru",
+                    "description": "Aplikasi untuk bergabung dengan instansi Anda akan muncul di sini."
+                },
+                "application": "Aplikasi",
+                "approved": "Disetujui",
+                "denied": "Ditolak",
+                "user": "Pengguna",
+                "deny": "Tolak",
+                "approve": "Setujui",
+                "reason": "Alasan",
+                "modalTitle": "Tolak Aplikasi"
+            },
+            "taglines": {
+                "title": "Tagline",
+                "add": "Tambahkan tagline",
+                "empty": {
+                    "title": "Tidak ada tagline",
+                    "description": "Tagline acak akan muncul di kartu situs saat pengguna mengunjungi instansi Anda."
+                }
+            },
+            "team": {
+                "title": "Admin",
+                "empty": {
+                    "title": "Tidak ada admin",
+                    "description": "Entah bagaimana tidak ada admin di situs ini. Bagaimana??"
+                }
+            },
+            "federation": {
+                "title": "Federasi",
+                "csv": "Unggah CSV",
+                "blocked": "Instansi yang Diblokir",
+                "block": "Blokir",
+                "blockplaceholder": "Blokir instansi...",
+                "allowed": "Instansi yang Diizinkan",
+                "allow": "Izinkan",
+                "allowplaceholder": "Izinkan instansi",
+                "emptyBlock": {
+                    "title": "Tidak ada instansi yang diblokir",
+                    "description": "Memblokir instansi akan menyembunyikan kiriman baru dari instansi tersebut."
+                },
+                "emptyAllow": {
+                    "title": "Tidak ada instansi yang diizinkan",
+                    "description": "Mengizinkan instansi akan memblokir setiap instansi lainnya."
+                }
+            }
+        },
+        "verifyEmail": {
+            "message": "Email Anda telah diverifikasi. Anda sekarang dapat menutup jendela ini.",
+            "error": "Gagal memverifikasi email Anda."
+        },
+        "passwordChange": {
+            "title": "Ganti Kata Sandi",
+            "description": "Pilih kata sandi baru Anda.",
+            "instance": "Di instansi mana akun Anda dihosting?"
+        },
+        "resetLogin": {
+            "title": "Atur Ulang Kata Sandi",
+            "description": "Masukkan email akun Anda, dan link reset ulang kata sandi akan dikirim. Jika akun tidak memiliki email, hubungi admin instansi Anda."
+        },
+        "theme": {
+            "title": "Tema",
+            "import": "Impor",
+            "export": "Ekspor",
+            "reset": "Atur Ulang",
+            "accent": "Aksen",
+            "resetWarning": {
+                "title": "Atur Ulang Tema",
+                "description": "Ini akan mengatur ulang semua warna Anda ke default. Disarankan untuk mengekspor tema Anda sebelum ini."
+            },
+            "preset": {
+                "title": "Tidak dapat dimodifikasi",
+                "description": "Ini adalah tema default, dan tidak dapat dimodifikasi.",
+                "delete": {
+                    "title": "Hapus Tema",
+                    "confirm": "Konfirmasi"
+                },
+                "default": "Default",
+                "classic": "Klasik",
+                "imported": "Tema Anda",
+                "new": "Tema Baru",
+                "presets": "Preset"
+            }
+        },
+        "community": {
+            "settings": {
+                "team": "Tim",
+                "settings": "Pengaturan",
+                "manage": "Kelola"
+            }
+        }
+    },
+    "cards": {
+        "site": {
+            "about": "Tentang",
+            "stats": "Statistik",
+            "admins": "Admin"
+        },
+        "community": {
+            "members": "Anggota",
+            "moderators": "Moderator",
+            "subscribe": "Ikuti",
+            "subscribed": "Mengikuti",
+            "modlog": "Modlog",
+            "block": "Blokir",
+            "unblock": "Buka Blokir",
+            "blockInstance": "Blokir instansi",
+            "favorite": "Favorit",
+            "unfavorite": "Hapus Favorit",
+            "activeDay": "Aktif Hari Ini"
+        }
+    },
+    "admin": {
+        "purge": "Bersihkan",
+        "instance": "Instansi",
+        "label": "Administrasi",
+        "purgeCommunity": {
+            "title": "Membersihkan Komunitas",
+            "warning": "Ini akan menghapus semua posting. Apakah Anda yakin? (Tombol akan aktif dalam 3 detik.)"
+        }
+    },
+    "content": {
+        "all": "Semua",
+        "users": "Pengguna",
+        "posts": "Posting",
+        "comments": "Komentar",
+        "communities": "Komunitas",
+        "instances": "Instansi",
+        "message": "Pesan"
+    },
+    "post": {
+        "actions": {
+            "comments": "Komentar",
+            "save": "Simpan",
+            "unsave": "Batalkan Simpan",
+            "more": {
+                "label": "Aksi Lainnya",
+                "edit": "Edit",
+                "creator": "Pembuat",
+                "actions": "Aksi",
+                "markRead": "Tandai sebagai Dibaca",
+                "markUnread": "Tandai sebagai Belum Dibaca",
+                "hide": "Sembunyikan",
+                "unhide": "Tampilkan",
+                "translate": "Terjemahkan",
+                "mediaBias": "Bias Media",
+                "share": "Bagikan",
+                "crosspost": "Crosspost",
+                "delete": "Hapus",
+                "restore": "Pulihkan"
+            },
+            "mediaBias": {
+                "description": "Deskripsi",
+                "credibility": "Kredibilitas",
+                "reporting": "Pelaporan Faktual",
+                "noData": {
+                    "title": "Tidak ada data",
+                    "description": "Tidak ada data bias untuk situs web ini."
+                },
+                "downloading": "Mengunduh dataset",
+                "loading": "Memuat sumber"
+            },
+            "link": {
+                "title": "Link Alternatif",
+                "actions": "Pilihan"
+            },
+            "vote": {
+                "upvote": "Sukai",
+                "downvote": "Tidak Suka",
+                "score": "Skor"
+            }
+        },
+        "badges": {
+            "nsfw": "NSFW",
+            "locked": "Terkunci",
+            "featured": "Unggulan",
+            "removed": "Dihapus",
+            "deleted": "Dihapus",
+            "saved": "Disimpan"
+        },
+        "image": {
+            "zoomIn": "Perbesar",
+            "zoomOut": "Perkecil",
+            "close": "Tutup"
+        },
+        "meta": {
+            "lastEdited": "Terakhir diedit {{default}}",
+            "created": "Dibuat {{default}}"
+        }
+    },
+    "comment": {
+        "reply": "Balas",
+        "actions": {
+            "label": "Aksi",
+            "link": "Salin Link"
+        },
+        "locked": "Posting ini terkunci.",
+        "banned": "Anda diblokir dari komunitas ini.",
+        "more": "{{comments:number}} lebih banyak"
+    },
+    "moderation": {
+        "report": "Laporkan",
+        "ban": {
+            "banning": "Memblokir Pengguna",
+            "unbanning": "Membuka Blokir Pengguna",
+            "deleteData": "Hapus data",
+            "warning": "Ini akan menghapus SEMUA kiriman pengguna ini di sini.",
+            "expires": "Kedaluwarsa (UTC)",
+            "banFromCommunity": "Blokir dari komunitas",
+            "unbanFromCommunity": "Buka blokir dari komunitas"
+        },
+        "removeSubmission": {
+            "title": "Menghapus Kiriman",
+            "titleRestore": "Memulihkan Kiriman",
+            "titlePurge": "Membersihkan Kiriman",
+            "withReason": "Balas dengan alasan",
+            "comment": "Komentar",
+            "message": "Pesan",
+            "failReply": "Gagal mengirim balasan. Menghapus tetap...",
+            "failMessage": "Gagal mengirim pesan ke pengguna. Menghapus tetap...",
+            "failEmptyReply": "Balasan Anda tidak boleh kosong jika 'Balas dengan alasan' diaktifkan.",
+            "successPurge": "Berhasil membersihkan kiriman tersebut."
+        },
+        "reportModal": {
+            "title": "Laporkan",
+            "success": "Melaporkan kiriman tersebut."
+        },
+        "reason": "Alasan",
+        "lock": "Kunci",
+        "unlock": "Buka Kunci",
+        "remove": "Hapus",
+        "restore": "Pulihkan",
+        "label": "Moderasi",
+        "labelInstanceOnly": "Moderasi (Hanya Instansi)",
+        "feature": "Unggulkan",
+        "unfeature": "Hapus Unggulan"
+    },
+    "common": {
+        "back": "Kembali",
+        "next": "Berikutnya",
+        "debug": "Debug",
+        "refresh": "Segarkan",
+        "jump": "Lompat",
+        "save": "Simpan",
+        "enabled": "Diaktifkan",
+        "disabled": "Dinonaktifkan",
+        "enable": "Aktifkan",
+        "disable": "Nonaktifkan",
+        "add": "Tambah",
+        "cancel": "Batal",
+        "send": "Kirim",
+        "general": "Umum"
+    },
+    "message": {
+        "success": "Berhasil",
+        "error": "Kesalahan",
+        "retry": "Coba Lagi"
+    },
+    "toast": {
+        "noComments": "API tidak menemukan komentar.",
+        "loginVoteGate": "Anda harus login untuk memberikan suara.",
+        "blockedCommunity": "Komunitas tersebut diblokir.",
+        "unblockedCommunity": "Blokiran koomunitas telah dibuka.",
+        "purgedCommunity": "Komunitas tersebut telah dibersihkan.",
+        "blockedInstance": "Instansi tersebut telah diblokir.",
+        "updatedCommunity": "Komunitas Anda telah diperbarui.",
+        "sentMessage": "Pesan tersebut telah dikirim.",
+        "invalidDateAbsolute": "Tanggal tidak valid. Harus berupa tanggal absolut.",
+        "invalidDateBeforeCurrent": "Tanggal tidak valid. Harus sebelum waktu saat ini.",
+        "bannedUser": "Pengguna tersebut telah diblokir.",
+        "unbannedUser": "Blokiran pengguna telah dibuka.",
+        "needCommunity": "Anda harus mengatur komunitas.",
+        "invalidURL": "URL tidak valid",
+        "generatedTitle": "Judul dan isi dibuat dari URL. Apakah Anda ingin membatalkan ini?",
+        "failGenerateTitle": "Tidak ada judul atau deskripsi yang dapat digunakan dari situs web tersebut.",
+        "restoredFromDraft": "Posting Anda dipulihkan dari draf.",
+        "copied": "Disalin ke clipboard.",
+        "approvedApplication": "Pendaftaran tersebut disetujui.",
+        "deniedApplication": "Pendaftaran tersebut ditolak.",
+        "updatedSite": "Situs Anda diperbarui.",
+        "failCSV": "Gagal membaca CSV",
+        "removeAdminWarning": "Apakah Anda yakin ingin menghapus admin tersebut?",
+        "removeAdmin": "Admin tersebut telah dihapus.",
+        "failFindUser": "Tidak dapat menemukan pengguna tersebut.",
+        "addMod": "Moderator tersebut telah ditambahkan.",
+        "updateMods": "Moderator komunitas telah diperbarui.",
+        "logIn": "Berhasil masuk. Selamat datang <3",
+        "failInstanceURL": "Gagal menghubungi URL instansi tersebut. Mungkin sedang down?",
+        "addAccount": "Akun tersebut ditambahkan.",
+        "resetLink": "Link reset ulang kata sandi dikirim ke email Anda.",
+        "resolveReport": "Laporan tersebut diselesaikan.",
+        "unresolveReport": "Laporan tersebut dibatalkan penyelesaiannya.",
+        "passwordReset": "Kata sandi Anda diatur ulang.",
+        "fetchPostOnHome": "Mencoba mencari posting ini di instansi asal Anda...",
+        "loginRefresh": "Login Anda diperbarui.",
+        "invalidLogin": "Kredensial tidak valid",
+        "saveSettings": "Pengaturan pengguna Anda disimpan. Jika Anda mengubah email Anda, link verifikasi dikirim.",
+        "confirmDelete1": "Apakah Anda yakin ingin menghapus akun Anda?",
+        "confirmDelete2": "Apakah Anda benar-benar yakin?",
+        "confirmDelete3": "Peringatan terakhir. Apakah Anda benar-benar yakin?!",
+        "needPassword": "Anda harus memberikan kata sandi Anda.",
+        "deleting": "Menghapus akun Anda...",
+        "deleted": "Akun Anda dihapus. Sedih.",
+        "resetSettings": "Apakah Anda ingin mengatur ulang pengaturan Anda ke default?",
+        "failFetchInstances": "Gagal mengambil instansi yang tersedia.",
+        "verifyEmail": "Link verifikasi dikirim ke email Anda. Verifikasi email Anda, lalu masuk.",
+        "failSignup": "Gagal mendaftar.",
+        "successSignup": "Berhasil mendaftar.",
+        "waitApplication": "Tunggu aplikasi pendaftaran Anda diterima sebelum masuk.",
+        "blockUser": "Pengguna tersebut diblokir.",
+        "unblockUser": "Pengguna tersebut dibuka blokirnya.",
+        "purgeUser": "Pengguna tersebut dibersihkan.",
+        "settingsImport": "Pengaturan berhasil diimpor",
+        "settingsImportWarning": "Pengaturan yang diimpor tampaknya tidak valid. Apakah Anda yakin ingin mengimpor ini?",
+        "userLoading": "Masih memuat data pengguna Anda..."
+    },
+    "settings": {
+        "title": "Pengaturan",
+        "beta": "Beta",
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Mobile",
+        "export": "Ekspor",
+        "import": "Impor",
+        "reset": "Atur Ulang",
+        "navigation": {
+            "title": "Navigasi",
+            "dockPos": {
+                "title": "Posisi dock",
+                "description": "Di mana dock harus diposisikan di layar.",
+                "top": "Atas",
+                "bottom": "Bawah",
+                "adaptive": "Adaptif"
+            },
+            "panel": {
+                "title": "Mode panel",
+                "description": "Perluas dock ke tepi layar, mirip dengan panel.",
+                "on": "Aktif",
+                "off": "Nonaktif",
+                "adaptive": "Adaptif"
+            },
+            "pins": {
+                "title": "Pin",
+                "description": "Klik untuk pin di bagian atas sidebar. Klik kanan item yang dipin untuk menghapusnya."
+            },
+            "commands": {
+                "title": "Palet perintah",
+                "description": "Tekan slash atau klik kanan logo photon untuk menavigasi aplikasi dengan mencari."
+            }
+        },
+        "app": {
+            "title": "Photon UI",
+            "theming": {
+                "title": "Tema",
+                "description": "Sesuaikan warna Photon.",
+                "link": "Pergi ke tema"
+            },
+            "colorscheme": {
+                "title": "Skema Warna",
+                "description": "Skema warna yang akan digunakan."
+            },
+            "lang": {
+                "title": "Bahasa",
+                "description": "Bahasa antarmuka.",
+                "note": "Melayu Papua masih di dalam oven.",
+                "id": "Bahasa Indonesia",
+                "en": "Inggris",
+                "en-US": "Inggris",
+                "he": "Ibrani",
+                "et": "Estonia",
+                "fr": "Prancis",
+                "de": "Jerman",
+                "fi": "Finlandia",
+                "pt": "Portugis",
+                "zh": "Cina",
+                "zh-Hans": "Cina (Sederhana)",
+                "zh-Hant": "Cina (Tradisional)",
+                "auto": "Otomatis",
+                "credits": "Kredit",
+                "useRtl": {
+                    "title": "Gunakan tata letak RTL",
+                    "description": "Gunakan tata letak RTL untuk bahasa RTL."
+                }
+            },
+            "view": {
+                "title": "Tampilan posting",
+                "list": "Tampilkan posting dalam daftar, dengan isi posting dan media ringkas.",
+                "cozy": "Tampilkan posting dengan gambar besar, embed kaya, dan isi posting yang lebih panjang.",
+                "compact": "Tampilkan posting dalam daftar, tanpa isi posting dan dengan jarak yang lebih rapat.",
+                "legacy": "Tampilan lama Photon."
+            },
+            "sort": {
+                "title": "Urutan default",
+                "description": "Urutan default yang akan digunakan dalam umpan."
+            },
+            "infiniteScroll": {
+                "title": "Infinite Scroll",
+                "description": "Posting baru ditambahkan saat Anda menggulir ke bawah, tanpa harus mengklik 'berikutnya'."
+            },
+            "postsInNewTab": {
+                "title": "Buka posting di tab baru",
+                "description": "Buka posting di tab terpisah, bukan di tab saat ini."
+            },
+            "displayName": {
+                "title": "Gunakan nama tampilan",
+                "description": "Tampilkan nama tampilan pengguna daripada nama pengguna sebenarnya."
+            },
+            "limitLayoutWidth": {
+                "title": "Batasi lebar tata letak",
+                "description": "Tingkatkan keterbacaan dengan membatasi lebar konten utama."
+            },
+            "placeholders": {
+                "title": "Placeholder acak",
+                "description": "Tampilkan placeholder acak untuk input teks tertentu."
+            },
+            "expandImages": {
+                "title": "Perbesar gambar",
+                "description": "Mengklik gambar posting membawa Anda ke tampilan yang diperbesar daripada halaman posting."
+            },
+            "duplicateTitles": {
+                "title": "Sembunyikan judul/isi duplikat",
+                "description": "Menyembunyikan judul dan isi posting jika identik dengan embed."
+            },
+            "thumbnailSide": {
+                "title": "Penjajaran thumbnail",
+                "description": "Di mana thumbnail harus berada di posting dalam mode daftar/ringkas",
+                "left": "Kiri",
+                "right": "Kanan"
+            },
+            "font": {
+                "title": "Font",
+                "description": "Font yang digunakan dalam antarmuka."
+            },
+            "translation": {
+                "title": "Terjemahan",
+                "description": "Instansi LibreTranslate yang akan digunakan untuk terjemahan.",
+                "instance": "Domain"
+            },
+            "titleTags": {
+                "title": "Parse tag dalam judul",
+                "description": "Ambil teks dalam [kurung] dan ubah menjadi tag yang dapat Anda klik untuk mencari.",
+                "rules": {
+                    "title": "Aturan",
+                    "blur": "Blur",
+                    "hide": "Sembunyikan",
+                    "show": "Tampilkan"
+                }
+            },
+            "reverseActions": {
+                "title": "Balikkan baris aksi",
+                "description": "Membalikkan urutan aksi pada posting dan komentar."
+            }
+        },
+        "embeds": {
+            "title": "Embed",
+            "clickToView": {
+                "title": "Klik untuk melihat",
+                "description": "Hanya memuat embed setelah Anda mengkliknya."
+            },
+            "youtube": {
+                "description": "Situs web untuk embed konten YouTube."
+            },
+            "instance": {
+                "invidious": "Instansi Invidious",
+                "piped": "Instansi Piped",
+                "description": "Instansi untuk embed konten YouTube."
+            }
+        },
+        "lemmy": {
+            "title": "Lemmy",
+            "showHiddenPosts": {
+                "title": "Tampilkan posting tersembunyi",
+                "description": "Tampilkan posting yang Anda sembunyikan secara manual."
+            },
+            "compactFeatured": {
+                "title": "Posting unggulan ringkas",
+                "description": "Buat posting unggulan lebih ringkas"
+            },
+            "markReadPosts": {
+                "title": "Tandai posting yang dibaca",
+                "description": "Tandai posting sebagai dibaca saat Anda mengkliknya"
+            },
+            "fadeReadPosts": {
+                "title": "Fade posting yang dibaca",
+                "description": "Fade judul posting yang sudah Anda baca"
+            },
+            "crosspostMarker": {
+                "title": "Tandai crosspost",
+                "description": "Tampilkan 'crossposted from' saat crossposting."
+            },
+            "hideSubmissions": {
+                "title": "Sembunyikan kiriman",
+                "description": "Sembunyikan jenis kiriman tertentu.",
+                "deleted": "Dihapus oleh pengguna",
+                "removed": "Dihapus oleh moderator"
+            },
+            "nsfwBlur": {
+                "title": "Blur NSFW",
+                "description": "Blur gambar dan hapus isi posting NSFW."
+            },
+            "instances": {
+                "title": "Tampilkan instansi",
+                "description": "Tampilkan instansi tempat konten tertentu berasal."
+            }
+        },
+        "moderation": {
+            "title": "Moderasi",
+            "replyPresets": {
+                "title": "Preset balasan penghapusan",
+                "description": "Preset untuk digunakan untuk 'alasan balasan' dalam dialog penghapusan kiriman.",
+                "syntax": "Sintaks"
+            }
+        },
+        "other": {
+            "title": "Lainnya",
+            "debug": {
+                "title": "Info debug",
+                "description": "Tampilkan informasi debug"
+            },
+            "virtualizeFeeds": {
+                "title": "Jangan virtualisasikan umpan",
+                "description": "Virtualisasi hanya merender posting yang terlihat, meningkatkan kinerja secara drastis. Nonaktifkan virtualisasi jika Anda mengalami masalah stutter. Ini akan menonaktifkan gulir tak terbatas."
+            }
+        },
+        "account": {
+            "title": "Akun"
+        }
+    },
+    "error": {
+        "incorrect_login": "Kredensial login salah. Silakan coba lagi.",
+        "incorrect_login_2": "Kredensial login salah. Coba lagi.",
+        "incorrect_login_3": "Salah, lagi. Coba beberapa kali lagi.",
+        "incorrect_login_4": "Itu masih bukan kredensial yang benar. Terus coba.",
+        "incorrect_login_5": "Saya bersumpah, Anda perlu melihat tombol yang Anda tekan.",
+        "incorrect_login_6": "Apakah ini lelucon bagi Anda?",
+        "incorrect_login_7": "Entah Anda kesulitan mengetik atau Anda melecehkan saya pada titik ini.",
+        "incorrect_login_8": "Saya menyerah.",
+        "incorrect_login_9": "Setiap permintaan yang Anda buat ini mengirimkan data melalui teknologi yang luar biasa. Dan Anda menggunakannya untuk membuat login yang gagal.",
+        "incorrect_login_10": "Pikirkan tentang ini. Admin instansi yang malang harus memelihara server mereka hanya untuk Anda membuat permintaan yang tidak berguna ini.",
+        "incorrect_login_11": "Saya menyerah, sungguh kali ini.",
+        "incorrect_login_12": "...",
+        "registration_application_is_pending": "Aplikasi pendaftaran untuk akun tersebut belum diterima.",
+        "couldnt_find_post": "Posting tersebut tidak ada, tidak ada di instansi ini, atau telah dihapus.",
+        "cant_block_yourself": "Anda tidak dapat memblokir diri sendiri. Anda juga tidak seharusnya, Anda adalah orang yang baik!",
+        "email_not_verified": "Email akun Anda belum diverifikasi.",
+        "passwords_do_not_match": "Kata sandi yang Anda masukkan dan kata sandi verifikasi tidak cocok.",
+        "honeypot_failed": "Bagaimana Anda- apakah Anda bot? Beep bop bap boop. Jika tidak, pemeriksaan Honeypot gagal.",
+        "downvotes_are_disabled": "Downvotes dinonaktifkan di instansi ini.",
+        "email_already_exists": "Akun dengan email tersebut sudah ada.",
+        "slurs": "Kiriman Anda mengandung istilah yang dilarang di instansi ini.",
+        "captcha_failed": "Jawaban CAPTCHA salah.",
+        "cant_block_local_instance": "Anda tidak dapat memblokir instansi yang sedang Anda gunakan.",
+        "invalid_vote_value": "Anda tidak dapat melakukan kecurangan suara pada posting Lemmy, maaf.",
+        "language_not_allowed": "Bahasa tersebut tidak diizinkan di komunitas ini. Hapus untuk menggunakan default komunitas.",
+        "couldnt_find_person": "Pengguna tersebut tidak ada.",
+        "couldnt_find_community": "Komunitas tersebut tidak ada."
+    },
+    "aria": {
+        "pagination": {
+            "nav": "Pembagian halaman",
+            "current": "Halaman saat ini"
+        },
+        "vote": {
+            "group": "Kontrol pemungutan suara posting",
+            "upvotes": "{{default}} suka",
+            "downvotes": "{{default}} tidak suka",
+            "score": "Skor: {{default}}"
+        }
+    },
+    "stats": {
+        "joined": "Bergabung",
+        "created": "Dibuat"
+    }
+}

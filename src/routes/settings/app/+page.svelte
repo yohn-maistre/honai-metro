@@ -40,6 +40,7 @@
   import ToggleSetting from '../ToggleSetting.svelte'
   import Filter from './Filter.svelte'
 
+  // ETNOS: only show active languages, upstream entries commented out below
   let localeMap: Map<
     string,
     {
@@ -47,24 +48,27 @@
     }
   > = new Map([
     ['en', { name: 'English' }],
-    ['ar', { name: 'العربية' }],
-    ['he', { name: 'עברית' }],
-    ['bg', { name: 'български' }],
-    ['de', { name: 'Deutsch' }],
-    ['es', { name: 'Español' }],
-    ['et', { name: 'eesti keel' }],
-    ['fi', { name: 'suomi' }],
-    ['fr', { name: 'Français' }],
-    ['hu', { name: 'Magyar' }],
-    ['ja', { name: '日本語' }],
-    ['nl', { name: 'Nederlands' }],
-    ['pl', { name: 'Polski' }],
-    ['pt', { name: 'Português (PT)' }],
-    ['pt-BR', { name: 'Português (BR)' }],
-    ['tr', { name: 'Türkçe' }],
-    ['ru', { name: 'Русский' }],
-    ['zh-Hans', { name: '简体中文' }],
-    ['zh-Hant', { name: '繁體中文' }],
+    ['id', { name: 'Bahasa Indonesia' }],
+    ['pmy', { name: 'Melayu Papua' }],
+    // ETNOS: upstream languages — uncomment to re-enable
+    // ['ar', { name: 'العربية' }],
+    // ['he', { name: 'עברית' }],
+    // ['bg', { name: 'български' }],
+    // ['de', { name: 'Deutsch' }],
+    // ['es', { name: 'Español' }],
+    // ['et', { name: 'eesti keel' }],
+    // ['fi', { name: 'suomi' }],
+    // ['fr', { name: 'Français' }],
+    // ['hu', { name: 'Magyar' }],
+    // ['ja', { name: '日本語' }],
+    // ['nl', { name: 'Nederlands' }],
+    // ['pl', { name: 'Polski' }],
+    // ['pt', { name: 'Português (PT)' }],
+    // ['pt-BR', { name: 'Português (BR)' }],
+    // ['tr', { name: 'Türkçe' }],
+    // ['ru', { name: 'Русский' }],
+    // ['zh-Hans', { name: '简体中文' }],
+    // ['zh-Hant', { name: '繁體中文' }],
   ])
 </script>
 

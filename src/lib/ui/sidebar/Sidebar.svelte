@@ -10,7 +10,9 @@
   import { Badge, Expandable, Option, Select } from 'mono-svelte'
   import {
     ArrowLeftOnRectangle,
+    BookOpen,
     Bookmark,
+    ChartBarSquare,
     ChevronUpDown,
     Cog6Tooth,
     ComputerDesktop,
@@ -86,6 +88,10 @@
       icon={UserGroup}
     />
   {/if}
+  <!-- ETNOS: custom pages -->
+  <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
+  <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
+  <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
   <EndPlaceholder margin="sm" size="xs">{$t('nav.menu.app')}</EndPlaceholder>
   <SidebarButton
     href="/settings"

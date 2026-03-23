@@ -180,7 +180,7 @@ export const defaultSettings: Settings = {
     autosubmitAutofill: false,
   },
   infiniteScroll: true,
-  language: env.PUBLIC_LANGUAGE ?? null,
+  language: env.PUBLIC_LANGUAGE ?? 'id', // ETNOS: default to Indonesian
   useRtl: false,
   parseTags: true,
   logoColorMonth: null,

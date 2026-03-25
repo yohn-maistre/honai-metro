@@ -64,8 +64,17 @@
   {/if}
 {/snippet}
 
+<!-- ETNOS: custom pages (top of menu) -->
+<MenuDivider>ETNOS</MenuDivider>
+<MenuButton href="/wiki" icon={BookOpen}>
+  Wiki
+</MenuButton>
+<MenuButton href="/dashboard" icon={ChartBarSquare}>
+  Dashboard
+</MenuButton>
 {#if profile.current?.jwt}
   {@const notifications = profile.inbox.notifications}
+  <MenuDivider>{$t('profile.profile')}</MenuDivider>
   <MenuButton href="/inbox" icon={Inbox}>
     {$t('profile.inbox')}
     {#if notifications.inbox > 0}
@@ -90,7 +99,6 @@
       {/snippet}
     </MenuButton>
   {/if}
-  <MenuDivider>{$t('profile.profile')}</MenuDivider>
   <MenuButton href="/profile" icon={UserCircle}>
     {$t('profile.profile')}
   </MenuButton>
@@ -107,14 +115,6 @@
 {/if}
 <MenuButton href="/accounts" icon={UserGroup}>
   {$t('account.accounts')}
-</MenuButton>
-<!-- ETNOS: custom pages -->
-<MenuDivider>ETNOS</MenuDivider>
-<MenuButton href="/wiki" icon={BookOpen}>
-  Wiki
-</MenuButton>
-<MenuButton href="/dashboard" icon={ChartBarSquare}>
-  Dashboard
 </MenuButton>
 <MenuDivider>{$t('nav.menu.app')}</MenuDivider>
 <MenuButton href="/settings" icon={Cog6Tooth}>

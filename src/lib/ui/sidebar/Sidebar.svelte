@@ -44,10 +44,6 @@
   class={['flex flex-col overflow-auto gap-1', clazz]}
   {style}
 >
-  <!-- ETNOS: custom pages -->
-  <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
-  <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
-  <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
   <ProfileSelection
     selectable={!(
       LINKED_INSTANCE_URL &&
@@ -56,6 +52,10 @@
     )}
     profiles={profile.meta.profiles}
   />
+  <!-- ETNOS: custom pages -->
+  <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
+  <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
+  <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
   <EndPlaceholder margin="sm" size="xs">{$t('profile.profile')}</EndPlaceholder>
   {#if profile.current?.jwt}
     {@const notifications = profile.inbox.notifications}

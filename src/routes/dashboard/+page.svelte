@@ -8,7 +8,7 @@
     ChatBubbleLeftRight,
     GlobeAmericas,
     AcademicCap,
-    BankNotes,
+    Banknotes,
     BuildingOffice2,
   } from 'svelte-hero-icons/dist'
 
@@ -29,7 +29,7 @@
   const dataCategories = [
     { label: 'Pendidikan', icon: AcademicCap, color: 'text-blue-500',
       desc: 'Angka partisipasi sekolah, literasi, jumlah guru & sekolah' },
-    { label: 'Ekonomi & APBD', icon: BankNotes, color: 'text-green-500',
+    { label: 'Ekonomi & APBD', icon: Banknotes, color: 'text-green-500',
       desc: 'Alokasi APBD, dana OTSUS, investasi, PDRB' },
     { label: 'Infrastruktur', icon: BuildingOffice2, color: 'text-orange-500',
       desc: 'Jalan, listrik, air bersih, telekomunikasi' },

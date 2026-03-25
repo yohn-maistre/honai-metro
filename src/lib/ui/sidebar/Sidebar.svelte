@@ -44,6 +44,10 @@
   class={['flex flex-col overflow-auto gap-1', clazz]}
   {style}
 >
+  <!-- ETNOS: custom pages -->
+  <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
+  <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
+  <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
   <ProfileSelection
     selectable={!(
       LINKED_INSTANCE_URL &&
@@ -88,10 +92,6 @@
       icon={UserGroup}
     />
   {/if}
-  <!-- ETNOS: custom pages -->
-  <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
-  <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
-  <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
   <EndPlaceholder margin="sm" size="xs">{$t('nav.menu.app')}</EndPlaceholder>
   <SidebarButton
     href="/settings"

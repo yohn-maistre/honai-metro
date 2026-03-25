@@ -19,8 +19,10 @@
   } from 'mono-svelte'
   import {
     ArrowLeftOnRectangle,
+    BookOpen,
     Bookmark,
     BugAnt,
+    ChartBarSquare,
     CodeBracketSquare,
     Cog6Tooth,
     CommandLine,
@@ -105,6 +107,14 @@
 {/if}
 <MenuButton href="/accounts" icon={UserGroup}>
   {$t('account.accounts')}
+</MenuButton>
+<!-- ETNOS: custom pages -->
+<MenuDivider>ETNOS</MenuDivider>
+<MenuButton href="/wiki" icon={BookOpen}>
+  Wiki
+</MenuButton>
+<MenuButton href="/dashboard" icon={ChartBarSquare}>
+  Dashboard
 </MenuButton>
 <MenuDivider>{$t('nav.menu.app')}</MenuDivider>
 <MenuButton href="/settings" icon={Cog6Tooth}>

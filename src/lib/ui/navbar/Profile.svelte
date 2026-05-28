@@ -23,9 +23,12 @@
     Bookmark,
     BugAnt,
     ChartBarSquare,
+    ChatBubbleLeftRight,
     CodeBracketSquare,
     Cog6Tooth,
     CommandLine,
+    CpuChip,
+    GlobeAmericas,
     InformationCircle,
     ComputerDesktop,
     Icon,
@@ -70,8 +73,20 @@
 <MenuButton href="/wiki" icon={BookOpen}>
   Wiki
 </MenuButton>
+<MenuButton href="/jelajah" icon={GlobeAmericas}>
+  {$t('etnos.nav.jelajah')}
+</MenuButton>
+<MenuButton href="/bahasa" icon={ChatBubbleLeftRight}>
+  {$t('etnos.nav.bahasa')}
+</MenuButton>
 <MenuButton href="/dashboard" icon={ChartBarSquare}>
   Dashboard
+</MenuButton>
+<MenuButton href="/registry" icon={CommandLine}>
+  {$t('etnos.nav.registry')}
+</MenuButton>
+<MenuButton href="/c/ai-updates" icon={CpuChip}>
+  Agen AI
 </MenuButton>
 <MenuButton href="/tentang" icon={InformationCircle}>
   {$t('etnos.nav.tentang')}

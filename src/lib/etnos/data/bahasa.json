@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "description": "Papuan languages directory. Speaker counts approximate (Ethnologue / Badan Bahasa).",
+    "demo": true
+  },
+  "languages": [
+    {
+      "name": "Papuan Malay",
+      "native": "Bahasa Melayu Papua",
+      "speakers": "~1.5 juta",
+      "region": "Lingua franca seluruh Tanah Papua",
+      "family": "Austronesia (kreol Melayu)",
+      "slug": "papuan-malay",
+      "status": "vital"
+    },
+    {
+      "name": "Dani",
+      "native": "Hubula",
+      "speakers": "~250.000",
+      "region": "Lembah Baliem, Jayawijaya",
+      "family": "Trans-New Guinea",
+      "slug": "dani",
+      "status": "vital"
+    },
+    {
+      "name": "Mee (Ekagi)",
+      "native": "Mee Madü",
+      "speakers": "~100.000",
+      "region": "Dataran tinggi Paniai, Dogiyai, Deiyai",
+      "family": "Trans-New Guinea (Wissel Lakes)",
+      "slug": "mee",
+      "status": "vital"
+    },
+    {
+      "name": "Biak",
+      "native": "Vavyer Mansren",
+      "speakers": "~70.000",
+      "region": "Kepulauan Biak-Numfor",
+      "family": "Austronesia (Halmahera-Cenderawasih)",
+      "slug": "biak",
+      "status": "definitely_endangered"
+    },
+    {
+      "name": "Asmat",
+      "native": "Asmat",
+      "speakers": "~70.000",
+      "region": "Pantai selatan Papua",
+      "family": "Trans-New Guinea (Asmat-Kamoro)",
+      "slug": "asmat",
+      "status": "definitely_endangered"
+    },
+    {
+      "name": "Sentani",
+      "native": "Buyaka",
+      "speakers": "~30.000",
+      "region": "Danau Sentani, Jayapura",
+      "family": "Sentani",
+      "slug": "sentani",
+      "status": "definitely_endangered"
+    },
+    {
+      "name": "Yali",
+      "native": "Yali",
+      "speakers": "~30.000",
+      "region": "Pegunungan Bintang & Yahukimo",
+      "family": "Trans-New Guinea",
+      "slug": "yali",
+      "status": "definitely_endangered"
+    },
+    {
+      "name": "Kombai",
+      "native": "Kombai",
+      "speakers": "~4.000",
+      "region": "Dataran rendah selatan Papua",
+      "family": "Awyu-Dumut",
+      "slug": "kombai",
+      "status": "severely_endangered"
+    },
+    {
+      "name": "Korowai",
+      "native": "Kolufaup",
+      "speakers": "~3.000",
+      "region": "Mappi & Boven Digoel",
+      "family": "Awyu-Dumut",
+      "slug": "korowai",
+      "status": "severely_endangered"
+    }
+  ]
+}

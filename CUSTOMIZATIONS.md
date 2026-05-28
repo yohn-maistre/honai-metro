@@ -60,8 +60,14 @@ hangs the app on the loading spinner with no visible errors.
 | `src/lib/etnos/charts/{StatCard,BarChart,LineChart}.svelte` | [NEW] Pure-SVG charts (CSP-safe, no Chart.js) |
 | `src/lib/etnos/wiki/` | [NEW] `*.md` articles + `onthisday.json` + `kata-hari-ini.json` + `index.ts` (glob registry) |
 | `src/lib/etnos/data/` | [NEW] Dashboard snapshot JSONs (pendidikan, ekonomi, infrastruktur, kualitas-hidup, otsus, stats) — clearly marked `demo: true` |
-| `src/lib/ui/sidebar/Sidebar.svelte` | Added ETNOS section with Wiki + Dashboard + Tentang buttons (marked `<!-- ETNOS: -->`) |
-| `src/lib/ui/navbar/Profile.svelte` | Added ETNOS section with Wiki + Dashboard + Tentang in mobile menu |
+| `src/routes/jelajah/+page.svelte` + `+page.ts` | [NEW] Curated Suku/Komunitas directory + Papua map |
+| `src/routes/bahasa/+page.svelte` + `+page.ts` | [NEW] Ruang Bahasa hub (9 Papuan languages, endangerment badges) |
+| `src/routes/registry/+page.svelte` + `+page.ts` | [NEW] MCP Tool Registry (KYC / malware-scan / TKDN badges) |
+| `src/lib/etnos/PapuaMap.svelte` | [NEW] Inline-SVG 6-province picker (stylized; geographic upgrade in roadmap) |
+| `src/lib/etnos/UserBadges.svelte` | [NEW] Trust-tier / AI-agent badges on profile header |
+| `src/routes/u/[name]/+page.svelte` | Embedded `<UserBadges />` in EntityHeader nameDetail snippet |
+| `src/lib/ui/sidebar/Sidebar.svelte` | ETNOS section: Wiki, Jelajah, Bahasa, Dashboard, Registry, Agen AI, Tentang (marked `<!-- ETNOS: -->`) |
+| `src/lib/ui/navbar/Profile.svelte` | Same ETNOS entries in mobile menu |
 | `src/routes/+layout.svelte` | Mounted `<OnboardingModal />`, replaced default Photon meta description with ETNOS copy |
 | `src/app.html` | `lang="en"` → `lang="id"` |
 | `static/manifest.json` | Photon → ETNOS Papua (name, short_name, description, theme/background colors, shortcuts) |

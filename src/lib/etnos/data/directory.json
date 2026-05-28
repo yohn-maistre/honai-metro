@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "description": "Curated community directory grouped by purpose. Demo data — replace with real communities present on the backing PieFed instance once seeded.",
+    "demo": true
+  },
+  "groups": [
+    {
+      "category": "Bahasa",
+      "icon": "💬",
+      "description": "Komunitas pelestarian bahasa daerah",
+      "communities": [
+        { "name": "Bahasa Mee", "slug": "bahasa-mee", "subtitle": "Mee (Ekagi) · dataran tinggi Paniai" },
+        { "name": "Bahasa Dani", "slug": "bahasa-dani", "subtitle": "Dani · Lembah Baliem" },
+        { "name": "Bahasa Sentani", "slug": "bahasa-sentani", "subtitle": "Sentani · Jayapura" },
+        { "name": "Bahasa Biak", "slug": "bahasa-biak", "subtitle": "Biak · Kepulauan Biak-Numfor" },
+        { "name": "Papuan Malay", "slug": "papuan-malay", "subtitle": "Melayu Papua · lingua franca" }
+      ]
+    },
+    {
+      "category": "Adat",
+      "icon": "🏠",
+      "description": "Ruang komunitas adat & Dewan Adat",
+      "communities": [
+        { "name": "Dewan Adat Mee", "slug": "dewan-adat-mee", "subtitle": "Komunitas Mee" },
+        { "name": "Dewan Adat Dani", "slug": "dewan-adat-dani", "subtitle": "Komunitas Dani" },
+        { "name": "Hutan Adat Papua", "slug": "hutan-adat", "subtitle": "Pengelolaan hutan komunal" }
+      ]
+    },
+    {
+      "category": "Pemerintah",
+      "icon": "🏛️",
+      "description": "Layanan & informasi pemerintahan",
+      "communities": [
+        { "name": "Kelurahan Papua", "slug": "kelurahan-papua", "subtitle": "Diskusi pelayanan publik desa/kelurahan" },
+        { "name": "Puskesmas", "slug": "puskesmas-papua", "subtitle": "Tenaga kesehatan & SATUSEHAT" },
+        { "name": "OTSUS Tracker", "slug": "otsus", "subtitle": "Transparansi dana otsus" },
+        { "name": "BPP Pertanian", "slug": "bpp-papua", "subtitle": "Penyuluh pertanian" }
+      ]
+    },
+    {
+      "category": "Wiki",
+      "icon": "📚",
+      "description": "Kontribusi wiki & dokumentasi",
+      "communities": [
+        { "name": "Wiki Papua", "slug": "wiki", "subtitle": "Sumber kolaboratif tentang Tanah Papua" },
+        { "name": "Sejarah Lisan", "slug": "sejarah-lisan", "subtitle": "Cerita & kesaksian dari tetua" }
+      ]
+    },
+    {
+      "category": "AI",
+      "icon": "🤖",
+      "description": "Agen AI & pembaruan otomatis",
+      "communities": [
+        { "name": "AI Updates", "slug": "ai-updates", "subtitle": "Ringkasan otomatis dari agen AI" },
+        { "name": "MCP Registry", "slug": "mcp-registry", "subtitle": "Diskusi alat MCP terverifikasi" }
+      ]
+    }
+  ]
+}

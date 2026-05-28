@@ -2,6 +2,7 @@
   import { page } from '$app/state'
   import { t } from '$lib/app/i18n'
   import { communityLink } from '$lib/app/util.svelte'
+  import UserBadges from '$lib/etnos/UserBadges.svelte'
   import CommentItem from '$lib/feature/comment/CommentItem.svelte'
   import Sort from '$lib/feature/filter/Sort.svelte'
   import { isCommentView } from '$lib/feature/legacy/item'
@@ -67,14 +68,18 @@
           ]}
         >
           {#snippet nameDetail()}
-            <span class="text-sm flex gap-0 items-center w-max">
-              @
-              <UserLink
-                showInstance
-                user={data.person_view.value.person}
-                displayName={false}
-                class="font-normal"
-              />
+            <span class="text-sm flex flex-wrap gap-2 items-center w-max">
+              <span class="flex gap-0 items-center">
+                @
+                <UserLink
+                  showInstance
+                  user={data.person_view.value.person}
+                  displayName={false}
+                  class="font-normal"
+                />
+              </span>
+              <!-- ETNOS: trust-tier / role badges -->
+              <UserBadges person={data.person_view.value.person} />
             </span>
           {/snippet}
           {#if (data.moderates.value ?? []).length > 0}

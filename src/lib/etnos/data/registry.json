@@ -1,0 +1,93 @@
+{
+  "_meta": {
+    "description": "Verified MCP tool registry. Static demo data — to be backed by a real tool review pipeline. Per memo §5.6 + §6.4.",
+    "demo": true,
+    "policies": {
+      "kyc": "Pengembang terverifikasi (PT/badan hukum atau identitas individu).",
+      "malware_scan": "Lulus pemindaian statis & dinamis pada CI pipeline.",
+      "tkdn": "Tingkat Komponen Dalam Negeri ≥ ambang batas (Permenperin)."
+    }
+  },
+  "tools": [
+    {
+      "name": "satusehat-bridge",
+      "developer": "PT Abstraksi Data & Kognitek",
+      "category": "Kesehatan",
+      "description": "MCP server untuk FHIR SATUSEHAT — observasi, encounter, kondisi, prosedur.",
+      "version": "0.4.1",
+      "license": "AGPL-3.0",
+      "repo": "https://example.org/abstraksi/satusehat-bridge",
+      "badges": ["kyc", "malware_scan", "tkdn"]
+    },
+    {
+      "name": "siskeudes-bridge",
+      "developer": "PT Abstraksi Data & Kognitek",
+      "category": "Civic / Desa",
+      "description": "Computer-use bridge untuk Sistem Keuangan Desa (SISKEUDES).",
+      "version": "0.2.0",
+      "license": "AGPL-3.0",
+      "repo": "https://example.org/abstraksi/siskeudes-bridge",
+      "badges": ["kyc", "malware_scan"]
+    },
+    {
+      "name": "opensid-tools",
+      "developer": "Komunitas OpenDesa",
+      "category": "Civic / Desa",
+      "description": "Skill pack OpenSID: surat domisili, SKTM, surat pengantar.",
+      "version": "1.1.0",
+      "license": "GPL-3.0",
+      "repo": "https://example.org/opendesa/opensid-tools",
+      "badges": ["kyc", "malware_scan", "tkdn"]
+    },
+    {
+      "name": "bsr e-meterai",
+      "developer": "PT Abstraksi Data & Kognitek",
+      "category": "Identitas & tanda tangan",
+      "description": "Wrapper API Peruri e-meterai + BSrE BSSN dengan audit trail.",
+      "version": "0.3.0",
+      "license": "AGPL-3.0",
+      "repo": "https://example.org/abstraksi/bsre-emeterai",
+      "badges": ["kyc", "malware_scan", "tkdn"]
+    },
+    {
+      "name": "dukcapil-lookup",
+      "developer": "PT Abstraksi Data & Kognitek",
+      "category": "Identitas & tanda tangan",
+      "description": "NIK lookup via Privy/Verihubs sesuai PERMENDAGRI 102/2019.",
+      "version": "0.2.1",
+      "license": "AGPL-3.0",
+      "repo": "https://example.org/abstraksi/dukcapil-lookup",
+      "badges": ["kyc", "malware_scan", "tkdn"]
+    },
+    {
+      "name": "bps-papua-fetcher",
+      "developer": "Universitas Cenderawasih",
+      "category": "Data publik",
+      "description": "Ambil data statistik provinsi Papua via API BPS.",
+      "version": "0.1.0",
+      "license": "MIT",
+      "repo": "https://example.org/uncen/bps-papua-fetcher",
+      "badges": ["kyc", "malware_scan"]
+    },
+    {
+      "name": "wikipedia-id",
+      "developer": "Komunitas",
+      "category": "Wiki / referensi",
+      "description": "Pengambil artikel id.wikipedia.org untuk konteks RAG.",
+      "version": "0.5.0",
+      "license": "MIT",
+      "repo": "https://example.org/komunitas/wikipedia-id",
+      "badges": ["malware_scan"]
+    },
+    {
+      "name": "simluhtan-bridge",
+      "developer": "PT Abstraksi Data & Kognitek",
+      "category": "Pertanian",
+      "description": "Bridge SIMLUHTAN untuk penyuluh pertanian (Aksara Go).",
+      "version": "0.1.0",
+      "license": "AGPL-3.0",
+      "repo": "https://example.org/abstraksi/simluhtan-bridge",
+      "badges": ["kyc", "malware_scan"]
+    }
+  ]
+}

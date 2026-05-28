@@ -18,6 +18,7 @@
     ComputerDesktop,
     Icon,
     Identification,
+    InformationCircle,
     Inbox,
     Moon,
     Sun,
@@ -56,6 +57,11 @@
   <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
   <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
   <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
+  <SidebarButton
+    href="/tentang"
+    label={$t('etnos.nav.tentang')}
+    icon={InformationCircle}
+  />
   <EndPlaceholder margin="sm" size="xs">{$t('profile.profile')}</EndPlaceholder>
   {#if profile.current?.jwt}
     {@const notifications = profile.inbox.notifications}

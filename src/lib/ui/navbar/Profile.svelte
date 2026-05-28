@@ -26,6 +26,7 @@
     CodeBracketSquare,
     Cog6Tooth,
     CommandLine,
+    InformationCircle,
     ComputerDesktop,
     Icon,
     Identification,
@@ -71,6 +72,9 @@
 </MenuButton>
 <MenuButton href="/dashboard" icon={ChartBarSquare}>
   Dashboard
+</MenuButton>
+<MenuButton href="/tentang" icon={InformationCircle}>
+  {$t('etnos.nav.tentang')}
 </MenuButton>
 {#if profile.current?.jwt}
   {@const notifications = profile.inbox.notifications}

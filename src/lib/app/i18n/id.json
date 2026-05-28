@@ -904,5 +904,77 @@
     "stats": {
         "joined": "Bergabung",
         "created": "Dibuat"
+    },
+    "etnos": {
+        "onboarding": {
+            "title": "Selamat datang di ETNOS",
+            "intro": "Ruang publik komunitas Melanesia — forum, wiki, dan data publik berfederasi per-provinsi.",
+            "b1": "Komunitas per suku & bahasa. Bergabung, baca, ikut diskusi.",
+            "b2": "Wiki Papua: tempat, sejarah, biodiversitas, suku & bahasa, kuliner.",
+            "b3": "Dashboard publik: APBD, OTSUS, pendidikan, infrastruktur.",
+            "b4": "Federasi peer-to-peer — terhubung ke ETNOS provinsi lain via ActivityPub.",
+            "more": "Pelajari selengkapnya",
+            "start": "Mulai jelajah"
+        },
+        "nav": {
+            "tentang": "Tentang",
+            "jelajah": "Jelajah",
+            "registry": "Registry MCP",
+            "bahasa": "Ruang Bahasa"
+        },
+        "tentang": {
+            "title": "Tentang ETNOS"
+        },
+        "wiki": {
+            "today_in_history": "Hari Ini Dalam Sejarah Papua",
+            "word_of_day": "Kata Hari Ini",
+            "read_aloud": "Baca dengan suara",
+            "stop_reading": "Hentikan",
+            "categories": {
+                "tempat": "Tempat",
+                "sejarah": "Sejarah",
+                "biodiversitas": "Biodiversitas",
+                "suku_bahasa": "Suku & Bahasa",
+                "kuliner": "Kuliner"
+            }
+        },
+        "dashboard": {
+            "otsus": "OTSUS Tracker",
+            "data_source": "Sumber data"
+        },
+        "directory": {
+            "title": "Jelajah Komunitas",
+            "subtitle": "Komunitas Papua dikelompokkan per suku, wilayah, dan tujuan",
+            "filter": {
+                "all": "Semua",
+                "bahasa": "Bahasa",
+                "adat": "Adat",
+                "pemerintah": "Pemerintah",
+                "wiki": "Wiki",
+                "ai": "AI"
+            }
+        },
+        "registry": {
+            "title": "Registry MCP",
+            "subtitle": "Direktori alat AI terverifikasi",
+            "badge": {
+                "kyc": "KYC",
+                "malware_scan": "Malware-scan",
+                "tkdn": "TKDN"
+            }
+        },
+        "bahasa": {
+            "title": "Ruang Bahasa",
+            "subtitle": "Pelestarian bahasa daerah Papua",
+            "contribute": "Kontribusi"
+        },
+        "badge": {
+            "verified_ktp": "Terverifikasi KTP",
+            "vouched": "Didukung komunitas",
+            "ai_agent": "Agen AI"
+        },
+        "feed": {
+            "ai": "AI"
+        }
     }
 }

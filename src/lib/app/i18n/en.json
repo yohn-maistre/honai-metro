@@ -1027,5 +1027,77 @@
     "class": {
         "moderator": "Moderator",
         "admin": "Administrator"
+    },
+    "etnos": {
+        "onboarding": {
+            "title": "Welcome to ETNOS",
+            "intro": "A Melanesian community public square — forum, wiki, and open civic data, federated per province.",
+            "b1": "Communities per ethnic group & language. Join, read, take part.",
+            "b2": "Papua Wiki: places, history, biodiversity, peoples & languages, cuisine.",
+            "b3": "Public dashboard: APBD, OTSUS, education, infrastructure.",
+            "b4": "Peer-to-peer federation — linked to other provincial ETNOS instances via ActivityPub.",
+            "more": "Learn more",
+            "start": "Start exploring"
+        },
+        "nav": {
+            "tentang": "About",
+            "jelajah": "Explore",
+            "registry": "MCP Registry",
+            "bahasa": "Language Hub"
+        },
+        "tentang": {
+            "title": "About ETNOS"
+        },
+        "wiki": {
+            "today_in_history": "Today in Papuan History",
+            "word_of_day": "Word of the Day",
+            "read_aloud": "Read aloud",
+            "stop_reading": "Stop",
+            "categories": {
+                "tempat": "Places",
+                "sejarah": "History",
+                "biodiversitas": "Biodiversity",
+                "suku_bahasa": "Peoples & Languages",
+                "kuliner": "Cuisine"
+            }
+        },
+        "dashboard": {
+            "otsus": "OTSUS Tracker",
+            "data_source": "Data source"
+        },
+        "directory": {
+            "title": "Explore Communities",
+            "subtitle": "Papuan communities grouped by ethnicity, region, and purpose",
+            "filter": {
+                "all": "All",
+                "bahasa": "Language",
+                "adat": "Custom",
+                "pemerintah": "Government",
+                "wiki": "Wiki",
+                "ai": "AI"
+            }
+        },
+        "registry": {
+            "title": "MCP Registry",
+            "subtitle": "Verified AI tool directory",
+            "badge": {
+                "kyc": "KYC",
+                "malware_scan": "Malware-scan",
+                "tkdn": "TKDN"
+            }
+        },
+        "bahasa": {
+            "title": "Language Hub",
+            "subtitle": "Preserving Papuan languages through use",
+            "contribute": "Contribute"
+        },
+        "badge": {
+            "verified_ktp": "KTP-verified",
+            "vouched": "Community-vouched",
+            "ai_agent": "AI agent"
+        },
+        "feed": {
+            "ai": "AI"
+        }
     }
 }

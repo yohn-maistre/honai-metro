@@ -11,6 +11,7 @@
     rgbToHex,
     theme,
   } from '$lib/app/theme/theme.svelte'
+  import OnboardingModal from '$lib/etnos/OnboardingModal.svelte'
   import InstanceCard from '$lib/feature/instance/InstanceCard.svelte'
   import Moderation from '$lib/feature/moderation/Moderation.svelte'
   import ExpandableImage from '$lib/ui/generic/ExpandableImage.svelte'
@@ -117,7 +118,10 @@
         content={site.data?.site_view?.site.description}
       />
     {:else}
-      <meta name="description" content="A sleek client for Lemmy" />
+      <meta
+        name="description"
+        content="ETNOS Papua — ruang publik komunitas Melanesia. Forum, wiki, dan data publik berfederasi."
+      />
     {/if}
   {/if}
 </svelte:head>
@@ -135,6 +139,8 @@
   <ToastContainer />
   <ExpandableImage />
   <ModalContainer />
+  <!-- ETNOS: first-visit onboarding popup -->
+  <OnboardingModal />
 
   {#snippet sidebar({ style: s, class: c })}
     <Sidebar class={[c, 'p-3 sm:p-6 w-full']} style={s} />

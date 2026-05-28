@@ -1,6 +1,6 @@
 {
-  "short_name": "Photon",
-  "name": "Photon",
+  "short_name": "ETNOS",
+  "name": "ETNOS Papua",
   "start_url": "/",
   "icons": [
     {
@@ -16,11 +16,11 @@
       "purpose": "any"
     }
   ],
-  "background_color": "#000000",
+  "background_color": "#1c0707",
   "display": "standalone",
   "scope": "/",
-  "theme_color": "#000000",
-  "description": "A Svelte based web client for Lemmy.",
+  "theme_color": "#6c5e42",
+  "description": "ETNOS Papua — ruang publik komunitas Melanesia. Forum, wiki, dan data publik berfederasi.",
   "screenshots": [
     {
       "form_factor": "wide",
@@ -38,16 +38,16 @@
   ],
   "shortcuts": [
     {
+      "name": "Wiki",
+      "url": "/wiki"
+    },
+    {
+      "name": "Dashboard",
+      "url": "/dashboard"
+    },
+    {
       "name": "Inbox",
       "url": "/inbox"
-    },
-    {
-      "name": "Create post",
-      "url": "/create/post"
-    },
-    {
-      "name": "Profile",
-      "url": "/profile/user"
     }
   ],
   "share_target": {
@@ -59,5 +59,5 @@
       "url": "localize"
     }
   },
-  "categories": ["entertainment", "news", "social"]
+  "categories": ["news", "social", "education"]
 }

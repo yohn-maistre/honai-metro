@@ -52,7 +52,14 @@ hangs the app on the loading spinner with no visible errors.
 |------|-----------|
 | `src/routes/wiki/+page.svelte` | [NEW] Wiki page with placeholder content |
 | `src/routes/dashboard/+page.svelte` | [NEW] Dashboard page with placeholder cards |
-| `src/lib/ui/sidebar/Sidebar.svelte` | Added ETNOS section with Wiki + Dashboard buttons (marked `<!-- ETNOS: -->`) |
+| `src/routes/tentang/+page.svelte` | [NEW] Thin About page (mission, trust tiers, Abstraksi) |
+| `src/lib/etnos/OnboardingModal.svelte` | [NEW] First-visit popup (localStorage-gated) |
+| `src/lib/ui/sidebar/Sidebar.svelte` | Added ETNOS section with Wiki + Dashboard + Tentang buttons (marked `<!-- ETNOS: -->`) |
+| `src/lib/ui/navbar/Profile.svelte` | Added ETNOS section with Wiki + Dashboard + Tentang in mobile menu |
+| `src/routes/+layout.svelte` | Mounted `<OnboardingModal />`, replaced default Photon meta description with ETNOS copy |
+| `src/app.html` | `lang="en"` → `lang="id"` |
+| `static/manifest.json` | Photon → ETNOS Papua (name, short_name, description, theme/background colors, shortcuts) |
+| `.env.example` | [NEW] Documents `PUBLIC_INSTANCE_URL`, `PUBLIC_INSTANCE_TYPE`, language, etc. Default → `piefed.social` / `piefedalpha` |
 
 ## Instance Configuration
 

@@ -1,0 +1,25 @@
+{
+  "title": "Ekonomi & APBD",
+  "subtitle": "Alokasi APBD, dana OTSUS, investasi, PDRB",
+  "source": "BPS, Kementerian Keuangan (data demo)",
+  "updated": "2025-01-01",
+  "demo": true,
+  "stats": [
+    { "label": "PDRB per Kapita", "value": "82.4", "unit": "jt Rp" },
+    { "label": "APBD Provinsi", "value": "11.7", "unit": "T Rp" },
+    { "label": "Realisasi Investasi 2024", "value": "9.8", "unit": "T Rp" },
+    { "label": "Pertumbuhan Ekonomi", "value": "4.2", "unit": "%" }
+  ],
+  "bars": {
+    "title": "Alokasi APBD per sektor (estimasi)",
+    "unit": "% APBD",
+    "data": [
+      { "label": "Pendidikan", "value": 22 },
+      { "label": "Kesehatan", "value": 14 },
+      { "label": "Infrastruktur", "value": 28 },
+      { "label": "Ekonomi", "value": 11 },
+      { "label": "Sosial", "value": 9 },
+      { "label": "Lain", "value": 16 }
+    ]
+  }
+}

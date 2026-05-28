@@ -1,0 +1,34 @@
+{
+  "title": "Pendidikan",
+  "subtitle": "Angka partisipasi, literasi, guru, sekolah",
+  "source": "BPS Provinsi Papua (data demo, akan disambungkan via API)",
+  "updated": "2025-01-01",
+  "demo": true,
+  "stats": [
+    { "label": "Angka Melek Huruf 15+", "value": "78.6", "unit": "%" },
+    { "label": "Rata-rata Lama Sekolah", "value": "7.2", "unit": "thn" },
+    { "label": "Jumlah Guru SD", "value": "23k", "unit": "" },
+    { "label": "Jumlah Sekolah", "value": "4.1k", "unit": "" }
+  ],
+  "bars": {
+    "title": "Angka Partisipasi Murni per jenjang",
+    "unit": "%",
+    "data": [
+      { "label": "SD/MI", "value": 92.5 },
+      { "label": "SMP/MTs", "value": 71.4 },
+      { "label": "SMA/MA/SMK", "value": 58.3 }
+    ]
+  },
+  "line": {
+    "title": "Tren Angka Melek Huruf",
+    "unit": "%",
+    "data": [
+      { "x": "2019", "y": 75.4 },
+      { "x": "2020", "y": 76.1 },
+      { "x": "2021", "y": 76.8 },
+      { "x": "2022", "y": 77.5 },
+      { "x": "2023", "y": 78.0 },
+      { "x": "2024", "y": 78.6 }
+    ]
+  }
+}

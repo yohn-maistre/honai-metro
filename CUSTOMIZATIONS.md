@@ -50,10 +50,16 @@ hangs the app on the loading spinner with no visible errors.
 
 | File | What it is |
 |------|-----------|
-| `src/routes/wiki/+page.svelte` | [NEW] Wiki page with placeholder content |
-| `src/routes/dashboard/+page.svelte` | [NEW] Dashboard page with placeholder cards |
+| `src/routes/wiki/+page.svelte` + `+page.ts` | Wiki entry: WikiCarousel + category buttons → `/wiki/[cat]` |
+| `src/routes/wiki/[category]/+page.svelte` + `+page.ts` | [NEW] Dynamic category renderer (markdown) with TTS |
+| `src/routes/dashboard/+page.svelte` + `+page.ts` | Dashboard: real stats, SVG charts, OTSUS tracker |
 | `src/routes/tentang/+page.svelte` | [NEW] Thin About page (mission, trust tiers, Abstraksi) |
 | `src/lib/etnos/OnboardingModal.svelte` | [NEW] First-visit popup (localStorage-gated) |
+| `src/lib/etnos/WikiCarousel.svelte` | [NEW] Carousel: "Hari Ini Dalam Sejarah" + "Kata Hari Ini" + TTS |
+| `src/lib/etnos/tts.ts` | [NEW] SpeechSynthesis helper (zero dep, zero key) |
+| `src/lib/etnos/charts/{StatCard,BarChart,LineChart}.svelte` | [NEW] Pure-SVG charts (CSP-safe, no Chart.js) |
+| `src/lib/etnos/wiki/` | [NEW] `*.md` articles + `onthisday.json` + `kata-hari-ini.json` + `index.ts` (glob registry) |
+| `src/lib/etnos/data/` | [NEW] Dashboard snapshot JSONs (pendidikan, ekonomi, infrastruktur, kualitas-hidup, otsus, stats) — clearly marked `demo: true` |
 | `src/lib/ui/sidebar/Sidebar.svelte` | Added ETNOS section with Wiki + Dashboard + Tentang buttons (marked `<!-- ETNOS: -->`) |
 | `src/lib/ui/navbar/Profile.svelte` | Added ETNOS section with Wiki + Dashboard + Tentang in mobile menu |
 | `src/routes/+layout.svelte` | Mounted `<OnboardingModal />`, replaced default Photon meta description with ETNOS copy |

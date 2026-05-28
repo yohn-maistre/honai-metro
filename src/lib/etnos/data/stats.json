@@ -1,0 +1,10 @@
+{
+  "_meta": {
+    "description": "Top stat cards on the dashboard. Demo data — to be replaced via PieFed/Lemmy API calls (active users, posts today, communities) and BPS for language stats.",
+    "demo": true
+  },
+  "active_users": "1.2k",
+  "posts_today": "84",
+  "communities": "37",
+  "language_data": "12 bahasa"
+}

@@ -1,86 +1,76 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
-  import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
   import Markdown from '$lib/app/markdown/Markdown.svelte'
+  import WikiCarousel from '$lib/etnos/WikiCarousel.svelte'
+  import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
 
-  // ETNOS: Provincial Wiki page
-  // Each ETNOS deployment is per-province. This wiki showcases the province.
-  // Future: LLM-generated carousel header with "Today in History" facts,
-  //         content pulled from Wikipedia/community contributions,
-  //         refreshed daily for stories, one-time for articles unless updated.
-  const wikiContent = `
-## Selamat datang di Wiki Provinsi Papua 🏠
+  let { data } = $props()
 
-Wiki ini berisi informasi tentang Provinsi Papua — budaya, sejarah, bahasa, dan kekayaan alam.
+  // ETNOS: Provincial Wiki page.
+  // - Carousel: Hari Ini Dalam Sejarah Papua + Kata Hari Ini (TTS)
+  // - Category buttons link to /wiki/[category] (markdown rendered from
+  //   src/lib/etnos/wiki/*.md)
+  // - Future: enrich via Wikipedia API (id.wikipedia.org) in load fns,
+  //   community posts via c/wiki, LLM-refreshed carousel content.
 
-### 📍 Tempat Menarik
-- **Danau Sentani** — Danau terbesar di Papua dengan puluhan pulau kecil
-- **Taman Nasional Lorentz** — Situs Warisan Dunia UNESCO, rumah bagi gletser tropis
-- **Pantai Base-G** — Pantai bersejarah Perang Dunia II di Jayapura
-- **Lembah Baliem** — Lembah indah di dataran tinggi, rumah suku Dani
+  type CategoryKey =
+    | 'tempat'
+    | 'sejarah'
+    | 'biodiversitas'
+    | 'suku-bahasa'
+    | 'kuliner'
 
-### 📚 Sejarah
-Papua memiliki sejarah panjang yang dimulai jauh sebelum kedatangan bangsa Eropa.
-Masyarakat adat telah mendiami pulau ini selama puluhan ribu tahun dengan
-keragaman budaya yang luar biasa — lebih dari 250 bahasa daerah.
+  const categories: { slug: CategoryKey; emoji: string }[] = [
+    { slug: 'tempat', emoji: '📍' },
+    { slug: 'sejarah', emoji: '📚' },
+    { slug: 'biodiversitas', emoji: '🌿' },
+    { slug: 'suku-bahasa', emoji: '👥' },
+    { slug: 'kuliner', emoji: '🍲' },
+  ]
 
-### 🌿 Keanekaragaman Hayati
-Papua adalah rumah bagi burung cenderawasih, kanguru pohon, dan ribuan
-spesies tumbuhan yang tidak ditemukan di tempat lain di dunia.
+  const intro = `
+## Selamat datang di Wiki Papua 🏠
 
-### 👥 Suku dan Bahasa
-- **Mee (Ekagi)** — ~100.000 penutur, dataran tinggi
-- **Dani** — Lembah Baliem
-- **Sentani** — Pesisir Danau Sentani
-- **Biak** — Kepulauan Biak
+Wiki ini berisi informasi tentang Tanah Papua — budaya, sejarah, bahasa, dan
+kekayaan alam. Konten dirawat manual dan akan diperkaya dengan kontribusi
+komunitas melalui forum \`c/wiki\` serta data dari Wikipedia.
 
-### 🤝 Cara Berkontribusi
-1. **Berbicara** — Gunakan bahasa daerah Anda di forum ini
-2. **Menulis** — Tambahkan cerita tentang budaya dan sejarah
-3. **Memvalidasi** — Bantu periksa terjemahan dan konten
+Klik salah satu kategori di atas untuk mulai membaca, atau dengarkan
+**Hari Ini Dalam Sejarah** dan **Kata Hari Ini** di kartu sorotan.
 
----
-
-*Halaman ini masih dalam pengembangan.*
+### 🤝 Cara berkontribusi
+1. **Berbicara** — gunakan bahasa daerah Anda di forum komunitas.
+2. **Menulis** — tambah cerita tentang budaya dan sejarah lewat \`c/wiki\`.
+3. **Memvalidasi** — bantu periksa terjemahan dan konten.
 `
-
-  // ETNOS: Future plans (commented in for reference)
-  // - Carousel header: LLM-generated "Hari Ini Dalam Sejarah" facts
-  //   Refreshed daily. Could use Gemini/GPT to generate from Wikipedia data.
-  //   Component: src/lib/etnos/WikiCarousel.svelte
-  // - Wiki categories menu: Tempat, Sejarah, Biodiversitas, Suku & Bahasa, Kuliner
-  //   Each category links to a sub-route or filtered view
-  // - Content sources:
-  //   - id.wikipedia.org API for Papua articles
-  //   - Community posts tagged with c/wiki community
-  //   - Static markdown files in src/lib/etnos/wiki/
-  // - Interactive features via Lemmy:
-  //   - Each wiki article = a Lemmy post in c/wiki
-  //   - Comments = discussion, upvotes = validation
-  //   - Federates to other ETNOS provincial instances for free
 </script>
 
 <svelte:head>
-  <title>Wiki Papua</title>
+  <title>Wiki Papua — ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-4 max-w-full w-full">
-  <!-- ETNOS: Future carousel header goes here -->
-  <!-- <WikiCarousel /> — "Hari Ini Dalam Sejarah Papua" -->
+  <WikiCarousel history={data.todayHistory} word={data.todayWord} />
+
   <EndPlaceholder size="lg">Wiki Papua</EndPlaceholder>
 
-  <!-- ETNOS: Future category menu -->
   <div class="flex flex-wrap gap-2">
-    {#each ['📍 Tempat', '📚 Sejarah', '🌿 Biodiversitas', '👥 Suku & Bahasa', '🍲 Kuliner'] as cat}
-      <button class="px-3 py-1.5 rounded-xl text-sm font-medium
-                     bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300
-                     hover:bg-primary-100 hover:dark:bg-primary-900 transition-colors cursor-pointer">
-        {cat}
-      </button>
+    {#each categories as cat (cat.slug)}
+      <a
+        href="/wiki/{cat.slug}"
+        class="px-3 py-1.5 rounded-xl text-sm font-medium
+               bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300
+               hover:bg-primary-100 hover:dark:bg-primary-900 transition-colors"
+      >
+        {cat.emoji}
+        {$t(`etnos.wiki.categories.${cat.slug.replace(/-/g, '_')}`)}
+      </a>
     {/each}
   </div>
 
-  <div class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800">
-    <Markdown source={wikiContent} />
+  <div
+    class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
+  >
+    <Markdown source={intro} />
   </div>
 </div>

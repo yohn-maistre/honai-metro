@@ -1,0 +1,38 @@
+{
+  "title": "OTSUS Tracker",
+  "subtitle": "Transparansi alokasi & penggunaan dana Otonomi Khusus Papua",
+  "source": "Kementerian Keuangan & Pemprov (data demo)",
+  "updated": "2025-01-01",
+  "demo": true,
+  "regulation": "UU No. 2/2021 jo. UU No. 21/2001 — Otsus Papua",
+  "stats": [
+    { "label": "Total OTSUS 2024", "value": "8.6", "unit": "T Rp" },
+    { "label": "Realisasi", "value": "76.4", "unit": "%" },
+    { "label": "Pendidikan & Kesehatan (≥30%)", "value": "34.2", "unit": "%" },
+    { "label": "Pemberdayaan Adat", "value": "12.8", "unit": "%" }
+  ],
+  "bars": {
+    "title": "Alokasi OTSUS per sektor wajib (UU 2/2021)",
+    "unit": "% alokasi",
+    "data": [
+      { "label": "Pendidikan", "value": 19 },
+      { "label": "Kesehatan", "value": 15 },
+      { "label": "Infrastruktur dasar", "value": 26 },
+      { "label": "Pemberdayaan adat", "value": 13 },
+      { "label": "Pemberdayaan ekonomi", "value": 12 },
+      { "label": "Lain", "value": 15 }
+    ]
+  },
+  "line": {
+    "title": "Dana OTSUS per tahun (T Rp)",
+    "unit": "T",
+    "data": [
+      { "x": "2019", "y": 7.1 },
+      { "x": "2020", "y": 7.5 },
+      { "x": "2021", "y": 7.9 },
+      { "x": "2022", "y": 8.2 },
+      { "x": "2023", "y": 8.4 },
+      { "x": "2024", "y": 8.6 }
+    ]
+  }
+}

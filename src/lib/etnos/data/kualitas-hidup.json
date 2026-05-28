@@ -1,0 +1,25 @@
+{
+  "title": "Kualitas Hidup",
+  "subtitle": "IPM, kesehatan, harapan hidup, kemiskinan",
+  "source": "BPS Provinsi Papua (data demo)",
+  "updated": "2025-01-01",
+  "demo": true,
+  "stats": [
+    { "label": "IPM", "value": "62.1", "unit": "" },
+    { "label": "Harapan Hidup", "value": "65.8", "unit": "thn" },
+    { "label": "Tingkat Kemiskinan", "value": "26.8", "unit": "%" },
+    { "label": "Gini Ratio", "value": "0.39", "unit": "" }
+  ],
+  "line": {
+    "title": "Tren IPM Provinsi",
+    "unit": "",
+    "data": [
+      { "x": "2019", "y": 60.8 },
+      { "x": "2020", "y": 60.4 },
+      { "x": "2021", "y": 60.6 },
+      { "x": "2022", "y": 61.2 },
+      { "x": "2023", "y": 61.7 },
+      { "x": "2024", "y": 62.1 }
+    ]
+  }
+}

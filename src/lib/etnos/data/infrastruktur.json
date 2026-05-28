@@ -1,0 +1,24 @@
+{
+  "title": "Infrastruktur",
+  "subtitle": "Jalan, listrik, air bersih, telekomunikasi",
+  "source": "BPS, Kementerian PUPR, Kominfo (data demo)",
+  "updated": "2025-01-01",
+  "demo": true,
+  "stats": [
+    { "label": "Rasio Elektrifikasi", "value": "61.4", "unit": "%" },
+    { "label": "Akses Air Bersih", "value": "57.8", "unit": "%" },
+    { "label": "Jalan Provinsi Mantap", "value": "44.2", "unit": "%" },
+    { "label": "Desa dengan Sinyal 4G+", "value": "60.0", "unit": "%" }
+  ],
+  "bars": {
+    "title": "Konektivitas per kategori (demo)",
+    "unit": "%",
+    "data": [
+      { "label": "Listrik PLN", "value": 61.4 },
+      { "label": "Air bersih", "value": 57.8 },
+      { "label": "Sinyal 4G+", "value": 60.0 },
+      { "label": "Internet rumah", "value": 18.3 },
+      { "label": "Jalan mantap", "value": 44.2 }
+    ]
+  }
+}

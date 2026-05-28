@@ -1,0 +1,56 @@
+{
+  "_meta": {
+    "description": "Hari Ini Dalam Sejarah Papua — keyed by MM-DD. Curated. To be expanded.",
+    "source": "manual + Wikipedia"
+  },
+  "default": {
+    "title": "Papua, tanah Cendrawasih",
+    "body": "Papua memiliki sejarah panjang yang dimulai jauh sebelum kedatangan bangsa Eropa. Masyarakat adat telah mendiami pulau ini selama puluhan ribu tahun dengan keragaman budaya yang luar biasa — lebih dari 250 bahasa daerah.",
+    "year": null
+  },
+  "01-01": {
+    "title": "Pembentukan Provinsi Papua Tengah",
+    "body": "Provinsi Papua Tengah resmi berdiri pada 11 November 2022 sebagai hasil pemekaran dari Provinsi Papua, dengan Nabire sebagai ibu kota sementara.",
+    "year": 2022
+  },
+  "05-01": {
+    "title": "Integrasi Papua ke Indonesia",
+    "body": "Pada 1 Mei 1963, administrasi Papua secara resmi diserahkan dari UNTEA kepada Republik Indonesia, mengakhiri masa pemerintahan transisi PBB.",
+    "year": 1963
+  },
+  "05-28": {
+    "title": "Pembentukan ETNOS",
+    "body": "Pada hari ini, sebuah ruang publik komunitas Melanesia bernama ETNOS mulai dibangun — sebagai forum berfederasi per-provinsi untuk pelestarian bahasa, transparansi data publik, dan komunikasi komunitas adat.",
+    "year": 2026
+  },
+  "07-15": {
+    "title": "Cenderawasih, simbol Papua",
+    "body": "Burung Cenderawasih (Paradisaeidae) telah menjadi simbol kultural Papua selama ribuan tahun. Lebih dari 40 spesies hidup di hutan Papua, dengan ritual bulu Cenderawasih menjadi bagian penting upacara adat suku Dani, Mee, dan lainnya.",
+    "year": null
+  },
+  "08-09": {
+    "title": "Hari Internasional Masyarakat Adat",
+    "body": "Hari Internasional Masyarakat Adat Sedunia diperingati setiap 9 Agustus. Papua, dengan lebih dari 250 suku dan 700+ bahasa, adalah salah satu kawasan dengan keragaman masyarakat adat tertinggi di dunia.",
+    "year": null
+  },
+  "08-17": {
+    "title": "Kemerdekaan Indonesia",
+    "body": "Indonesia memproklamirkan kemerdekaan pada 17 Agustus 1945. Wilayah Papua bergabung kemudian melalui proses panjang yang melibatkan PBB hingga 1969.",
+    "year": 1945
+  },
+  "10-01": {
+    "title": "Otonomi Khusus Papua",
+    "body": "UU No. 21/2001 tentang Otonomi Khusus bagi Provinsi Papua disahkan, memberikan kewenangan khusus dan dana otsus untuk pembangunan Papua. Diperbarui dengan UU 2/2021.",
+    "year": 2001
+  },
+  "11-11": {
+    "title": "Tiga provinsi baru di Papua",
+    "body": "Pada 11 November 2022, tiga provinsi baru — Papua Tengah, Papua Pegunungan, dan Papua Selatan — resmi terbentuk sebagai hasil pemekaran, melengkapi Papua, Papua Barat, dan Papua Barat Daya.",
+    "year": 2022
+  },
+  "12-01": {
+    "title": "Lembah Baliem dan Suku Dani",
+    "body": "Lembah Baliem ditemukan oleh dunia luar pada 1938 ketika penerbang Richard Archbold mendokumentasikannya dari udara. Sebelumnya, Suku Dani telah mendiami lembah ini selama ribuan tahun dengan sistem pertanian terasering yang maju.",
+    "year": 1938
+  }
+}

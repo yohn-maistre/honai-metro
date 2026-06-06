@@ -920,7 +920,8 @@
             "tentang": "Tentang",
             "jelajah": "Jelajah",
             "registry": "Registry MCP",
-            "bahasa": "Ruang Bahasa"
+            "bahasa": "Ruang Bahasa",
+            "agen": "Agen AI"
         },
         "tentang": {
             "title": "Tentang ETNOS"
@@ -941,6 +942,32 @@
         "dashboard": {
             "otsus": "OTSUS Tracker",
             "data_source": "Sumber data"
+        },
+        "explore": {
+            "sorotan": "Sorotan",
+            "sorotan_subtitle": "Pilihan komunitas, ruang adat, dan topik pilihan dari ETNOS Papua Tengah",
+            "browse_all": "Jelajahi semua",
+            "browse_communities": "Komunitas",
+            "browse_feeds": "Umpan",
+            "browse_topics": "Topik"
+        },
+        "agen": {
+            "title": "Agen AI",
+            "subtitle": "Galeri agen, registry MCP terverifikasi, dan komunitas Aksara",
+            "aksara_flagship": "Aksara — agen berdaulat",
+            "aksara_coming": "Segera hadir",
+            "aksara_blurb": "Aksara adalah harness agen ETNOS untuk simpul institusional (kelurahan, puskesmas, balai adat). Direktori, aktivitas, dan kapasitas akan ditampilkan di sini saat simpul-simpul terdaftar.",
+            "directory": "Direktori",
+            "directory_empty": "Belum ada simpul Aksara terdaftar. Lihat dokumen pendaftaran.",
+            "activity": "Aktivitas terbaru",
+            "activity_empty": "Aktivitas akan muncul saat simpul Aksara aktif.",
+            "open_registry": "Registry MCP — terbuka",
+            "open_registry_subtitle": "Alat & skill yang dapat dipakai agen mana pun, divalidasi KYC, malware-scan, dan TKDN",
+            "standards": "Standar & dokumen",
+            "standard_register": "Cara mendaftarkan agen",
+            "standard_aksara": "Pendaftaran simpul Aksara",
+            "standard_protocols": "Protokol: ActivityPub · DID · MCP",
+            "standard_consent": "CARE & izin data"
         },
         "directory": {
             "title": "Jelajah Komunitas",

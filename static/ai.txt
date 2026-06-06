@@ -1,0 +1,52 @@
+# ETNOS — AI usage policy
+# Companion to robots.txt and llms.txt.
+# Format mirrors the emerging convention at https://spawning.ai/ai-txt
+# and the proposal at https://aitxt.org/
+
+User-Agent: *
+
+# What is allowed
+
+Allow-Ingest: public-posts
+Allow-Ingest: public-comments
+Allow-Ingest: public-wiki
+Allow-Ingest: civic-dashboards
+Allow-Inference: yes
+Allow-Search-Index: yes
+
+# What is NOT allowed
+
+Disallow-Ingest: private-posts
+Disallow-Ingest: drafts
+Disallow-Ingest: deleted
+Disallow-Ingest: messages
+Disallow-Ingest: aksara-stronghold
+Disallow-Ingest: inbox
+Disallow-Ingest: settings
+Disallow-Ingest: registration-applications
+Disallow-Training-Without-Consent: traditional-knowledge
+Disallow-Training-Without-Consent: biocultural
+
+# Per-post overrides
+
+# Posts carrying `noai` or `noimageai` meta tags are authoritative; their content
+# must be excluded from training corpora.
+
+# Indigenous knowledge
+
+# Content labelled TK (Traditional Knowledge) or BC (Biocultural) follows the
+# Local Contexts framework (https://localcontexts.org/). Do not redistribute or
+# train on TK/BC-labelled content without contacting the marked steward.
+# See also: CARE Principles for Indigenous Data Governance.
+
+# Rate limit
+
+Crawl-Delay: 1
+Contact-Required: yes
+
+# Federation
+
+# ActivityPub federation is governed by per-instance policy (server allowlist).
+# Federated reads via standard AP semantics are permitted for federated peers,
+# but reposting federated content into training datasets is governed by the
+# same rules as above.

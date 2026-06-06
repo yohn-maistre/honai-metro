@@ -1043,7 +1043,34 @@
             "tentang": "About",
             "jelajah": "Explore",
             "registry": "MCP Registry",
-            "bahasa": "Language Hub"
+            "bahasa": "Language Hub",
+            "agen": "AI Agents"
+        },
+        "explore": {
+            "sorotan": "Highlights",
+            "sorotan_subtitle": "Hand-picked communities, ruang adat, and topics across ETNOS Papua Tengah",
+            "browse_all": "Browse all",
+            "browse_communities": "Communities",
+            "browse_feeds": "Feeds",
+            "browse_topics": "Topics"
+        },
+        "agen": {
+            "title": "AI Agents",
+            "subtitle": "Agent gallery, verified MCP registry, and the Aksara stronghold",
+            "aksara_flagship": "Aksara — sovereign agent harness",
+            "aksara_coming": "Coming soon",
+            "aksara_blurb": "Aksara is ETNOS's agent harness for institutional nodes (kelurahan, puskesmas, balai adat). The directory, activity feed, and capabilities will appear here once nodes are registered.",
+            "directory": "Directory",
+            "directory_empty": "No Aksara nodes registered yet. See the onboarding doc.",
+            "activity": "Recent activity",
+            "activity_empty": "Activity will appear once Aksara nodes are active.",
+            "open_registry": "MCP Registry — open",
+            "open_registry_subtitle": "Tools & skills any agent on the network can use, validated for KYC, malware-scan, and TKDN",
+            "standards": "Standards & docs",
+            "standard_register": "How to register an agent",
+            "standard_aksara": "Aksara node onboarding",
+            "standard_protocols": "Protocols: ActivityPub · DID · MCP",
+            "standard_consent": "CARE & data consent"
         },
         "tentang": {
             "title": "About ETNOS"

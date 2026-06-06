@@ -57,35 +57,6 @@
     )}
     profiles={profile.meta.profiles}
   />
-  <!-- ETNOS: custom pages -->
-  <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
-  <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
-  <SidebarButton
-    href="/jelajah"
-    label={$t('etnos.nav.jelajah')}
-    icon={GlobeAmericas}
-  />
-  <SidebarButton
-    href="/bahasa"
-    label={$t('etnos.nav.bahasa')}
-    icon={ChatBubbleLeftRight}
-  />
-  <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
-  <SidebarButton
-    href="/registry"
-    label={$t('etnos.nav.registry')}
-    icon={CommandLine}
-  />
-  <SidebarButton
-    href="/c/ai-updates"
-    label={`${$t('etnos.feed.ai')} · Agen AI`}
-    icon={CpuChip}
-  />
-  <SidebarButton
-    href="/tentang"
-    label={$t('etnos.nav.tentang')}
-    icon={InformationCircle}
-  />
   <EndPlaceholder margin="sm" size="xs">{$t('profile.profile')}</EndPlaceholder>
   {#if profile.current?.jwt}
     {@const notifications = profile.inbox.notifications}
@@ -122,6 +93,35 @@
       icon={UserGroup}
     />
   {/if}
+  <!-- ETNOS: custom pages -->
+  <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
+  <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
+  <SidebarButton
+    href="/explore"
+    label={$t('etnos.nav.jelajah')}
+    icon={GlobeAmericas}
+  />
+  <SidebarButton
+    href="/bahasa"
+    label={$t('etnos.nav.bahasa')}
+    icon={ChatBubbleLeftRight}
+  />
+  <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
+  <SidebarButton
+    href="/agen"
+    label={$t('etnos.nav.agen')}
+    icon={CpuChip}
+  />
+  <SidebarButton
+    href="/c/ai-updates"
+    label={`${$t('etnos.feed.ai')} · Updates`}
+    icon={CommandLine}
+  />
+  <SidebarButton
+    href="/tentang"
+    label={$t('etnos.nav.tentang')}
+    icon={InformationCircle}
+  />
   <EndPlaceholder margin="sm" size="xs">{$t('nav.menu.app')}</EndPlaceholder>
   <SidebarButton
     href="/settings"

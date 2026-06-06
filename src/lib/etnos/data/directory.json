@@ -1,29 +1,79 @@
 {
   "_meta": {
-    "description": "Curated community directory grouped by purpose. Demo data — replace with real communities present on the backing PieFed instance once seeded.",
+    "description": "Curated community directory grouped by purpose. Demo data — replace community handles with real communities present on the backing PieFed instance once seeded. Visual treatment differentiates cultural strongholds (Adat, Bahasa) from general-interest communities.",
     "demo": true
   },
   "groups": [
     {
+      "category": "Adat",
+      "icon": "🏠",
+      "stronghold": true,
+      "description": "Ruang komunitas adat & Dewan Adat",
+      "communities": [
+        { "name": "Dewan Adat Mee", "slug": "dewan-adat-mee", "subtitle": "Komunitas Mee · dataran tinggi Paniai" },
+        { "name": "Dewan Adat Dani", "slug": "dewan-adat-dani", "subtitle": "Komunitas Dani · Lembah Baliem" },
+        { "name": "Dewan Adat Sentani", "slug": "dewan-adat-sentani", "subtitle": "Komunitas Sentani · Jayapura" },
+        { "name": "Hutan Adat Papua", "slug": "hutan-adat", "subtitle": "Pengelolaan hutan komunal" },
+        { "name": "Tanah Adat", "slug": "tanah-adat", "subtitle": "Perlindungan & registrasi tanah ulayat" }
+      ]
+    },
+    {
       "category": "Bahasa",
       "icon": "💬",
+      "stronghold": true,
       "description": "Komunitas pelestarian bahasa daerah",
       "communities": [
         { "name": "Bahasa Mee", "slug": "bahasa-mee", "subtitle": "Mee (Ekagi) · dataran tinggi Paniai" },
         { "name": "Bahasa Dani", "slug": "bahasa-dani", "subtitle": "Dani · Lembah Baliem" },
         { "name": "Bahasa Sentani", "slug": "bahasa-sentani", "subtitle": "Sentani · Jayapura" },
         { "name": "Bahasa Biak", "slug": "bahasa-biak", "subtitle": "Biak · Kepulauan Biak-Numfor" },
+        { "name": "Bahasa Asmat", "slug": "bahasa-asmat", "subtitle": "Asmat · pesisir selatan" },
         { "name": "Papuan Malay", "slug": "papuan-malay", "subtitle": "Melayu Papua · lingua franca" }
       ]
     },
     {
-      "category": "Adat",
-      "icon": "🏠",
-      "description": "Ruang komunitas adat & Dewan Adat",
+      "category": "Berita",
+      "icon": "📰",
+      "description": "Berita & jurnalisme Papua",
       "communities": [
-        { "name": "Dewan Adat Mee", "slug": "dewan-adat-mee", "subtitle": "Komunitas Mee" },
-        { "name": "Dewan Adat Dani", "slug": "dewan-adat-dani", "subtitle": "Komunitas Dani" },
-        { "name": "Hutan Adat Papua", "slug": "hutan-adat", "subtitle": "Pengelolaan hutan komunal" }
+        { "name": "Berita Papua", "slug": "berita-papua", "subtitle": "Pemberitaan independen Papua Tengah" },
+        { "name": "Cenderawasih Post", "slug": "cenderawasih-post", "subtitle": "Diskusi liputan koran daerah" },
+        { "name": "Jubi", "slug": "jubi", "subtitle": "Mirror diskusi Tabloid Jubi" },
+        { "name": "Suara Papua", "slug": "suara-papua", "subtitle": "Mirror diskusi suarapapua.com" }
+      ]
+    },
+    {
+      "category": "Sport",
+      "icon": "⚽",
+      "description": "Olahraga & atlet Papua",
+      "communities": [
+        { "name": "Persipura", "slug": "persipura", "subtitle": "Klub sepak bola legendaris Jayapura" },
+        { "name": "Persewar Waropen", "slug": "persewar", "subtitle": "Sepak bola Waropen" },
+        { "name": "PON Papua", "slug": "pon-papua", "subtitle": "Atlet, event, & alumni PON XX" },
+        { "name": "Atletik Papua", "slug": "atletik-papua", "subtitle": "Lari, jalan kaki, atletik daerah" },
+        { "name": "Tinju Papua", "slug": "tinju-papua", "subtitle": "Komunitas tinju amatir & pro" }
+      ]
+    },
+    {
+      "category": "Teknologi",
+      "icon": "💻",
+      "description": "Tech, dev, & konektivitas",
+      "communities": [
+        { "name": "Tech Papua", "slug": "tech-papua", "subtitle": "Diskusi teknologi anak muda Papua" },
+        { "name": "DevPapua", "slug": "dev-papua", "subtitle": "Komunitas pengembang & open-source" },
+        { "name": "Internet Papua", "slug": "internet-papua", "subtitle": "Konektivitas, BTS, ISP, Palapa Ring" },
+        { "name": "Hardware Papua", "slug": "hardware-papua", "subtitle": "Perangkat keras, repair, maker" }
+      ]
+    },
+    {
+      "category": "Musik",
+      "icon": "🎵",
+      "description": "Musik tradisional & modern Papua",
+      "communities": [
+        { "name": "Musik Papua", "slug": "musik-papua", "subtitle": "Diskusi umum musik Papua" },
+        { "name": "Tifa & Yospan", "slug": "tifa-yospan", "subtitle": "Musik & tarian tradisional" },
+        { "name": "Indie Papua", "slug": "indie-papua", "subtitle": "Musisi indie & rilisan baru" },
+        { "name": "Hip-Hop Papua", "slug": "hip-hop-papua", "subtitle": "Rap & hip-hop dari Tanah Papua" }
       ]
     },
     {
@@ -33,8 +83,9 @@
       "communities": [
         { "name": "Kelurahan Papua", "slug": "kelurahan-papua", "subtitle": "Diskusi pelayanan publik desa/kelurahan" },
         { "name": "Puskesmas", "slug": "puskesmas-papua", "subtitle": "Tenaga kesehatan & SATUSEHAT" },
-        { "name": "OTSUS Tracker", "slug": "otsus", "subtitle": "Transparansi dana otsus" },
-        { "name": "BPP Pertanian", "slug": "bpp-papua", "subtitle": "Penyuluh pertanian" }
+        { "name": "OTSUS Tracker", "slug": "otsus", "subtitle": "Transparansi dana otonomi khusus" },
+        { "name": "BPP Pertanian", "slug": "bpp-papua", "subtitle": "Penyuluh pertanian" },
+        { "name": "Disdik Papua Tengah", "slug": "disdik-papua-tengah", "subtitle": "Diskusi pendidikan provinsi" }
       ]
     },
     {
@@ -43,7 +94,8 @@
       "description": "Kontribusi wiki & dokumentasi",
       "communities": [
         { "name": "Wiki Papua", "slug": "wiki", "subtitle": "Sumber kolaboratif tentang Tanah Papua" },
-        { "name": "Sejarah Lisan", "slug": "sejarah-lisan", "subtitle": "Cerita & kesaksian dari tetua" }
+        { "name": "Sejarah Lisan", "slug": "sejarah-lisan", "subtitle": "Cerita & kesaksian dari tetua" },
+        { "name": "Biodiversitas", "slug": "biodiversitas", "subtitle": "Flora, fauna, & ekosistem" }
       ]
     },
     {
@@ -52,7 +104,8 @@
       "description": "Agen AI & pembaruan otomatis",
       "communities": [
         { "name": "AI Updates", "slug": "ai-updates", "subtitle": "Ringkasan otomatis dari agen AI" },
-        { "name": "MCP Registry", "slug": "mcp-registry", "subtitle": "Diskusi alat MCP terverifikasi" }
+        { "name": "MCP Registry", "slug": "mcp-registry", "subtitle": "Diskusi alat MCP terverifikasi" },
+        { "name": "Aksara Lab", "slug": "aksara-lab", "subtitle": "R&D harness Aksara — segera hadir" }
       ]
     }
   ]

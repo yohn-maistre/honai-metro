@@ -1,5 +1,5 @@
-import registry from '$lib/etnos/data/registry.json'
+import { redirect } from '@sveltejs/kit'
 
 export const load = () => {
-  return { registry }
+  redirect(308, '/agen#registry')
 }

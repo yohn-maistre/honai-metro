@@ -1,0 +1,38 @@
+# ETNOS — Ruang publik komunitas Melanesia
+
+> ETNOS is a federated public-square + wiki + civic-data platform for Papua, Indonesia. It runs as a heavily customized Photon (Svelte) client against a PieFed backend that speaks ActivityPub. The provincial focus is Papua Tengah; other Papuan provinces (Papua, Papua Selatan, Papua Pegunungan, Papua Barat, Papua Barat Daya) are intended federation peers.
+
+ETNOS distinguishes between two kinds of agents:
+- **Open public agents** — any agent on the network can read public content and call open MCP tools listed at `/agen`.
+- **Aksara nodes** — institutional, BSrE-attested agent harnesses (kelurahan, puskesmas, balai adat). Aksara MCP tools require authenticated node identity and, for government workflows, a valid BSrE seal.
+
+## Key surfaces
+
+- [/explore](https://etnos.example/explore) — community discovery + curated highlights (Sorotan) + Papua map
+- [/wiki](https://etnos.example/wiki) — collaborative wiki on Papuan places, history, biodiversity, peoples & languages, cuisine
+- [/dashboard](https://etnos.example/dashboard) — public civic dashboards (APBD, OTSUS, education, infrastructure)
+- [/bahasa](https://etnos.example/bahasa) — language preservation hub (Mee, Dani, Sentani, Biak, Papuan Malay)
+- [/agen](https://etnos.example/agen) — agent gallery, open MCP registry, Aksara stronghold directory
+- [/tentang](https://etnos.example/tentang) — about ETNOS
+
+## Policy
+
+- All public posts, comments, communities, and wiki articles are licensed CC-BY-SA-4.0 unless otherwise noted on the post.
+- Indigenous knowledge labelled with TK (Traditional Knowledge) or BC (Biocultural) notices follows the [Local Contexts](https://localcontexts.org/) framework and the CARE Principles. Do not redistribute TK/BC-labelled content without consulting the marked steward.
+- Private posts, draft posts, deleted content, and DMs MUST NOT be ingested for training. Authentication-gated sections (Aksara stronghold tools, inbox, settings) are out of scope.
+- Per-post `noai` / `noimageai` meta tags, if present, are authoritative — honor them.
+- Rate limit: at most 1 req/sec per agent. Identify yourself with a `User-Agent` that includes contact information.
+
+## Federation
+
+ETNOS speaks ActivityPub via the backend. Federated peers can be discovered via WebFinger at `/.well-known/webfinger`. The ActivityPub actor namespace is at `/u/{user}` and `/c/{community}`.
+
+## Agent integration
+
+- Open MCP servers, with capabilities, badges, and licenses, are listed at `/agen` (see `Registry MCP — open`).
+- Aksara node registration is documented at `/agen` (see `Standar & dokumen`).
+- An MCP endpoint exposing read-only public content as agent-callable tools is on the roadmap; see `ETNOS_ROADMAP.md` in the source repo.
+
+## Source
+
+ETNOS is an open-source heavy fork of [xyphyn/photon](https://github.com/xyphyn/photon). Source for the fork is at the repository this site is built from. License: AGPL-3.0.

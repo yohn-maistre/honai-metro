@@ -920,7 +920,34 @@
             "tentang": "Tentang",
             "jelajah": "Jelajah",
             "registry": "Registry MCP",
-            "bahasa": "Ruang Bahasa"
+            "bahasa": "Ruang Bahasa",
+            "agen": "Agen AI"
+        },
+        "explore": {
+            "sorotan": "Sorotan",
+            "sorotan_subtitle": "Komunitas, ruang adat, deng topik pilihan dari ETNOS Papua Tengah",
+            "browse_all": "Lia samua",
+            "browse_communities": "Komunitas",
+            "browse_feeds": "Umpan",
+            "browse_topics": "Topik"
+        },
+        "agen": {
+            "title": "Agen AI",
+            "subtitle": "Galeri agen, registry MCP yang sudah terbukti, deng komunitas Aksara",
+            "aksara_flagship": "Aksara — agen mandiri",
+            "aksara_coming": "Akan datang",
+            "aksara_blurb": "Aksara itu harness agen ETNOS untuk simpul institusi (kelurahan, puskesmas, balai adat). Direktori, aktivitas, deng kapasitas akan muncul di sini setelah simpul-simpul daftar.",
+            "directory": "Direktori",
+            "directory_empty": "Belum ada simpul Aksara yang terdaftar. Lia dokumen pendaftaran.",
+            "activity": "Aktivitas terbaru",
+            "activity_empty": "Aktivitas akan muncul setelah simpul Aksara aktif.",
+            "open_registry": "Registry MCP — terbuka",
+            "open_registry_subtitle": "Alat & skill yang bisa dipake agen mana saja, sudah lulus KYC, malware-scan, deng TKDN",
+            "standards": "Standar & dokumen",
+            "standard_register": "Cara daftarkan agen",
+            "standard_aksara": "Pendaftaran simpul Aksara",
+            "standard_protocols": "Protokol: ActivityPub · DID · MCP",
+            "standard_consent": "CARE & izin data"
         },
         "tentang": {
             "title": "Tentang ETNOS"

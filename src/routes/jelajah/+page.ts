@@ -1,5 +1,5 @@
-import directory from '$lib/etnos/data/directory.json'
+import { redirect } from '@sveltejs/kit'
 
 export const load = () => {
-  return { directory }
+  redirect(308, '/explore')
 }

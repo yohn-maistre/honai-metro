@@ -1,144 +1,135 @@
 <script lang="ts">
-  // Inline SVG Papua province picker. Stylized, NOT geographically accurate —
-  // a polygonal abstraction of the 6 current Papuan provinces (post-2022 split).
-  // Reserved for upgrade to svelte-maplibre-gl + Protomaps tiles (see ETNOS_ROADMAP.md).
-  // CSP-safe: no workers, no WebGL, no external assets.
+  import { browser } from '$app/environment'
+  import { goto } from '$app/navigation'
+  import { theme } from '$lib/app/theme/theme.svelte'
+  import {
+    AttributionControl,
+    MapLibre,
+    Marker,
+    NavigationControl,
+    ScaleControl,
+  } from 'svelte-maplibre-gl'
+  import 'maplibre-gl/dist/maplibre-gl.css'
 
   interface Province {
     code: string
     name: string
     capital: string
-    href?: string
+    lnglat: [number, number]
   }
 
   interface Props {
-    instances?: Record<string, string> // optional code → URL map for federated instance links
+    instances?: Record<string, string>
     selected?: string
     onselect?: (code: string) => void
   }
 
   let { instances = {}, selected, onselect }: Props = $props()
 
-  // Path data hand-drawn in a 400×280 viewBox, arranged in approximate
-  // geographic position: west on the left, south at the bottom.
-  const provinces: (Province & { d: string; cx: number; cy: number })[] = [
-    {
-      code: 'pbd',
-      name: 'Papua Barat Daya',
-      capital: 'Sorong',
-      d: 'M30,80 L80,70 L110,90 L100,130 L60,140 L30,120 Z',
-      cx: 65,
-      cy: 105,
-    },
-    {
-      code: 'pb',
-      name: 'Papua Barat',
-      capital: 'Manokwari',
-      d: 'M110,90 L160,75 L190,100 L185,135 L130,150 L100,130 Z',
-      cx: 145,
-      cy: 115,
-    },
-    {
-      code: 'pt',
-      name: 'Papua Tengah',
-      capital: 'Nabire',
-      d: 'M185,135 L240,125 L260,155 L235,180 L180,180 L130,150 Z',
-      cx: 200,
-      cy: 158,
-    },
-    {
-      code: 'pp',
-      name: 'Papua Pegunungan',
-      capital: 'Jayawijaya',
-      d: 'M235,180 L295,170 L320,200 L290,225 L235,225 L180,200 Z',
-      cx: 265,
-      cy: 200,
-    },
-    {
-      code: 'p',
-      name: 'Papua',
-      capital: 'Jayapura',
-      d: 'M260,80 L340,75 L370,110 L355,150 L295,170 L240,125 Z',
-      cx: 310,
-      cy: 115,
-    },
-    {
-      code: 'ps',
-      name: 'Papua Selatan',
-      capital: 'Merauke',
-      d: 'M180,200 L235,225 L290,225 L300,255 L240,265 L170,255 Z',
-      cx: 240,
-      cy: 235,
-    },
+  const provinces: Province[] = [
+    { code: 'pbd', name: 'Papua Barat Daya', capital: 'Sorong', lnglat: [131.2558, -0.8761] },
+    { code: 'pb', name: 'Papua Barat', capital: 'Manokwari', lnglat: [134.062, -0.8615] },
+    { code: 'pt', name: 'Papua Tengah', capital: 'Nabire', lnglat: [135.4833, -3.3667] },
+    { code: 'pp', name: 'Papua Pegunungan', capital: 'Wamena', lnglat: [138.9489, -4.0892] },
+    { code: 'p', name: 'Papua', capital: 'Jayapura', lnglat: [140.7181, -2.5337] },
+    { code: 'ps', name: 'Papua Selatan', capital: 'Merauke', lnglat: [140.4011, -8.4731] },
   ]
 
-  function classFor(code: string): string {
-    const base =
-      'transition-colors cursor-pointer stroke-2 stroke-slate-300 dark:stroke-zinc-700'
-    if (instances[code]) {
-      // Has a federated instance — show in primary.
-      return `${base} fill-primary-200 dark:fill-primary-900 hover:fill-primary-400 dark:hover:fill-primary-700`
-    }
-    return `${base} fill-slate-100 dark:fill-zinc-800 hover:fill-primary-200 dark:hover:fill-primary-900/40`
-  }
+  let isDark = $state(false)
 
-  function handle(code: string) {
+  $effect(() => {
+    if (!browser) return
+    const compute = () => {
+      if (theme.colorScheme === 'system') {
+        isDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+      } else {
+        isDark = theme.colorScheme === 'dark'
+      }
+    }
+    compute()
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    mq.addEventListener('change', compute)
+    return () => mq.removeEventListener('change', compute)
+  })
+
+  let styleUrl = $derived(
+    isDark
+      ? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+      : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+  )
+
+  // Default view centers on Papua Tengah (Nabire) and frames all 6 provinces.
+  const center: [number, number] = [136.5, -3.8]
+  const initialZoom = 5.2
+
+  function pick(code: string) {
     onselect?.(code)
     const url = instances[code]
     if (url) {
-      window.location.href = url
+      if (url.startsWith('http')) window.location.href = url
+      else goto(url)
     }
   }
 </script>
 
 <div class="w-full">
-  <svg
-    viewBox="0 0 400 280"
-    class="w-full h-auto rounded-2xl"
-    role="img"
-    aria-label="Peta provinsi-provinsi di Tanah Papua"
+  <MapLibre
+    style={styleUrl}
+    {center}
+    zoom={initialZoom}
+    minZoom={1.5}
+    maxZoom={13}
+    attributionControl={false}
+    class="w-full h-72 sm:h-96 rounded-2xl overflow-hidden"
   >
-    <!-- ocean background -->
-    <rect
-      x="0"
-      y="0"
-      width="400"
-      height="280"
-      class="fill-blue-50/50 dark:fill-blue-950/30"
+    <NavigationControl position="top-right" showCompass={false} />
+    <ScaleControl position="bottom-left" maxWidth={120} unit="metric" />
+    <AttributionControl
+      position="bottom-right"
+      compact={true}
     />
+
     {#each provinces as p (p.code)}
-      <g
-        role="button"
-        tabindex="0"
-        aria-label={`${p.name}, ibu kota ${p.capital}`}
-        aria-pressed={selected === p.code}
-        onclick={() => handle(p.code)}
-        onkeydown={(e) => (e.key === 'Enter' || e.key === ' ') && handle(p.code)}
-      >
-        <path
-          d={p.d}
-          class={[
-            classFor(p.code),
-            selected === p.code
-              ? 'fill-primary-500 dark:fill-primary-500'
-              : '',
-          ]}
-        />
-        <text
-          x={p.cx}
-          y={p.cy}
-          text-anchor="middle"
-          font-size="9"
-          font-weight="600"
-          class="fill-slate-700 dark:fill-zinc-300 pointer-events-none select-none"
-        >
-          {p.name.split(' ').slice(-1)[0]}
-        </text>
-      </g>
+      {@const hasInstance = !!instances[p.code]}
+      {@const isSelected = selected === p.code}
+      <Marker lnglat={p.lnglat} onclick={() => pick(p.code)}>
+        {#snippet content()}
+          <button
+            type="button"
+            aria-label={`${p.name}, ibu kota ${p.capital}`}
+            aria-pressed={isSelected}
+            class={[
+              'group flex items-center gap-1.5 px-2.5 py-1 rounded-full shadow-md border transition-all cursor-pointer',
+              'text-xs font-medium whitespace-nowrap',
+              hasInstance
+                ? 'bg-primary-500 text-white border-primary-600 hover:bg-primary-600'
+                : 'bg-white/95 dark:bg-zinc-900/95 text-slate-700 dark:text-zinc-200 border-slate-200 dark:border-zinc-700 hover:border-primary-400 dark:hover:border-primary-600',
+              isSelected ? 'ring-2 ring-primary-500 ring-offset-1' : '',
+              p.code === 'pt'
+                ? 'border-amber-400 dark:border-amber-600 bg-amber-50/95 dark:bg-amber-950/80 text-amber-900 dark:text-amber-100'
+                : '',
+            ]}
+            onclick={(e) => {
+              e.stopPropagation()
+              pick(p.code)
+            }}
+          >
+            <span
+              class={[
+                'inline-block w-1.5 h-1.5 rounded-full',
+                hasInstance ? 'bg-white' : 'bg-primary-500 dark:bg-primary-400',
+                p.code === 'pt' ? 'bg-amber-500 dark:bg-amber-400' : '',
+              ]}
+            ></span>
+            {p.capital}
+          </button>
+        {/snippet}
+      </Marker>
     {/each}
-  </svg>
+  </MapLibre>
+
   <p class="text-xs text-slate-400 dark:text-zinc-500 mt-2 text-center">
-    Pilih provinsi untuk membuka instance ETNOS-nya. Provinsi yang sudah punya
-    instance ditampilkan dengan warna penuh.
+    Pilih ibu kota provinsi untuk membuka instance ETNOS-nya. Papua Tengah
+    disorot dalam warna kuning. Zoom keluar untuk tampilan dunia.
   </p>
 </div>

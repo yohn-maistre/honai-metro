@@ -6,11 +6,13 @@ The provincial focus is **Papua Tengah**. Other Papuan provinces (Papua, Papua S
 
 ## Relationship to Photon
 
-ETNOS is a **heavy fork** of [xyphyn/photon](https://github.com/xyphyn/photon) — the Svelte web client for Lemmy and PieFed. Photon's README is preserved at [`.github/README.md`](./.github/README.md).
+ETNOS is an actively-maintained **heavy fork** of [xyphyn/photon](https://github.com/xyphyn/photon) — the Svelte web client for Lemmy and PieFed. Photon's README is preserved at [`.github/README.md`](./.github/README.md).
 
-We owe Photon a real debt: the upstream client is the reason ETNOS exists as a working app in months, not years. We intend to **stay in sync with upstream for one more cycle** while we're still on the Lemmy-shaped API surface (the path PieFed's `piefedalpha` adapter takes), to absorb upstream bugfixes and the maturing PieFed adapter. Beyond that point, ETNOS diverges — heavily customized discovery (`/explore`), an `/agen` page with our own MCP/skill registry and an Aksara stronghold, a Papua-scoped map, a per-province directory, civic dashboards, an `/wiki` integration, and a different default IA tailored to Papua use.
+We owe Photon a real debt: the upstream client is the reason ETNOS exists as a working app in months, not years. **For as long as we share useful surfaces with upstream**, we intend to keep syncing — Photon's PieFed adapter is improving, bugfixes flow, and we don't want to maintain those layers alone. The custom surfaces (`/explore` consolidation, `/agen`, `/wiki`, `/bahasa`, `/dashboard`, `/tentang`, the i18n surface, the curated directory) are ours to evolve; the upstream community/post/comment/feed layer we stay close to.
 
-The data-layer plan is to keep PieFed as the content/forum backend (Lemmy-shaped API is a known quantity, federation works, the upstream PieFed roadmap delivers private communities, quote posts, and pronouns that the project needs anyway), and to layer an [ActivityPods](https://activitypods.org)–compatible Pod surface alongside it specifically for the Aksara agent-memory plane, once the [NextGraph](https://nextgraph.org) CRDT swap inside ActivityPods stabilises. See [`docs/research/activitypods-backend-port.md`](./docs/research/activitypods-backend-port.md).
+A harder fork may become necessary later — for example, if the underlying API surface diverges sharply when we adopt additional substrates for agent memory or identity. We'll cross that bridge when it's structurally forced, not earlier. See [`docs/research/activitypods-backend-port.md`](./docs/research/activitypods-backend-port.md) and (when written) [`docs/research/sovereign-stack-architecture.md`](./docs/research/sovereign-stack-architecture.md) for the substrate decisions feeding that timing.
+
+The current data-layer direction is to keep **PieFed** as the content/forum backend (Lemmy-shaped API is a known quantity, federation works, the upstream 1.6 release delivers private communities, quote posts, and pronouns that ETNOS needs anyway), and to evaluate substrates like Solid Pods + NextGraph as a parallel **agent-memory plane** for institutional Aksara nodes — without making that a prerequisite for the content layer.
 
 ## What's different from upstream Photon
 

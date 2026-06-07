@@ -63,7 +63,7 @@ hangs the app on the loading spinner with no visible errors.
 | `src/routes/jelajah/+page.svelte` + `+page.ts` | [NEW] Curated Suku/Komunitas directory + Papua map |
 | `src/routes/bahasa/+page.svelte` + `+page.ts` | [NEW] Ruang Bahasa hub (9 Papuan languages, endangerment badges) |
 | `src/routes/registry/+page.svelte` + `+page.ts` | [NEW] MCP Tool Registry (KYC / malware-scan / TKDN badges) |
-| `src/lib/etnos/PapuaMap.svelte` | [NEW] Inline-SVG 6-province picker (stylized; geographic upgrade in roadmap) |
+| `src/lib/etnos/PapuaMap.svelte` | [NEW] MapLibre GL JS picker via `svelte-maplibre-gl` — 6 provincial-capital pills, Papua Tengah amber-highlighted, CARTO tile styles, follows theme color scheme |
 | `src/lib/etnos/UserBadges.svelte` | [NEW] Trust-tier / AI-agent badges on profile header |
 | `src/routes/u/[name]/+page.svelte` | Embedded `<UserBadges />` in EntityHeader nameDetail snippet |
 | `src/lib/ui/sidebar/Sidebar.svelte` | ETNOS section: Wiki, Jelajah, Bahasa, Dashboard, Registry, Agen AI, Tentang (marked `<!-- ETNOS: -->`) |

@@ -1,0 +1,36 @@
+{
+  "_meta": {
+    "description": "Curated Sorotan highlights — hand-picked spotlights surfaced at the top of /explore. Each item links to a real route. Demo content for early access; the editorial workflow lives outside the repo for now.",
+    "demo": true,
+    "max_visible": 3
+  },
+  "highlights": [
+    {
+      "id": "tentang-etnos",
+      "icon": "🏛️",
+      "title": "Apa itu ETNOS?",
+      "subtitle": "Ruang publik federatif untuk Tanah Papua — manusia, agen, dan institusi bertemu dalam satu lapisan.",
+      "href": "/tentang",
+      "kind": "primary",
+      "accent": "primary"
+    },
+    {
+      "id": "ruang-bahasa",
+      "icon": "🗣️",
+      "title": "Ruang Bahasa Papua",
+      "subtitle": "9 bahasa lokal dengan badge status pemertahanan — Mee, Dani, Asmat, Biak, dan lainnya.",
+      "href": "/bahasa",
+      "kind": "secondary",
+      "accent": "amber"
+    },
+    {
+      "id": "dashboard-otsus",
+      "icon": "📊",
+      "title": "Dashboard OTSUS",
+      "subtitle": "Snapshot data pendidikan, ekonomi, infrastruktur, kualitas hidup — bertahap menjadi live BPS feed.",
+      "href": "/dashboard",
+      "kind": "secondary",
+      "accent": "emerald"
+    }
+  ]
+}

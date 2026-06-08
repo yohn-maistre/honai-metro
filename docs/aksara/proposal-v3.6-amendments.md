@@ -20,6 +20,8 @@
 | 6 | §22 — Software stack | Substrate swap | Same as #2 + "Hermes" → "Hermes Agent" |
 | 7 | §14 — Substrate commitments | Add adapter | Adapter layer bridging PieFed (content plane today) to ActivityPods (content + memory plane target) named as a deliverable |
 | 8 | §11 / §31 — Validation flow | No change | Paket Kelurahan MVP unchanged |
+| 9 | §19 / §22 — API keys + telemetry | Net-new stance | Platform manages all cloud-LLM keys + billing; users never touch credentials; only anonymous fleet telemetry collected |
+| 10 | §13 / §19 — Gemma multimodal ASR | Stack simplification | Gemma 4 multimodal as native audio→text+intent; Whisper demoted to CPU fallback; TTS deferred to dedicated research doc |
 
 ---
 
@@ -140,6 +142,48 @@ Insert between current line 281 and 283:
 ## Amendment 8 — No change to MVP scope (§28–§31)
 
 The Paket Kelurahan validation flow (5–7 kelurahan, 7 surat types, M0–M12 timeline) is unchanged. Hardware batch, deployment sequencing, success metrics, and demo selection all remain valid. The amendments above affect substrate and runtime wording, not the pilot scope.
+
+---
+
+## Amendment 9 — Managed API keys + telemetry posture (§19, §22)
+
+**Source line 339 (§19 — Aksara hardware spec), append to the API-key sentence:**
+
+Before (already amended by Amendment 5):
+> Kunci API di vault HSM-backed (ATECC608B atau Zymkey), pemakaian token termeter dan terbagi antar perangkat.
+
+After:
+> Kunci API di vault HSM-backed (ATECC608B atau Zymkey), pemakaian token termeter dan terbagi antar perangkat. **Operator akhir (Lurah, Bendahara, Bidan, Penyuluh) tidak pernah berinteraksi dengan kunci API — penyediaan, rotasi, dan billing dikelola oleh PT Abstraksi Data & Kognitek sebagai bagian dari layanan**, baik provider-nya OpenRouter, Anthropic langsung, atau NVIDIA NIM hosted-in-Indonesia. Data telemetri yang dikirim balik ke platform terbatas pada fleet management anonim (uptime, error counts, model-routing health, token throughput per device); tidak ada konten percakapan, tidak ada PII, tidak ada metadata transaksi sipil.
+
+**Insert into §22 (Software stack) as a new line after data residency commitment:**
+
+Insert between current line 369 and 371:
+
+> **Pengelolaan kunci API dan langganan model.** Semua kredensial cloud LLM (OpenRouter, Anthropic, NIM) dikelola oleh PT Abstraksi Data & Kognitek dan didistribusikan ke unit Aksara sebagai bagian dari subscription. Operator tidak menangani billing model. Audit kuota per institusi tetap transparent — Diskominfo dapat meminta laporan token usage per kelurahan kapan pun — tetapi rotasi kunci, fallback provider, dan negosiasi rate dijamin oleh platform.
+
+**Rationale.** The original §19 mentioned "kunci API di vault" without specifying who manages them. The founder's clarification on 2026-06-08 makes the responsibility explicit: end users (institutions, civil servants) do not deal with API keys or model billing. PT Abstraksi handles provisioning, rotation, fallback, and billing as part of the Aksara service. Telemetry sent back is anonymous fleet-management data — no conversation content, no PII, no civic-transaction metadata. This is both a UX commitment (users never see "your OpenAI key expired") and a trust commitment (we explicitly limit what we collect for operations).
+
+This amendment is **net-new operational stance** that was not articulated in v3.5. Worth highlighting in the v3.6 cover note.
+
+---
+
+## Amendment 10 — Gemma 4 multimodal as native ASR + reasoning (§13, §19)
+
+**Source line 339 (§19 — Aksara hardware spec), STT line:**
+
+Before:
+> STT bawaan (Whisper atau Gemma multimodal); TTS ekspresif Bahasa Indonesia masih dievaluasi.
+
+After:
+> **STT bawaan via Gemma 4 multimodal (E4B di flagship Aksara, E2B di Aksara Go) — audio input langsung diproses menjadi text+intent dalam satu jalur inferensi**, menghilangkan dependensi Whisper sebagai komponen ASR terpisah. Whisper tetap tersedia sebagai fallback CPU-only ketika NPU Gemma tidak tersedia. **TTS ekspresif Bahasa Indonesia** — kandidat sedang dievaluasi (VoxCPM2 dan model SOTA lain dirinci di `docs/research/indonesian-tts.md`); target output streaming dengan minimal dua persona suara (formal dan ramah), mendukung intonasi Papuan Malay jika model memungkinkan.
+
+**Insert into §13 (Reasoning + Memory) as a new sub-paragraph after the model-tiering block:**
+
+Insert between current line 261 and 263:
+
+> **Multimodal input.** Pada konfigurasi Aksara (Gemma 4 E4B) dan Aksara Go (E2B), input audio dari operator atau warga (suara WhatsApp, panggilan radio, perekaman lapangan) masuk langsung ke model multimodal — Gemma 4 menerima waveform audio dan menghasilkan teks transkrip + parsing intent secara native, tanpa memerlukan pipeline ASR terpisah. Ini memangkas latency dan menyederhanakan stack: dua dependensi (Whisper + Gemma text) menjadi satu (Gemma multimodal). Whisper tetap di repository sebagai fallback CPU untuk kasus model multimodal tidak loaded.
+
+**Rationale.** The original wording lists Whisper as a separate ASR component. Gemma 4 E2B and E4B (release as of mid-2026) accept audio input natively and produce text output in one inference pass — this is a clean architectural simplification. The TTS line is also updated to point at the dedicated research doc rather than leave it as an open question.
 
 ---
 

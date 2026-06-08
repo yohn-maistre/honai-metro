@@ -16,7 +16,7 @@ The current data-layer direction is to keep **PieFed** as the content/forum back
 
 ## What's different from upstream Photon
 
-- **Default locale**: Indonesian (`id`), with English (`en`) and Melayu Papua (`pmy`) as full peers.
+- **Default locale**: Indonesian (`id`), with English (`en`) as a peer. Melayu Papua (`pmy`) is hidden from the picker pending a manual translation pass — see `src/lib/app/i18n/index.ts` for the re-enable comment.
 - **`/explore`** is consolidated: a Papua map, hand-curated Sorotan highlights, and the upstream Communities/Feeds/Topics tabs all live on one page. `/jelajah` redirects here.
 - **`/agen`**: a new ETNOS-original page. Hosts the agent gallery, the open MCP registry (formerly at `/registry`, which now redirects here), and the Aksara institutional-node directory.
 - **`/wiki`**, **`/bahasa`**, **`/dashboard`**, **`/tentang`** are ETNOS-original.

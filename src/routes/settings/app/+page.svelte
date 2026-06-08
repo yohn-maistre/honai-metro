@@ -49,7 +49,9 @@
   > = new Map([
     ['en', { name: 'English' }],
     ['id', { name: 'Bahasa Indonesia' }],
-    ['pmy', { name: 'Melayu Papua' }],
+    // ETNOS: 'pmy' hidden until manual Melayu Papua pass lands; mirror the
+    // commented loader in src/lib/app/i18n/index.ts to re-enable.
+    // ['pmy', { name: 'Melayu Papua' }],
     // ETNOS: upstream languages — uncomment to re-enable
     // ['ar', { name: 'العربية' }],
     // ['he', { name: 'עברית' }],

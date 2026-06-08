@@ -140,16 +140,22 @@ Beta-readiness is ~5 working days of focused engineering plus the legal text. Se
 
 ---
 
-## Decisions blocking this plan
+## Decisions (resolved 2026-06-08)
 
-The plan above assumes founder calls on:
+1. **Backend target** — **`piefed.social` flagship** for the early-access window. Validates the UX end-to-end on someone else's federation infrastructure before we invest in self-hosting. No SMTP wiring on our side. Item 1 of the MUST list collapses to a one-line `.env` confirmation. Kominfo PSE filing is **not blocking** because we are not yet the PSE-Privat (piefed.social is) — we file once we stand up our own backend.
+2. **Domain** — **deferred.** Cloudflare Pages can serve under a temporary preview URL until the founder picks the canonical domain. The DNS work is small and unblocks itself once the call is made.
+3. **Branding** — **"early access"**, not "beta." Honest framing for the current state: a working public-square that is not yet running on our own infrastructure, with explicit "more is coming." Lower polish expectations, more honest invitation to participate. Affects copy in `OnboardingModal.svelte` and `tentang/+page.svelte`.
+4. **First-cohort plan** — **open registration from day 1**, no technical cap, no marketing. Founder personally DMs close contacts to invite the first users. The piefed.social backend is in `Open` registration mode (we don't control it), so a frontend gate would be cosmetic only. Soft launch = no public broadcast + personal invites + Sentry on for the first failures.
 
-1. **Backend target** — `piefed.social` flagship vs standing up a single cloud node. The plan works for either, but the choice changes the legal/compliance load (own-backend triggers Kominfo PSE + UU PDP DSR sooner; piggyback delays both).
-2. **Domain** — `etnos.papua.id`, `etnos.id`, `etnos.papua-tengah.id`, etc. DNS / Cloudflare Pages config waits on this.
-3. **Branding for beta vs alpha** — do we publicly call this "beta" or "early access"? Affects copywriting in `OnboardingModal.svelte` and `tentang/+page.svelte`.
-4. **First-cohort size + invite plan** — capped at ~200 like the alpha brief suggested, or open from day 1 with rate limits and a polished onboarding?
+### "How do you cap signups?" — short answer
 
-These do not block engineering work on items 2–12 (those are unambiguously needed regardless), but they do block items 1, 13, 14.
+We don't, technically, on piefed.social. Three caps are available later if we stand up our own backend:
+
+- **PieFed `RegistrationMode`** — `Open` / `RequireApplication` / `Closed`. Switch to `RequireApplication` to gate signups behind a written application + admin approval.
+- **Cloudflare Turnstile / hCaptcha** in front of `/signup` — blocks bots, not humans.
+- **Maintenance page swap** — DNS-level pause if traffic surges.
+
+For early access on piefed.social: just don't publicize. The cap is editorial.
 
 ---
 

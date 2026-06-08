@@ -19,10 +19,11 @@ ETNOS is the substrate Aksara operates in: a federated public square where human
 **Aksara (in-place node).** The flagship form factor:
 
 - **SBC**: Orange Pi 5 (RK3588S, NPU, 8–16 GB RAM)
-- **Secure element**: ATECC608B or Zymkey (for HSM-rooted DID key, BSrE seal storage, API-key vault)
+- **Secure element**: ATECC608B or Zymkey (for HSM-rooted DID key, BSrE seal storage, provisioning-token vault)
 - **Connectivity**: IoT SIM
 - **Output**: OLED strip (animated-eye presence indicator), e-ink strip (deliberate status display: pending tasks, sync status, alerts)
-- **Input**: STT (Whisper or Gemma multimodal)
+- **Audio input**: **Gemma 4 E4B native multimodal** (audio waveform → transcript + intent in one inference pass) as the primary ASR path; Whisper retained as CPU-only fallback if the multimodal model is not loaded
+- **Audio output**: TTS model TBD pending the research at `docs/research/indonesian-tts.md` — target expressive Bahasa Indonesia with streaming, ≥2 voice personas
 - **Hardware license**: CERN-OHL-S — designs published for community manufacturing
 
 **Aksara Go (field device).** For midwives, penyuluh, rangers:
@@ -123,7 +124,27 @@ This is the architectural choice that differs from the original v3.5 proposal wo
 - **Local SLM is also the PII-safe path.** When Presidio-ID detects sensitive content at the boundary, the reasoning routes locally rather than sending plaintext to the cloud. This keeps the data-residency commitment honest.
 - **NVIDIA NIM sandbox is a planned evaluation target** for hosting cloud-class inference inside Indonesian infrastructure — preserving "no data through foreign cloud" (§22 of the proposal) without sacrificing reasoning quality.
 
-The Hermes Agent's provider abstraction makes the routing pluggable. Swapping cloud providers (Anthropic ↔ NIM ↔ Bedrock) does not require architecture changes.
+The Hermes Agent's provider abstraction makes the routing pluggable. Swapping cloud providers (Anthropic ↔ NIM ↔ Bedrock ↔ OpenRouter) does not require architecture changes.
+
+### 3a. Managed API keys — the operator never sees a credential
+
+The end operator (Lurah, Bendahara, Bidan, Penyuluh) never deals with API keys. **PT Abstraksi Data & Kognitek manages all cloud LLM credentials as part of the Aksara service** — provisioning, rotation, fallback between providers, and billing. To the user it is "the device works"; behind the scenes a per-device, per-month subscription is what is selling.
+
+Implementation:
+
+- Each Aksara device boots with a **device-bound provisioning token** stored in the ATECC608B / Zymkey secure element. The token is what the device presents to PT Abstraksi's gateway to receive short-lived LLM API credentials, scoped per request.
+- The cloud LLM gateway sits between the device and the underlying providers (OpenRouter, Anthropic direct, NIM Indonesia). Rotation, fallback (NIM → Anthropic → OpenRouter), and per-tenant rate-limit are gateway concerns, not device concerns.
+- Diskominfo provincial admins receive **transparent usage reports** per kelurahan (tokens consumed, model routing breakdown, cost equivalent) on request — auditability is intact.
+- If a Diskominfo wants to bring-its-own provider key (e.g., they have a contract with Anthropic), the gateway supports that override at the institution level. Default path is platform-managed.
+
+### 3b. Telemetry sent back — anonymous fleet management only
+
+The Aksara device sends telemetry back to PT Abstraksi for fleet management. The categorical commitment:
+
+- **Sent:** uptime, error counts, model-routing health (which provider answered), token throughput, version of aksara-cli, version of Hermes Agent, OS health metrics.
+- **NOT sent:** conversation content, intent transcripts, citizen names, surat content, audio recordings, document images, kabupaten-level transaction metadata.
+
+The telemetry stream is documented per field, opt-out at the institution level (Diskominfo can disable for any device), and the schema lives at `docs/aksara/telemetry-schema.md` (forthcoming). PII or civic-transaction metadata in the telemetry pipeline would be a P0 incident.
 
 ---
 

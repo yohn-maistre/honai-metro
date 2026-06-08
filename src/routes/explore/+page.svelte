@@ -37,6 +37,48 @@
     <p class="text-sm text-slate-500 dark:text-zinc-400">
       {$t('etnos.explore.sorotan_subtitle')}
     </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-1">
+      {#each data.sorotan.highlights as h (h.id)}
+        {@const isPrimary = h.kind === 'primary'}
+        {@const accent = h.accent ?? 'primary'}
+        <a
+          href={h.href}
+          class={[
+            'rounded-2xl p-4 shadow-sm border transition-colors flex flex-col gap-2',
+            isPrimary
+              ? 'sm:col-span-2 lg:col-span-1 bg-gradient-to-br from-primary-50 to-white dark:from-primary-950/40 dark:to-zinc-900 border-primary-200/70 dark:border-primary-900/50 hover:border-primary-400 dark:hover:border-primary-600'
+              : accent === 'amber'
+                ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/60 dark:border-amber-900/40 hover:border-amber-400 dark:hover:border-amber-600'
+                : accent === 'emerald'
+                  ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-900/40 hover:border-emerald-400 dark:hover:border-emerald-600'
+                  : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 hover:border-primary-400 dark:hover:border-primary-600',
+          ]}
+        >
+          <div class="flex items-start gap-2">
+            <span class="text-2xl shrink-0" aria-hidden="true">{h.icon}</span>
+            <span class="font-semibold dark:text-white leading-tight">
+              {h.title}
+            </span>
+          </div>
+          <p class="text-sm text-slate-600 dark:text-zinc-400 leading-snug">
+            {h.subtitle}
+          </p>
+          <span
+            class={[
+              'inline-flex items-center gap-1 text-xs font-medium mt-1',
+              accent === 'amber'
+                ? 'text-amber-700 dark:text-amber-300'
+                : accent === 'emerald'
+                  ? 'text-emerald-700 dark:text-emerald-300'
+                  : 'text-primary-600 dark:text-primary-400',
+            ]}
+          >
+            {$t('etnos.explore.sorotan_open')}
+            <Icon src={ArrowRight} micro size="14" />
+          </span>
+        </a>
+      {/each}
+    </div>
   </section>
 
   {#each data.directory.groups as group (group.category)}

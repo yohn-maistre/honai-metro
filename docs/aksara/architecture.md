@@ -23,7 +23,11 @@ ETNOS is the substrate Aksara operates in: a federated public square where human
 - **Connectivity**: IoT SIM
 - **Output**: OLED strip (animated-eye presence indicator), e-ink strip (deliberate status display: pending tasks, sync status, alerts)
 - **Audio input**: **Gemma 4 E4B native multimodal** (audio waveform → transcript + intent in one inference pass) as the primary ASR path; Whisper retained as CPU-only fallback if the multimodal model is not loaded
-- **Audio output**: TTS model TBD pending the research at `docs/research/indonesian-tts.md` — target expressive Bahasa Indonesia with streaming, ≥2 voice personas
+- **Audio output (TTS, three tiers):**
+  - **Primary**: VoxCPM2 (Apache 2.0) hosted on a single A10/L4 at IDCloudHost or NVIDIA NIM Indonesia sandbox; 110 ms streaming, Indonesian first-class, voice design + cloning. Accessed from the device via streaming WebSocket.
+  - **On-device fallback**: Piper `id_ID-news_tts-medium` via sherpa-onnx with RKNN NPU delegation (RTF ~0.15, MIT, single news-register voice, real-time offline).
+  - **Last-resort cloud**: Google Cloud TTS Chirp 3 HD Indonesian (~$30/M chars), Presidio-gated to non-PII only.
+  - **Papuan Malay**: not handled by current models (June 2026); M9–M12 stretch is a Diskominfo Papua volunteer-corpus fine-tune of VoxCPM2, republished upstream.
 - **Hardware license**: CERN-OHL-S — designs published for community manufacturing
 
 **Aksara Go (field device).** For midwives, penyuluh, rangers:
@@ -43,6 +47,13 @@ ETNOS is the substrate Aksara operates in: a federated public square where human
 ---
 
 ## 2. The runtime stack
+
+> **Persona model.** Aksara's five personas (Staf Administrasi, Operator Sistem, Bendahara, Sekretaris, Arsiparis Digital) are implemented as **role-bound skill registries on a single Hermes Agent profile**, not five separate profiles. Hermes Agent profiles isolate memory + DID too aggressively for institutional shared state — five separate profiles would silo the Bendahara's notes away from the Sekretaris. One institutional profile with role-gated tool exposure (skill registry per persona, authorization by aksara-cli on UCAN capability + audit emission) preserves shared institutional memory while enforcing role-permission boundaries.
+>
+> **OpenViking in Hermes Agent.** Hermes Agent's `plugins/memory/openviking` subtree ships OpenViking as a first-class memory provider; selecting it is a single config flag, no external server. The composition with LightRAG (graph-RAG layer) happens at the retrieval-orchestration layer above both.
+>
+> **Hermes Agent license posture.** Hermes Agent is MIT — composes cleanly with ETNOS's AGPL-3.0 downstream. The upstream Warp integration discussion already walks this line; no licensing blocker.
+
 
 ```
 ┌────────────────────────────────────────────────────────────────┐
@@ -167,6 +178,26 @@ Aksara's split:
 - **aksara-cli executes** the formal output through validated templates, cryptographic primitives, and audit emission.
 
 The LLM never directly produces a BSrE-sealed letter. It calls a tool that produces it deterministically.
+
+**Enforcement mechanism (Hermes Agent's tool registration ⊥ exposure split).** Hermes Agent separates tool *registration* (the catalog of available capabilities) from tool *exposure* (which capabilities a given session can call). Aksara's aksara-cli tools are registered globally but exposed to the reasoning loop only under role + UCAN policy. A `pre_inference` hook plus the exposure filter is how the reasoning⊥execution rule is enforced at runtime, not just at documentation level.
+
+### 4a. Computer-use leg — sites without APIs
+
+Many Indonesian government systems (Dukcapil for citizen lookup, SISKEUDES for desa finance, SIPD for province budgets, OSS for licenses) expose partial or no public APIs. Aksara bridges into them via a **computer-use leg** — a sandboxed browser session driven by a vision-LLM that fills institutional forms on behalf of the Lurah / Bendahara with their credentials and per-step approval.
+
+The stack (`docs/research/computer-use-for-aksara.md`):
+
+- **Skyvern** (AGPL-3.0) — orchestrator, self-hosted on the **Hub provincial server** (or Aksara Pro on configurations without a Hub). Real production users on US government forms.
+- **Patchright** — anti-detection Playwright browser layer.
+- **Firecracker microVMs** — per-session sandbox isolation (2026 consensus that container isolation is insufficient for browser-driving agents holding credentials).
+- **OpenBao** — credential broker. The driver-VLM never sees plaintext credentials; it gets short-lived broker tokens per session.
+- **Vision-LLM** — routed through Hermes Agent's provider abstraction, not locked to any vendor's beta API.
+
+The leg is invoked as a tool call from the Hermes Agent loop: `aksara-cli computer_use(target, task, credentials_ref)`. Every action (click, type, navigate) is hashed and emitted to the Merkle audit log. Per-step approval is configurable: "approve every form submission" for high-risk flows, "approve once at finalize" for routine ones. Captchas pause and ask the human — no captcha-solving SaaS.
+
+**Cost:** ~$7.50/month/unit at MVP scale (500 docs/month). **Latency:** ~15s per Dukcapil-class flow. **Locality:** runs on Hub / Pro, never on the Aksara Pi 5 directly (insufficient resources for parallel browser + driver inference).
+
+**Upstream contribution opportunity:** no open project today documents Bahasa Indonesia UI-grounding evaluation. A ground-truth dataset + benchmark on Dukcapil / SISKEUDES / SIPD / OSS / SATUSEHAT screens is a clean publishable artifact, paired naturally with the CARE-as-Code framing.
 
 ---
 

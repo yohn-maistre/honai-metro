@@ -22,6 +22,9 @@
 | 8 | §11 / §31 — Validation flow | No change | Paket Kelurahan MVP unchanged |
 | 9 | §19 / §22 — API keys + telemetry | Net-new stance | Platform manages all cloud-LLM keys + billing; users never touch credentials; only anonymous fleet telemetry collected |
 | 10 | §13 / §19 — Gemma multimodal ASR | Stack simplification | Gemma 4 multimodal as native audio→text+intent; Whisper demoted to CPU fallback; TTS deferred to dedicated research doc |
+| 11 | §19 — TTS engine | Substrate name | **VoxCPM2 (Apache 2.0)** as primary, hosted at IDCloudHost or NIM Indonesia sandbox; Piper id_ID-news_tts-medium via sherpa-onnx + RKNN as on-device fallback; Google Cloud TTS Chirp 3 HD as last-resort (non-PII via Presidio gate) |
+| 12 | §13 — Persona model | Architecture clarification | Five Hermes Agent personas (Staf Administrasi, Operator Sistem, Bendahara, Sekretaris, Arsiparis Digital) implemented as **role-bound skill registries on ONE Hermes Agent profile**, not separate profiles — preserves shared institutional memory while keeping role-permission boundaries |
+| 13 | §14 / §327 — computer-use leg | Substrate name | **Skyvern (AGPL-3.0) self-hosted on Hub + Patchright + Firecracker microVMs + OpenBao broker tokens** as the legacy-government-system bridge stack; vision-LLM routed through Hermes Agent provider abstraction |
 
 ---
 
@@ -164,6 +167,58 @@ Insert between current line 369 and 371:
 **Rationale.** The original §19 mentioned "kunci API di vault" without specifying who manages them. The founder's clarification on 2026-06-08 makes the responsibility explicit: end users (institutions, civil servants) do not deal with API keys or model billing. PT Abstraksi handles provisioning, rotation, fallback, and billing as part of the Aksara service. Telemetry sent back is anonymous fleet-management data — no conversation content, no PII, no civic-transaction metadata. This is both a UX commitment (users never see "your OpenAI key expired") and a trust commitment (we explicitly limit what we collect for operations).
 
 This amendment is **net-new operational stance** that was not articulated in v3.5. Worth highlighting in the v3.6 cover note.
+
+---
+
+## Amendment 11 — TTS engine selection (§19)
+
+**Source line 339 (§19 — Aksara hardware spec), TTS line (already amended by Amendment 10):**
+
+Before (already amended):
+> TTS ekspresif Bahasa Indonesia — kandidat sedang dievaluasi (VoxCPM2 dan model SOTA lain dirinci di `docs/research/indonesian-tts.md`); target output streaming dengan minimal dua persona suara (formal dan ramah), mendukung intonasi Papuan Malay jika model memungkinkan.
+
+After:
+> **TTS ekspresif Bahasa Indonesia** dirinci dalam tiga lapis fallback:
+> - **Primer**: **VoxCPM2** (Apache 2.0, Indonesian first-class, 110 ms streaming, 30 bahasa, voice design + cloning) hosted di IDCloudHost A10/L4 atau NVIDIA NIM Indonesia sandbox, diakses dari device via streaming WebSocket. Memenuhi komitmen residensi data §22.
+> - **Fallback on-device**: **Piper `id_ID-news_tts-medium`** via sherpa-onnx dengan RKNN NPU delegation (RTF ~0.15 dengan 4.3× NPU speedup, MIT, satu suara news-register, real-time offline).
+> - **Last-resort cloud**: **Google Cloud TTS Chirp 3 HD Indonesian** (~$30 per juta karakter, gated melalui Presidio-ID untuk konten non-PII only).
+>
+> Papuan Malay tidak ditangani oleh model existing per Juni 2026; target M9–M12 adalah fine-tune VoxCPM2 dengan korpus relawan Diskominfo Papua, di-republish upstream sebagai kontribusi CARE.
+
+**Rationale.** The research (`docs/research/indonesian-tts.md`) settled the TTS question with a three-tier recommendation. Naming it explicitly in the proposal both shows due diligence and locks in the cloud-primary residency story (VoxCPM2 is the right cloud engine; Piper is the right on-device fallback; Google Chirp 3 is the last-resort gate for everything non-PII). The Papua-fine-tune as M9–M12 stretch goal is a deliverable that pairs naturally with the CARE-as-code contributions framing.
+
+---
+
+## Amendment 12 — Persona model (§13)
+
+**Insert into §13 (Reasoning) as a new sub-paragraph after the Amendment-10 multimodal paragraph:**
+
+> **Persona model.** Lima persona Aksara (Staf Administrasi, Operator Sistem, Bendahara, Sekretaris, Arsiparis Digital) diimplementasikan sebagai **role-bound skill registries pada SATU profil Hermes Agent**, bukan lima profil terpisah. Profile-level isolation di Hermes Agent memisahkan memori + DID terlalu agresif untuk shared institutional state — implementasi lima profil terpisah akan membuat Bendahara tidak melihat catatan yang disimpan Sekretaris. Satu profil dengan role-gated tool exposure (skill registry per persona) menjaga shared institutional memory utuh sembari membatasi tool access per role. Otorisasi role-switching dilakukan oleh aksara-cli berdasarkan UCAN capability + audit emission.
+
+**Rationale.** Identified during deep research on Hermes Agent's session and profile model. Naive interpretation ("one persona = one profile") would silo institutional memory in ways that break the Aksara value proposition (the Sekretaris referring to the Bendahara's note about citizen X yesterday). The right model is one institutional profile with role-gated skill registries.
+
+---
+
+## Amendment 13 — Computer-use leg substrate (§14, §327)
+
+**Source line 327 (§14 — substrate commitments, government-systems access paths):**
+
+Before:
+> Jalur akses sistem pemerintahan: BSrE melalui registrasi OPD atau Diskominfo sebagai Registration Authority dengan Abstraksi sebagai pengembang aplikasi; Dukcapil dan e-KYC via kontrak Privy atau Verihubs; Peruri e-meterai via distributor resmi; SATUSEHAT via developer portal; sistem tanpa API via **leg computer-use dengan kredensial institusi sendiri**.
+
+After:
+> Jalur akses sistem pemerintahan: BSrE melalui registrasi OPD atau Diskominfo sebagai Registration Authority dengan Abstraksi sebagai pengembang aplikasi; Dukcapil dan e-KYC via kontrak Privy atau Verihubs; Peruri e-meterai via distributor resmi; SATUSEHAT via developer portal; sistem tanpa API via **leg computer-use yang dijalankan oleh stack Skyvern (AGPL-3.0) self-hosted di Hub provinsi, dengan Patchright sebagai browser layer, Firecracker microVM sebagai sandbox per-session, dan OpenBao sebagai credential broker yang memastikan driver-VLM tidak pernah melihat kredensial institusi dalam plaintext**. Vision-LLM yang menggerakkan loop di-route via Hermes Agent provider abstraction sehingga tidak terkunci ke vendor beta API tertentu.
+
+**Rationale.** The original §14 / §327 hand-waved the computer-use leg as "kredensial institusi sendiri" without naming a substrate. The research (`docs/research/computer-use-for-aksara.md`) found that:
+- Hosted incumbent products (Operator successor, Mariner successor) shut down or consolidated and are now hosted-only — fatal for §22 residency
+- Skyvern is **the** open-source option combining AGPL self-hosting, structured government-form positioning, native vault + 2FA hooks, and LLM-provider-agnostic core (real US-gov-forms production users)
+- 2026 consensus that shared-kernel containers are insufficient isolation for browser-driving agents holding credentials → **Firecracker microVMs** per session
+
+Cost: ~$7.50/month/unit at MVP scale (500 docs/month); latency ~15 s per Dukcapil-class flow. Named explicitly because the procurement framing (Diskominfo APBD line items) needs a credible cost basis.
+
+**Insert into §22 (Software stack) at the end:**
+
+> **Computer-use leg infrastructure (di Hub).** Skyvern orchestrator (AGPL-3.0) + Patchright browser + Firecracker microVM sandbox per session + OpenBao credential broker. Berjalan di Hub provinsi (atau Aksara Pro pada konfigurasi tanpa Hub) — tidak pernah pada Aksara device langsung karena Pi 5 tidak cukup untuk multiple browser sessions + driver inference paralel.
 
 ---
 

@@ -12,19 +12,15 @@ A skeptical pass at running HippoRAG-class memory per Aksara node and federating
 
 ---
 
-## 1. HippoRAG 2 — what it actually is, and why we don't run it as-shipped
+## 1. HippoRAG 2 — what it is, why we don't ship it as-is
 
-[HippoRAG 2 (Gutiérrez et al., Feb 2025; arXiv:2502.14802)](https://arxiv.org/abs/2502.14802) is "From RAG to Memory: Non-Parametric Continual Learning for LLMs". The core mechanic is a **dual-node knowledge graph** of passages and extracted phrases, traversed with **Personalized PageRank** seeded by a query's entity matches, then re-ranked by an LLM that filters triples. It claims +7 F1 over NV-Embed-v2 on associative (multi-hop) benchmarks and reduced token use vs GraphRAG ([HippoRAG 2 HTML](https://arxiv.org/html/2502.14802v1)).
+[HippoRAG 2 (Gutiérrez et al., Feb 2025; arXiv:2502.14802)](https://arxiv.org/abs/2502.14802) — "From RAG to Memory: Non-Parametric Continual Learning for LLMs" — is a **dual-node KG** of passages and extracted phrases, traversed by **Personalized PageRank** seeded on query entities, with LLM-filtered triples. It claims +7 F1 over NV-Embed-v2 on associative benchmarks and lower tokens than GraphRAG ([paper HTML](https://arxiv.org/html/2502.14802v1)).
 
-**What the code actually requires.** The OSU-NLP-Group reference ([github.com/OSU-NLP-Group/HippoRAG](https://github.com/OSU-NLP-Group/HippoRAG)) is a research artifact: `torch==2.5.1`, `vllm==0.6.6.post1`, `nvidia/NV-Embed-v2` as the embedder, optional GritLM/Contriever, Llama-3.3-70B-Instruct for triple extraction and filtering. The paper's reported configuration: **4× H100 with tensor parallelism, ~4 hours to index 10k documents.** A kelurahan with five years of surat-domisili plus puskesmas immunization logs is comfortably 100k–500k records. Indexing on a CAX21 (4 vCPU ARM, 8 GB RAM) is not a 5× scaling problem; it is a wrong-substrate problem. Even swapping the 70B for a quantized 3B Qwen via Ollama (sweet spot on Pi 5: ~2-5 tok/s per [Stratosphere Lab](https://www.stratosphereips.org/blog/2025/6/5/how-well-do-llms-perform-on-a-raspberry-pi-5)) leaves the embedder dependency: NV-Embed-v2 is 7.85B parameters and ~16 GB FP16.
+**What the code actually requires.** The OSU-NLP reference ([github.com/OSU-NLP-Group/HippoRAG](https://github.com/OSU-NLP-Group/HippoRAG)) pins `torch==2.5.1`, `vllm==0.6.6.post1`, NV-Embed-v2 (7.85B params, ~16 GB FP16) as embedder, Llama-3.3-70B for triple extraction. **Reported config: 4× H100 with tensor parallelism, ~4 hours to index 10k documents.** A kelurahan with five years of surat-domisili plus immunization logs is comfortably 100k–500k records. This is a wrong-substrate problem on a CAX21, not a 5× scaling problem. Swapping the 70B for Qwen 3B via Ollama (~2–5 tok/s on a Pi 5 per [Stratosphere Lab](https://www.stratosphereips.org/blog/2025/6/5/how-well-do-llms-perform-on-a-raspberry-pi-5)) still leaves the embedder dependency.
 
-**What we keep from HippoRAG 2.** Three ideas, not the code:
+**What we keep from HippoRAG 2 — three ideas, not the code.** (1) Passage + phrase dual nodes: also embed entities (citizen DID, dusun, hutan adat) and connect them as graph nodes — that's what makes multi-hop kinship queries tractable. (2) Personalized PageRank seeded by query entities; networkx handles it on a Pi. (3) LLM-filtered triple extraction *at ingest, not at query* — pay the cloud-model cost once when a surat-domisili is filed, not on each Q&A.
 
-1. **Passage + phrase dual nodes.** Don't embed only chunks; also embed extracted entities (citizen DID, dusun, dinas, hutan adat name) and connect them as graph nodes. This is what makes multi-hop "Has anyone in our Dewan recorded a kinship vouching for this person?" tractable without an LLM crawling the whole memory.
-2. **Personalized PageRank seeded by query entities.** Cheap to compute on a small graph; `networkx` does it on a Pi.
-3. **LLM-filtered triple extraction at ingest, not at query.** Pay the LLM cost once when a surat-domisili is filed, not every time someone asks about it. Use a Tier-2 cloud model (Anthropic, OpenAI, or a Telkomsel-hosted vLLM endpoint per OTSUS sovereignty rules) at ingest; query-time can be local.
-
-**Verdict on HippoRAG 2.** Research-grade in 2026, not deployable as-shipped per-Aksara. **Score 2/5 for deployment, 5/5 as architecture vocabulary.** A peer 90%-functional alternative — **LightRAG** ([github.com/HKUDS/LightRAG](https://github.com/LarFii/LightRAG-hku), EMNLP 2025; [LightRAG paper](https://arxiv.org/html/2410.05779v1)) — has 34k+ stars, runs against external LLMs (no GPU required), supports Postgres/Neo4j/SQLite/Faiss backends, and shipped role-specific LLM configs in May 2026 (cheap extractor, smarter query model). LightRAG is what we actually ship.
+**Verdict.** Research-grade, not deployable per-Aksara. **2/5 deployment, 5/5 architecture vocabulary.** The 90% alternative — **LightRAG** ([repo](https://github.com/LarFii/LightRAG-hku), EMNLP 2025; [paper](https://arxiv.org/html/2410.05779v1)) — has 34k+ stars, runs against external LLMs (no GPU required), supports Postgres/Neo4j/SQLite/Faiss backends, and shipped role-specific LLM configs in May 2026 (cheap extractor, smarter query model). Ship LightRAG.
 
 ## 2. Graph-RAG landscape — pick LightRAG, hold the rest
 
@@ -40,7 +36,7 @@ A skeptical pass at running HippoRAG-class memory per Aksara node and federating
 | **RAGFlow** | Slim 2 GB / full 9 GB Docker ([Firecrawl 2026 list](https://www.firecrawl.dev/blog/best-open-source-rag-frameworks)) | Apache 2.0 | Medium | Prod, doc-centric | Skip — wrong shape |
 | **OpenViking (ByteDance)** | Untested on ARM | Apache 2.0 | Unknown | New, 13k stars | Defer, ByteDance origin concerns |
 
-**The mix that ships.** LightRAG for the document-rooted KG (surat-domisili, ceremony logs, immunization records). Memori for conversation memory (the steward asked Hermes X yesterday; remember it). Cognee revisited at the 12-month mark only if LightRAG's adat KG ceremony modeling proves too lossy.
+**Mix that ships:** LightRAG for the document-rooted KG; Memori for conversation memory; Cognee revisited at 12 months only if LightRAG's adat KG modeling proves too lossy.
 
 ## 3. The local Aksara stack
 
@@ -54,41 +50,38 @@ One process tree per node: Hermes harness → MCP → local skill server → SQL
 
 **Device tiers.** Edge = Pi 5 8 GB or laptop, cache + ingest only, forwards Q&A to its kabupaten hub, works offline-deferred. Aksara default = Hetzner CAX21 (4 vCPU ARM, 8 GB, 80 GB SSD; ~€7/mo). Hub = CAX31/CAX41 (8–16 GB), bigger Ollama, vLLM batch ingest, federated query aggregator. **Pi-only as primary substrate is a romantic story that costs reliability;** CAX21 is the default.
 
-## 4. Federated retrieval — the hard part, plus what to actually ship
+## 4. Federated retrieval — the hard part, plus what to ship
 
-The user lists four query shapes. Each is a different protocol problem.
+The user's four query shapes map to different protocol problems:
 
 | Query | Routing | Permission | Privacy |
 |---|---|---|---|
-| Citizen X's immunization | A→B direct (Aksara A knows X's home puskesmas via the DID Document `service` chain) | UCAN scoped to `subject=DID(X)`, `relation=read:immunization` | Standard TLS + signed result; no PIR needed |
-| Dewan kinship vouch | A→{B,C,…} fan-out within a Dewan-scoped peer set | UCAN issued by Dewan, scoped to `dewan=...`, M-of-N witness | Standard TLS |
-| Public Dinas Kesehatan publication | A→Dinas (public) | None — public lexicon record | None |
-| Cross-Aksara semantic search for "hutan adat Asmat" | A→peer set, semantic match | UCAN per peer that opted into the search index | Hard. Punt to public-only in v1 |
+| Citizen X's immunization | A→B direct via X's DID Document `service` chain | UCAN scoped `subject=DID(X)`, `relation=read:immunization` | TLS + signed result |
+| Dewan kinship vouch | A→{B,C,…} fan-out in Dewan peer set | UCAN issued by Dewan, M-of-N witness | TLS |
+| Dinas Kesehatan public publication | A→Dinas | None — public lexicon | None |
+| Cross-Aksara semantic search "hutan adat Asmat" | A→peer set, semantic match | UCAN per peer opted-in | Hard — public-only in v1 |
 
-**Routing — what works in 2026.** We do **not** broadcast. Two complementary patterns:
+**Routing — no broadcast.** Two complementary patterns. (1) **Capability registry per ETNOS instance:** each Aksara publishes an A2A Agent Card listing lexicons, scopes, and a capability sentence; the ETNOS AppView builds a small HNSW index over those sentences. This is the *Federation of Agents* pattern with Versioned Capability Vectors ([arXiv:2509.20175](https://arxiv.org/abs/2509.20175)), and it composes natively with the A2A stack from `unified-federation-protocol.md`. (2) **DID-Document `service` entries for canonical routing:** a citizen's DID has a `service` of type `PrimaryPuskesmas`; for "X's immunization?" we resolve the DID and route directly. Use semantic routing only when canonical lookup is empty.
 
-1. **Capability registry per ETNOS instance.** Each Aksara publishes an *A2A Agent Card* listing its lexicons, scopes, and a sentence-level capability description. The ETNOS AppView indexes these into a small HNSW vector index. Aksara A asks the AppView "who serves immunization for citizens born in Mimika?" and gets a ranked list of peer DIDs. This is the *Federation of Agents* pattern ([arXiv:2509.20175](https://arxiv.org/abs/2509.20175)) with Versioned Capability Vectors over A2A Agent Cards — a perfect fit because it composes natively with the A2A spec we already adopted in `unified-federation-protocol.md`.
-2. **DID Document service entries for canonical routing.** A citizen's DID has a `service` entry of type `PrimaryPuskesmas` pointing at the puskesmas DID. For "what is X's immunization?", we resolve X's DID and route to the named puskesmas — no semantic search needed. Use semantic only when the directed-graph answer is empty.
+**Transport.** A2A v1.0 ([a2a-protocol.org spec](https://a2a-protocol.org/v0.2.6/specification/)) over JSON-RPC: one A2A Task per `query/retrieve`. UCAN rides in `Authorization: Bearer ucan:...`; receiver verifies the chain locally (no authority callback) and returns a typed `RetrievalResponse` with PDS record URIs as provenance.
 
-**Transport — A2A v1.0 over JSON-RPC, UCAN in headers.** A2A reached v1.0 in 2026 under the Linux Foundation ([a2a-protocol.org spec](https://a2a-protocol.org/v0.2.6/specification/)) with stable Agent Cards, Tasks, and JSON-RPC bindings. Our retrieval request is *one A2A Task* with a typed `query/retrieve` payload. The UCAN rides in an `Authorization: Bearer ucan:...` header; the receiving Aksara verifies the chain locally (no callback to an authority), evaluates over its memory, and returns a typed `RetrievalResponse` with provenance refs (PDS record URIs from `unified-federation-protocol.md` §8).
+**Permission gating.** UCAN attenuates across hops ([delegation spec](https://github.com/ucan-wg/delegation)): a Dewan grants a 30-day read to a researcher's agent; the agent attenuates further when calling subordinate Aksaras. Responder checks: caller DID = `aud`, chain validates to a known issuer, scope covers the request, expiry valid. Sacred-tagged content additionally requires a libsodium sealed-box decrypt against the Dewan threshold key.
 
-**Permission gating.** UCAN attenuates across hops, which lets a Dewan grant a 30-day read scope to a researcher's agent and the researcher's agent further attenuate it when calling subordinate Aksaras ([UCAN delegation spec](https://github.com/ucan-wg/delegation)). The Aksara responder runs four checks: caller DID matches `aud`, UCAN chain validates to a known issuer, scope covers the request, expiry not passed. If the requested content is sacred-tagged, an additional libsodium sealed-box decrypt step against the Dewan threshold key gates the read.
+**Privacy-preserving retrieval — not in v1.** PIR is improving fast — PIR-RAG's cluster-and-fetch ([arXiv:2509.21325](https://arxiv.org/html/2509.21325)) and information-theoretic semantic PIR ([Vithana et al.](https://arxiv.org/pdf/2003.13667)) — but bandwidth and CPU costs are still 10×–1000× a TLS GET at province scale. The right v1 answer to "do you have records about Y" is "you had to present a UCAN scoped to Y; we trust it; we answer." PIR returns when the threat model includes a curious peer correlating query patterns over time — post-2027.
 
-**Privacy-preserving retrieval — not in v1.** PIR is real and improving fast. PIR-RAG ([arXiv:2509.21325](https://arxiv.org/html/2509.21325)) shows a cluster-and-fetch architecture using lattice-based PIR and coarse semantic clustering; semantic PIR has a clean information-theoretic formulation ([Wang et al.](https://arxiv.org/pdf/2003.13667)). Bandwidth and CPU cost are still 10×–1000× a TLS GET for the same answer at province scale. **For Papua in 2026, the right answer to "do you have records about Y" is "the caller had to present a UCAN scoped to Y to ask; we trust the UCAN; we answer."** PIR returns to the table when we have an adversary model that says "another Aksara is curious enough to inspect query patterns over time," which is post-2027 territory.
+**Result merging.** Aksara A reranks responses from peers B, C, D by: provenance weight (pemerintah > adat for civic facts, adat > pemerintah for cultural), cosine similarity, recency. **No fact in the synthesized answer without a citable peer DID + record URI.**
 
-**Result merging.** Aksara A receives `RetrievalResponse` from peers B, C, D — each with passages, attribution (peer DID), the lexicon record URI, a confidence score, and a UCAN-proof-of-authority. A reranks: (1) provenance weight (Aksara-class tier first — pemerintah > adat for civic facts, adat > pemerintah for cultural facts), (2) cosine similarity to the original query, (3) recency. Citation is mandatory: every fact in the synthesized answer carries the source Aksara's DID + record URI. **No fact without a citable peer URI.**
-
-**Caching.** A UCAN's `expiry` claim is the cache TTL. Aksara A may cache peer answers in a `peer_cache` table indexed by `(query_hash, peer_did, ucan_cid)`. Revocation: when the peer publishes a `revoke` record in its PDS, A's nightly subscriber clears matching cache rows. This is the same revocation pattern as `unified-federation-protocol.md` §6.
+**Caching.** UCAN `expiry` is the cache TTL; entries indexed by `(query_hash, peer_did, ucan_cid)`. Revocation: a peer's `revoke` PDS record clears matching cache rows via the nightly subscriber from `unified-federation-protocol.md` §6.
 
 ## 5. Composition with the chosen federation substrate
 
-`unified-federation-protocol.md` committed us to PieFed (forum) + atproto PDS (per-actor memory) + A2A + UCAN. The decentralized-memory layer slots in cleanly:
+`unified-federation-protocol.md` committed us to PieFed + atproto PDS + A2A + UCAN. The memory layer slots in cleanly:
 
-- **The PDS *is* part of the local memory.** Typed records under `id.papua.*` lexicons are the canonical, signed, hash-addressed primary content. The Aksara node's SQLite is a **derived index** of its own PDS — re-buildable from the firehose of its PDS at any time. This is structurally analogous to a Bluesky AppView except it is per-Aksara.
-- **A2A is the retrieval transport.** Federated `query/retrieve` is one Task type. Federated `ingest/notify` (peer pushes a relevant record to A's index) is another.
-- **ActivityPub `Search` is NOT a real thing in 2026.** There is no FEP for federated semantic search; FEP-6606 (collections addressing) is the closest in spirit and is unrelated. We do **not** invent FEP-search; we use A2A.
-- **ActivityPods quad-store: defer.** When NextGraph self-hostable broker actually ships (still mid-late 2026 target per `sovereign-stack-architecture.md` §1; tracked monthly), we re-evaluate whether an Aksara's SQLite-derived KG should be re-projected into a SPARQL-queryable quad-store for cross-Aksara analytics. Not in v1.
-- **NextGraph CRDTs as offline-first: also defer.** Our offline-first story for kelurahan in 3T areas is "ingest queue on the Pi 5, sync to CAX21 when bandwidth allows." That is an SQLite WAL plus a sync daemon, not a CRDT engine.
+- **The PDS *is* part of local memory.** Typed records under `id.papua.*` lexicons are the canonical, signed, hash-addressed source. The Aksara node's SQLite is a **derived index**, rebuildable from the PDS firehose. Structurally a per-Aksara AppView.
+- **A2A is the retrieval transport.** `query/retrieve` is one Task type; `ingest/notify` (peer pushes a relevant record to A's index) is another.
+- **ActivityPub `Search` is not a real thing in 2026.** No FEP for federated semantic search exists; FEP-6606 (collections addressing) is unrelated. We do not invent FEP-search; we use A2A.
+- **ActivityPods quad-store: defer** until NextGraph's self-hostable broker actually ships (mid-late 2026 target per `sovereign-stack-architecture.md` §1; tracked monthly). Re-evaluate then whether to re-project SQLite into a SPARQL quad-store for cross-Aksara analytics.
+- **NextGraph CRDTs as offline-first: defer.** Our 3T-area story is "ingest queue on the Pi 5, sync to CAX21 when bandwidth allows" — an SQLite WAL plus a sync daemon, not a CRDT engine.
 
 ## 6. Readiness scorecard
 
@@ -108,20 +101,11 @@ The user lists four query shapes. Each is a different protocol problem.
 
 ## 7. Phased plan
 
-**Now → end of 2026 (alpha).** Local-only per-Aksara RAG. No federation. The pilot kelurahan from `unified-federation-protocol.md` §10 gets a CAX21 running:
-1. PieFed already federates content.
-2. New: a SQLite + sqlite-vec + LightRAG memory bound to the kelurahan's PDS, ingesting every typed record into the index.
-3. A Hermes skill `aksara.memory.search(query)` calls LightRAG locally.
-4. The "demo" is: a steward says "show me last month's surat-domisili for warga turun-temurun Dani"; Hermes answers with cited records from the local index alone. No peer queries.
+**Now → end of 2026 (alpha).** Local-only per-Aksara RAG, no federation. The pilot kelurahan from `unified-federation-protocol.md` §10 gets a CAX21 with SQLite + sqlite-vec + LightRAG bound to the kelurahan's PDS, ingesting every typed record. A Hermes skill `aksara.memory.search(query)` calls LightRAG locally. Demo: steward asks "show me last month's surat-domisili for warga turun-temurun Dani"; Hermes returns cited records from the local index alone.
 
-**End-2026 → mid-2027 (beta).** Two Aksara nodes federate. Pilot kelurahan + pilot puskesmas. Both expose an A2A endpoint. Kelurahan asks puskesmas about immunization for a citizen X; UCAN issued by the kelurahan's steward against the kelurahan's own DID, scoped to `read:immunization` for `subject=DID(X)`, valid 7 days. Puskesmas verifies, evaluates over its memory, returns results with provenance. This is the smallest defensible federated-memory demo we can claim. A2A Agent Cards are published, but no semantic capability-vector routing yet — routing is by hand-edited registry.
+**End-2026 → mid-2027 (beta).** Two Aksaras federate — pilot kelurahan + pilot puskesmas, both exposing an A2A endpoint. Kelurahan asks puskesmas about immunization for citizen X; UCAN issued by the kelurahan steward against the kelurahan DID, scoped `read:immunization` for `subject=DID(X)`, 7-day expiry. Puskesmas verifies, evaluates, returns with provenance. A2A Agent Cards published; routing still by hand-edited registry, not semantic.
 
-**Mid-2027 → end-2028.** Multi-Aksara federation:
-- ETNOS AppView ingests Agent Cards and builds the HNSW capability-vector index per Federation-of-Agents.
-- Cross-Aksara semantic search ships, gated by a coarse public-only label by default; sacred and sealed lexicons require pre-issued UCANs from the respective Dewan or institution.
-- Cognee or LightRAG-with-quad-projection re-evaluated for adat KG modeling that's richer than triple extraction.
-- ActivityPods + NextGraph re-evaluated *only if* the NextGraph broker actually self-hosts and Pod ACLs in NextGraph clearly subsume our UCAN+sealed-box story.
-- PIR remains research-only. We may publish a short prototype paper for a research grant track, not ship to production.
+**Mid-2027 → end-2028.** ETNOS AppView ingests Agent Cards and builds the HNSW capability-vector index per Federation-of-Agents. Cross-Aksara semantic search ships, public-by-default; sacred and sealed lexicons require pre-issued UCANs from the respective Dewan. Cognee / LightRAG-with-quad-projection re-evaluated for adat KG depth. ActivityPods + NextGraph re-evaluated *only if* the NextGraph broker actually self-hosts and Pod ACLs subsume our UCAN+sealed-box story. PIR stays research-only — possibly a grant-track paper, not production.
 
 ## 8. What we'd be inventing (be honest)
 
@@ -137,32 +121,27 @@ The user lists four query shapes. Each is a different protocol problem.
 
 ## 9. Adversarial and governance
 
-**Threat model.** Minimum: a *curious Aksara operator* — the steward of a peer node who, given access, would read more than they're supposed to. Realistic medium-term: a *malicious Aksara* — a node that lies in its responses to defame an individual or community. Out-of-scope for v1: *state-level adversary* compromising a node's keys end-to-end.
+**Threat model.** Minimum: a *curious Aksara operator* who would read more than allowed if granted access. Medium-term: a *malicious Aksara* that lies in its responses. Out of scope for v1: state-level adversary compromising keys end-to-end.
 
-**Defenses we ship.**
+**Defenses shipped.** No synthesized fact without provenance (peer DID + record URI) — lies become attributable. Per-peer trust weighting in the reranker; pemerintah-weighted for civic, adat-weighted for cultural. UCAN scoping mandatory: no "read everything" capability is issuable; default expiry 7 days. Both ends log requester DID, UCAN CID, scope, response hash, timestamp; logs append-only, Merkle-anchored daily per `sovereign-stack-architecture.md`.
 
-- **No fact without provenance.** Every synthesized answer cites peer DID + record URI. Lies become attributable.
-- **Per-peer trust weighting.** The reranker downweights answers from a peer with prior dispute records. Adat answers weighted higher in adat domain, pemerintah higher in civic.
-- **UCAN scoping minimizes exposure.** No "read everything" capability is issuable; the issuer must specify subject + relation + expiry. The default expiry is 7 days.
-- **All retrievals are logged.** Both ends log: requester DID, UCAN CID, scope, response hash, timestamp. Logs are append-only and Merkle-anchored daily per `sovereign-stack-architecture.md`. A peer claiming "you never asked us that" can be refuted by the log.
+**KG poisoning.** Recent research is unambiguous — five malicious passages can drive 90% attack success ([Securing RAG taxonomy, arXiv:2604.08304](https://arxiv.org/html/2604.08304v1); [GraphRAG under Fire, arXiv:2501.14050](https://arxiv.org/pdf/2501.14050)). Defenses, in order: (1) ingest only from signed PDS records of known Aksaras — no open-web scraping at v1; (2) sacred and civic-action lexicons require BSrE or Dewan threshold co-signatures at ingest, so triples are signed-in; (3) sparse-document attention at synthesis time to block cross-document collusion ([SDAG, arXiv:2602.04711](https://www.arxiv.org/pdf/2602.04711)); (4) monthly red-team injecting known-poisoned triples into a staging Aksara to validate the reranker downweights.
 
-**KG poisoning.** Recent research is unambiguous: five malicious passages can drive 90% attack success on RAG KGs ([Securing RAG taxonomy, arXiv:2604.08304](https://arxiv.org/html/2604.08304v1); [GraphRAG under Fire, arXiv:2501.14050](https://arxiv.org/pdf/2501.14050)). Our defenses in priority order: **(1)** ingest only from signed PDS records of known Aksaras — no scraping the open web at v1; **(2)** sacred and civic-action lexicons require BSrE or Dewan threshold-co-signatures at ingest, so triples are signed-in; **(3)** sparse-attention pattern (SDAG) for the synthesizer call to prevent cross-document collusion at query time; **(4)** monthly red-team script that injects known-poisoned triples into a staging Aksara and validates the reranker downweights them.
+**Takedown propagation.** A CARE-labeled takedown is a new signed PDS event (`docs/aksara/onboarding.md` §10). Subscribers tombstone on receipt; peer caches clear via §4's revocation pattern. Federated answers older than the takedown remain in the log (tamper-evidence requires it) but cannot be re-served. The AppView rejects responses whose provenance refs are in the tombstone set.
 
-**Takedown propagation.** A CARE-labeled takedown is a new signed event in the issuing Aksara's PDS (per `docs/aksara/onboarding.md` §10). Subscribers tombstone the original record on receipt. Peer caches expire via the revocation pattern in §4. **Federated answers older than the takedown remain in the log** — tamper-evidence requires it — but cannot be re-served. New synthesis queries must not surface tombstoned content; the AppView rejects responses whose provenance refs are in the tombstone set.
-
-**Audit story.** Every cross-Aksara retrieval generates a triple of artifacts: the UCAN chain, the request hash, the response hash. These three plus timestamps go into the daily Merkle anchor. A Dewan can audit "did Aksara X really see Y?" by reconstructing the chain from public anchors.
+**Audit.** Every cross-Aksara retrieval emits {UCAN chain, request hash, response hash, timestamp} into the daily Merkle anchor. A Dewan can reconstruct "did Aksara X really see Y?" from public anchors.
 
 ## 10. The "openviking" question
 
-Best-guess identification of the user's mangled term, ranked:
+Best-guess identification, ranked:
 
-1. **OpenViking** (ByteDance) — confirmed. "Filesystem-paradigm context DB for AI agents." Dense + sparse + hybrid embeddings, hierarchical retrieval, ~13k stars in early 2026 ([MarkTechPost coverage](https://www.marktechpost.com/2026/03/15/meet-openviking-an-open-source-context-database-that-brings-filesystem-based-memory-and-retrieval-to-ai-agent-systems-like-openclaw/); [docs.openviking.ai](https://docs.openviking.ai/en/faq/faq); [Red Hat deployment guide](https://developers.redhat.com/articles/2026/04/23/deploy-openviking-openshift-ai-improve-ai-agent-memory)). **Score 3/5.** Interesting hierarchical model that maps well to "Aksara → Dusun → Citizen" addressing. **Concern:** ByteDance origin, untested on ARM, and we already have a sufficient stack. Defer to 2027.
-2. **OpenVINO** (Intel) — irrelevant. Inference toolkit, not memory.
-3. **OpenCog AtomSpace** — academic, not deployable per-node in 2026.
-4. **Oxigraph** — covered in §3.
-5. **ourkb** — no project with this name found; likely transcription artifact.
+1. **OpenViking** (ByteDance) — confirmed. Filesystem-paradigm context DB for AI agents, dense + sparse + hybrid embeddings, hierarchical retrieval, ~13k stars early 2026 ([docs.openviking.ai](https://docs.openviking.ai/en/faq/faq); [MarkTechPost coverage](https://www.marktechpost.com/2026/03/15/meet-openviking-an-open-source-context-database-that-brings-filesystem-based-memory-and-retrieval-to-ai-agent-systems-like-openclaw/); [Red Hat guide](https://developers.redhat.com/articles/2026/04/23/deploy-openviking-openshift-ai-improve-ai-agent-memory)). **3/5.** Interesting hierarchical model that maps cleanly to "Aksara → Dusun → Citizen" addressing. Concerns: ByteDance origin, untested on ARM, our stack is already sufficient. Defer to 2027.
+2. OpenVINO (Intel inference toolkit) — irrelevant.
+3. OpenCog AtomSpace — academic, not deployable.
+4. Oxigraph — covered in §3.
+5. "ourkb" — no matching project found; likely transcription noise.
 
-**Recommendation on the term:** treat OpenViking as the candidate, score 3/5, defer until LightRAG's limitations actually bite (probably 2027).
+**Recommendation:** OpenViking is the candidate, scored 3/5, deferred until LightRAG's limitations actually bite.
 
 ---
 

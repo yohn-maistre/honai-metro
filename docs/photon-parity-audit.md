@@ -28,57 +28,54 @@ locale dropdown.**
 
 | Photon feature | In ETNOS? | If no, why | Restore? | Effort |
 | --- | --- | --- | --- | --- |
-| Multi-account switching | Yes — `src/lib/feature/user/ProfileSelection.svelte`, wired into sidebar at `src/lib/ui/sidebar/Sidebar.svelte:52-59` | — | n/a | — |
-| Lemmy + PieFed dual backend | Yes — `PiefedClient` referenced at `src/lib/feature/post/form/PostForm.svelte:3,69`, `src/lib/feature/post/actions/PostActionsMenu.svelte:2,86` | — | n/a | — |
-| Infinite scroll | Yes — `svelte-infinite-scroll` imported at `src/lib/feature/post/feed/VirtualFeed.svelte:21,295` | — | n/a | — |
-| Virtualized comment list | Yes — `src/lib/feature/comment/CommentListVirtualizer.svelte` | — | n/a | — |
-| Image post viewer (lightbox + alt text) | Yes — `src/lib/feature/post/media/PostImage.svelte:23-108`, expand modal via `src/lib/ui/generic/ExpandableImage.svelte:11` | — | n/a | — |
-| Native video player | Yes — `<video controls>` in `src/lib/feature/post/media/PostIframe.svelte:129-132` | — | n/a | — |
-| YouTube embed with Invidious/Piped frontends | Yes — `src/lib/feature/post/media/PostIframe.svelte:13-66` (full domain rewrite for `youtube`/`invidious`/`piped`) | — | n/a | — |
-| Click-to-view embeds (bandwidth saver) | Yes — `settings.embeds.clickToView` at `src/lib/app/settings.svelte.ts:78,161`, gated in `PostIframe.svelte:114-115,128` | — | n/a | — |
-| Polls (PieFed v1.4+) | Yes — `src/lib/feature/post/media/PostPoll.svelte`, wired in `PostMedia.svelte:7,45-46` | — | n/a | — |
-| Events (PieFed v1.4+) | Yes — `src/lib/feature/post/media/PostEvent.svelte`, wired in `PostMedia.svelte:6,47-48` | — | n/a | — |
-| Custom thumbnails (v2.2.2) | Yes — `customThumbnail` state in `src/lib/feature/post/form/PostForm.svelte:76`, persisted in `postform.svelte.ts:98,113` | — | n/a | — |
-| Markdown editor toolbar (bold/italic/link/header/strike/quote/list/code/spoiler/sub/sup/image) | Yes — twelve buttons in `src/lib/app/markdown/MarkdownEditor.svelte:172-288`, parity with upstream | — | n/a | — |
-| Markdown editor keyboard shortcuts (Ctrl+B/I/S/H/K, Ctrl+Enter submit) | Yes — `src/lib/app/markdown/MarkdownEditor.svelte:59-65,79-85` | — | n/a | — |
-| Paste-image-into-editor | Yes — `src/lib/app/markdown/MarkdownEditor.svelte:309-315` | — | n/a | — |
-| Spoiler tags (`::: spoiler`) | Yes — renderer at `src/lib/app/markdown/renderers/spoiler/`, `MdSpoiler.svelte` | — | n/a | — |
-| Subtext + table renderers | Yes — `src/lib/app/markdown/renderers/subtext/`, `table/` | — | n/a | — |
-| Subscript / superscript markdown | Yes — `MdSubscript.svelte`, `MdSuperscript.svelte` in renderers/ | — | n/a | — |
-| LaTeX / Mermaid | **Never had upstream** — Photon doesn't ship either (`MarkdownEditor.svelte` has no math/mermaid toolbar; renderers/ has no `MdMath` or `MdMermaid`). Grep for `latex|katex|mermaid` in our tree returns 0 hits. | No | — |
-| Theme system (multi-theme, presets, color editor) | Yes — `src/lib/app/theme/theme.svelte.ts`, `presets.ts` (we added Honai Metro, kept Mono, Classic, AMOLED, Catppuccin, Neutral), editor at `src/routes/theme/+page.svelte:135-146` | — | n/a | — |
-| `PUBLIC_THEME` instance default export | Yes — honored at `src/lib/app/theme/presets.ts:85,92,100-102` | — | n/a | — |
-| Light / dark / system color scheme | Yes — `src/lib/ui/sidebar/Sidebar.svelte:131-155` | — | n/a | — |
-| Command palette (Ctrl-K / Ctrl-P / `/`) | Yes — `src/lib/ui/navbar/commands/CommandsHost.svelte:11-19`, palette UI at `Commands.svelte:141-187`, fuzzy search at `:64-95` | — | n/a | — |
-| Per-action keyboard shortcuts (Ctrl+H home, Ctrl+I inbox, Ctrl+letter for themes) | Yes — defined in `src/lib/ui/navbar/commands/actions.svelte.ts:87,249,380`, dispatched at `Commands.svelte:141-154` | — | n/a | — |
-| Crosspost flow | Yes — `crosspostB64()` in `src/lib/feature/post/actions/PostActionsMenu.svelte:30-43,66-70`, `settings.crosspostOriginalLink` honored | — | n/a | — |
-| Hide / unhide post | Yes — `hidePost()` at `src/lib/feature/post/helpers.ts:122-133`, button at `PostActionsMenu.svelte:86-105` | — | n/a | — |
-| Mark-read / mark-unread tracking | Yes — `markAsRead()` import at `PostActionsMenu.svelte:7,52-62`, auto-mark on open at `src/routes/post/[instance]/[id=integer]/+page.svelte:43-52`, settings flag `markPostsAsRead` at `settings.svelte.ts:72,157` | — | n/a | — |
-| Fade-read posts (visual) | Yes — `markReadPosts` flag at `settings.svelte.ts:30,114` (note upstream name is misleading) | — | n/a | — |
-| Resumables / "continue where you left off" | Yes — `resumableStore` at `src/lib/feature/legacy/item.ts:87-106`, surfaced in command palette via `Commands.svelte:9,31` | — | n/a | — |
-| Keyword/URL post filters (v2.3.0) | Yes — `src/lib/feature/post/filters.svelte.ts:1-41`, integrated in `PostFeed.svelte:59` and `VirtualFeed.svelte:226` | — | n/a | — |
-| Settings UI for keyword filters | **Yes in routes** (`src/routes/settings/other/` parity) but **not yet localized** to `id`/`pmy` | Yes — beta | S |
-| PieFed user notes (v2.2.0) | Yes — `src/lib/feature/user/UserNote.svelte:1-58`, calls `client().setNote` | — | n/a | — |
-| User blocks (block user, block instance, block community) | Yes — full surface at `src/routes/profile/(local_user)/settings/+page.svelte` (grep hit) and inbox routes | — | n/a | — |
-| Moderation menu (ban, remove, lock, feature, view-votes) | Yes — `src/lib/feature/moderation/` has all nine upstream files (`ApplicationDenyModal`, `BanModal`, `CommentModerationMenu`, `Moderation`, `ModerationMenu`, `RemoveModal`, `ReportModal`, `ShieldIcon`, `ViewVotesModal`, `moderation.ts`, `report.ts`) — byte-identical layout to upstream | — | n/a | — |
-| Reports queue (`/moderation`) | Yes — `src/routes/moderation/+page.svelte`, `Report.svelte`, sub-routes `c/[id=integer]`, `communities/` | — | n/a | — |
-| Modlog | Yes — `src/routes/modlog/`, `modlogCardView` setting at `settings.svelte.ts:64,150` | — | n/a | — |
-| Admin panel (applications, config, federation, media, taglines, team) | Yes — six upstream subroutes all present at `src/routes/admin/` | — | n/a | — |
-| Registration applications | Yes — `src/routes/registration_applications/` | — | n/a | — |
-| Inbox (replies, mentions, messages) | Yes — `src/routes/inbox/`, `inbox/messages/[user_id=integer]/`, `InboxItem.svelte` | — | n/a | — |
-| Private messages w/ markdown | Yes — `settings.messages.fullMarkdown` at `settings.svelte.ts:106,189` | — | n/a | — |
-| Saved items | Yes — `src/routes/saved/` | — | n/a | — |
-| Multi-language UI (sveltekit-i18n) | Yes — `src/lib/app/i18n/`. **ETNOS deliberately commented out** ~15 upstream locales (de, es, fr, ja, nl, pl, pt, ru, tr, zh-Hans, zh-Hant, bg, et, fi, hu, tok) to keep `id`/`pmy`/`en` only, per CUSTOMIZATIONS.md | Skip | — |
-| PWA + share_target | Yes — `static/manifest.json:53-61` with `share_target` pointing at `/go`, plus `shortcuts` (Wiki/Dashboard/Inbox) | — | n/a | — |
-| Cross-server content retrieval (v2.3.0 auto) | Yes — present in the `2.3.0` API adapter rewrite that we inherited | — | n/a | — |
-| Auto-detect server software at login (v2.2.0) | Yes — inherited | — | n/a | — |
-| Cozy / Compact view toggle | Yes — `settings.view` at `settings.svelte.ts:9,37,153`, switched in `PostMedia.svelte:34-49` | — | n/a | — |
-| NSFW blur toggle | Yes — `settings.nsfwBlur` at `settings.svelte.ts:59,140`, gated in `PostMedia.svelte:23` | — | n/a | — |
-| QR code share | Yes — `@svelte-put/qr` dep, imported in `PostForm.svelte:44` (`QrCode` icon) | — | n/a | — |
-| Donate / Buy-Me-A-Coffee footer | **Suppressed** — `env.PUBLIC_XYLIGHT_MODE` gate at `src/lib/ui/sidebar/Sidebar.svelte:227` defaults off | Skip | — |
-| `/translators` route credit page | Yes — `src/routes/translators/` (preserved) | — | n/a | — |
-| External ActivityPub interaction handler | Yes — `src/routes/activitypub/` (preserved) | — | n/a | — |
-| Email verify / password reset routes | Yes — `src/routes/verify_email/[token]/`, `password_change/[token]/` | — | n/a | — |
+| Multi-account switching | Yes — `src/lib/feature/user/ProfileSelection.svelte`, wired at `src/lib/ui/sidebar/Sidebar.svelte:52-59` | — | — |
+| Lemmy + PieFed dual backend | Yes — `PiefedClient` at `src/lib/feature/post/form/PostForm.svelte:3,69` | — | — |
+| Infinite scroll | Yes — `svelte-infinite-scroll` at `src/lib/feature/post/feed/VirtualFeed.svelte:21,295` | — | — |
+| Virtualized comment list | Yes — `src/lib/feature/comment/CommentListVirtualizer.svelte` | — | — |
+| Image post viewer (lightbox + alt text) | Yes — `src/lib/feature/post/media/PostImage.svelte:23-108`, expand modal via `src/lib/ui/generic/ExpandableImage.svelte:11` | — | — |
+| Native video player | Yes — `<video controls>` in `src/lib/feature/post/media/PostIframe.svelte:129-132` | — | — |
+| YouTube via Invidious/Piped | Yes — `src/lib/feature/post/media/PostIframe.svelte:13-66` | — | — |
+| Click-to-view embeds (bandwidth saver) | Yes — `settings.embeds.clickToView` at `settings.svelte.ts:78,161`, gated at `PostIframe.svelte:114-115,128` | — | — |
+| Polls (PieFed v1.4+) | Yes — `src/lib/feature/post/media/PostPoll.svelte` | — | — |
+| Events (PieFed v1.4+) | Yes — `src/lib/feature/post/media/PostEvent.svelte` | — | — |
+| Custom thumbnails (v2.2.2) | Yes — `PostForm.svelte:76`, persisted in `postform.svelte.ts:98,113` | — | — |
+| Markdown toolbar (12 buttons incl spoiler/sub/sup) | Yes — `src/lib/app/markdown/MarkdownEditor.svelte:172-288` | — | — |
+| Editor shortcuts (Ctrl+B/I/S/H/K, Ctrl+Enter) | Yes — `MarkdownEditor.svelte:59-65,79-85` | — | — |
+| Paste-image-into-editor | Yes — `MarkdownEditor.svelte:309-315` | — | — |
+| Spoiler / subtext / table renderers | Yes — `src/lib/app/markdown/renderers/{spoiler,subtext,table}/` | — | — |
+| Sub/superscript markdown | Yes — `MdSubscript.svelte`, `MdSuperscript.svelte` | — | — |
+| LaTeX / Mermaid | **Never had upstream** — no math/mermaid in `MarkdownEditor` or renderers; grep returns 0 hits in our tree | No | — |
+| Theme system (multi-theme, presets, color editor) | Yes — `src/lib/app/theme/theme.svelte.ts`, `presets.ts` (Honai Metro + Mono/Classic/AMOLED/Catppuccin/Neutral), editor at `src/routes/theme/+page.svelte:135-146` | — | — |
+| `PUBLIC_THEME` instance default export | Yes — `src/lib/app/theme/presets.ts:85,92,100-102` | — | — |
+| Light / dark / system color scheme | Yes — `Sidebar.svelte:131-155` | — | — |
+| Command palette (Ctrl-K / Ctrl-P / `/`) | Yes — `src/lib/ui/navbar/commands/CommandsHost.svelte:11-19`, palette at `Commands.svelte:141-187` | — | — |
+| Per-action keyboard shortcuts | Yes — `actions.svelte.ts:87,249,380`, dispatcher `Commands.svelte:141-154` | — | — |
+| Crosspost flow | Yes — `crosspostB64()` `PostActionsMenu.svelte:30-43,66-70` | — | — |
+| Hide / unhide post | Yes — `hidePost()` `helpers.ts:122-133`, button `PostActionsMenu.svelte:86-105` | — | — |
+| Mark-read tracking | Yes — auto-mark on open `routes/post/[instance]/[id=integer]/+page.svelte:43-52`, settings `settings.svelte.ts:72,157` | — | — |
+| Fade-read posts | Yes — `markReadPosts` flag `settings.svelte.ts:30,114` | — | — |
+| Resumables / continue-where-you-left-off | Yes — `resumableStore` `src/lib/feature/legacy/item.ts:87-106`, surfaced in palette via `Commands.svelte:9,31` | — | — |
+| Keyword/URL post filters (v2.3.0) | Yes — `src/lib/feature/post/filters.svelte.ts:1-41`, integrated in `PostFeed.svelte:59`, `VirtualFeed.svelte:226` | — | — |
+| Filter settings UI | Routes present but **not localized** to `id`/`pmy` | Beta | S |
+| PieFed user notes | Yes — `src/lib/feature/user/UserNote.svelte:1-58` | — | — |
+| User / instance / community blocks | Yes — `src/routes/profile/(local_user)/settings/+page.svelte` and inbox routes | — | — |
+| Full mod menu (ban, remove, lock, feature, view-votes) | Yes — all 9 upstream files in `src/lib/feature/moderation/` | — | — |
+| Reports queue + sub-routes | Yes — `src/routes/moderation/{+page,Report,c/[id=integer],communities}` | — | — |
+| Modlog | Yes — `src/routes/modlog/`, `modlogCardView` setting `settings.svelte.ts:64,150` | — | — |
+| Admin panel (6 subroutes) | Yes — `src/routes/admin/{applications,config,federation,media,taglines,team}` | — | — |
+| Registration applications | Yes — `src/routes/registration_applications/` | — | — |
+| Inbox (replies, mentions, DMs) | Yes — `src/routes/inbox/`, `InboxItem.svelte` | — | — |
+| Private messages w/ markdown | Yes — `settings.messages.fullMarkdown` `settings.svelte.ts:106,189` | — | — |
+| Saved items | Yes — `src/routes/saved/` | — | — |
+| Multi-language UI | Yes; **ETNOS commented out ~15 upstream locales** to keep `id`/`pmy`/`en` only, per CUSTOMIZATIONS.md | Skip | — |
+| PWA + share_target | Yes — `static/manifest.json:53-61`, shortcuts: Wiki/Dashboard/Inbox | — | — |
+| Auto cross-server retrieval (v2.3.0) | Yes — inherited via API-adapter rewrite | — | — |
+| Auto-detect server software at login (v2.2.0) | Yes — inherited | — | — |
+| Cozy / Compact view toggle | Yes — `settings.view` `settings.svelte.ts:9,37,153` | — | — |
+| NSFW blur toggle | Yes — `settings.nsfwBlur` `settings.svelte.ts:59,140` | — | — |
+| QR code share | Yes — `@svelte-put/qr`, imported in `PostForm.svelte:44` | — | — |
+| Donate / Buy-Me-A-Coffee footer | **Suppressed** — `env.PUBLIC_XYLIGHT_MODE` gate `Sidebar.svelte:227` | Skip | — |
+| `/translators`, `/activitypub`, verify-email, password-reset routes | Yes — preserved | — | — |
 
 ## Mobile UX
 

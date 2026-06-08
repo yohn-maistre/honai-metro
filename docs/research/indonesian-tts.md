@@ -49,43 +49,39 @@ Weights reflect Aksara's constraints: Indonesian quality > license > deployabili
 
 ## 2. The candidate verdict — yes, with a footnote
 
-The user's candidate is the right pick **as the cloud-primary engine**, not as an on-device engine. The reasons are concrete:
+The user's candidate is the right pick **as the cloud-primary engine**, not as an on-device engine.
 
-**For it.** Indonesian is a first-class supported language in the 30-language list, not a "we trained mostly English and threw some IPA in" afterthought. The model's own ASR-side eval shows 1.36% WER on Indonesian — that is a strong signal the speech embedding genuinely captures Bahasa Indonesia phonotactics. Apache 2.0 covers commercial civic use without strings. The diffusion-AR architecture is genuinely expressive (intonation, register, questions, emphasis are not flat). 110 ms first-byte streaming and chunked output meet the "user hears speech start before generation finishes" constraint. Voice design (text-described personas like "warm female administrative voice, Jakarta accent, professional") plus voice cloning gives us trivial mapping to the five Aksara personas. The release is recent (April–May 2026), the project has momentum, and a community CPU port (`VoxCPM.cpp` on GGML, Q4_K / Q8_0 GGUF) exists for the future.
+**For it.** Indonesian is a first-class supported language in the 30-language list, not an afterthought. The model's own ASR-side eval shows 1.36% WER on Indonesian — strong signal the speech embedding captures Bahasa Indonesia phonotactics. Apache 2.0 covers commercial civic use without strings. The diffusion-AR architecture is genuinely expressive (intonation, register, questions, emphasis). 110 ms first-byte streaming meets the "user hears speech start before generation finishes" constraint. Voice design (text-described personas) plus voice cloning gives trivial mapping to the five Aksara personas. Recent release (April–May 2026), strong momentum, and a community CPU port (`VoxCPM.cpp` on GGML, Q4_K / Q8_0 GGUF) exists for future edge work.
 
-**Against it for the Pi.** The model is 2 B parameters, bf16 ≈ 8 GB VRAM. On CPU, the community port reports model-only RTF of 3.83–15.02 (i.e. **4–15 seconds of compute per second of audio**) — multiple minutes for a typical surat-response utterance. Even with Q4_K quantization, the Orange Pi 5's CPU is unlikely to hit real-time, and the RKNN NPU does not yet have a port for diffusion-AR TTS models (the RKNN ecosystem is mature for VITS-style and YOLO-style models, not yet for this class). Edge-deployment is **not the right altitude for this model in 2026**.
+**Against it for the Pi.** The model is 2 B parameters, bf16 ≈ 8 GB VRAM. On CPU, the community port reports model-only RTF of 3.83–15.02 — **4–15 seconds of compute per second of audio**, multiple minutes for a typical surat-response utterance. Even Q4_K won't hit real-time on the Pi CPU, and the RKNN NPU does not yet have a port for diffusion-AR TTS (mature for VITS-style only). Edge-deployment is **not the right altitude for this model in 2026**.
 
-**Where it fits.** It belongs at the same altitude as the cloud LLM. Aksara's architecture (v3.6 Amendment 5) is already cloud-primary for reasoning, with the local SLM as backstop. Putting the expressive TTS on the same cloud tier is consistent: surat responses, persona dialogue, ETNOS-side voice messages all hit the cloud TTS when the IoT SIM is up. When the SIM drops or PII is detected at boundary, the node falls back to a smaller offline voice. That is the same routing rule Hermes Agent already uses for reasoning — no new architectural primitive needed.
+**Where it fits.** Same altitude as the cloud LLM. Aksara's architecture (v3.6 Amendment 5) is already cloud-primary for reasoning with local SLM as backstop; cloud TTS on the same tier is consistent. Same routing rule Hermes Agent already uses for reasoning — no new primitive.
 
 ---
 
 ## 3. Indonesian quality — who actually sounds Indonesian?
 
-Marketing claims about "supports Bahasa Indonesia" are mostly meaningless because the relevant question is whether native Indonesian audio was in the training set at scale. The honest groupings:
+"Supports Bahasa Indonesia" is mostly meaningless; the question is whether native Indonesian audio was in training at scale.
 
-- **Trained on real Indonesian at scale**: the primary cloud candidate (1.36% Indonesian ASR-WER is hard to fake), Google Chirp 3 HD ID, Azure Neural HD ID (Gadis, Ardi), and ElevenLabs Indonesian voices. Native-speaker spot-checks on Hugging Face Spaces and the Google/Azure demo pages confirm these sound like Indonesian people, not English speakers reading IPA.
-- **Trained on Indonesian, but flat / single-register**: `facebook/mms-tts-ind` (VITS, MMS project — sounds fine but newsreader-monotone), Piper `id_ID-news_tts-medium` (community FT on news corpus, similar register), CSM-1B Indonesian fine-tune (81 speakers, 24 kHz, surprisingly varied for an OSS FT).
-- **Community Indonesian fine-tunes of English models**: F5-TTS-INDO-FINETUNE-V2 and Ijazah_Palsu_V2 explicitly acknowledge speaker-similarity and emotion mismatch issues. They're usable for demos, not production civic flows.
-- **Claims Indonesian, untested or "global coverage tier"**: Fish Audio S2 Pro puts Indonesian in the second tier behind zh/en/ja — interpret as "we have data, we did not optimize for it." OpenAI's TTS inherits Whisper's language list (50+ langs) but Indonesian is unevaluated. CosyVoice 3.5 added Indonesian in March 2026 — no independent native-speaker review surfaced as of June 2026; needs evaluation before commitment.
-- **Does not support Indonesian**: Kokoro, MeloTTS (base), Chatterbox Multilingual base, NVIDIA Magpie TTS Multilingual, MaskGCT, Style-TTS 2, NaturalSpeech 3.
+- **Trained on real Indonesian at scale**: the primary cloud candidate (1.36% ID ASR-WER), Google Chirp 3 HD ID, Azure Neural HD ID (Gadis, Ardi), ElevenLabs ID voices. Native-speaker spot-checks on the Google/Azure demo pages confirm these sound like Indonesian people, not English speakers reading IPA.
+- **Trained on Indonesian, but flat / single-register**: `facebook/mms-tts-ind`, Piper `id_ID-news_tts-medium`, CSM-1B Indonesian fine-tune (81 speakers, 24 kHz, surprisingly varied for an OSS FT).
+- **Community FTs of English models**: F5-TTS-INDO-FINETUNE-V2, Ijazah_Palsu_V2 — acknowledge speaker-similarity and emotion mismatch. Demo-grade, not civic-grade.
+- **Claims Indonesian, untested**: Fish Audio S2 Pro ("Global Coverage" tier behind zh/en/ja). OpenAI gpt-4o-mini-tts (Whisper language list). CosyVoice 3.5 (added March 2026, no independent native-speaker review yet).
+- **Does not support Indonesian**: Kokoro, MeloTTS base, Chatterbox Multilingual base, NVIDIA Magpie TTS Multi, MaskGCT, Style-TTS 2, NaturalSpeech 3.
 
-The bar for "good Indonesian" should be **"a native speaker from Jayapura can listen for 30 seconds and not flinch at vowel length, the final-glottal-stop on words ending in -k, or the stress pattern on three-syllable Sanskrit-derived words like *sertifikat*."** Apply this bar in pilot; do not trust vendor leaderboards.
+The bar for "good Indonesian" should be: a native speaker from Jayapura can listen 30 seconds and not flinch at vowel length, the final-glottal-stop on words ending in -k, or stress on Sanskrit-derived words like *sertifikat*. Apply this in pilot; do not trust vendor leaderboards.
 
 ---
 
 ## 4. Deployment story — primary engine
 
-**Where it runs.** A single A10 (24 GB) or L4 (24 GB) GPU instance at IDCloudHost (or inside the NVIDIA NIM Indonesia sandbox once available — the v3.6 §22 data-residency commitment is satisfied either way because both are Indonesia-hosted). The model in bf16 fits comfortably; even an A10 has headroom for 4–8 concurrent streams. The same VM hosts a small FastAPI/WebSocket service that exposes:
+**Where it runs.** Single A10 (24 GB) or L4 (24 GB) instance at IDCloudHost (or NVIDIA NIM Indonesia sandbox when available — v3.6 §22 residency commitment satisfied either way). The bf16 model fits with headroom for 4–8 concurrent streams. The VM hosts a small FastAPI/WebSocket service: `POST /tts/synthesize` (short), `WS /tts/stream` (default for surat), per-persona endpoints with cached voice-design prompts.
 
-- `POST /tts/synthesize` for non-streaming (short utterances)
-- `WS /tts/stream` for chunked streaming (default for surat responses)
-- Per-persona endpoints with cached voice-design prompts and (optionally) cloned reference clips
+**Latency budget.** Cloud-side first-byte ≤ 200 ms (model 110 ms + jitter). IoT-SIM RTT to Jakarta adds 60–150 ms. Total perceived first-byte ≤ 400 ms — inside the 1 s Tier B target. Full 30-second surat-response generates in ≈ 9 s on A10 (RTF ~0.3); chunked output means the user hears the first second of audio almost immediately.
 
-**Latency budget.** Cloud-side first-byte ≤ 200 ms (model 110 ms + jitter). Network IoT-SIM RTT to Jakarta GPU adds 60–150 ms. Total perceived first-byte ≤ 400 ms in normal conditions — well inside the 1 s Tier B target. Full 30-second surat-response utterance generates in ≈ 9 seconds on A10 (RTF ~0.3), but chunked output means the user hears the first second of audio almost immediately and the rest streams behind.
+**Memory budget.** Cloud: 8 GB VRAM + ~2 GB overhead. Pi: zero — WebSocket client + audio sink only. Preserves Pi RAM for Gemma 4 E4B (≈ 4 GB), LightRAG + sqlite-vec (≈ 1 GB), Hermes Agent, aksara-cli.
 
-**Memory budget.** Cloud: 8 GB VRAM for the model, ~2 GB for runtime overhead. Pi: zero — the Pi only runs the WebSocket client and an audio sink. This preserves the Pi's RAM for Gemma 4 E4B (≈ 4 GB), LightRAG + sqlite-vec (≈ 1 GB), Hermes Agent runtime, and aksara-cli.
-
-**Audio pipeline on the Pi.** WebSocket consumer → opus decoder → ALSA sink (for the OLED/e-ink panel's small speaker) or WhatsApp voice-note upload (for citizen delivery, where the chunked stream is buffered locally and packaged as a single Ogg-Opus file). The Pi never synthesizes; it receives PCM/Opus frames.
+**Audio pipeline on the Pi.** WebSocket consumer → Opus decode → ALSA sink (panel speaker) or buffer to Ogg-Opus file (WhatsApp voice-note delivery). The Pi never synthesizes; it receives PCM/Opus frames.
 
 **Routing rule** (consistent with Hermes Agent provider abstraction):
 
@@ -97,34 +93,29 @@ TTS request
   └─ Cloud engine 5xx for 30s → fall through to Google Cloud TTS Chirp 3 HD ID (paid API, residency: Singapore region acceptable for non-PII responses; Presidio gates this path)
 ```
 
-The PII gate matters: a cloud TTS provider receives the text to synthesize. For surat content (which includes NIK, KK numbers, names), routing through ElevenLabs or OpenAI is a data-residency violation. The primary engine is OK because it runs in Indonesia; the fallback Google API is OK only for non-PII responses (greetings, status updates, error messages); for PII surat read-aloud during a cloud outage, the system degrades to the Pi-side Piper voice and a "*kualitas suara sederhana, koneksi terbatas*" notice.
+The PII gate matters: a cloud TTS provider receives the text to synthesize. Surat content (NIK, KK numbers, names) routed through ElevenLabs/OpenAI is a residency violation. The primary engine is OK because it runs in Indonesia; the Google API fallback is OK only for non-PII (greetings, status, errors). For PII surat read-aloud during a cloud outage the system degrades to Pi-side Piper plus a "*kualitas suara sederhana, koneksi terbatas*" notice.
 
 ---
 
 ## 5. Cloud fallback cost
 
-For the high-polish API fallback (Google Chirp 3 HD Indonesian):
+For the API fallback (Google Chirp 3 HD ID): **$30 per 1 M characters**. A typical surat-response is ~600 chars in ~30 s → **$0.018/utterance**. At 500 docs/month/unit × ~3 voice interactions = 1500 utterances/unit/month = **$27/unit/month** worst-case if every utterance hit the paid API. In practice the primary engine handles >95% of traffic; fallback lands at <$2/unit/month.
 
-- **$30 per 1 million characters** input.
-- A typical surat-response utterance is ~600 characters spoken in ~30 seconds. That is **$0.018 per utterance**.
-- At the pilot success metric of 500 docs/month/unit, with ~3 voice interactions per doc, that is ~1500 utterances/unit/month = **$27/unit/month** worst-case if every utterance hit the paid API.
-- In practice the primary engine handles >95% of traffic. Fallback cost lands at <$2/unit/month. Negligible vs. compute budget.
+Alternatives: Azure Neural HD ID at $22/M chars (Gadis, Ardi voices, high quality, Azure account ops needed). ElevenLabs ID: highest quality, $330/month Scale minimum for production-volume. OpenAI gpt-4o-mini-tts: cheapest at ~$0.015/min of audio, mid-tier ID quality.
 
-Azure Neural HD ID at $22/M chars is cheaper and has the Gadis/Ardi voices (high quality), but requires Azure account ops. ElevenLabs Indonesian is highest quality and highest cost ($330/month Scale plan minimum for production-volume). OpenAI gpt-4o-mini-tts is cheapest at ~$0.015/min of audio but Indonesian quality is mid-tier.
-
-Primary engine self-hosted on IDCloudHost A10 runs ~$0.50/hour × 730 hours = **$365/month flat** for the GPU, serving ~600 concurrent-stream-hours. Across 7 pilot units that is **$52/unit/month** — same order as the API but with better latency and full residency control. The math flips in our favor as pilot scales.
+Primary engine self-hosted on IDCloudHost A10 ≈ $0.50/hr × 730 hr = **$365/month flat**, ~600 concurrent-stream-hours. Across 7 pilot units that is **$52/unit/month** — same order as the API but with better latency and full residency control. The math flips in our favor as pilot scales.
 
 ---
 
 ## 6. License gotchas
 
-- **Microsoft Edge-TTS is off the table.** It is technically Azure neural voices behind a free wrapper, and Microsoft's TOS explicitly says it is for Edge browser reader use only. Using it in production civic flows is a TOS violation, however quiet. Do not let anyone slip this into a "free voice on the demo" Friday-afternoon shortcut.
-- **facebook/mms-tts-ind is CC-BY-NC 4.0.** Non-commercial. A government-issued surat with revenue-attached service is commercial activity by any reasonable read. Skip.
-- **XTTS-v2 is CPML** (Coqui Public Model License) which requires a paid commercial license. Coqui the company also closed in December 2025, so no one is even available to sell us one. Skip.
-- **Bark, MeloTTS, OpenVoice v2 are MIT.** Fine licensing-wise; they just don't speak Indonesian well enough to matter.
-- **Primary cloud engine is Apache 2.0.** Clean for commercial civic use, including BSrE-sealed audio attachments to surat if we ever go there.
-- **The CSM-1B Indonesian fine-tune and the F5-TTS Indonesian fine-tunes** inherit MIT / Apache 2.0 from upstream. The Hugging Face model cards do not assert additional restrictions. Diligence: re-check the dataset licenses (SuaraGabungan-ID, the curated Bahasa corpus the Ijazah model used) before any production commitment — community fine-tunes occasionally train on copyrighted radio/podcast audio without saying so.
-- **Cloud APIs (Google, Azure, ElevenLabs, OpenAI)** carry standard commercial T&Cs; verify the per-character / per-token contract supports broadcast/civic output (it does, in all four cases as of 2026).
+- **Edge-TTS is off the table.** Azure neural voices behind a free wrapper; Microsoft TOS limits to Edge browser reader use. Production civic use is a TOS violation. Block at the demo level.
+- **facebook/mms-tts-ind is CC-BY-NC 4.0.** Government-issued surat counts as commercial. Skip.
+- **XTTS-v2 is CPML** (paid commercial license required), and Coqui closed December 2025 — no one to sell us one. Skip.
+- **Bark, MeloTTS base, OpenVoice v2 are MIT.** Fine licensing-wise; they don't speak Indonesian well enough to matter.
+- **Primary cloud engine is Apache 2.0.** Clean for civic use, including BSrE-sealed audio attachments.
+- **CSM-1B-ID and F5-TTS Indonesian FTs** inherit MIT / Apache 2.0 upstream. Diligence: re-check dataset licenses (SuaraGabungan-ID, the curated Bahasa corpus Ijazah used) before production — community FTs sometimes train on copyrighted radio/podcast audio undeclared.
+- **Cloud APIs (Google, Azure, ElevenLabs, OpenAI)** standard commercial T&Cs; all four support broadcast/civic output as of 2026.
 
 ---
 
@@ -140,42 +131,40 @@ The Master Proposal names five personas (§11): **Staf Administrasi, Operator Si
 | Arsiparis Digital | Neutral/androgynous, monotone-by-design (archive narration) | Voice design prompt |
 | Operator Sistem | Male, terse, technical register, fewer fillers | Voice design prompt |
 
-Voice design via text description avoids reference-clip licensing entirely (no need for a real person to record reference audio). If pilot feedback wants more local-color, we can clone from a single 10-second clip of a willing local volunteer per persona, with explicit consent recorded via CARE-as-Code.
+Voice design via text avoids reference-clip licensing. If pilot feedback wants more local color, clone from a 10-second clip of a willing local volunteer per persona, consent via CARE-as-Code.
 
-**On-device fallback** has only the one Piper voice; under degraded mode all personas collapse to a single "Staf Administrasi-suara-darurat" speaker. The UI should make this transparent ("**Mode darurat: koneksi terbatas, suara seragam**").
+**On-device fallback** has only the one Piper voice; under degraded mode all personas collapse to one "Staf Administrasi-suara-darurat" speaker. UI should be transparent: "**Mode darurat: koneksi terbatas, suara seragam**".
 
 ---
 
 ## 8. Papuan Malay — the honest answer
 
-No current TTS model produces convincing Papuan Malay. The literature has expressive Indonesian work (Tacotron 2 + Global Style Token for Indonesian / Javanese / Sundanese, INTERSPEECH 2023 STEN-TTS for code-switching), but none of it is Papuan-specific, and no open model has Papuan training data at meaningful scale. The primary engine produces Jakarta-register Bahasa Indonesia. That is the v1 reality.
+No current TTS model produces convincing Papuan Malay. The literature has expressive ID work (Tacotron 2 + Global Style Token for ID/Jv/Su, INTERSPEECH 2023 STEN-TTS code-switching), but none is Papuan-specific, and no open model has Papuan data at meaningful scale. The primary engine produces Jakarta-register Bahasa Indonesia. That is the v1 reality.
 
-Three options for the gap, in increasing ambition:
+Three options, increasing ambition:
 
-1. **Accept Jakarta-register for pilot.** Most government surat output is already in formal Jakarta-register Bahasa; this matches user expectation for institutional voice. Papuan Malay matters more in citizen-facing intake (which is voice-to-text, where Gemma multimodal handles it) than in node response. Acceptable for M0–M12.
+1. **Accept Jakarta-register for pilot.** Government surat output is already Jakarta-formal; matches user expectation for institutional voice. Papuan Malay matters more in citizen-facing intake (voice-to-text, Gemma multimodal handles it) than in node response. Acceptable M0–M12.
+2. **Light voice-cloning from a Papuan speaker.** 10-second clip of a Papuan civil servant via primary engine cloning. Prosody shifts Papuan, segmentals stay Jakarta-Bahasa. CARE-as-Code consent, revocable, clip-not-stored beyond local Pi.
+3. **Fine-tune the primary engine on a Papuan Malay corpus** (M9–M12 stretch). 5–20 h of clean speech from a Diskominfo Papua volunteer dataset. Apache 2.0 weights let us republish as a Papua-specific community contribution. Aligns with the Hub-level federated-learning track in §36.
 
-2. **Light voice-cloning from a Papuan speaker.** A 10-second clip of a Papuan civil servant willing to "lend their voice" to the local Aksara node, via the primary engine's controllable voice cloning. Prosody shifts toward Papuan intonation, segmentals stay Jakarta-Bahasa. Better than option 1; ethical sourcing required (CARE-as-Code consent, revocable, clip-not-stored beyond the local Pi).
-
-3. **Fine-tune the primary engine on a small Papuan Malay corpus** (M9–M12 stretch). 5–20 hours of clean Papuan-Malay speech from a volunteer Diskominfo Papua dataset is feasible. Apache 2.0 weights let us republish the fine-tune to the community as a Papua-specific contribution. This is the most defensible long-term answer and aligns with the Hub-level federated-learning track in the proposal (§36).
-
-Flag this as a known limitation in the pilot communication. Do not over-promise "Aksara berbicara Papua" in M0–M6.
+Flag as a known limitation in pilot comms. Do not over-promise "Aksara berbicara Papua" in M0–M6.
 
 ---
 
 ## 9. The unsatisfying caveat
 
-Indonesian TTS in mid-2026 is **good enough for civic deployment but not yet good enough to feel intimate.** The primary engine will sometimes mis-stress *kepala kelurahan* on the wrong syllable. Cloud Indonesian voices from Google/Azure are smoother but read formal text more naturally than they read conversational text — they sound like announcements, not like the staf at the loket. ElevenLabs is closest to "feels human" but is foreign-hosted and pricey for civic budget.
+Indonesian TTS in mid-2026 is **good enough for civic deployment but not yet good enough to feel intimate.** The primary engine will sometimes mis-stress *kepala kelurahan*. Google/Azure ID voices are smoother but read formal text more naturally than conversational text — announcements, not the staf at the loket. ElevenLabs is closest to "feels human" but foreign-hosted and pricey.
 
-If pilot field feedback in M6–M8 says "robotik, tidak ramah," the escalation ladder is:
+If pilot feedback in M6–M8 says "robotik, tidak ramah," the escalation ladder:
 
-1. **Tune voice-design prompts** (cheapest; just text). Add explicit "ramah, hangat, sedikit informal" cues.
-2. **Switch to per-unit cloned voices** with local volunteer reference clips (free; consent-gated).
-3. **Fall through to ElevenLabs Indonesian for citizen-facing flows only** (paid; non-PII only; gates via Presidio).
-4. **Fine-tune on a Papua-region corpus** in M9–M12 (engineering effort but produces a community deliverable).
+1. Tune voice-design prompts. Add "ramah, hangat, sedikit informal" cues.
+2. Per-unit cloned voices from local volunteer clips (consent-gated).
+3. Fall through to ElevenLabs ID for citizen-facing non-PII flows only (Presidio-gated).
+4. Fine-tune on a Papua-region corpus M9–M12.
 
-The realistic worst case is that we ship M6 with the primary engine on cloud + Piper on edge, citizens say "okay, terdengar formal seperti pegawai negeri" (which is *the actual target* — the persona is PNS Digital, not a friend), and we iterate prosody warmth in M9.
+Realistic worst case: M6 ships with primary cloud + Piper edge, citizens say "okay, terdengar formal seperti pegawai negeri" — *that is the actual target*; the persona is PNS Digital, not a friend. We iterate warmth in M9.
 
-The truly bad case — every modern Indonesian TTS sounds wrong to Papuan users in a way no amount of prompt-tuning fixes — has a non-zero probability and would force us to fall back to a thoughtful **text + UI-tone** product strategy (no voice output by default, voice-on-request) until the M9–M12 Papua fine-tune ships. Document this as a pilot risk; it is not a project risk.
+Truly bad case: every modern ID TTS sounds wrong to Papuan users in ways no prompt-tuning fixes. Forces fallback to **text + UI-tone** strategy (no voice by default, voice-on-request) until the M9–M12 Papua FT ships. Pilot risk, not project risk.
 
 ---
 

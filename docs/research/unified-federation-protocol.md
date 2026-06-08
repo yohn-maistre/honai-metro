@@ -34,9 +34,28 @@ After two rounds of cross-evaluation (this memo + the YOSE counter-take + the se
 
 ---
 
+## Reconciliation with Master Proposal v3.5 / v3.6
+
+The Master Proposal v3.5 (see `docs/aksara/master-proposal-digest.md`) committed in §15 to "ETNOS … di-rework dari API Lemmy ke API ActivityPods" as a grant-year deliverable. **As of 2026-06-08, the founder elected to amend that commitment** (see `docs/aksara/proposal-v3.6-amendments.md` for the surgical edits):
+
+- Production ETNOS stays on PieFed (Lemmy-shaped API) through the grant year and the foreseeable horizon.
+- A **bridge / adapter layer** replaces the full UI rewrite as the grant artifact: a small server process exposing a subset of ActivityPods-compatible endpoints (actors, inbox/outbox, basic Pod containers) over PieFed's storage, enabling Aksara nodes built against the ActivityPods API to interoperate without forcing a Photon rewrite.
+- Full migration to ActivityPods + NextGraph stays the 2027+ target when the encrypted-Pods stack stabilises.
+
+This preserves the "PieFed for forum, no migration" decision above while keeping the NLnet grant deliverable verifiable.
+
+## Two-plane federation — lifted from the Master Proposal
+
+Proposal §15 frames federation as two independent planes, which is sharper than this memo's earlier wording. Adopted as canonical:
+
+- **Content plane** — standard ActivityPub instance federation per Lemmy / PieFed. Each instance chooses its peers. Public posts, communities, comments traverse this plane.
+- **Memory plane** — separately governs whether an institution's communal memory (Aksara Pod) is reachable by agents on other instances. CARE-gated, UCAN-issued, revocable.
+
+A community sets its social reach and its memory access as **two different decisions**, both under CARE / Dewan authority. Collapsing them is the data-bleed risk this design removes.
+
 ## Open questions remaining
 
-1. **Decentralized agent memory** — a research thread (`docs/research/decentralized-agent-memory.md`) is open on whether HippoRAG 2 / GraphRAG / similar can run per-Aksara-node with federated permissioned retrieval. The decision above is substrate-only; the memory-architecture question is orthogonal.
+1. **Decentralized agent memory** — the memory architecture is resolved: LightRAG (graph-RAG over SQLite + sqlite-vec) + OpenViking (hierarchical MD store built into Hermes Agent) per Aksara node. See `docs/research/decentralized-agent-memory.md` and `docs/aksara/architecture.md`.
 2. **ActivityPods schedule** — if encrypted-Pods slips past Q3 2027, what's the fallback? Options: stay on Postgres+libsodium longer (acceptable), revisit atproto (acceptable), revisit Solid CSS without ActivityPods (acceptable). Decision deferred.
 3. **First Aksara pilot partner** — a kelurahan willing to be the 2026 pilot has not been identified yet. Bizdev question, not engineering.
 

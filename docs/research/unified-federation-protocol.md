@@ -6,6 +6,42 @@ Opinionated re-evaluation of the prior PieFed + ActivityPods/NextGraph recommend
 
 ---
 
+## Decision — finalized June 2026
+
+After two rounds of cross-evaluation (this memo + the YOSE counter-take + the seamlessness-as-product-promise framing), the architectural decision is **finalized as follows**:
+
+**Forum layer:** **PieFed**, no migration. The atproto-unified case is technically clean but the UI rebuild cost (3–6 months to replace the Photon Svelte client against atproto lexicons) is not justified before 2029. PieFed 1.6 ships private communities, quote posts, and pronouns directly. Lemmy-shape API is already what Photon speaks.
+
+**Identity layer:** **`did:web`** for citizens, dinas, and pemerintah Aksara nodes. **`did:wba`** for agent actors. **`did:plc` deferred** unless atproto-native discovery becomes a community ask.
+
+**Capabilities layer:** **UCAN** for permissioned access. No WebACL, no bare OAuth.
+
+**Aksara memory layer (2026 interim):** **Postgres + libsodium sealed boxes + UCAN guards**, served behind PieFed's existing actor model with an `aksara:AksaraNode` custom actor type. Not a substrate — a placeholder that works today and ships nothing we can't migrate later.
+
+**Aksara memory layer (2027+):** **ActivityPods + NextGraph** as the encrypted Pod layer, once NextGraph's encrypted-Pods story is stable on a self-hostable broker. Migration: each Aksara node mirrors its Postgres state to a Pod, gains RDF/SPARQL queries over its data, and federates Pod discovery across instances. The Postgres state stays as the cache and write-ahead surface; the Pod is the federation surface.
+
+**Agent transport:** **MCP** (intra-agent skill invocation) + **A2A** (inter-agent peer calls, Linux Foundation hosted, 150+ org adopters). Agent identity is `did:wba`. UCAN gates cross-Aksara calls.
+
+**Ruang adat sovereignty:** **Postgres + libsodium with Dewan-held threshold keys** for content. **OpenTimestamps daily Merkle anchor → Bitcoin** for tamper-evidence. **No chain runtime.** Holochain pilot only if the Dewan asks for stronger sovereignty than key-control gives them. See `docs/aksara/ruang-adat-sovereignty.md`.
+
+**Upstream contributions:** ETNOS will participate in **atproto's Private Data Working Group** with the indigenous-sovereignty use case, contribute a **CARE-labels lexicon**, and publish our sealed-box sidecar pattern as a reference impl. We do this even though we are not adopting atproto as our substrate, because cross-ecosystem cross-pollination on permissioned-data UX is worth the hedge. See `docs/research/atproto-upstream-contributions.md`.
+
+**Foundation Protocol (arXiv:2605.23218):** Adopted as **vocabulary**, used in design docs and internal architecture mental models. Not deployed.
+
+**The seamless human+agent UX commitment is independent of substrate choice.** See `docs/etnos/goal-ux.md` — the goal UX must be deliverable with any of the candidate substrates. Substrates serve the UX, never the other way around.
+
+**Stop-doing list (final):** atproto unified, atproto-as-memory-only, DWN/Web5, permissioned chains, self-built chain, PieFed strip-and-expand fork, Solid Pod WebACL UX, ActivityPods before NextGraph encrypted-Pods stabilizes.
+
+---
+
+## Open questions remaining
+
+1. **Decentralized agent memory** — a research thread (`docs/research/decentralized-agent-memory.md`) is open on whether HippoRAG 2 / GraphRAG / similar can run per-Aksara-node with federated permissioned retrieval. The decision above is substrate-only; the memory-architecture question is orthogonal.
+2. **ActivityPods schedule** — if encrypted-Pods slips past Q3 2027, what's the fallback? Options: stay on Postgres+libsodium longer (acceptable), revisit atproto (acceptable), revisit Solid CSS without ActivityPods (acceptable). Decision deferred.
+3. **First Aksara pilot partner** — a kelurahan willing to be the 2026 pilot has not been identified yet. Bizdev question, not engineering.
+
+---
+
 ## TL;DR
 
 **Keep PieFed for the public square. Stop trying to make ActivityPods + NextGraph the memory layer. For Aksara memory and agent↔agent, adopt AT Protocol PDS repos as our second (and only other) substrate — used internally, federated externally through a thin atproto↔ActivityPub bridge.** Use `did:web` as the everyday identifier and `did:wba` (ANP's web-based DID method) for agent actors; mint a `did:plc` only when an Aksara node opts into atproto-native discovery. No chain. No Solid Pods. No DWN. No third runtime. The Foundation Protocol paper (arXiv:2605.23218, 22 May 2026) is a coordination *overlay* on top of whichever substrate we pick — we adopt its vocabulary, not its plumbing. Two substrates beat three; one substrate is not currently realistic given that no production system covers A+B+C+D under one roof in 2026. The PieFed-only path (strip-and-expand) is a five-engineer-year fork; the AT-Protocol-only path forfeits the threadiverse audience and bets on a permissioned-data spec that is still mid-summer-2026 work. The composition below is the smallest two-substrate stack that ships.

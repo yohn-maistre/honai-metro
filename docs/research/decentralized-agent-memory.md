@@ -44,52 +44,15 @@ A skeptical pass at running HippoRAG-class memory per Aksara node and federating
 
 ## 3. The local Aksara stack
 
-Each Aksara node has the same skeleton; institution class only changes the lexicons and the BSrE sidecar.
+One process tree per node: Hermes harness → MCP → local skill server → SQLite primary (records + audit log + capability cache) with sqlite-vec for embeddings and networkx for the small PageRank graph → Ollama for local generation → LightRAG orchestrator → libsodium sealed-box sidecar for sacred-tagged ciphertext → A2A endpoint with UCAN verifier in front.
 
-```
-┌────────────────────── Aksara node (one process tree) ──────────────────────┐
-│                                                                            │
-│  Hermes harness ──── MCP ──── local skill server                           │
-│       │                          │                                         │
-│       ▼                          ▼                                         │
-│  ┌──────────────────────────────────────────────────────────────────┐     │
-│  │ SQLite primary (records, audit log, capability cache)           │     │
-│  │   ├── sqlite-vec extension (passage + phrase embeddings)        │     │
-│  │   └── networkx-on-disk for the small PageRank graph             │     │
-│  └──────────────────────────────────────────────────────────────────┘     │
-│       │                                                                    │
-│       ▼                                                                    │
-│  Ollama (Qwen2.5 3B, gemma3:4b, or a remote Telkomsel vLLM endpoint)      │
-│       │                                                                    │
-│       ▼                                                                    │
-│  LightRAG orchestrator (custom Python: ingest pipeline + retrieval)       │
-│       │                                                                    │
-│       ▼                                                                    │
-│  libsodium sealed-box sidecar (sacred-tagged ciphertext + Dewan threshold) │
-│       │                                                                    │
-│       ▼                                                                    │
-│  A2A endpoint (JSON-RPC over HTTPS) + UCAN verifier                       │
-└────────────────────────────────────────────────────────────────────────────┘
-```
+- **Primary store: SQLite + sqlite-vec.** File-on-disk, no daemon. Per [sqlite-vec docs](https://www.sqlite.ai/sqlite-vector) and a Feb-2026 production case (6,500 agent queries in six weeks, no incident), production-ready on edge with NEON SIMD on ARM. LanceDB ([lancedb.com](https://www.lancedb.com/)) is a fine second pick if vector count crosses ~5M per Aksara (unlikely for a kelurahan in five years).
+- **Graph layer: networkx, not an embedded graph DB yet.** Kùzu was **archived October 2025**; the active fork is **RyuGraph** ([github.com/predictable-labs/ryugraph](https://github.com/predictable-labs/ryugraph)) — too young to bet on. Oxigraph ([repo](https://github.com/oxigraph/oxigraph)) admits un-optimized SPARQL evaluation — fine as a quad-store sidecar, not as primary. networkx loaded from SQLite tables handles a 100k-entity kelurahan KG in <1 GB RAM; PageRank converges in seconds.
+- **LLM runtime: Ollama, fallback llama.cpp** (10–20% faster per [itsfoss.com benchmarks](https://itsfoss.com/llms-for-raspberry-pi/)). Don't promise on-device generation: Qwen2.5:3B runs at 2–5 tok/s on a Pi 5, usable for batch extraction but painful for interactive Q&A. **A Tier-3 kabupaten hub runs the LLM** (CAX31 16 GB plus a Telkomsel-hosted vLLM for heavier work); kelurahan-class nodes call up.
+- **Document store: SQLite blob for <1 MB; filesystem-with-hash for larger.** No S3 in alpha.
+- **Retrieval orchestrator: LightRAG**, with phrase-node extraction paid once at ingest via a Tier-2 cloud model; query-time runs against local Ollama.
 
-**Component picks, with rationale.**
-
-- **Primary store: SQLite.** Boring, file-on-disk, no daemon, no migration story. Per [sqlite-vec docs](https://www.sqlite.ai/sqlite-vector) and a Feb-2026 production case (6,500 agent queries in six weeks, no incident), sqlite-vec is production-ready on edge. Use SIMD for ARM (NEON).
-- **Vector store: sqlite-vec, not LanceDB at v1.** LanceDB ([lancedb.com](https://www.lancedb.com/)) graduated SDKs to 1.0 in early 2026 and is great, but it is a second moving part. sqlite-vec keeps everything in one file. Switch to LanceDB only if vector count crosses ~5M per Aksara (very unlikely for a kelurahan in five years).
-- **Graph layer: do NOT pick an embedded graph DB yet.** Kùzu, the obvious pick, was **archived in October 2025**; the active fork is **RyuGraph** ([github.com/predictable-labs/ryugraph](https://github.com/predictable-labs/ryugraph)) and we are not betting an Aksara node on a one-month-old fork. Oxigraph ([github.com/oxigraph/oxigraph](https://github.com/oxigraph/oxigraph)) is in "heavy development" with un-optimized SPARQL evaluation per its own README — fine for a quad-store sidecar, not as the primary. **Use `networkx` (in-memory Python) loaded from SQLite tables.** A kelurahan KG of 100k entities × 10 relations is ~1 GB in memory at most. PageRank converges in seconds.
-- **LLM runtime: Ollama, with llama.cpp as fallback.** Ollama is the easier ops story; llama.cpp is 10–20% faster ([itsfoss.com benchmarks](https://itsfoss.com/llms-for-raspberry-pi/)) and worth swapping if perf bites. **Don't promise on-device generation.** Qwen2.5:3B and Gemma3:4b run at 2–5 tok/s on a Pi 5 8 GB; usable for batch extraction but painful for interactive Q&A. The realistic story: **a Tier-3 hub Aksara at the kabupaten level runs the LLM** (CAX31 with 16 GB and a Telkomsel-hosted vLLM behind it for heavier work), and kelurahan-class nodes call up.
-- **Document store: SQLite blob for <1 MB attachments; filesystem with hash addressing for larger.** No S3 dependency in alpha.
-- **Retrieval orchestrator: LightRAG.** With our own ingest tweaks: phrase node extraction uses a Tier-2 cloud model paid once per document; query-time uses the local Ollama.
-
-**Device profile.** The honest answer:
-
-| Tier | Hardware | Role |
-|---|---|---|
-| **Edge** | Pi 5 8 GB or local laptop | Cache + ingest only. Forwards Q&A to its kabupaten hub. Works offline-deferred. |
-| **Aksara (default)** | Hetzner CAX21 (4 vCPU ARM, 8 GB, 80 GB SSD; ~€7/mo) | Primary deployment: SQLite + sqlite-vec + Ollama (3B model) + A2A endpoint |
-| **Hub** | CAX31 / CAX41 (8-16 GB) | Bigger Ollama, vLLM for heavier batch ingest, federated query aggregator for child kelurahans |
-
-A Pi 5 only as primary substrate is a romantic story that costs us reliability. **Recommend CAX21 as the default Aksara device.** Pi 5 with SSD is the *offline-edge* node, syncing nightly to a kabupaten hub.
+**Device tiers.** Edge = Pi 5 8 GB or laptop, cache + ingest only, forwards Q&A to its kabupaten hub, works offline-deferred. Aksara default = Hetzner CAX21 (4 vCPU ARM, 8 GB, 80 GB SSD; ~€7/mo). Hub = CAX31/CAX41 (8–16 GB), bigger Ollama, vLLM batch ingest, federated query aggregator. **Pi-only as primary substrate is a romantic story that costs reliability;** CAX21 is the default.
 
 ## 4. Federated retrieval — the hard part, plus what to actually ship
 
@@ -129,27 +92,19 @@ The user lists four query shapes. Each is a different protocol problem.
 
 ## 6. Readiness scorecard
 
-| Piece | Prod-ready 2026? | CPU-only Aksara? | Maintenance | Pilot now / 2027 / skip |
-|---|---|---|---|---|
-| LightRAG | Yes | Yes (remote LLM) | Low | **Now** |
-| Memori | Yes | Yes (SQL-native) | Low | **Now** |
-| sqlite-vec | Yes | Yes (NEON SIMD) | Low | **Now** |
-| Ollama 3B-class | Yes | Marginal interactive, fine batch | Low | **Now** for batch ingest |
-| networkx PageRank | Yes | Yes | Low | **Now** |
-| A2A v1.0 | Yes | Yes (JSON-RPC) | Low | **Now** |
-| UCAN delegation | Yes (spec stable, libs maturing) | Yes | Medium | **Now** |
-| libsodium sealed-box | Yes | Yes | Low | **Now** |
-| Capability-vector routing | Yes (FoA pattern) | Yes | Medium | 2026 H2 |
-| HippoRAG 2 as-shipped | No (GPU) | No | High | **Skip** |
-| GraphRAG MSR | Yes | No (cost) | Medium | **Skip** |
-| KAG / OpenSPG | Yes (JVM) | No | High | **Skip** |
-| Kùzu | Archived | n/a | n/a | **Skip** |
-| RyuGraph | New | Maybe | Unknown | **2027** revisit |
-| Oxigraph | Beta | Yes | Medium | 2027 quad-store sidecar |
-| OpenViking | Yes (Docker) | Untested ARM | Medium | **2027** if useful |
-| Cognee | Yes (Docker) | Yes | Medium | 2027 KG-heavy revisit |
-| PIR / FHE retrieval | Research | No | Very high | **Research-only** |
-| ActivityPub Search FEP | Doesn't exist | n/a | n/a | **Skip** |
+| Piece | Prod-ready 2026? | CPU-only Aksara? | Verdict |
+|---|---|---|---|
+| LightRAG, Memori, sqlite-vec, networkx, A2A v1.0, UCAN delegation, libsodium sealed-box | Yes | Yes | **Now** |
+| Ollama 3B-class | Yes | Batch yes, interactive marginal | **Now** for batch |
+| Capability-vector routing (FoA) | Yes | Yes | 2026 H2 |
+| HippoRAG 2 as-shipped | No (GPU) | No | **Skip — borrow ideas** |
+| GraphRAG MSR | Yes | No (cost) | **Skip** |
+| KAG / OpenSPG | Yes (JVM) | No | **Skip** |
+| Kùzu | Archived | n/a | **Skip** |
+| RyuGraph, OpenViking, Cognee | New | Maybe | **2027 revisit** |
+| Oxigraph | Beta | Yes | 2027 quad-store sidecar |
+| PIR / FHE retrieval | Research | No | **Research-only** |
+| ActivityPub Search FEP | Doesn't exist | n/a | **Skip** |
 
 ## 7. Phased plan
 
@@ -170,15 +125,15 @@ The user lists four query shapes. Each is a different protocol problem.
 
 ## 8. What we'd be inventing (be honest)
 
-1. **`aksara.memory` MCP skill.** No off-the-shelf MCP skill that wraps LightRAG with our lexicon + UCAN gating. Three engineer-weeks.
-2. **A2A retrieval Task type.** A2A v1.0 is generic; the typed `RetrievalRequest`/`RetrievalResponse` payload with provenance refs and UCAN binding is ours to define. Two weeks.
-3. **Capability Agent Card schema.** A2A Agent Cards exist; the *content* — lexicon list, region scope, capability sentence for HNSW embedding — is ours. Two weeks.
-4. **UCAN verifier integrated with Hermes.** Libraries exist for JS and TS ([ucan-wg/ts-ucan](https://github.com/ucan-wg/ts-ucan)) and a few for Rust; **Python parity is patchy**. Either write a small Python verifier or use the Rust binding. Three weeks.
-5. **libsodium threshold-decrypt for sacred blobs.** `unified-federation-protocol.md` already commits to this; remind the team it is three engineer-weeks of work, not three days.
-6. **AppView capability-vector index.** Federation-of-Agents pattern in our AppView, indexing Aksara Agent Cards by their capability sentence with HNSW. Four weeks.
-7. **Peer-cache + revocation propagation.** Cache table, nightly PDS firehose subscriber to clear revoked entries. Two weeks.
+1. **`aksara.memory` MCP skill** wrapping LightRAG with our lexicon + UCAN gating — 3 weeks.
+2. **A2A `RetrievalRequest`/`RetrievalResponse` Task type** with provenance refs and UCAN binding — 2 weeks.
+3. **Capability Agent Card schema** (lexicon list, region scope, capability sentence for HNSW embedding) — 2 weeks.
+4. **UCAN verifier in Python**. JS/TS libraries exist ([ucan-wg/ts-ucan](https://github.com/ucan-wg/ts-ucan)); Python parity is patchy. Either a small Python verifier or a Rust binding — 3 weeks.
+5. **libsodium threshold-decrypt for sacred blobs** — 3 weeks (already committed in `unified-federation-protocol.md`).
+6. **AppView capability-vector HNSW index** per the Federation-of-Agents pattern — 4 weeks.
+7. **Peer-cache + revocation propagation** via PDS firehose subscriber — 2 weeks.
 
-**Total greenfield effort for the federated v1 (beta milestone):** ~16 engineer-weeks. Plausible for two engineers in one quarter on top of the existing roadmap.
+**Total greenfield for the beta milestone: ~16 engineer-weeks.** Two engineers, one quarter, on top of the existing roadmap.
 
 ## 9. Adversarial and governance
 

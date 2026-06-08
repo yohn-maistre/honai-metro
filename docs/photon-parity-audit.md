@@ -6,23 +6,19 @@ that hurts the alpha/beta launch in Papua.
 
 ## TL;DR
 
-The honest answer is: **we dropped almost nothing of substance**. The fork
-diverged on top of v2.3.0, the same baseline Photon ships in v2.3.1, so the
-post/comment/feed/moderation surface is byte-identical for almost every flagship
-feature Photon advertises. The only feature classes we should worry about are
-**(a)** an explicit PWA install banner (Photon never shipped one either, so this
-is a parity-with-LEMMY-UI question, not a parity-with-Photon question);
-**(b)** opt-in keyword filtering UI in our localized settings page; and **(c)**
-the optional `xylight_mode` donate/credit footer (deliberately suppressed — leave
-suppressed). There is **no missing video player, no missing image carousel, no
-missing modtools, no missing markdown editor extras, no missing keyboard
-palette** — every one of those is present in our tree. The real beta gaps are
-ETNOS-original: localized moderation presets, civic-specific reports, and the
-PieFed admin federation flow — none of which are Photon's to give.
+**We dropped almost nothing of substance.** ETNOS forked at v2.3.0 (Photon
+ships v2.3.1 today), so the post/comment/feed/moderation surface is
+byte-identical for almost every flagship feature upstream advertises. The
+only worry-classes are **(a)** an explicit PWA install banner (upstream never
+shipped one); **(b)** keyword-filter settings UI not yet localized to
+`id`/`pmy`; **(c)** the `xylight_mode` donate footer (deliberately
+suppressed). There is **no missing video player, image gallery, modtools,
+markdown extras, or keyboard palette** — all present. The real beta gaps are
+ETNOS-original (localized mod presets, civic reports, PieFed admin
+federation), not Photon's to give.
 
-Net: **restore-now list is empty; restore-for-beta is a list of three small
-polish items; skip-permanently is the donate footer and the et/de/fi/ja/pl/etc.
-locale dropdown.**
+Net: **restore-now is empty; restore-for-beta is three small items;
+skip-permanently is the donate footer and the locale dropdown.**
 
 ## Flagship Feature Inventory
 
@@ -103,10 +99,9 @@ in `/src` → 0 hits). The mobile primitives Photon does ship and that we keep:
   custom `<InstallBanner />` for Indonesia where add-to-home-screen is the
   dominant install path — see beta list below.
 - **Mark-read on jump** (v2.1.0 behavior) — inherited.
-- **Reduced JS payload** — Photon ships at ~620 KB compressed (v2.1.0 notes);
-  we haven't measured ETNOS post-Honai-fonts and PapuaMap addition, but
-  `maplibre-gl` is heavy (~600 KB itself). Worth a build-size check before
-  beta — that is an ETNOS-introduced regression, not a Photon drop.
+- **Reduced JS payload** — Photon ships ~620 KB compressed; ETNOS adds
+  `maplibre-gl` (~600 KB) + custom fonts. Worth a build-size check before
+  beta — that is an ETNOS regression, not a Photon drop.
 
 ## Modtools Coverage
 
@@ -236,9 +231,8 @@ CUSTOMIZATIONS.md are the conflict surface. The areas of highest sync risk:
   did not edit it. **High risk** for the next major-version sync; expect to
   re-port everything if upstream goes v3.
 
-Bottom line on the sync question: ETNOS is still a thin overlay on Photon
-v2.3.0+. The custom surfaces (`/wiki`, `/dashboard`, `/jelajah`, `/bahasa`,
-`/agen`, `/tentang`, `/registry`) are new files with no upstream conflict
-surface, and the modifications we did make to upstream files are small and
-clearly marked. The audit answer for the user's actual question is: **don't
-delay alpha to chase Photon parity. We have it.**
+Bottom line: ETNOS is a thin overlay on Photon v2.3.0+. Custom surfaces
+(`/wiki`, `/dashboard`, `/jelajah`, `/bahasa`, `/agen`, `/tentang`, `/registry`)
+add no upstream conflict surface. The modifications we did make to upstream
+files are small and clearly marked. **Don't delay alpha to chase Photon
+parity — we have it.**

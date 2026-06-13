@@ -1,0 +1,88 @@
+name: Deploy ETNOS to Cloudflare Pages
+
+# Triggers:
+#   - push to main → production deploy
+#   - manual run (workflow_dispatch) → on-demand deploy
+#   - push to any non-main branch → preview deploy on that branch
+#
+# Required GitHub Actions secrets (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   — token with "Cloudflare Pages: Edit" + "Account → User Details: Read"
+#   CLOUDFLARE_ACCOUNT_ID  — your Cloudflare account ID (top-right of the dashboard)
+#
+# PUBLIC_* env vars are inlined into the JS bundle at build time. Edit the
+# `env:` block on the build step to change production values (they are
+# public by definition — not secrets).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cf-pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'preview' }}
+      url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache Bun install
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build (Cloudflare adapter)
+        env:
+          CF_PAGES: '1'
+          # Production env vars — edit here when they change.
+          # These are PUBLIC_* so they are intentionally not secrets;
+          # they end up inlined into the client JS bundle.
+          PUBLIC_INSTANCE_URL: piefed.social
+          PUBLIC_INSTANCE_TYPE: piefedalpha
+          PUBLIC_LOCK_TO_INSTANCE: 'true'
+          PUBLIC_LANGUAGE: id
+          PUBLIC_SSR_ENABLED: 'false'
+        run: bun run build
+
+      # Idempotent project provisioning. Fails harmlessly if the project
+      # already exists; succeeds on first run. continue-on-error keeps the
+      # workflow green either way.
+      - name: Ensure Cloudflare Pages project exists
+        continue-on-error: true
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages project create etnos --production-branch=main
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy .svelte-kit/cloudflare
+            --project-name=etnos
+            --branch=${{ github.ref_name }}
+            --commit-dirty=true

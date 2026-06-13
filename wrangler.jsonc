@@ -1,5 +1,25 @@
 {
-  "compatibility_date": "2024-09-23",
+  // Cloudflare Pages project config.
+  // `wrangler pages deploy` reads this; the SvelteKit cloudflare adapter
+  // writes its build to `pages_build_output_dir` which `wrangler` uploads.
+  //
+  // Required Cloudflare Pages env vars (set in the CF dashboard → Pages →
+  // your project → Settings → Environment variables) — mirror .env.example:
+  //   PUBLIC_INSTANCE_URL=piefed.social
+  //   PUBLIC_INSTANCE_TYPE=piefedalpha
+  //   PUBLIC_LOCK_TO_INSTANCE=true
+  //   PUBLIC_LANGUAGE=id
+  //   PUBLIC_SSR_ENABLED=false   (flip to true when SSR work in beta plan lands)
+  //
+  // Deploy:
+  //   wrangler login
+  //   CF_PAGES=1 bun run build
+  //   wrangler pages deploy .svelte-kit/cloudflare --project-name=etnos
+  //
+  // First time only — create the project:
+  //   wrangler pages project create etnos --production-branch=main
+  "name": "etnos",
+  "compatibility_date": "2026-06-01",
   "compatibility_flags": ["nodejs_compat"],
   "pages_build_output_dir": ".svelte-kit/cloudflare",
 }

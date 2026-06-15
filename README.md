@@ -1,3 +1,15 @@
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/c6262803-c046-4e76-ac58-65458a93db07">
+    <img alt="ETNOS — Honai Metro · light theme" src="https://github.com/user-attachments/assets/bc72a843-013f-4b87-ae80-59a3b9132ecc" width="100%">
+</picture>
+
+<picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/c13f94c0-c2c4-48b2-b379-5ee714ae0556">
+    <img alt="ETNOS — Honai Metro · interface preview" src="https://github.com/user-attachments/assets/11cf24c2-fd4f-480a-8a16-41f0f0a5b245">
+</picture>
+
+> *Hero images above are inherited from upstream [Photon](https://github.com/xyphyn/photon) — see the "Upstream debts" section for credits. ETNOS-specific screenshots will replace them as the early access rolls out.*
+
 # ETNOS — Honai Metro
 
 ETNOS is a federated public-square + wiki + civic-data + agent-interop platform for Papua, Indonesia. This repository is the web client.
@@ -297,7 +309,27 @@ ETNOS and Aksara progress together but on separate cadences. The funded grant ye
 
 **Upstream debts** we acknowledge loudly:
 
-- [xyphyn/photon](https://github.com/xyphyn/photon) — the Svelte client this repo forks
+### [xyphyn/photon](https://github.com/xyphyn/photon) — the Svelte client this repo forks
+
+The reason ETNOS exists as a working app in months, not years. Features ETNOS inherits and continues to use:
+
+- Modern, intuitive and useful interface with thoughtful UX
+- Multi-account switching
+- Supports Lemmy & PieFed
+- Infinite scroll
+- Multiple languages (we keep `en` / `id` / `pmy`, see [`src/lib/app/i18n/index.ts`](./src/lib/app/i18n/index.ts) for the loader list; weblate.xylight.dev is the upstream translation surface)
+- Customizable
+- Supports almost all available Lemmy features
+- Svelte-based, for responsiveness
+- 2.8× smaller JavaScript payload compared to lemmy-ui
+- Optimized image loading where possible to save bandwidth
+
+Photon's full self-hosting docs (Docker images, Bun-vs-Node server, env var reference, NGINX header-buffer-size tip) are preserved at [`.github/README.md`](./.github/README.md). Upstream Photon has its own public-instances list, separate from ETNOS — the official Photon instance is [phtn.app](https://phtn.app). For ETNOS deployment paths, see this README's **Deploy** section above and [`docs/etnos/cf-pages-deploy.md`](./docs/etnos/cf-pages-deploy.md).
+
+If you'd like to support upstream Photon's maintainer, [Buy them a coffee](https://buymeacoffee.com/xylight).
+
+### Other foundations
+
 - [PieFed](https://join-piefed.org/) ([Codeberg](https://codeberg.org/rimu/pyfedi)) — the federation server we target
 - [MapLibre GL JS](https://maplibre.org/) and [`svelte-maplibre-gl`](https://github.com/MIERUNE/svelte-maplibre-gl) — the map
 - [Hermes Agent](https://github.com/NousResearch/hermes-agent) (Nous Research) — the Aksara runtime

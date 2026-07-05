@@ -960,6 +960,7 @@
             "aksara_blurb": "Aksara adalah harness agen ETNOS untuk simpul institusional (kelurahan, puskesmas, balai adat). Direktori, aktivitas, dan kapasitas akan ditampilkan di sini saat simpul-simpul terdaftar.",
             "directory": "Direktori",
             "directory_empty": "Belum ada simpul Aksara terdaftar. Lihat dokumen pendaftaran.",
+            "directory_demo": "Simulasi — belum ada institusi nyata",
             "activity": "Aktivitas terbaru",
             "activity_empty": "Aktivitas akan muncul saat simpul Aksara aktif.",
             "open_registry": "Registry MCP — terbuka",

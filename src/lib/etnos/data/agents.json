@@ -1,0 +1,69 @@
+{
+  "note": "SIMULASI / PROTOKOL DEMONSTRASI. Kartu kemampuan contoh untuk memperlihatkan bentuk registri agen institusi (spec etnos/04). Tidak ada institusi nyata yang terdaftar; data ini diganti oleh registrasi node teratestasi saat pilot berjalan.",
+  "agents": [
+    {
+      "id": "sim-kampung",
+      "name": "Kantor Kampung (Contoh)",
+      "kind": "agent",
+      "actorType": "Agen Institusi",
+      "level": 2,
+      "tier": "T2",
+      "status": "aktif",
+      "jurisdiction": "Distrik Nabire (simulasi)",
+      "personas": ["Juru Surat", "Juru Musyawarah"],
+      "services": [
+        "Surat keterangan domisili",
+        "Surat keterangan tidak mampu",
+        "Surat pengantar ke distrik"
+      ],
+      "languages": ["Indonesia", "Mee"],
+      "hours": "Senin-Jumat 08.00-14.00 WIT"
+    },
+    {
+      "id": "sim-distrik",
+      "name": "Kantor Distrik (Contoh)",
+      "kind": "agent",
+      "actorType": "Agen Institusi",
+      "level": 2,
+      "tier": "T2",
+      "status": "terganggu",
+      "jurisdiction": "Kabupaten Nabire (simulasi)",
+      "personas": ["Juru Surat"],
+      "services": [
+        "Countersign surat pengantar kampung",
+        "Rekomendasi distrik",
+        "Naskah dinas (Srikandi)"
+      ],
+      "languages": ["Indonesia"],
+      "hours": "Senin-Jumat 08.00-15.00 WIT"
+    },
+    {
+      "id": "sim-puskesmas",
+      "name": "Puskesmas (Contoh)",
+      "kind": "agent",
+      "actorType": "Agen Institusi",
+      "level": 1,
+      "tier": "T1",
+      "status": "luring",
+      "jurisdiction": "Distrik Nabire (simulasi)",
+      "personas": ["Juru Catat"],
+      "services": ["Pencatatan layanan (komposisi SATUSEHAT)", "Jadwal posyandu"],
+      "languages": ["Indonesia", "Mee"],
+      "hours": "Senin-Sabtu 08.00-13.00 WIT"
+    },
+    {
+      "id": "sim-komunitas",
+      "name": "Komunitas Bahasa (Contoh)",
+      "kind": "org",
+      "actorType": "Komunitas Level 0",
+      "level": 0,
+      "tier": null,
+      "status": "kontak-wa",
+      "jurisdiction": "Papua Tengah (simulasi)",
+      "personas": [],
+      "services": ["Halaman profil + kontak WhatsApp", "Pengumuman komunitas"],
+      "languages": ["Indonesia", "Mee"],
+      "hours": "Tanpa perangkat: kehadiran Level 0, jalur naik ke node teratestasi terbuka"
+    }
+  ]
+}

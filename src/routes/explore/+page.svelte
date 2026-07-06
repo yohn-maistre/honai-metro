@@ -1,6 +1,6 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
-  import PapuaMap from '$lib/etnos/PapuaMap.svelte'
+  import PetaPapua from '$lib/etnos/PetaPapua.svelte'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
   import { Badge } from 'mono-svelte'
   import {
@@ -22,17 +22,20 @@
 
 <div class="flex flex-col gap-6 max-w-full w-full">
   <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
+    class="bg-white dark:bg-zinc-900 rounded p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
   >
-    <PapuaMap {instances} />
+    <PetaPapua {instances} />
   </div>
 
   <section class="flex flex-col gap-3">
-    <div class="flex items-center gap-2">
-      <Icon src={Sparkles} size="18" class="text-primary-600 dark:text-primary-400" />
-      <h2 class="text-lg font-semibold dark:text-white">
-        {$t('etnos.explore.sorotan')}
-      </h2>
+    <div class="flex flex-col gap-1.5">
+      <div class="flex items-center gap-2">
+        <Icon src={Sparkles} size="18" class="text-primary-600 dark:text-primary-400" />
+        <h2 class="text-lg font-semibold font-display dark:text-white">
+          {$t('etnos.explore.sorotan')}
+        </h2>
+      </div>
+      <div class="rule2 is-drawn"></div>
     </div>
     <p class="text-sm text-slate-500 dark:text-zinc-400">
       {$t('etnos.explore.sorotan_subtitle')}
@@ -85,7 +88,7 @@
     <section class="flex flex-col gap-3">
       <div class="flex items-center gap-2">
         <span class="text-xl">{group.icon}</span>
-        <h3 class="text-base font-semibold dark:text-white">{group.category}</h3>
+        <h3 class="text-base font-semibold font-display dark:text-white">{group.category}</h3>
         <Badge color={group.stronghold ? 'yellow-subtle' : 'gray-subtle'} rounding="md">
           {group.communities.length}
         </Badge>

@@ -929,6 +929,10 @@
             "bahasa": "Ruang Bahasa",
             "agen": "Agen"
         },
+        "map": {
+            "inkbar": "Peta · Tanah Papua",
+            "caption": "Simpul komunitas Tanah Papua — enam kota jangkar, satu tanah."
+        },
         "explore": {
             "sorotan": "Sorotan",
             "sorotan_subtitle": "Komunitas, ruang adat, deng topik pilihan dari ETNOS Papua Tengah",

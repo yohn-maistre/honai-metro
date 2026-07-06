@@ -1,12 +1,18 @@
+import { browser } from '$app/environment'
 import { client } from '$lib/api/client.svelte'
 import type { ListingType, SortType } from '$lib/api/types'
+import { profile } from '$lib/app/auth'
 import { t } from '$lib/app/i18n'
 import { settings } from '$lib/app/settings.svelte'
 import { ReactiveState, awaitIfServer } from '$lib/app/util.svelte'
 import { feed } from '$lib/feature/feeds/feed.svelte'
 import { ChevronDoubleUp } from '@xylightdev/svelte-hero-icons'
+import { redirect } from '@sveltejs/kit'
 
 export async function load({ url, fetch, route }) {
+  // Guests land on the curated Jelajah hub; the feed is the logged-in home.
+  if (browser && !profile.current.jwt) redirect(302, '/explore')
+
   const cursor = url.searchParams.get('cursor') as string | undefined
 
   const sort: SortType =

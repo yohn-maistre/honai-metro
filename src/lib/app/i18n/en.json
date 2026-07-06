@@ -1047,6 +1047,10 @@
             "bahasa": "Language Hub",
             "agen": "Agents"
         },
+        "map": {
+            "inkbar": "Peta · Tanah Papua",
+            "caption": "Community anchors of Tanah Papua — six anchor cities, one land."
+        },
         "explore": {
             "sorotan": "Highlights",
             "sorotan_subtitle": "Hand-picked communities, ruang adat, and topics across ETNOS Papua Tengah",

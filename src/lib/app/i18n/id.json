@@ -949,6 +949,10 @@
             "otsus": "OTSUS Tracker",
             "data_source": "Sumber data"
         },
+        "map": {
+            "inkbar": "Peta · Tanah Papua",
+            "caption": "Simpul komunitas Tanah Papua — enam kota jangkar, satu tanah."
+        },
         "explore": {
             "sorotan": "Sorotan",
             "sorotan_subtitle": "Pilihan komunitas, ruang adat, dan topik pilihan dari ETNOS Papua Tengah",

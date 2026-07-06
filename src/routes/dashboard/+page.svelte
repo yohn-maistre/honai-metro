@@ -16,12 +16,37 @@
     UserGroup,
   } from 'svelte-hero-icons/dist'
 
+  import { getCached, loadLive, type LiveStats } from '$lib/etnos/live'
+
   let { data } = $props()
 
-  // ETNOS: Provincial Dashboard.
-  // Top stats from PieFed/Lemmy + language data (currently demo).
-  // Section data from BPS / Satudata (currently demo JSON in src/lib/etnos/data/).
+  // ETNOS: Papan Data Tanah Papua.
+  // Live row from the PieFed backend (only what the API really answers —
+  // see live.ts); section data from BPS / Satudata (demo JSON for now).
   // OTSUS tracker — UU 2/2021 transparency.
+
+  let live = $state<LiveStats | null>(getCached())
+  $effect(() => {
+    loadLive().then((s) => {
+      if (s) live = s
+    })
+  })
+
+  let liveUsers = $derived(live?.users ?? null)
+  let liveCommunities = $derived(
+    live?.communities != null
+      ? live.communitiesSaturated
+        ? `${live.communities}+`
+        : live.communities
+      : null,
+  )
+  let livePosts24h = $derived(
+    live?.posts24h != null
+      ? live.posts24hSaturated
+        ? `${live.posts24h}+`
+        : live.posts24h
+      : null,
+  )
 
   interface StatItem {
     label: string
@@ -51,35 +76,66 @@
 </script>
 
 <svelte:head>
-  <title>Dashboard Papua — ETNOS</title>
+  <title>Papan Data Tanah Papua — ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-6 max-w-full w-full">
-  <EndPlaceholder size="lg">Dashboard Papua</EndPlaceholder>
+  <EndPlaceholder size="lg">Papan Data Tanah Papua</EndPlaceholder>
 
-  <!-- Top community stats -->
+  <!-- Live row: only what the backend really answers; anything the API
+       can't confirm falls back to its demo tile, honestly labeled. -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-    <StatCard
-      label="Pengguna Aktif"
-      value={data.topStats.active_users}
-      icon={UserGroup}
-      color="text-blue-500"
-      demo
-    />
-    <StatCard
-      label="Postingan Hari Ini"
-      value={data.topStats.posts_today}
-      icon={ChatBubbleLeftRight}
-      color="text-green-500"
-      demo
-    />
-    <StatCard
-      label="Komunitas"
-      value={data.topStats.communities}
-      icon={GlobeAmericas}
-      color="text-amber-500"
-      demo
-    />
+    {#if liveUsers != null}
+      <StatCard
+        label="Pengguna Terdaftar"
+        value={liveUsers}
+        icon={UserGroup}
+        color="text-primary-500"
+        live
+      />
+    {:else}
+      <StatCard
+        label="Pengguna Aktif"
+        value={data.topStats.active_users}
+        icon={UserGroup}
+        color="text-blue-500"
+        demo
+      />
+    {/if}
+    {#if livePosts24h != null}
+      <StatCard
+        label="Postingan 24 Jam"
+        value={livePosts24h}
+        icon={ChatBubbleLeftRight}
+        color="text-primary-500"
+        live
+      />
+    {:else}
+      <StatCard
+        label="Postingan Hari Ini"
+        value={data.topStats.posts_today}
+        icon={ChatBubbleLeftRight}
+        color="text-green-500"
+        demo
+      />
+    {/if}
+    {#if liveCommunities != null}
+      <StatCard
+        label="Komunitas Lokal"
+        value={liveCommunities}
+        icon={GlobeAmericas}
+        color="text-primary-500"
+        live
+      />
+    {:else}
+      <StatCard
+        label="Komunitas"
+        value={data.topStats.communities}
+        icon={GlobeAmericas}
+        color="text-amber-500"
+        demo
+      />
+    {/if}
     <StatCard
       label="Data Bahasa"
       value={data.topStats.language_data}
@@ -203,6 +259,38 @@
     <p class="text-slate-500 dark:text-zinc-400 text-sm">
       Status agen AI Jayapura akan ditampilkan di sini. Agen-agen ini memantau
       sumber informasi lokal dan memberikan ringkasan pembaruan untuk komunitas.
+    </p>
+  </div>
+
+  <!-- Sumber: every number on this board and where it comes from -->
+  <EndPlaceholder size="sm">Sumber</EndPlaceholder>
+  <div
+    class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-3"
+  >
+    <span class="eyebrow">Satu angka, satu sumber</span>
+    <div class="ledger">
+      <div>
+        <span>Pengguna · Komunitas · Postingan 24 jam</span>
+        <span class="v">piefed.social API — langsung</span>
+      </div>
+      <div>
+        <span>Seksi pendidikan, ekonomi, infrastruktur, kualitas hidup</span>
+        <span class="v">BPS / Satudata — data demo</span>
+      </div>
+      <div>
+        <span>Pelacak OTSUS</span>
+        <span class="v">UU 2/2021 — data demo</span>
+      </div>
+      <div>
+        <span>Data bahasa</span>
+        <span class="v">kurasi ETNOS — data demo</span>
+      </div>
+    </div>
+    <p class="text-xs text-slate-400 dark:text-zinc-500">
+      Angka berlabel <span class="font-mono uppercase">langsung</span> diambil
+      dari server saat halaman dibuka; label
+      <span class="font-mono uppercase">demo</span> berarti contoh yang menunggu
+      sumber resmi.
     </p>
   </div>
 </div>

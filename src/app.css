@@ -7,13 +7,17 @@
 @theme {
   --font-sans: sans-serif;
   --font-system: system-ui;
-  --font-display: Inter, system-ui, sans-serif;
+  --font-display: 'Archivo Variable', Inter, system-ui, sans-serif;
   --font-reading: Inter, system-ui, sans-serif;
-  --font-mono: monospace;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --font-fig: 'Instrument Serif', Georgia, serif;
 
   --animate-pop-in: pop-in 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
 
   --ease-cubic: cubic-bezier(0.075, 0.82, 0.165, 1);
+  /* ETNOS motion grammar (detak-detik tokens.css): transforms+opacity only */
+  --ease-etnos: cubic-bezier(0.7, 0, 0.3, 1);
+  --ease-etnos-out: cubic-bezier(0.22, 1, 0.36, 1);
   --spacing-22: 88px;
 
   /* Honai Siang static mirror (pre-hydration paint + utility generation).
@@ -94,33 +98,60 @@
   font-display: swap;
 }
 
+/* ETNOS type trio (Honai Siang, spec etnos/10): Archivo Variable display,
+   Geist Mono furniture/numbers, Instrument Serif italic captions only. */
+@font-face {
+  font-family: 'Archivo Variable';
+  src: url('/font/ArchivoVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/font/GeistMonoVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Instrument Serif';
+  src: url('/font/InstrumentSerif-Italic.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+}
+
 .font--serifs {
   --font-display: 'Roboto Slab', serif;
   --font-reading: 'Roboto Slab', serif;
   --font-sans: 'Roboto Slab', serif;
 }
+/* Display slot is Archivo Variable site-wide (Honai Siang type grammar);
+   body/reading fonts stay the user's pick. .font--serifs keeps its serif
+   display as an explicit opt-out. */
 .font--inter {
-  --font-display: Inter, sans-serif;
+  --font-display: 'Archivo Variable', Inter, sans-serif;
   --font-reading: Inter, sans-serif;
   --font-sans: Inter, sans-serif;
 }
 .font--satoshi {
-  --font-display: Satoshi, sans-serif;
+  --font-display: 'Archivo Variable', Satoshi, sans-serif;
   --font-reading: Satoshi, sans-serif;
   --font-sans: Satoshi, sans-serif;
 }
 .font--nunito {
-  --font-display: Nunito, sans-serif;
+  --font-display: 'Archivo Variable', Nunito, sans-serif;
   --font-reading: Nunito, sans-serif;
   --font-sans: Nunito, sans-serif;
 }
 .font--system {
-  --font-display: system-ui, sans-serif;
+  --font-display: 'Archivo Variable', system-ui, sans-serif;
   --font-reading: system-ui, sans-serif;
   --font-sans: system-ui, sans-serif;
 }
 .font--browser {
-  --font-display: sans-serif;
+  --font-display: 'Archivo Variable', sans-serif;
   --font-reading: sans-serif;
   --font-sans: sans-serif;
 }
@@ -194,4 +225,250 @@ button:focus-visible {
 
 .dark ::-webkit-scrollbar-thumb {
   @apply bg-zinc-800;
+}
+
+/* ============================================================
+   ETNOS grammar layer (Honai Siang) — ported from detak-detik
+   base.css, remapped onto Photon's theme variables so every
+   piece follows /theme presets (incl. dark, incl. Lama rollback).
+   Spec truth: abstraksi/specs/etnos/10_design-language.md.
+   CSS-only ornament: no images, no blur filters, no JS libs.
+   ============================================================ */
+
+:root {
+  --etnos-bg: var(--color-slate-25);
+  --etnos-card: var(--color-white);
+  --etnos-ink: var(--color-slate-900);
+  --etnos-muted: var(--color-slate-600);
+  --etnos-accent: var(--color-primary-500);
+  --etnos-line: var(--color-slate-900);
+  --etnos-line-soft: var(--color-slate-300);
+  --dur-etnos: 0.32s;
+}
+.dark {
+  --etnos-bg: var(--color-zinc-950);
+  --etnos-card: var(--color-zinc-900);
+  --etnos-ink: var(--color-zinc-100);
+  --etnos-muted: var(--color-zinc-400);
+  --etnos-line: var(--color-zinc-300);
+  --etnos-line-soft: var(--color-zinc-700);
+}
+
+/* paper grain: one fixed turbulence layer over everything */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* ---- eyebrow: the mono section label ---- */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--etnos-muted);
+  display: block;
+}
+
+/* ---- ink bar: a reversed section label, the broadsheet's weight ---- */
+.inkbar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--etnos-ink);
+  color: var(--etnos-bg);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  padding: 6px 12px 5px;
+}
+.inkbar .dot {
+  color: var(--etnos-accent);
+}
+
+/* ---- hairlines that draw themselves on reveal ---- */
+.rule {
+  height: 1px;
+  background: var(--etnos-line);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--dur-etnos) var(--ease-etnos);
+}
+.rule.is-drawn,
+.no-js .rule {
+  transform: scaleX(1);
+}
+
+/* ---- double rule: the classic thick-thin newspaper cut ---- */
+.rule2 {
+  height: 7px;
+  border-top: 3px solid var(--etnos-line);
+  border-bottom: 1px solid var(--etnos-line);
+  transform-origin: left center;
+  transform: scaleX(0);
+  transition: transform var(--dur-etnos) var(--ease-etnos);
+}
+.rule2.is-drawn,
+.no-js .rule2 {
+  transform: scaleX(1);
+}
+
+/* ---- citation chips: ink sweeps in from the left on hover ---- */
+.chip {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  border: 1px solid var(--etnos-line);
+  border-radius: 0;
+  padding: 5px 11px;
+  background: transparent;
+  color: var(--etnos-ink);
+  cursor: pointer;
+  transition:
+    color 0.3s var(--ease-etnos-out),
+    border-color 0.3s var(--ease-etnos-out);
+}
+.chip::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--etnos-ink);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.34s var(--ease-etnos-out);
+}
+.chip:hover {
+  color: var(--etnos-bg);
+  border-color: var(--etnos-ink);
+}
+.chip:hover::before {
+  transform: scaleX(1);
+}
+.chip:active {
+  transform: translateY(1px);
+}
+.chip .tick {
+  color: var(--etnos-accent);
+  margin-right: 5px;
+  transition: color 0.3s;
+}
+.chip:hover .tick {
+  color: var(--etnos-bg);
+}
+.chip.hop {
+  border-style: dashed;
+}
+
+/* ---- serial numbers + folio furniture ---- */
+.serial {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--etnos-muted);
+  text-transform: uppercase;
+}
+
+/* ---- the stamp (honest labels, PROTOKOL DEMONSTRASI seals) ---- */
+.stamp {
+  display: inline-block;
+  position: relative;
+  color: var(--etnos-accent);
+  border: 2px solid var(--etnos-accent);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  padding: 4px 9px;
+  text-transform: uppercase;
+  transform: rotate(-4deg);
+}
+.stamp::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 1px dashed currentColor;
+  border-radius: 2px;
+  opacity: 0.55;
+  pointer-events: none;
+}
+.stamp.fill {
+  background: var(--etnos-accent);
+  color: var(--etnos-bg);
+}
+
+/* ---- ghost numeral: the oversized folio index behind columns ---- */
+.ghost-num {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(56px, 7vw, 96px);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1.2px var(--etnos-line-soft);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* ---- ledger table: mono tabular rows ---- */
+.ledger {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13.5px;
+  line-height: 1.9;
+  border-top: 1px solid var(--etnos-line);
+}
+.ledger > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid var(--etnos-line);
+  padding: 4px 0;
+  transition:
+    background 0.25s,
+    padding-left 0.25s var(--ease-etnos-out);
+}
+.ledger > div:hover {
+  background: color-mix(in oklab, var(--etnos-accent) 7%, transparent);
+  padding-left: 8px;
+}
+.ledger .v {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ---- captions: Instrument Serif italic, wiki figures only ---- */
+.fig {
+  font-family: var(--font-fig);
+  font-style: italic;
+  color: var(--etnos-muted);
+}
+
+/* ---- reduced motion: instant state, no performance ---- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.001s !important;
+  }
+  .ticker-track {
+    animation: none;
+    padding-left: 0;
+  }
 }

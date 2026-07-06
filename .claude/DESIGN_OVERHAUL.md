@@ -1,0 +1,87 @@
+# ETNOS beta design overhaul — FINAL PLAN
+
+## Context
+
+ETNOS is live at etnos.pages.dev (alpha, borrowed piefed.social backend by design). Everything except /agen is carried-over Photon chrome. This is the last stretch before PUBLIC BETA. Yose's brief (2026-07-06, 11 screenshots reviewed): award-aiming design with our own language (sibling to detak-detik + the Aksara device), IA consolidation, label rewrite, light theme recolored to detak-detik's cream scheme, wiki components, live dashboard data, island-not-province framing, news surfaces, Level-0 org pages + usulan composer, cleanup for beta. A fresh executor agent picks this up: **step one is copying this plan into the repo** (see Phase P-1). Build ritual on this phone: `NODE_OPTIONS=--max-old-space-size=1536 bun run build` (~3 min), never stack heavy work, commit per phase.
+
+## Design language: "Honai Siang / Honai Malam"
+
+One family, three products (newspaper detak-detik / device aksara-papan / forum ETNOS). Tokens from detak-detik `src/styles/tokens.css`, voice differences deliberate:
+
+- **Light (Honai Siang) = DINAS cream**: bg `#d6cbac`, card `#e3dabf`, ink `#15130e`, muted `#5a5345`, soft line `#aaa085`, hard lines = ink. **Accent = terracotta `#C0633E`** (device language; NOT detak's service orange — forum is the hearth, not the presses). Radius 4px.
+- **Dark (Honai Malam) = MESIN**: bg `#100f0d`, card `#1a1815`, ink `#f2efe6`, muted `#8f897c`, gold `#cdb47a` as accent2; terracotta stays on agent/civic chrome.
+- **Grammar layer** (port from detak base.css): paper grain (feTurbulence data-URI, 0.05), `.eyebrow` (mono 10.5px uppercase 0.18em), `.inkbar` (reversed kicker + terracotta dot), `.rule`/`.rule2` (self-drawing), receipt `.chip` (⊙ tick, ink-sweep hover), `.stamp` (rotated, back.out thump), `.ledger` (mono tabular rows), inline honest labels "(data contoh)". NO registration marks (too literary for a forum).
+- **Type**: Archivo Variable 800 display (-0.02em, lh 1.02) + Geist Mono for ALL micro-labels/meta/numbers (tabular) + Instrument Serif italic only in wiki captions. Body stays system sans. Self-host woff2 latin subsets in `static/font/` (repo convention), budget ≤ ~180KB added.
+- **Motion**: CSS transforms+opacity only, 0.32s `cubic-bezier(0.7,0,0.3,1)`; rules draw, chips sweep, stamps thump, dashboard numbers count up; detak's global `prefers-reduced-motion` collapse block copied verbatim (repo has only ONE reduced-motion rule today). NO GSAP/Lenis.
+- **Icons**: svelte-hero-icons stays (already consistent). Emoji only as content; wiki emoji chips become mono-label chips. Stempel suasana glyphs (○◔◑●) as decorative status marks on agent cards/dashboard corners (visual only this wave).
+- **Seeded variety**: port detak `seed.ts` (cyrb128+splitmix32) + day-clock pattern — same rotation for every reader.
+
+## IA target
+
+- **Sidebar ETNOS group (5, Indonesian-first, all i18n)**: Jelajah(/explore), Wiki(/wiki), Papan Data(/dashboard), Agen(/agen), Tentang(/tentang). Removed: Ruang Bahasa (merges into wiki), "AI · Updates" (just a community; lives in explore cluster).
+- **Hamburger (Profile.svelte L71-93)**: mirror sidebar exactly. Fix drift: /jelajah→/explore, delete standalone "Registry MCP" (/registry already 308s to /agen#registry), Agen entry → /agen (not /c/ai-updates).
+- **Top bar**: label via `routes.explore.title` added to id.json+pmy.json ("Jelajah").
+- **Guest home = curated Jelajah hub** (Yose decision): `/` load redirects logged-out users → /explore; logged-in keep feed.
+- **/bahasa → /wiki/bahasa**: content moves into a real wiki language hub (BahasaHub component: status cards Vital/Terancam, penutur/wilayah/rumpun, each language → its c/ community + article); /bahasa becomes 308 (pattern: src/routes/jelajah/+page.ts). Explore's Bahasa cluster keeps COMMUNITY links only (one fact one owner).
+- **Map**: replace MapLibre tile map on /explore with **PapuaPlate.svelte** — seeded dot-grid island plate (port detak atlas-dots.ts + engrave.ts + seed.ts approach; Papua GeoJSON: copy/simplify from detak-detik's assets, fallback = engraved-hatch outline), city anchor dots, theme-aware, zero tile/CDN dep. Island framing copy ("Tanah Papua", "simpul komunitas" — no province-picker language). MapLibre dep likely droppable from explore bundle.
+- **News trio (Yose decision, present variants at review)**: (1) **KILAS marquee** = NEWS from detak-detik's edisi JSON (LiveKliping shape; endpoint not provisioned yet → baked sample labeled "(contoh)" + SWR live-flip when `PUBLIC_DETAK_URL` lands); (2) **Papan Kilas SPLIT-FLAP board** = hero showpiece on /explore: Solari-style rows flipping between headline/trending post/community spotlight/kata hari ini — per-ROW half-fold CSS 3D flip (never per-character; budget phones), day-clock seeded; (3) **Sorotan scoreboard** = trending posts as ledger rows w/ ghost numerals in the feed area (live getPosts). News and posts never share a surface; every item carries a source chip.
+- **Cleanup**: hide dead PieFed surfaces (signup→note+link to piefed.social; modlog/reports/password nav gated by instance-type capability), /util unguarded links removed, honest-label audit.
+
+## Ground-truth corrections (from stress-test — executor MUST know)
+
+1. `/explore/+layout.ts` L12-15 already defaults Local when instance-locked; prod lemmy.world leak likely dev-only (no .env → lemdro.id). Real prod gap: `PUBLIC_DEFAULT_FEED` missing from workflow env (settings.svelte.ts L122 defaults 'All'). Note: localStorage settings (ver 8) override for existing users — acceptable.
+2. **~50 currently-dead `primary-*` utility classes go live** when the full ramp lands (Tailwind 4 only generates stops declared in app.css `@theme`; runtime injects only 100/900 today). Pre-grep: `grep -rEn 'primary-(50|300|400|500|600|700|950)' src` and eyeball each hit post-swap. Biggest surprise-change risk.
+3. **Chart bug (latent)**: LineChart.svelte L20 + BarChart.svelte L51 use `rgb(var(--color-primary-500))` — var doesn't exist yet and calculateVars() emits already-rgb()-wrapped values → would become invalid `rgb(rgb(...))`. Fix to bare `var(...)` in the same commit as the ramp.
+4. **`other.white` IS the card color** (app.css L30) — set to `#e3dabf` for cream cards; audit all 12 `text-white` files (PapuaMap pills, buttons on terracotta).
+5. **Every slate stop is used** (200×103 borders, 600×80 muted text, etc.) and zinc has nonstandard 925 (×22, and app.css L20 is missing its rgb() wrapper — fix). Regenerated ramps must fill ALL stops, monotonic lightness, contrast: 600-on-50 and 900-on-50 ≥ 4.5:1.
+6. **FOUC**: theme vars are client-side inline styles post-hydration (SPA, SSR off). Mirror the full new ramps statically in app.css `@theme` — kills FOUC and is the dist-grep proof.
+7. No prerendered routes exist; keep it that way for new routes.
+8. `listCommunities` response has NO total count and adapter drops `next_page` → count by paging limit:50 while full, cap 4 pages, render "200+".
+9. i18n fallback safe (en); new keys go to en+id+pmy all three.
+10. Old palette preserved verbatim as preset `{id:-12, name:'Honai Metro (Lama)'}` for rollback.
+
+## Phases (each = one build-verified commit; deploy-watch P0/P1/P4 minimum)
+
+**P-1. Plan docs into repos (S)** — copy this plan to `honai-metro/.claude/DESIGN_OVERHAUL.md`; write the design-language section as `abstraksi/specs/etnos/10_design-language.md` (DRAFT, cite D-numbers + horizon items); commit both repos. Also update abstraksi SESSION_LOG (wave open).
+
+**P0. Credibility hotfixes (S)** — Profile.svelte L71-93 (fix 3 drifts, mirror sidebar, i18n-ify hardcoded labels); Sidebar.svelte L96-124 (5-item target, remove /bahasa + /c/ai-updates, i18n-ify "Wiki"/"Dashboard"); add `routes.explore.title` + `etnos.nav.wiki` + `etnos.nav.dashboard` ("Papan Data") to en/id/pmy, delete `etnos.nav.registry`; workflow env += `PUBLIC_DEFAULT_FEED: Local`; new `.env.example` (piefed.social + piefedalpha + lock + id + Local — fixes dev lemdro.id permanently).
+Proof: dist has `Papan Data`; dist lacks `"/jelajah"`, `/c/ai-updates`, `Registry MCP`.
+
+**P1. Theme preset swap ALONE (L risk — bisectable)** — presets.ts: rewrite HONAI_METRO id 0 (cream slate ramp 25-950 per corrections #5, MESIN zinc ramp incl. 925 monotonic, FULL terracotta primary ramp 50-950 with Photon's inverted convention: 900=accent-on-light #C0633E, 100=accent-on-dark gold-leaning), other.white=#e3dabf; add old ramp as id -12 preset; app.css @theme: mirror full ramps statically + fix zinc-925 wrapper + add missing primary stops; fix the two chart var bugs.
+Proof: `rgb(214 203 172)` + `192 99 62` in dist CSS; `bg-primary-600` utility exists. Manual: light+dark sweep of home/explore/dashboard/agen//theme, audit 12 text-white files + 5 vendored mono-svelte files with raw hex (FileInput, Select, ModalContainer, Search, ToastContainer). Deploy + verify pre-hydration cream paint.
+
+**P2. Fonts + grammar layer (M)** — static/font/ woff2s (Archivo Variable, Geist Mono, Instrument Serif italic; latin subsets); app.css @font-face (existing L53-75 pattern) + `--font-mono`/`--font-display` + grammar classes (.eyebrow/.inkbar/.rule/.rule2/.chip/.stamp/.ledger/.grain) + motion tokens + verbatim reduced-motion block. Optional Eyebrow/Inkbar primitives in new `src/lib/etnos/ui/`. Don't restyle EndPlaceholder yet.
+Proof: `.eyebrow`, `cubic-bezier(0.7`, ≥2 `prefers-reduced-motion` in dist CSS; fonts ≤ ~180KB added.
+
+**P3. Explore hub + PapuaPlate + guest home (M/L)** — new `PapuaPlate.svelte` (canvas dot-grid, seeded; GeoJSON from detak assets or simplified outline; city anchors; theme-aware) replaces PapuaMap on /explore (keep PapuaMap component in tree); island copy reframe (i18n: etnos.map.subtitle "simpul komunitas", hero "Tanah Papua"); cluster headers get inkbar/eyebrow; /explore/communities visible filter chips Local/Semua Federasi; `/` +page.ts: logged-out → redirect /explore.
+Proof: dist has `simpul komunitas`, lacks `membuka instance ETNOS`; guest / lands on hub; 360px check.
+
+**P4. Dashboard live + Sumber (M/L)** — new `src/lib/etnos/live.ts` (SWR module, localStorage `etnos.live.v1`): users via getSite (ONLY user_count real — others are -1, never render), local communities via paged listCommunities (cap 4 pages → "200+"), posts-24h via getPosts New/50 client-count ("50+" if saturated); calls from onMount (browser, CORS-open). StatCard gains `live` variant ("LANGSUNG" chip). Dashboard: title → "Papan Data Tanah Papua", island framing, live row on top, DEMO tiles stay chipped, in-page Sumber section (receipt chips, sumber.astro pattern). Count-up animation.
+Proof: dist has `LANGSUNG` + `Papan Data Tanah Papua`, lacks `Dashboard Papua`; offline → honest contoh fallback, no unhandled rejections.
+
+**P5. News trio (M)** — new `KilasTicker.svelte` (marquee: terracotta KILAS tab, duplicated track, pause-on-hover, reduced-motion → static list; data = detak LiveKliping-shaped baked sample labeled "(contoh)" + SWR flip to LANGSUNG when `PUBLIC_DETAK_URL` env set); new `PapanKilas.svelte` split-flap (per-ROW half-fold flip, 4 row types: headline/trending post (live getPosts)/community spotlight (directory.json)/kata hari ini (existing json); day-clock seeded) on /explore hero; Sorotan scoreboard (ledger rows + ghost numerals, live getPosts) in feed area. Mount ticker on `/` above Header (outside VirtualFeed measurement).
+Proof: dist has `KILAS`; no CLS at 360px; reduced-motion static.
+
+**P6. Wiki overhaul + bahasa merge (M/L)** — new `BahasaHub.svelte` (cards from /bahasa restyled; bahasa.json enriched w/ wiki+community links); wiki/[category] special-cases bahasa (+ new `bahasa.md` intro — no glob collision with suku-bahasa.md); /bahasa route → 308 /wiki/bahasa (jelajah pattern; both files replaced); wiki index restyle (welcome card → grammar, emoji chips → mono chips); WikiCarousel restyle (keep TTS untouched); article typography (serif captions, rules, eyebrows).
+Proof: dist has `/wiki/bahasa`; cold deep-link /bahasa lands right; Kuliner article renders new components; TTS speaks.
+
+**P7. Civic surfaces (L)** — extract `CapabilityCard.svelte` from /agen (behavior-identical commit FIRST, restyle separately); new `orgs.json` + `/org/[slug]` (Level-0 pages: CapabilityCard + profil/layanan/jam/WA + "naik kelas" note; unknown slug → error(404)); new `/musrenbang` (usulan composer: jurisdiction/category/narrative/cost-band via vendored forms, 5-stage tracker, PROTOKOL DEMONSTRASI stamp; submit = compose markdown → hand to existing /create/post flow if it accepts params, else render + copy button — NO parallel submit path). Nav: no sidebar slot; link from /tentang + explore civic cluster (Yose can promote later).
+Proof: dist has `PROTOKOL DEMONSTRASI`; /org/<slug> renders, /org/nope 404s; /agen pixel-parity after extraction.
+
+**P8. Cleanup + audit + docs (M)** — signup → note+link to piefed.social registration; gate modlog/reports/password nav by instance capability (small `capabilities.ts` helper); /util links removed from any nav; honest-label audit (every demo number chipped, every LANGSUNG backed by real fetch); i18n flatten-diff en/id/pmy for etnos.* → zero missing; update docs/CODEBASE_GROUNDTRUTH.md (COMMIT it — currently untracked), CUSTOMIZATIONS.md, ETNOS_ROADMAP.md; ask Yose about repo-root implementation_plan.md/walkthrough-1.md before deleting (may be his).
+
+## Final verification (after P8)
+
+Build + deploy green (`gh run watch`); re-shoot all 11 screenshot surfaces + /musrenbang + /org; both themes incl. /theme editor + Lama rollback preset; reduced-motion emulation; 360px pass; offline honest-fallback pass; /bahasa deep link; logged-in smoke on piefed.social (vote/comment — vendored modal/toast chrome intact); mood + session log + LEDGER updates in abstraksi.
+
+## Risk top-5 (full register in conversation)
+
+R1 slate ramp regeneration (all stops live) → monotonic + contrast-checked + id -12 rollback. R2 dead primary classes going live (~50) → pre-grep + post-sweep. R3 other.white recolor (12 files) → audit. R5 FOUC/static-mirror → @theme greps. R15 live-tile rate/latency unknowns → SWR + caps + honest fallback.
+
+## AMENDMENTS (Yose, 2026-07-06, post-approval — these override the plan above)
+
+1. **LIGHT THEME ONLY this wave.** P1 swaps the slate ramp + full primary (terracotta) ramp + `other.white` card cream ONLY. The zinc dark ramp stays UNTOUCHED (current dark look is kept; Honai Malam is a later wave). This halves R1 risk. Dark-mode sweeps in verification = confirm dark is UNCHANGED.
+2. **Animations: keep only zero-latency CSS.** No JS animation work this wave beyond count-up. Grammar-layer animations (rules draw, chip sweep) are pure CSS transform/opacity and ship; anything that would add a lib, a scroll listener, or main-thread work does NOT. Reduced-motion block still ships. Split-flap Papan Kilas (P5) stays CSS-only per-row; if it measures janky on the A12, degrade to a simple rotating card (no 3D flip).
+3. **Type is SITE-WIDE**: Archivo display + Geist Mono furniture apply across all pages, not just ETNOS routes (map `--font-display` into headings globally, mono into meta/labels where classes exist).
+4. **Map (P3): NOT dot-grid.** Port the ACTUAL act-1 main atlas map from detak-detik's front page (whatever component renders the big island map in act 1 — inspect `src/pages/index.astro` act 1 + its island imports; likely the engrave plate). Executor: read that component first, then port its rendering approach for Tanah Papua with city anchors.
+5. **Sorotan posts placement: decide during P5.** Current lean: desktop = right sidebar (Shell suffix area), mobile = section on /explore. Ticker stays top of feed/home.

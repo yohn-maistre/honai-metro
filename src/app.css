@@ -16,18 +16,38 @@
   --ease-cubic: cubic-bezier(0.075, 0.82, 0.165, 1);
   --spacing-22: 88px;
 
-  --color-slate-25: rgb(252 253 254);
-  --color-zinc-925: 28 28 32;
+  /* Honai Siang static mirror (pre-hydration paint + utility generation).
+     Runtime presets.ts values override these via inline vars on <html>;
+     keep the two in sync. Dark (zinc) stays Tailwind/default this wave. */
+  --color-slate-25: rgb(214 203 172); /* #d6cbac page field */
+  --color-slate-50: rgb(207 195 163);
+  --color-slate-100: rgb(196 184 150);
+  --color-slate-200: rgb(178 166 133);
+  --color-slate-300: rgb(170 160 133);
+  --color-slate-400: rgb(138 128 107);
+  --color-slate-500: rgb(111 103 87);
+  --color-slate-600: rgb(90 83 69);
+  --color-slate-700: rgb(64 58 47);
+  --color-slate-800: rgb(43 39 30);
+  --color-slate-900: rgb(21 19 14); /* #15130e ink */
+  --color-slate-950: rgb(14 12 9);
+  --color-zinc-925: rgb(28 28 32);
 
-  /* dark theme */
-  --color-primary-100: rgb(248 248 251);
-  --color-primary-200: rgb(175 175 185);
+  /* terracotta primary ramp (500 = brand #C0633E; 100/900 = Photon's
+     semantic on-dark/on-light accent pair) */
+  --color-primary-50: rgb(250 240 230);
+  --color-primary-100: rgb(255 245 224);
+  --color-primary-200: rgb(232 195 174);
+  --color-primary-300: rgb(214 157 121);
+  --color-primary-400: rgb(203 127 85);
+  --color-primary-500: rgb(192 99 62);
+  --color-primary-600: rgb(166 82 52);
+  --color-primary-700: rgb(140 69 41);
+  --color-primary-800: rgb(102 50 36);
+  --color-primary-900: rgb(140 69 41);
+  --color-primary-950: rgb(74 36 25);
 
-  /* light theme */
-  --color-primary-800: rgb(50 58 77);
-  --color-primary-900: rgb(15 23 42);
-
-  --color-white: var(--color-other-white, rgb(255 255 255));
+  --color-white: var(--color-other-white, rgb(227 218 191));
   --color-black: var(--color-other-black, rgb(0 0 0));
 
   @keyframes pop-in {

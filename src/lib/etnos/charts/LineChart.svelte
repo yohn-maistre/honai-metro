@@ -17,7 +17,7 @@
     data,
     unit = '',
     height = 160,
-    color = 'rgb(var(--color-primary-500))',
+    color = 'var(--color-primary-500)',
   }: Props = $props()
 
   const W = 600

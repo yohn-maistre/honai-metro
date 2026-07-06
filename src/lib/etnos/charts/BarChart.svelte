@@ -48,7 +48,7 @@
           <div
             class="h-full rounded-md transition-[width] duration-700"
             style="width:{pct}%; background-color: {d.color ??
-              'rgb(var(--color-primary-500))'};"
+              'var(--color-primary-500)'};"
           ></div>
         </div>
         {#if showValues}

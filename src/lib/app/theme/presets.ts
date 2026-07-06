@@ -41,8 +41,68 @@ const PHOTON_MONO = {
   },
 }
 
-// ETNOS 'Honai Metro' — warm earthy/cream palette inspired by Papuan highlands
+// ETNOS 'Honai Siang' — DINAS cream paper + terracotta, shared design
+// language with detak-detik (its tokens.css) and the Aksara device
+// (abstraksi/specs/etnos/10_design-language.md is the token truth).
+// Light ramps only this wave: zinc (dark mode) is intentionally carried
+// over unchanged from the previous palette (Honai Malam is a later wave).
 const HONAI_METRO = {
+  slate: {
+    // 25 is the page field (Shell.svelte paints bg with slate-25);
+    // cards sit LIGHTER than the page via other.white, like paper on a desk.
+    25: '214 203 172', // #d6cbac khaki paper
+    50: '207 195 163',
+    100: '196 184 150',
+    200: '178 166 133', // borders
+    300: '170 160 133', // #aaa085 soft dividers (detak line-soft)
+    400: '138 128 107',
+    500: '111 103 87',
+    600: '90 83 69', // #5a5345 muted text (4.5:1 on the page field)
+    700: '64 58 47',
+    800: '43 39 30',
+    900: '21 19 14', // #15130e ink
+    950: '14 12 9',
+  },
+  zinc: {
+    '50': '255 245 224',
+    '100': '247 236 212',
+    '200': '219 201 164',
+    '300': '234 220 189',
+    '400': '219 201 164',
+    '500': '211 190 146',
+    '600': '234 220 189',
+    '700': '13 14 42',
+    '800': '14 14 37',
+    '900': '14 17 32',
+    '925': '7 7 24',
+    '950': '6 6 22',
+  },
+  primary: {
+    // Terracotta family (device language #C0633E at 500 = charts/badges).
+    // 100 stays the on-dark accent (dark mode untouched this wave).
+    // 900 is the on-light accent (buttons/links): deep terracotta #8c4529
+    // so cream text on it passes AA; it sits lighter than 800 on purpose,
+    // Photon treats 100/900 as a semantic pair, not ramp ends.
+    50: '250 240 230',
+    100: '255 245 224',
+    200: '232 195 174',
+    300: '214 157 121',
+    400: '203 127 85',
+    500: '192 99 62', // #C0633E brand terracotta
+    600: '166 82 52',
+    700: '140 69 41',
+    800: '102 50 36',
+    900: '140 69 41', // #8c4529 on-light accent (semantic slot)
+    950: '74 36 25',
+  },
+  other: {
+    black: '0 0 0',
+    white: '227 218 191', // #e3dabf card surface
+  },
+}
+
+// Previous default palette, preserved verbatim for rollback (plan R1).
+const HONAI_METRO_LAMA = {
   slate: {
     25: '255 245 224',
     50: '247 236 212',
@@ -89,12 +149,14 @@ export function getDefaultTheme(): Theme {
   return {
     id: 0,
     colors: getDefaultColors(),
-    name: env.PUBLIC_THEME ? 'Instance Default' : 'Honai Metro',
+    name: env.PUBLIC_THEME ? 'Instance Default' : 'Honai Siang',
   }
 }
 
 export const presets: Theme[] = [
   getDefaultTheme(),
+  // Previous default, selectable for rollback
+  { colors: HONAI_METRO_LAMA, id: -12, name: 'Honai Metro (Lama)' },
   // Always include Mono (original Photon) as a selectable preset
   { colors: PHOTON_MONO, id: -10, name: 'Mono' },
   ...(env.PUBLIC_THEME

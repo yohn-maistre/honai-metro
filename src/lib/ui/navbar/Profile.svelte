@@ -23,7 +23,6 @@
     Bookmark,
     BugAnt,
     ChartBarSquare,
-    ChatBubbleLeftRight,
     CodeBracketSquare,
     Cog6Tooth,
     CommandLine,
@@ -68,25 +67,19 @@
   {/if}
 {/snippet}
 
-<!-- ETNOS: custom pages (top of menu) -->
+<!-- ETNOS: custom pages (order + labels mirror sidebar/Sidebar.svelte) -->
 <MenuDivider>ETNOS</MenuDivider>
-<MenuButton href="/wiki" icon={BookOpen}>
-  Wiki
-</MenuButton>
-<MenuButton href="/jelajah" icon={GlobeAmericas}>
+<MenuButton href="/explore" icon={GlobeAmericas}>
   {$t('etnos.nav.jelajah')}
 </MenuButton>
-<MenuButton href="/bahasa" icon={ChatBubbleLeftRight}>
-  {$t('etnos.nav.bahasa')}
+<MenuButton href="/wiki" icon={BookOpen}>
+  {$t('etnos.nav.wiki')}
 </MenuButton>
 <MenuButton href="/dashboard" icon={ChartBarSquare}>
-  Dashboard
+  {$t('etnos.nav.dashboard')}
 </MenuButton>
-<MenuButton href="/registry" icon={CommandLine}>
-  {$t('etnos.nav.registry')}
-</MenuButton>
-<MenuButton href="/c/ai-updates" icon={CpuChip}>
-  Agen AI
+<MenuButton href="/agen" icon={CpuChip}>
+  {$t('etnos.nav.agen')}
 </MenuButton>
 <MenuButton href="/tentang" icon={InformationCircle}>
   {$t('etnos.nav.tentang')}

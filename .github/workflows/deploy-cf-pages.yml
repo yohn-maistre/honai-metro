@@ -62,6 +62,7 @@ jobs:
           PUBLIC_LOCK_TO_INSTANCE: 'true'
           PUBLIC_LANGUAGE: id
           PUBLIC_SSR_ENABLED: 'false'
+          PUBLIC_DEFAULT_FEED: Local
         run: bun run build
 
       # Idempotent project provisioning. Fails harmlessly if the project

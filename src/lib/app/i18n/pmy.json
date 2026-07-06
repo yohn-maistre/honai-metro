@@ -194,6 +194,11 @@
             "footer": "{{users:number}} aktif {{users; 1:user; default:users;}}",
             "endFeed": "Anda telah mencapai akhir dari {{community_name; undefined:umpan.; default:{{community_name}}.}}"
         },
+        "explore": {
+            "title": "Jelajah",
+            "feeds": "Umpan",
+            "topics": "Topik"
+        },
         "modlog": "Modlog",
         "instances": "Instansi",
         "legal": {
@@ -919,9 +924,10 @@
         "nav": {
             "tentang": "Tentang",
             "jelajah": "Jelajah",
-            "registry": "Registry MCP",
+            "wiki": "Wiki",
+            "dashboard": "Papan Data",
             "bahasa": "Ruang Bahasa",
-            "agen": "Agen AI"
+            "agen": "Agen"
         },
         "explore": {
             "sorotan": "Sorotan",

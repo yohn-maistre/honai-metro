@@ -13,10 +13,8 @@
     BookOpen,
     Bookmark,
     ChartBarSquare,
-    ChatBubbleLeftRight,
     ChevronUpDown,
     Cog6Tooth,
-    CommandLine,
     ComputerDesktop,
     CpuChip,
     GlobeAmericas,
@@ -93,29 +91,23 @@
       icon={UserGroup}
     />
   {/if}
-  <!-- ETNOS: custom pages -->
+  <!-- ETNOS: custom pages (order + labels mirror navbar/Profile.svelte) -->
   <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
-  <SidebarButton href="/wiki" label="Wiki" icon={BookOpen} />
   <SidebarButton
     href="/explore"
     label={$t('etnos.nav.jelajah')}
     icon={GlobeAmericas}
   />
+  <SidebarButton href="/wiki" label={$t('etnos.nav.wiki')} icon={BookOpen} />
   <SidebarButton
-    href="/bahasa"
-    label={$t('etnos.nav.bahasa')}
-    icon={ChatBubbleLeftRight}
+    href="/dashboard"
+    label={$t('etnos.nav.dashboard')}
+    icon={ChartBarSquare}
   />
-  <SidebarButton href="/dashboard" label="Dashboard" icon={ChartBarSquare} />
   <SidebarButton
     href="/agen"
     label={$t('etnos.nav.agen')}
     icon={CpuChip}
-  />
-  <SidebarButton
-    href="/c/ai-updates"
-    label={`${$t('etnos.feed.ai')} · Updates`}
-    icon={CommandLine}
   />
   <SidebarButton
     href="/tentang"

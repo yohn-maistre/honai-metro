@@ -1042,9 +1042,10 @@
         "nav": {
             "tentang": "About",
             "jelajah": "Explore",
-            "registry": "MCP Registry",
+            "wiki": "Wiki",
+            "dashboard": "Data Board",
             "bahasa": "Language Hub",
-            "agen": "AI Agents"
+            "agen": "Agents"
         },
         "explore": {
             "sorotan": "Highlights",

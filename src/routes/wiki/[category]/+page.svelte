@@ -1,6 +1,7 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
   import Markdown from '$lib/app/markdown/Markdown.svelte'
+  import BahasaHub from '$lib/etnos/BahasaHub.svelte'
   import { isTtsAvailable, speak, stop } from '$lib/etnos/tts'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
   import { Button } from 'mono-svelte'
@@ -68,8 +69,12 @@
   </div>
   <EndPlaceholder size="lg">{$t(labelKey)}</EndPlaceholder>
   <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
+    class="bg-white dark:bg-zinc-900 rounded p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
   >
     <Markdown source={data.content} />
   </div>
+
+  {#if data.bahasa}
+    <BahasaHub languages={data.bahasa} />
+  {/if}
 </div>

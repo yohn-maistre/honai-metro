@@ -18,18 +18,20 @@
     | 'sejarah'
     | 'biodiversitas'
     | 'suku-bahasa'
+    | 'bahasa'
     | 'kuliner'
 
-  const categories: { slug: CategoryKey; emoji: string }[] = [
-    { slug: 'tempat', emoji: '📍' },
-    { slug: 'sejarah', emoji: '📚' },
-    { slug: 'biodiversitas', emoji: '🌿' },
-    { slug: 'suku-bahasa', emoji: '👥' },
-    { slug: 'kuliner', emoji: '🍲' },
+  const categories: { slug: CategoryKey }[] = [
+    { slug: 'tempat' },
+    { slug: 'sejarah' },
+    { slug: 'biodiversitas' },
+    { slug: 'suku-bahasa' },
+    { slug: 'bahasa' },
+    { slug: 'kuliner' },
   ]
 
   const intro = `
-## Selamat datang di Wiki Papua 🏠
+## Selamat datang di Wiki Tanah Papua
 
 Wiki ini berisi informasi tentang Tanah Papua — budaya, sejarah, bahasa, dan
 kekayaan alam. Konten dirawat manual dan akan diperkaya dengan kontribusi
@@ -38,7 +40,7 @@ komunitas melalui forum \`c/wiki\` serta data dari Wikipedia.
 Klik salah satu kategori di atas untuk mulai membaca, atau dengarkan
 **Hari Ini Dalam Sejarah** dan **Kata Hari Ini** di kartu sorotan.
 
-### 🤝 Cara berkontribusi
+### Cara berkontribusi
 1. **Berbicara** — gunakan bahasa daerah Anda di forum komunitas.
 2. **Menulis** — tambah cerita tentang budaya dan sejarah lewat \`c/wiki\`.
 3. **Memvalidasi** — bantu periksa terjemahan dan konten.
@@ -46,30 +48,25 @@ Klik salah satu kategori di atas untuk mulai membaca, atau dengarkan
 </script>
 
 <svelte:head>
-  <title>Wiki Papua — ETNOS</title>
+  <title>Wiki Tanah Papua — ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-4 max-w-full w-full">
   <WikiCarousel history={data.todayHistory} word={data.todayWord} />
 
-  <EndPlaceholder size="lg">Wiki Papua</EndPlaceholder>
+  <EndPlaceholder size="lg">Wiki Tanah Papua</EndPlaceholder>
 
   <div class="flex flex-wrap gap-2">
     {#each categories as cat (cat.slug)}
-      <a
-        href="/wiki/{cat.slug}"
-        class="px-3 py-1.5 rounded-xl text-sm font-medium
-               bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300
-               hover:bg-primary-100 hover:dark:bg-primary-900 transition-colors"
-      >
-        {cat.emoji}
+      <a href="/wiki/{cat.slug}" class="chip">
+        <span class="tick" aria-hidden="true">⊙</span>
         {$t(`etnos.wiki.categories.${cat.slug.replace(/-/g, '_')}`)}
       </a>
     {/each}
   </div>
 
   <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
+    class="bg-white dark:bg-zinc-900 rounded p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
   >
     <Markdown source={intro} />
   </div>

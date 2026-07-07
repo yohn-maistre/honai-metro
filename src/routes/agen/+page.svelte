@@ -41,7 +41,7 @@
 </script>
 
 <svelte:head>
-  <title>{$t('etnos.agen.title')} — ETNOS</title>
+  <title>{$t('etnos.agen.title')} · ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-8 max-w-full w-full">
@@ -54,11 +54,11 @@
 
   <!-- Aksara flagship: foreshadowing -->
   <section
-    class="rounded-3xl p-6 sm:p-8 border border-amber-200/60 dark:border-amber-900/40 bg-gradient-to-br from-amber-50/70 via-white to-white dark:from-amber-950/30 dark:via-zinc-950/40 dark:to-zinc-950/40 flex flex-col gap-4"
+    class="rounded-2xl p-6 sm:p-8 border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm flex flex-col gap-4"
   >
     <div class="flex items-center gap-3 flex-wrap">
       <div
-        class="w-12 h-12 rounded-2xl grid place-items-center bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300"
+        class="w-11 h-11 rounded-xl grid place-items-center bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 shrink-0"
       >
         <Icon src={Sparkles} size="22" />
       </div>

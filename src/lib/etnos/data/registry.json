@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Verified MCP tool registry. Static demo data — to be backed by a real tool review pipeline. Per memo §5.6 + §6.4.",
+    "description": "Verified MCP tool registry. Static demo data, to be backed by a real tool review pipeline. Per memo §5.6 + §6.4.",
     "demo": true,
     "policies": {
       "kyc": "Pengembang terverifikasi (PT/badan hukum atau identitas individu).",
@@ -13,7 +13,7 @@
       "name": "satusehat-bridge",
       "developer": "PT Abstraksi Data & Kognitek",
       "category": "Kesehatan",
-      "description": "MCP server untuk FHIR SATUSEHAT — observasi, encounter, kondisi, prosedur.",
+      "description": "MCP server untuk FHIR SATUSEHAT: observasi, encounter, kondisi, prosedur.",
       "version": "0.4.1",
       "license": "AGPL-3.0",
       "repo": "https://example.org/abstraksi/satusehat-bridge",

@@ -913,11 +913,11 @@
     "etnos": {
         "onboarding": {
             "title": "Selamat datang di ETNOS",
-            "intro": "Ruang publik komunitas Melanesia — forum, wiki, dan data publik berfederasi per-provinsi.",
+            "intro": "Ruang publik komunitas Melanesia, forum, wiki, dan data publik berfederasi per-provinsi.",
             "b1": "Komunitas per suku & bahasa. Bergabung, baca, ikut diskusi.",
             "b2": "Wiki Papua: tempat, sejarah, biodiversitas, suku & bahasa, kuliner.",
             "b3": "Dashboard publik: APBD, OTSUS, pendidikan, infrastruktur.",
-            "b4": "Federasi peer-to-peer — terhubung ke ETNOS provinsi lain via ActivityPub.",
+            "b4": "Federasi peer-to-peer, terhubung ke ETNOS provinsi lain via ActivityPub.",
             "more": "Pelajari selengkapnya",
             "start": "Mulai jelajah"
         },
@@ -931,7 +931,7 @@
         },
         "map": {
             "inkbar": "Peta · Tanah Papua",
-            "caption": "Simpul komunitas Tanah Papua — enam kota jangkar, satu tanah."
+            "caption": "Simpul komunitas Tanah Papua, enam kota jangkar, satu tanah."
         },
         "explore": {
             "sorotan": "Pilihan",
@@ -945,15 +945,15 @@
         "agen": {
             "title": "Agen AI",
             "subtitle": "Galeri agen, registry MCP yang sudah terbukti, deng komunitas Aksara",
-            "aksara_flagship": "Aksara — agen mandiri",
+            "aksara_flagship": "Aksara: agen mandiri",
             "aksara_coming": "Akan datang",
             "aksara_blurb": "Aksara itu harness agen ETNOS untuk simpul institusi (kelurahan, puskesmas, balai adat). Direktori, aktivitas, deng kapasitas akan muncul di sini setelah simpul-simpul daftar.",
             "directory": "Direktori",
-            "directory_demo": "Simulasi — belum ada institusi betulan",
+            "directory_demo": "Simulasi: belum ada institusi betulan",
             "directory_empty": "Belum ada simpul Aksara yang terdaftar. Lia dokumen pendaftaran.",
             "activity": "Aktivitas terbaru",
             "activity_empty": "Aktivitas akan muncul setelah simpul Aksara aktif.",
-            "open_registry": "Registry MCP — terbuka",
+            "open_registry": "Registry MCP: terbuka",
             "open_registry_subtitle": "Alat & skill yang bisa dipake agen mana saja, sudah lulus KYC, malware-scan, deng TKDN",
             "standards": "Standar & dokumen",
             "standard_register": "Cara daftarkan agen",

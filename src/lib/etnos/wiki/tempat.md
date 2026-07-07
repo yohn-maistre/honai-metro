@@ -9,7 +9,7 @@ Danau Sentani** yang menampilkan tarian, musik, dan kuliner khas Papua.
 ## Taman Nasional Lorentz
 
 Situs Warisan Dunia UNESCO seluas 2,5 juta hektar. Membentang dari pantai
-selatan hingga puncak Cartensz (Jaya Wijaya) — satu-satunya tempat di Asia
+selatan hingga puncak Cartensz (Jaya Wijaya), satu-satunya tempat di Asia
 tropis dengan gletser permanen. Habitat ribuan spesies endemik.
 
 ## Lembah Baliem
@@ -20,7 +20,7 @@ Agustus digelar **Festival Lembah Baliem** dengan perang-perangan tradisional.
 
 ## Raja Ampat
 
-Kepulauan di Papua Barat Daya, dikenal sebagai *the heart of coral triangle* —
+Kepulauan di Papua Barat Daya, dikenal sebagai *the heart of coral triangle* , 
 keragaman terumbu karang dan ikan tertinggi di dunia. Empat pulau utama:
 Waigeo, Misool, Salawati, Batanta.
 

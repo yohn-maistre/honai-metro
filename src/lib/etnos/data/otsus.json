@@ -4,7 +4,7 @@
   "source": "Kementerian Keuangan & Pemprov (data demo)",
   "updated": "2025-01-01",
   "demo": true,
-  "regulation": "UU No. 2/2021 jo. UU No. 21/2001 — Otsus Papua",
+  "regulation": "UU No. 2/2021 jo. UU No. 21/2001: Otsus Papua",
   "stats": [
     { "label": "Total OTSUS 2024", "value": "8.6", "unit": "T Rp" },
     { "label": "Realisasi", "value": "76.4", "unit": "%" },

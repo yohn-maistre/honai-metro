@@ -21,7 +21,7 @@ Penting di banyak komunitas dataran rendah dan tengah.
 
 ### Papeda
 Bubur sagu yang disantap dengan kuah ikan kuning (kunyit + ikan tongkol/kakap)
-dan sambal colo-colo. Hidangan komunal — biasanya disantap dengan jari atau
+dan sambal colo-colo. Hidangan komunal, biasanya disantap dengan jari atau
 sumpit kayu, langsung dari panci besar.
 
 ### Ikan bakar Manokwari

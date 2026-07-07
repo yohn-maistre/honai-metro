@@ -20,7 +20,7 @@
       "languages": ["Indonesia"],
       "hours": "Senin-Jumat 08.00-14.00 WIT",
       "wa": null,
-      "profile": "Halaman contoh untuk kantor distrik: profil, layanan, dan jam buka dicantumkan tanpa perlu akun. Data di halaman ini simulasi — kantor sebenarnya dapat mengklaim dan memperbarui halamannya."
+      "profile": "Halaman contoh untuk kantor distrik: profil, layanan, dan jam buka dicantumkan tanpa perlu akun. Data di halaman ini simulasi, kantor sebenarnya dapat mengklaim dan memperbarui halamannya."
     },
     {
       "slug": "puskesmas-kampung-contoh",
@@ -56,7 +56,7 @@
       "languages": ["Indonesia", "bahasa daerah setempat"],
       "hours": "Sesuai musyawarah",
       "wa": null,
-      "profile": "Halaman contoh untuk lembaga adat: kehadiran Level 0 menghormati cara kerja lembaga tanpa memaksa pola kantor — jam buka boleh 'sesuai musyawarah'."
+      "profile": "Halaman contoh untuk lembaga adat: kehadiran Level 0 menghormati cara kerja lembaga tanpa memaksa pola kantor, jam buka boleh 'sesuai musyawarah'."
     }
   ]
 }

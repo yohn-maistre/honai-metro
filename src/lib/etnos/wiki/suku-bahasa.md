@@ -1,7 +1,7 @@
 # Suku & Bahasa Papua
 
 Papua adalah salah satu wilayah dengan **keragaman linguistik tertinggi di
-dunia** — lebih dari **250 suku** dan **700+ bahasa daerah** terdokumentasi.
+dunia**: lebih dari **250 suku** dan **700+ bahasa daerah** terdokumentasi.
 Bahasa-bahasa ini terbagi menjadi dua keluarga besar: **Austronesia** (pesisir,
 sebagian besar Biak, Sentani) dan **non-Austronesia / Papua** (sebagian besar
 dataran tinggi, sangat beragam).
@@ -33,7 +33,7 @@ dataran tinggi, sangat beragam).
 ### Biak
 - ~70.000 penutur.
 - Wilayah: Kepulauan Biak-Numfor.
-- Mitologi **Koreri** — konsep mesianik tentang kondisi damai abadi.
+- Mitologi **Koreri**: konsep mesianik tentang kondisi damai abadi.
 
 ### Kombai, Korowai
 - Suku rumah pohon di dataran rendah selatan Papua.
@@ -42,19 +42,19 @@ dataran tinggi, sangat beragam).
 ## Papuan Malay (Melayu Papua)
 
 *Lingua franca* lintas-suku di seluruh Tanah Papua. Berbasis Melayu dengan
-pengaruh kuat dari bahasa daerah. Bukan dialek Indonesia standar — memiliki
+pengaruh kuat dari bahasa daerah. Bukan dialek Indonesia standar, memiliki
 tata bahasa, kosa kata, dan intonasi sendiri.
 
 Contoh:
-- *Sa pi pasar* — saya pergi ke pasar.
-- *Bapa pung anak* — anaknya bapak.
-- *Mama tra ada di rumah* — ibu tidak ada di rumah.
+- *Sa pi pasar*, saya pergi ke pasar.
+- *Bapa pung anak*, anaknya bapak.
+- *Mama tra ada di rumah*, ibu tidak ada di rumah.
 
 ## Bahasa terancam
 
 Sebagian besar bahasa daerah Papua memiliki **kurang dari 1.000 penutur** dan
 masuk kategori *endangered* (UNESCO). Pelestarian melalui penggunaan sehari-hari
-— bukan hanya dokumentasi — adalah kunci. Itulah misi **Ruang Bahasa ETNOS**.
+,  bukan hanya dokumentasi, adalah kunci. Itulah misi **Ruang Bahasa ETNOS**.
 
 ---
 

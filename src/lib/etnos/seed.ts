@@ -1,7 +1,7 @@
 /**
  * Seeded randomness, ported from detak-detik's seed.ts: the same seed
  * always draws the same rotation, so every reader sees the same board
- * on the same day — deterministic-for-all-readers is house doctrine.
+ * on the same day, deterministic-for-all-readers is house doctrine.
  * cyrb128 hashes a string seed; splitmix32 is the tiny PRNG over it.
  */
 export function cyrb128(str: string): number {

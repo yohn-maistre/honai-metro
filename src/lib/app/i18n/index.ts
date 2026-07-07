@@ -14,14 +14,14 @@ const config: Config = {
       loader: async () => (await import('./id.json')).default,
     },
     // ETNOS: Melayu Papua hidden from picker until manual translation pass
-    // lands — currently a duplicate of id.json. Loader retained (commented) so
+    // lands, currently a duplicate of id.json. Loader retained (commented) so
     // we can re-enable in one line once the translation work is done.
     // {
     //   locale: 'pmy',
     //   key: '',
     //   loader: async () => (await import('./pmy.json')).default,
     // },
-    // ETNOS: upstream loaders commented out — uncomment to re-enable
+    // ETNOS: upstream loaders commented out, uncomment to re-enable
     // { locale: 'he', key: '', loader: async () => (await import('./he.json')).default },
     // { locale: 'ar', key: '', loader: async () => (await import('./ar.json')).default },
     // { locale: 'bg', key: '', loader: async () => (await import('./bg.json')).default },

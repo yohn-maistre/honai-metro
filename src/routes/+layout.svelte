@@ -120,7 +120,7 @@
     {:else}
       <meta
         name="description"
-        content="ETNOS Papua — ruang publik komunitas Melanesia. Forum, wiki, dan data publik berfederasi."
+        content="ETNOS Papua: ruang publik komunitas Melanesia. Forum, wiki, dan data publik berfederasi."
       />
     {/if}
   {/if}

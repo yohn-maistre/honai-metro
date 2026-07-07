@@ -5,7 +5,7 @@
   import PetaPapua from '$lib/etnos/PetaPapua.svelte'
   import SorotanBoard from '$lib/etnos/SorotanBoard.svelte'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
-  import { Badge } from 'mono-svelte'
+  import { Badge, Material } from 'mono-svelte'
   import {
     ArrowRight,
     ArrowTopRightOnSquare,
@@ -49,19 +49,15 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mt-1">
       {#each data.sorotan.highlights as h (h.id)}
         {@const isPrimary = h.kind === 'primary'}
-        {@const accent = h.accent ?? 'primary'}
-        <a
+        <Material
+          element="a"
           href={h.href}
-          class={[
-            'rounded-2xl p-4 shadow-sm border transition-colors flex flex-col gap-2',
-            isPrimary
-              ? 'sm:col-span-2 lg:col-span-1 bg-gradient-to-br from-primary-50 to-white dark:from-primary-950/40 dark:to-zinc-900 border-primary-200/70 dark:border-primary-900/50 hover:border-primary-400 dark:hover:border-primary-600'
-              : accent === 'amber'
-                ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/60 dark:border-amber-900/40 hover:border-amber-400 dark:hover:border-amber-600'
-                : accent === 'emerald'
-                  ? 'bg-emerald-50/50 dark:bg-emerald-950/20 border-emerald-200/60 dark:border-emerald-900/40 hover:border-emerald-400 dark:hover:border-emerald-600'
-                  : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 hover:border-primary-400 dark:hover:border-primary-600',
-          ]}
+          color="default"
+          rounding="2xl"
+          padding="md"
+          class="flex flex-col gap-2 no-underline {isPrimary
+            ? 'sm:col-span-2 lg:col-span-1'
+            : ''}"
         >
           <div class="flex items-start gap-2">
             <span class="text-2xl shrink-0" aria-hidden="true">{h.icon}</span>
@@ -73,19 +69,12 @@
             {h.subtitle}
           </p>
           <span
-            class={[
-              'inline-flex items-center gap-1 text-xs font-medium mt-1',
-              accent === 'amber'
-                ? 'text-amber-700 dark:text-amber-300'
-                : accent === 'emerald'
-                  ? 'text-emerald-700 dark:text-emerald-300'
-                  : 'text-primary-600 dark:text-primary-400',
-            ]}
+            class="inline-flex items-center gap-1 text-xs font-medium mt-1 text-primary-600 dark:text-primary-400"
           >
             {$t('etnos.explore.sorotan_open')}
             <Icon src={ArrowRight} micro size="14" />
           </span>
-        </a>
+        </Material>
       {/each}
     </div>
   </section>
@@ -107,14 +96,13 @@
       </div>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {#each group.communities as c (c.slug)}
-          <a
+          <Material
+            element="a"
             href="/c/{c.slug}"
-            class={[
-              'rounded-2xl p-4 shadow-sm border transition-colors flex items-start gap-3',
-              group.stronghold
-                ? 'bg-amber-50/50 dark:bg-amber-950/20 border-amber-200/60 dark:border-amber-900/40 hover:border-amber-400 dark:hover:border-amber-600'
-                : 'bg-white dark:bg-zinc-900 border-slate-200 dark:border-zinc-800 hover:border-primary-400 dark:hover:border-primary-600',
-            ]}
+            color="default"
+            rounding="2xl"
+            padding="md"
+            class="flex items-start gap-3 no-underline"
           >
             <div
               class={[
@@ -145,7 +133,7 @@
               size="14"
               class="ml-auto text-slate-400 dark:text-zinc-500 mt-1"
             />
-          </a>
+          </Material>
         {/each}
       </div>
     </section>
@@ -155,32 +143,18 @@
     {$t('etnos.explore.browse_all')}
   </EndPlaceholder>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-    <a
-      href="/explore/communities"
-      class="bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-zinc-800 hover:border-primary-400 dark:hover:border-primary-600 transition-colors flex items-center gap-3"
-    >
-      <span class="font-medium dark:text-white">
-        {$t('etnos.explore.browse_communities')}
-      </span>
-      <Icon src={ArrowRight} micro size="16" class="ml-auto text-slate-400" />
-    </a>
-    <a
-      href="/explore/feeds"
-      class="bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-zinc-800 hover:border-primary-400 dark:hover:border-primary-600 transition-colors flex items-center gap-3"
-    >
-      <span class="font-medium dark:text-white">
-        {$t('etnos.explore.browse_feeds')}
-      </span>
-      <Icon src={ArrowRight} micro size="16" class="ml-auto text-slate-400" />
-    </a>
-    <a
-      href="/explore/topics"
-      class="bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-zinc-800 hover:border-primary-400 dark:hover:border-primary-600 transition-colors flex items-center gap-3"
-    >
-      <span class="font-medium dark:text-white">
-        {$t('etnos.explore.browse_topics')}
-      </span>
-      <Icon src={ArrowRight} micro size="16" class="ml-auto text-slate-400" />
-    </a>
+    {#each [{ href: '/explore/communities', label: $t('etnos.explore.browse_communities') }, { href: '/explore/feeds', label: $t('etnos.explore.browse_feeds') }, { href: '/explore/topics', label: $t('etnos.explore.browse_topics') }] as link (link.href)}
+      <Material
+        element="a"
+        href={link.href}
+        color="default"
+        rounding="2xl"
+        padding="md"
+        class="flex items-center gap-3 no-underline"
+      >
+        <span class="font-medium dark:text-white">{link.label}</span>
+        <Icon src={ArrowRight} micro size="16" class="ml-auto text-slate-400" />
+      </Material>
+    {/each}
   </div>
 </div>

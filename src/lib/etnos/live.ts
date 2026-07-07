@@ -2,7 +2,7 @@
  * ETNOS live tiles: the few numbers the borrowed PieFed backend can
  * actually answer today, fetched client-side with a stale-while-
  * revalidate cache. Honest-label doctrine: only render what a real
- * request returned — getSite exposes ONLY user_count (every other
+ * request returned, getSite exposes ONLY user_count (every other
  * count is -1 in the adapter), listCommunities has no total (we page
  * limit:50, cap 4 pages, saturate to "200+"), and posts-in-24h is
  * client-counted from one New/50 page (saturates to "50+").

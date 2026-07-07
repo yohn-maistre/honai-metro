@@ -1,11 +1,11 @@
 {
   "_meta": {
-    "description": "Hari Ini Dalam Sejarah Papua — keyed by MM-DD. Curated. To be expanded.",
+    "description": "Hari Ini Dalam Sejarah Papua: keyed by MM-DD. Curated. To be expanded.",
     "source": "manual + Wikipedia"
   },
   "default": {
     "title": "Papua, tanah Cendrawasih",
-    "body": "Papua memiliki sejarah panjang yang dimulai jauh sebelum kedatangan bangsa Eropa. Masyarakat adat telah mendiami pulau ini selama puluhan ribu tahun dengan keragaman budaya yang luar biasa — lebih dari 250 bahasa daerah.",
+    "body": "Papua memiliki sejarah panjang yang dimulai jauh sebelum kedatangan bangsa Eropa. Masyarakat adat telah mendiami pulau ini selama puluhan ribu tahun dengan keragaman budaya yang luar biasa, lebih dari 250 bahasa daerah.",
     "year": null
   },
   "01-01": {
@@ -20,7 +20,7 @@
   },
   "05-28": {
     "title": "Pembentukan ETNOS",
-    "body": "Pada hari ini, sebuah ruang publik komunitas Melanesia bernama ETNOS mulai dibangun — sebagai forum berfederasi per-provinsi untuk pelestarian bahasa, transparansi data publik, dan komunikasi komunitas adat.",
+    "body": "Pada hari ini, sebuah ruang publik komunitas Melanesia bernama ETNOS mulai dibangun, sebagai forum berfederasi per-provinsi untuk pelestarian bahasa, transparansi data publik, dan komunikasi komunitas adat.",
     "year": 2026
   },
   "07-15": {
@@ -45,7 +45,7 @@
   },
   "11-11": {
     "title": "Tiga provinsi baru di Papua",
-    "body": "Pada 11 November 2022, tiga provinsi baru — Papua Tengah, Papua Pegunungan, dan Papua Selatan — resmi terbentuk sebagai hasil pemekaran, melengkapi Papua, Papua Barat, dan Papua Barat Daya.",
+    "body": "Pada 11 November 2022, tiga provinsi baru, Papua Tengah, Papua Pegunungan, dan Papua Selatan, resmi terbentuk sebagai hasil pemekaran, melengkapi Papua, Papua Barat, dan Papua Barat Daya.",
     "year": 2022
   },
   "12-01": {

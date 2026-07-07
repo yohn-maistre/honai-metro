@@ -1,7 +1,7 @@
 <script lang="ts">
   /**
    * Capability card (spec etnos/04), extracted verbatim from /agen so
-   * /org/[slug] Level-0 pages can reuse it — behavior-identical to the
+   * /org/[slug] Level-0 pages can reuse it, behavior-identical to the
    * inline card it replaces.
    */
   import { Badge } from 'mono-svelte'

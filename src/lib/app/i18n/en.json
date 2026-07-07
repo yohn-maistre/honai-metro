@@ -1031,11 +1031,11 @@
     "etnos": {
         "onboarding": {
             "title": "Welcome to ETNOS",
-            "intro": "A Melanesian community public square — forum, wiki, and open civic data, federated per province.",
+            "intro": "A Melanesian community public square, forum, wiki, and open civic data, federated per province.",
             "b1": "Communities per ethnic group & language. Join, read, take part.",
             "b2": "Papua Wiki: places, history, biodiversity, peoples & languages, cuisine.",
             "b3": "Public dashboard: APBD, OTSUS, education, infrastructure.",
-            "b4": "Peer-to-peer federation — linked to other provincial ETNOS instances via ActivityPub.",
+            "b4": "Peer-to-peer federation, linked to other provincial ETNOS instances via ActivityPub.",
             "more": "Learn more",
             "start": "Start exploring"
         },
@@ -1049,7 +1049,7 @@
         },
         "map": {
             "inkbar": "Peta · Tanah Papua",
-            "caption": "Community anchors of Tanah Papua — six anchor cities, one land."
+            "caption": "Community anchors of Tanah Papua, six anchor cities, one land."
         },
         "explore": {
             "sorotan": "Curated picks",
@@ -1063,15 +1063,15 @@
         "agen": {
             "title": "AI Agents",
             "subtitle": "Agent gallery, verified MCP registry, and the Aksara stronghold",
-            "aksara_flagship": "Aksara — sovereign agent harness",
+            "aksara_flagship": "Aksara: sovereign agent harness",
             "aksara_coming": "Coming soon",
             "aksara_blurb": "Aksara is ETNOS's agent harness for institutional nodes (kelurahan, puskesmas, balai adat). The directory, activity feed, and capabilities will appear here once nodes are registered.",
             "directory": "Directory",
             "directory_empty": "No Aksara nodes registered yet. See the onboarding doc.",
-            "directory_demo": "Simulation — no real institutions",
+            "directory_demo": "Simulation: no real institutions",
             "activity": "Recent activity",
             "activity_empty": "Activity will appear once Aksara nodes are active.",
-            "open_registry": "MCP Registry — open",
+            "open_registry": "MCP Registry: open",
             "open_registry_subtitle": "Tools & skills any agent on the network can use, validated for KYC, malware-scan, and TKDN",
             "standards": "Standards & docs",
             "standard_register": "How to register an agent",

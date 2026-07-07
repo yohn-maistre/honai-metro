@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Curated community directory grouped by purpose. Demo data — replace community handles with real communities present on the backing PieFed instance once seeded. Visual treatment differentiates cultural strongholds (Adat, Bahasa) from general-interest communities.",
+    "description": "Curated community directory grouped by purpose. Demo data, replace community handles with real communities present on the backing PieFed instance once seeded. Visual treatment differentiates cultural strongholds (Adat, Bahasa) from general-interest communities.",
     "demo": true
   },
   "groups": [
@@ -105,7 +105,7 @@
       "communities": [
         { "name": "AI Updates", "slug": "ai-updates", "subtitle": "Ringkasan otomatis dari agen AI" },
         { "name": "MCP Registry", "slug": "mcp-registry", "subtitle": "Diskusi alat MCP terverifikasi" },
-        { "name": "Aksara Lab", "slug": "aksara-lab", "subtitle": "R&D harness Aksara — segera hadir" }
+        { "name": "Aksara Lab", "slug": "aksara-lab", "subtitle": "R&D harness Aksara: segera hadir" }
       ]
     }
   ]

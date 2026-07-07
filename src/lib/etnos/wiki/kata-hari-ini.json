@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Kata Hari Ini — kosa kata bahasa daerah Papua. Diputar harian via index hari dalam tahun.",
+    "description": "Kata Hari Ini: kosa kata bahasa daerah Papua. Diputar harian via index hari dalam tahun.",
     "source": "manual + linguistic references"
   },
   "words": [
@@ -9,14 +9,14 @@
       "language": "Mee (Ekagi)",
       "region": "Dataran tinggi Paniai",
       "meaning": "Uang. Awalnya merujuk pada kerang sebagai mata uang adat.",
-      "example": "Mege gaa ne — uang banyak."
+      "example": "Mege gaa ne: uang banyak."
     },
     {
       "word": "Honai",
       "language": "Dani",
       "region": "Lembah Baliem",
       "meaning": "Rumah tradisional Suku Dani berbentuk kubah, terbuat dari kayu dan ilalang.",
-      "example": "Honai ane wenelok — rumah kami di sini."
+      "example": "Honai ane wenelok: rumah kami di sini."
     },
     {
       "word": "Wamena",
@@ -43,28 +43,28 @@
       "word": "Sentani",
       "language": "Sentani",
       "region": "Danau Sentani, Jayapura",
-      "meaning": "Di sini kita tinggal dengan damai — asal nama Danau Sentani.",
+      "meaning": "Di sini kita tinggal dengan damai, asal nama Danau Sentani.",
       "example": null
     },
     {
       "word": "Koreri",
       "language": "Biak",
       "region": "Kepulauan Biak",
-      "meaning": "Kondisi damai, sejahtera, dan abadi — konsep mesianik dalam mitologi Biak.",
+      "meaning": "Kondisi damai, sejahtera, dan abadi, konsep mesianik dalam mitologi Biak.",
       "example": null
     },
     {
       "word": "Bega",
       "language": "Mee (Ekagi)",
       "region": "Dataran tinggi Paniai",
-      "meaning": "Hutan, alam liar — tempat sumber kehidupan komunitas.",
-      "example": "Bega ane nai — hutan itu kami punya."
+      "meaning": "Hutan, alam liar, tempat sumber kehidupan komunitas.",
+      "example": "Bega ane nai: hutan itu kami punya."
     },
     {
       "word": "Wam",
       "language": "Dani",
       "region": "Lembah Baliem",
-      "meaning": "Babi — hewan ternak dengan nilai sosial dan ritual tinggi.",
+      "meaning": "Babi: hewan ternak dengan nilai sosial dan ritual tinggi.",
       "example": null
     },
     {
@@ -72,21 +72,21 @@
       "language": "Papuan Malay",
       "region": "Seluruh Papua",
       "meaning": "Sapaan hormat untuk laki-laki dewasa; ayah; tetua.",
-      "example": "Bapa pung anak — anaknya bapak itu."
+      "example": "Bapa pung anak: anaknya bapak itu."
     },
     {
       "word": "Mama",
       "language": "Papuan Malay",
       "region": "Seluruh Papua",
       "meaning": "Sapaan hormat untuk perempuan dewasa; ibu; tetua perempuan.",
-      "example": "Mama jual sayur di pasar — ibu itu menjual sayur di pasar."
+      "example": "Mama jual sayur di pasar: ibu itu menjual sayur di pasar."
     },
     {
       "word": "Sa",
       "language": "Papuan Malay",
       "region": "Seluruh Papua",
       "meaning": "Saya (kata ganti orang pertama).",
-      "example": "Sa pi pasar — saya pergi ke pasar."
+      "example": "Sa pi pasar: saya pergi ke pasar."
     }
   ]
 }

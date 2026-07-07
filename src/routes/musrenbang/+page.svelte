@@ -11,6 +11,7 @@
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
   import {
     Button,
+    Material,
     Note,
     Option,
     Select,
@@ -118,9 +119,7 @@
   </p>
 
   <!-- the road a real usulan travels -->
-  <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800"
-  >
+  <Material color="default" rounding="2xl" padding="lg" class="shadow-sm">
     <h3 class="font-semibold dark:text-white mb-4">Tahapan usulan</h3>
     <ol class="flex flex-col sm:flex-row gap-4 sm:gap-3">
       {#each TAHAPAN as t, i (t.label)}
@@ -144,7 +143,7 @@
         </li>
       {/each}
     </ol>
-  </div>
+  </Material>
 
   <!-- the composer -->
   <form

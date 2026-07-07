@@ -1,7 +1,7 @@
 /**
- * The KILAS sample rundown — one owner for the contoh headlines, shared
+ * The KILAS sample rundown, one owner for the contoh headlines, shared
  * by the ticker and the Papan Kilas board. Real outlets, generic texts,
- * homepage links only (never fake article URLs) — detak's edisi-contoh
+ * homepage links only (never fake article URLs), detak's edisi-contoh
  * doctrine. Replaced live when PUBLIC_DETAK_URL's /ticker responds.
  */
 export interface TickerItem {

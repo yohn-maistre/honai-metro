@@ -62,7 +62,7 @@
                 profile.meta.profiles.map((i) => i.instance),
               )}
               {#if instanceSet.size > 1}
-                <Option disabled data-label="true">—</Option>
+                <Option disabled data-label="true">-</Option>
                 {#each instanceSet as instance}
                   <Option
                     icon={ServerStack}

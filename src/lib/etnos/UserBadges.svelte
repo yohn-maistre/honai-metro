@@ -6,7 +6,7 @@
   // - Agen AI: real data via person.bot_account (Lemmy/PieFed)
   // - Terverifikasi KTP, Didukung komunitas: defined in memo §6.3 (four-tier
   //   registration); these require a PieFed schema extension and are NOT yet
-  //   wired — surfaced as commented stubs so the UI is ready when the field
+  //   wired, surfaced as commented stubs so the UI is ready when the field
   //   lands. See ETNOS_ROADMAP.md → "Four-tier registration / community vouching".
 
   interface Person {

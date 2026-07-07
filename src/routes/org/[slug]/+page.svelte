@@ -7,7 +7,8 @@
    */
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
-  import { Badge, Note } from 'mono-svelte'
+  import { Badge, Material, Note } from 'mono-svelte'
+  import { ArrowLeft, Icon } from 'svelte-hero-icons/dist'
 
   let { data } = $props()
 </script>
@@ -17,15 +18,28 @@
 </svelte:head>
 
 <div class="flex flex-col gap-5 max-w-full w-full">
-  <div class="flex items-center gap-2 flex-wrap">
-    <EndPlaceholder size="lg">{data.org.name}</EndPlaceholder>
-  </div>
-  <Badge color="yellow-subtle" rounding="md">Data contoh</Badge>
+  <a
+    href="/org"
+    class="inline-flex items-center gap-1 text-sm text-slate-600 dark:text-zinc-400 hover:text-primary-600 dark:hover:text-primary-400"
+  >
+    <Icon src={ArrowLeft} micro size="16" />
+    Direktori Organisasi
+  </a>
+
+  <EndPlaceholder size="lg">
+    {data.org.name}
+    {#snippet action()}
+      <Badge color="yellow-subtle" rounding="md">Data contoh</Badge>
+    {/snippet}
+  </EndPlaceholder>
 
   <CapabilityCard agent={data.org} />
 
-  <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-3"
+  <Material
+    color="default"
+    rounding="2xl"
+    padding="lg"
+    class="shadow-sm flex flex-col gap-3"
   >
     <h3 class="font-semibold dark:text-white">Profil</h3>
     <p class="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed">
@@ -49,7 +63,7 @@
         {data.org.wa ?? 'belum tersedia'}
       </dd>
     </dl>
-  </div>
+  </Material>
 
   <Note>
     <strong>Naik kelas.</strong> Halaman Level 0 ini hanya direktori, tanpa akun

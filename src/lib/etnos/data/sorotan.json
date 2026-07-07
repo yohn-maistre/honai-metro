@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Curated Sorotan highlights — hand-picked spotlights surfaced at the top of /explore. Each item links to a real route. Demo content for early access; the editorial workflow lives outside the repo for now.",
+    "description": "Curated Sorotan highlights, hand-picked spotlights surfaced at the top of /explore. Each item links to a real route. Demo content for early access; the editorial workflow lives outside the repo for now.",
     "demo": true,
     "max_visible": 3
   },
@@ -9,7 +9,7 @@
       "id": "tentang-etnos",
       "icon": "🏛️",
       "title": "Apa itu ETNOS?",
-      "subtitle": "Ruang publik federatif untuk Tanah Papua — manusia, agen, dan institusi bertemu dalam satu lapisan.",
+      "subtitle": "Ruang publik federatif untuk Tanah Papua, manusia, agen, dan institusi bertemu dalam satu lapisan.",
       "href": "/tentang",
       "kind": "primary",
       "accent": "primary"
@@ -18,7 +18,7 @@
       "id": "ruang-bahasa",
       "icon": "🗣️",
       "title": "Bahasa Tanah Papua",
-      "subtitle": "Hub bahasa di Wiki — direktori 9 bahasa dengan status pemertahanan, kosa kata harian, dan ruang komunitasnya.",
+      "subtitle": "Hub bahasa di Wiki, direktori 9 bahasa dengan status pemertahanan, kosa kata harian, dan ruang komunitasnya.",
       "href": "/wiki/bahasa",
       "kind": "secondary",
       "accent": "amber"
@@ -27,7 +27,7 @@
       "id": "dashboard-otsus",
       "icon": "📊",
       "title": "Dashboard OTSUS",
-      "subtitle": "Snapshot data pendidikan, ekonomi, infrastruktur, kualitas hidup — bertahap menjadi live BPS feed.",
+      "subtitle": "Snapshot data pendidikan, ekonomi, infrastruktur, kualitas hidup, bertahap menjadi live BPS feed.",
       "href": "/dashboard",
       "kind": "secondary",
       "accent": "emerald"
@@ -36,7 +36,7 @@
       "id": "musrenbang",
       "icon": "🪶",
       "title": "Usulan Musrenbang",
-      "subtitle": "Susun usulan pembangunan kampung dalam format yang siap dibawa ke musyawarah — protokol demonstrasi.",
+      "subtitle": "Susun usulan pembangunan kampung dalam format yang siap dibawa ke musyawarah, protokol demonstrasi.",
       "href": "/musrenbang",
       "kind": "secondary",
       "accent": "emerald"

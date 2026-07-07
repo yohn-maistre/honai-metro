@@ -6,15 +6,15 @@ tertinggi setelah Madagaskar.
 
 ## Burung
 
-- **Cenderawasih** (Paradisaeidae) — 40+ spesies, simbol kultural Papua.
-- **Mambruk** (Goura) — merpati mahkota terbesar di dunia.
-- **Kakatua Raja** (Probosciger aterrimus) — kakatua terbesar.
+- **Cenderawasih** (Paradisaeidae), 40+ spesies, simbol kultural Papua.
+- **Mambruk** (Goura), merpati mahkota terbesar di dunia.
+- **Kakatua Raja** (Probosciger aterrimus), kakatua terbesar.
 
 ## Mamalia
 
-- **Kanguru pohon** (Dendrolagus) — kanguru yang hidup di pohon, endemik Papua.
-- **Kuskus** (Phalangeridae) — marsupial yang aktif di malam hari.
-- **Tikus pohon raksasa** (Mallomys) — bisa mencapai panjang 1 meter.
+- **Kanguru pohon** (Dendrolagus), kanguru yang hidup di pohon, endemik Papua.
+- **Kuskus** (Phalangeridae), marsupial yang aktif di malam hari.
+- **Tikus pohon raksasa** (Mallomys), bisa mencapai panjang 1 meter.
 
 ## Reptil & amfibi
 
@@ -24,15 +24,15 @@ tertinggi setelah Madagaskar.
 
 ## Laut
 
-- **Raja Ampat** — pusat *coral triangle*, 75% spesies karang dunia ada di sini.
+- **Raja Ampat**: pusat *coral triangle*, 75% spesies karang dunia ada di sini.
 - 1.500+ spesies ikan karang.
 - **Pari manta**, **paus pembunuh**, **hiu paus** rutin terlihat.
 
 ## Tumbuhan
 
-- **Anggrek Papua** — 2.000+ spesies, 600+ endemik.
-- **Sagu** (Metroxylon sagu) — pangan pokok masyarakat pesisir dan sungai.
-- **Matoa** (Pometia pinnata) — buah khas Papua dengan cita rasa unik.
+- **Anggrek Papua**: 2.000+ spesies, 600+ endemik.
+- **Sagu** (Metroxylon sagu), pangan pokok masyarakat pesisir dan sungai.
+- **Matoa** (Pometia pinnata), buah khas Papua dengan cita rasa unik.
 
 ## Ancaman & konservasi
 

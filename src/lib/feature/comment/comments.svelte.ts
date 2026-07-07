@@ -37,7 +37,7 @@ export function buildCommentsTree(
     const depthI = getDepthFromComment(comment_view.comment) ?? 0
     const depth = depthI + baseDepth
     if (comment_view.comment.content == '' && comment_view.comment.removed) {
-      comment_view.comment.content = `*Removed by Moderator — [${t.get('routes.modlog.title')}](/modlog?comment=${comment_view.comment.id})*`
+      comment_view.comment.content = `*Removed by Moderator, [${t.get('routes.modlog.title')}](/modlog?comment=${comment_view.comment.id})*`
     }
     const node: CommentNodeI = {
       comment_view,

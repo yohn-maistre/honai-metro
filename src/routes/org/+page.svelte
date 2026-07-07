@@ -15,8 +15,12 @@
 </svelte:head>
 
 <div class="flex flex-col gap-5 max-w-full w-full">
-  <EndPlaceholder size="lg">Direktori Organisasi</EndPlaceholder>
-  <Badge color="yellow-subtle" rounding="md">Data contoh</Badge>
+  <EndPlaceholder size="lg">
+    Direktori Organisasi
+    {#snippet action()}
+      <Badge color="yellow-subtle" rounding="md">Data contoh</Badge>
+    {/snippet}
+  </EndPlaceholder>
 
   <p class="text-sm text-slate-600 dark:text-zinc-400 max-w-prose">
     Kehadiran Level 0: organisasi tercantum dengan profil, layanan, dan jam

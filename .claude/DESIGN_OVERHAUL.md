@@ -106,3 +106,22 @@ R1 slate ramp regeneration (all stops live) → monotonic + contrast-checked + i
 
 ## FINAL LIVE SWEEP (2026-07-07, post-P8, all full-fetch size-checked)
 Route nodes on etnos.pages.dev entry app.* (P8 deploy 28839471379): explore/42 carries Papan Kilas + Papan Sorotan + openfreemap×2; musrenbang/64 carries PROTOKOL DEMONSTRASI + crosspost handoff; org/65-66 carry Level 0 + Naik kelas; signup/96 carries auth/register; wiki-category/112 carries Direktori Bahasa. P0–P8 all deployed and live-verified. Beta gate = Yose screenshot review.
+
+## REVERT + POLISH WAVE (2026-07-07, Yose screenshot feedback)
+
+Yose reviewed the live P0-P8 build and steered:
+1. **Backed off the detak-detik grammar** (it clashed with ETNOS's rounded corners + design language) AND the site-wide Archivo/mono typography.
+2. Labels "screaming slop", especially wiki (carried-over copy).
+3. Map was inert ("doesn't check anything").
+4. No em dashes anywhere.
+5. Reuse existing primitives (Material/Badge/Note) but polish; fix colored labels used as boxes/containers.
+
+Shipped (commits 7578f844 revert, 894adf6c polish, 1916e6d4 Material fix):
+- **app.css**: reverted @theme type to Inter/system + ui-monospace, removed the 3 ETNOS @font-face (woff2 files kept in static/font/ but unreferenced), removed the whole grammar layer (eyebrow/inkbar/ledger/chip/stamp/serial/rule/ghost-num/fig) + paper grain body::after + --etnos-* vars. KEPT the cream+terracotta color mirror. Result: rounded, Inter-native, cream.
+- **All etnos components re-dressed** to rounded-2xl cards, no mono imposition: StatCard, WikiCarousel (reverted to original gradient hero), SorotanBoard, KilasTicker (rounded ink strip, theme colors, fixed rgb(rgb()) bug), PapanKilas (rounded card, kept flip), BahasaHub (original rounded cards), dashboard Sumber (dl not ledger), explore, musrenbang, org, org/[slug], signup, wiki index (rounded chips, no emoji, cleaned intro) / category.
+- **Map (PetaPapua)**: pins now respond (flyTo + live caption naming city/wilayah) instead of dead clicks; rounded container; DINAS engraved look kept (renders fine, endpoints all 200 - the deadness was inert pins with empty instances{}).
+- **Colored-label-boxes fixed**: explore highlight + community cards de-tinted to neutral Material cards (accent only in icon/link, not the whole box); agen Aksara flagship amber-gradient -> clean card w/ small amber chip; standalone "Data contoh" badges folded into EndPlaceholder action snippet (proper inline label) on /org + /org/[slug].
+- **Reuse Material**: explore cards (x7), org profil, musrenbang tracker now use mono-svelte `<Material>`. Back button added to /org/[slug].
+- **Material card-color fix (systemic)**: `.material-*` used literal `background-color: white`, so cream theme's bg-white (#e3dabf) diverged from Material's #fff. Changed to `var(--color-white)` so ALL cards (feed included) use the theme card surface. Cohesive cream in Honai Siang, still white in default themes, dark unaffected. THIS IS THE FIX that made Material reuse consistent - the pre-existing feed was rendering bright white on cream.
+- **Em dashes**: 0 remain site-wide. 65 swept by a background general-purpose agent across 25 data/i18n/code files (colon after label/definition, comma for clause breaks); rest by hand.
+- NEXT / open for Yose review: WikiCarousel keeps its soft primary->amber gradient (original hero, left intact); dark theme (Honai Malam) still deferred; confirm cream Material feed reads well.

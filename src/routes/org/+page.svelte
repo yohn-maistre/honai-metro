@@ -1,29 +1,26 @@
 <script lang="ts">
   /**
-   * The Level-0 organization directory index: every listed org, one
-   * card each, all honest contoh until real organizations claim them.
+   * The Level-0 organization directory index: every listed org, one card
+   * each, all sample data until real organizations claim them.
    */
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
+  import { Badge } from 'mono-svelte'
 
   let { data } = $props()
 </script>
 
 <svelte:head>
-  <title>Direktori Organisasi — ETNOS</title>
+  <title>Direktori Organisasi · ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-5 max-w-full w-full">
-  <div class="flex items-end justify-between gap-3 flex-wrap">
-    <span class="eyebrow">Direktori organisasi · Level 0</span>
-    <span class="stamp">Data contoh</span>
-  </div>
-
   <EndPlaceholder size="lg">Direktori Organisasi</EndPlaceholder>
+  <Badge color="yellow-subtle" rounding="md">Data contoh</Badge>
 
   <p class="text-sm text-slate-600 dark:text-zinc-400 max-w-prose">
     Kehadiran Level 0: organisasi tercantum dengan profil, layanan, dan jam
-    buka — tanpa akun, tanpa kewajiban. Organisasi yang siap dapat mengklaim
+    buka, tanpa akun dan tanpa kewajiban. Organisasi yang siap dapat mengklaim
     halamannya dan bertumbuh menjadi Agen Institusi.
   </p>
 
@@ -35,5 +32,5 @@
     {/each}
   </div>
 
-  <p class="serial">{data.note}</p>
+  <p class="text-xs text-slate-400 dark:text-zinc-500">{data.note}</p>
 </div>

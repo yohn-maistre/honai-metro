@@ -59,14 +59,14 @@
 >
   {#if live}
     <span
-      title="data langsung dari server"
-      class="absolute top-2 right-2 text-[10px] font-mono font-medium uppercase tracking-wide px-1.5 py-0.5 rounded-sm bg-primary-500/15 text-primary-700 dark:text-primary-300 border border-primary-500/40"
+      title="Data langsung dari server"
+      class="absolute top-2 right-2 text-[10px] font-medium uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-primary-100 dark:bg-primary-500/20 text-primary-700 dark:text-primary-300"
     >
-      langsung
+      Langsung
     </span>
   {:else if demo}
     <span
-      title="data demo"
+      title="Data demo"
       class="absolute top-2 right-2 text-[10px] font-medium uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"
     >
       demo
@@ -75,8 +75,11 @@
   {#if icon}
     <Icon src={icon} size="24" class={color} />
   {/if}
-  <span class="text-2xl font-bold font-display tabular-nums dark:text-white leading-tight">
-    {display}{#if unit}<span class="text-base font-medium text-slate-500 dark:text-zinc-400 ml-1">{unit}</span>{/if}
+  <span class="text-2xl font-bold tabular-nums dark:text-white leading-tight">
+    {display}{#if unit}<span
+        class="text-base font-medium text-slate-500 dark:text-zinc-400 ml-1"
+        >{unit}</span
+      >{/if}
   </span>
   <span class="text-sm text-slate-500 dark:text-zinc-400">{label}</span>
 </div>

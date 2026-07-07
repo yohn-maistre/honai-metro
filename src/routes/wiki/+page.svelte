@@ -31,24 +31,24 @@
   ]
 
   const intro = `
-## Selamat datang di Wiki Tanah Papua
+## Tentang wiki ini
 
-Wiki ini berisi informasi tentang Tanah Papua — budaya, sejarah, bahasa, dan
-kekayaan alam. Konten dirawat manual dan akan diperkaya dengan kontribusi
-komunitas melalui forum \`c/wiki\` serta data dari Wikipedia.
+Wiki ini merawat pengetahuan tentang Tanah Papua: budaya, sejarah, bahasa, dan
+kekayaan alam. Isinya dirawat manual dan diperkaya kontribusi komunitas lewat
+forum \`c/wiki\`.
 
-Klik salah satu kategori di atas untuk mulai membaca, atau dengarkan
-**Hari Ini Dalam Sejarah** dan **Kata Hari Ini** di kartu sorotan.
+Pilih kategori di atas untuk mulai membaca, atau dengarkan **Hari Ini Dalam
+Sejarah** dan **Kata Hari Ini** di kartu sorotan.
 
 ### Cara berkontribusi
-1. **Berbicara** — gunakan bahasa daerah Anda di forum komunitas.
-2. **Menulis** — tambah cerita tentang budaya dan sejarah lewat \`c/wiki\`.
-3. **Memvalidasi** — bantu periksa terjemahan dan konten.
+1. **Berbicara**, gunakan bahasa daerah Anda di forum komunitas.
+2. **Menulis**, tambah cerita budaya dan sejarah lewat \`c/wiki\`.
+3. **Memvalidasi**, bantu periksa terjemahan dan konten.
 `
 </script>
 
 <svelte:head>
-  <title>Wiki Tanah Papua — ETNOS</title>
+  <title>Wiki Tanah Papua · ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-4 max-w-full w-full">
@@ -58,15 +58,17 @@ Klik salah satu kategori di atas untuk mulai membaca, atau dengarkan
 
   <div class="flex flex-wrap gap-2">
     {#each categories as cat (cat.slug)}
-      <a href="/wiki/{cat.slug}" class="chip">
-        <span class="tick" aria-hidden="true">⊙</span>
+      <a
+        href="/wiki/{cat.slug}"
+        class="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-primary-100 dark:hover:bg-primary-900/40 hover:text-primary-800 dark:hover:text-primary-200 transition-colors"
+      >
         {$t(`etnos.wiki.categories.${cat.slug.replace(/-/g, '_')}`)}
       </a>
     {/each}
   </div>
 
   <div
-    class="bg-white dark:bg-zinc-900 rounded p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
+    class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
   >
     <Markdown source={intro} />
   </div>

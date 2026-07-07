@@ -21,9 +21,9 @@
   let { data } = $props()
 
   // ETNOS: Papan Data Tanah Papua.
-  // Live row from the PieFed backend (only what the API really answers —
+  // Live row from the PieFed backend (only what the API really answers,
   // see live.ts); section data from BPS / Satudata (demo JSON for now).
-  // OTSUS tracker — UU 2/2021 transparency.
+  // OTSUS tracker per UU 2/2021 transparency.
 
   let live = $state<LiveStats | null>(getCached())
   $effect(() => {
@@ -76,7 +76,7 @@
 </script>
 
 <svelte:head>
-  <title>Papan Data Tanah Papua — ETNOS</title>
+  <title>Papan Data Tanah Papua · ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-6 max-w-full w-full">
@@ -267,30 +267,42 @@
   <div
     class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-3"
   >
-    <span class="eyebrow">Satu angka, satu sumber</span>
-    <div class="ledger">
-      <div>
-        <span>Pengguna · Komunitas · Postingan 24 jam</span>
-        <span class="v">piefed.social API — langsung</span>
+    <h3 class="font-semibold dark:text-white">Satu angka, satu sumber</h3>
+    <dl class="flex flex-col divide-y divide-slate-100 dark:divide-zinc-800 text-sm">
+      <div class="flex justify-between gap-4 py-2">
+        <dt class="text-slate-600 dark:text-zinc-400">
+          Pengguna, komunitas, postingan 24 jam
+        </dt>
+        <dd class="text-right font-medium dark:text-zinc-200">
+          piefed.social, langsung
+        </dd>
       </div>
-      <div>
-        <span>Seksi pendidikan, ekonomi, infrastruktur, kualitas hidup</span>
-        <span class="v">BPS / Satudata — data demo</span>
+      <div class="flex justify-between gap-4 py-2">
+        <dt class="text-slate-600 dark:text-zinc-400">
+          Pendidikan, ekonomi, infrastruktur, kualitas hidup
+        </dt>
+        <dd class="text-right font-medium dark:text-zinc-200">
+          BPS / Satudata, data demo
+        </dd>
       </div>
-      <div>
-        <span>Pelacak OTSUS</span>
-        <span class="v">UU 2/2021 — data demo</span>
+      <div class="flex justify-between gap-4 py-2">
+        <dt class="text-slate-600 dark:text-zinc-400">Pelacak OTSUS</dt>
+        <dd class="text-right font-medium dark:text-zinc-200">
+          UU 2/2021, data demo
+        </dd>
       </div>
-      <div>
-        <span>Data bahasa</span>
-        <span class="v">kurasi ETNOS — data demo</span>
+      <div class="flex justify-between gap-4 py-2">
+        <dt class="text-slate-600 dark:text-zinc-400">Data bahasa</dt>
+        <dd class="text-right font-medium dark:text-zinc-200">
+          kurasi ETNOS, data demo
+        </dd>
       </div>
-    </div>
+    </dl>
     <p class="text-xs text-slate-400 dark:text-zinc-500">
-      Angka berlabel <span class="font-mono uppercase">langsung</span> diambil
-      dari server saat halaman dibuka; label
-      <span class="font-mono uppercase">demo</span> berarti contoh yang menunggu
-      sumber resmi.
+      Angka berlabel <span class="font-medium uppercase">langsung</span> diambil
+      dari server saat halaman dibuka. Label
+      <span class="font-medium uppercase">demo</span> berarti contoh yang
+      menunggu sumber resmi.
     </p>
   </div>
 </div>

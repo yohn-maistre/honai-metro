@@ -1,10 +1,9 @@
 <script lang="ts">
   /**
-   * The language directory cards, moved from the retired /bahasa route
-   * into the wiki language hub (/wiki/bahasa) — one fact, one owner:
-   * explore's Bahasa cluster keeps community LINKS only, this hub owns
-   * the language DATA. Honest labels: speaker counts are estimates and
-   * say so.
+   * The language directory, moved from the retired /bahasa route into the
+   * wiki language hub (/wiki/bahasa). One fact, one owner: explore's
+   * Bahasa cluster keeps community links only, this hub owns the data.
+   * Speaker counts are estimates and say so.
    */
   import { Badge } from 'mono-svelte'
 
@@ -57,56 +56,50 @@
 </script>
 
 <div class="flex flex-col gap-3">
-  <div class="flex items-end justify-between gap-3 flex-wrap">
-    <span class="inkbar"><span class="dot">●</span>Direktori Bahasa</span>
-    <span class="serial">Ethnologue / Badan Bahasa · perkiraan</span>
+  <div class="flex items-baseline justify-between gap-3 flex-wrap">
+    <h2 class="text-lg font-semibold dark:text-white">Direktori bahasa</h2>
+    <span class="text-xs text-slate-400 dark:text-zinc-500">
+      Ethnologue / Badan Bahasa, angka perkiraan
+    </span>
   </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
     {#each languages as lang (lang.slug)}
       <div
-        class="bg-white dark:bg-zinc-900 rounded p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-2"
+        class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-2"
       >
         <div class="flex items-start justify-between gap-2">
           <div class="flex flex-col gap-0.5 min-w-0">
-            <h3 class="font-semibold font-display dark:text-white">
-              {lang.name}
-            </h3>
-            <p class="fig text-sm">{lang.native}</p>
+            <h3 class="font-semibold dark:text-white">{lang.name}</h3>
+            <p class="text-sm italic text-slate-500 dark:text-zinc-400">
+              {lang.native}
+            </p>
           </div>
           <Badge color={statusColor(lang.status)} rounding="md">
             {statusLabel(lang.status)}
           </Badge>
         </div>
-        <div class="ledger text-sm">
-          <div>
-            <span>Penutur</span>
-            <span class="v">{lang.speakers}</span>
-          </div>
-          <div>
-            <span>Wilayah</span>
-            <span class="v">{lang.region}</span>
-          </div>
-          <div>
-            <span>Rumpun</span>
-            <span class="v">{lang.family}</span>
-          </div>
-        </div>
+        <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+          <dt class="text-slate-500 dark:text-zinc-500">Penutur</dt>
+          <dd class="text-slate-700 dark:text-zinc-300 text-right">
+            {lang.speakers}
+          </dd>
+          <dt class="text-slate-500 dark:text-zinc-500">Wilayah</dt>
+          <dd class="text-slate-700 dark:text-zinc-300 text-right">
+            {lang.region}
+          </dd>
+          <dt class="text-slate-500 dark:text-zinc-500">Rumpun</dt>
+          <dd class="text-slate-700 dark:text-zinc-300 text-right">
+            {lang.family}
+          </dd>
+        </dl>
         <a
           href="/c/bahasa-{lang.slug}"
-          class="serial mt-2 hover:text-primary-600 dark:hover:text-primary-400"
+          class="text-sm text-primary-600 dark:text-primary-400 hover:underline mt-1"
         >
-          /c/bahasa-{lang.slug} →
+          /c/bahasa-{lang.slug}
         </a>
       </div>
     {/each}
   </div>
 </div>
-
-<style>
-  /* long region values wrap instead of overflowing the card */
-  .ledger .v {
-    white-space: normal;
-    text-align: right;
-  }
-</style>

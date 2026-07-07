@@ -44,7 +44,7 @@
 </script>
 
 <svelte:head>
-  <title>{$t(labelKey)} — Wiki Papua — ETNOS</title>
+  <title>{$t(labelKey)} · Wiki Tanah Papua · ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-4 max-w-full w-full">
@@ -54,7 +54,7 @@
       class="inline-flex items-center gap-1 text-sm text-slate-600 dark:text-zinc-400 hover:text-primary-600 dark:hover:text-primary-400"
     >
       <Icon src={ArrowLeft} micro size="16" />
-      Wiki Papua
+      Wiki Tanah Papua
     </a>
     {#if isTtsAvailable()}
       <Button size="sm" color="tertiary" onclick={toggleSpeak}>
@@ -69,7 +69,7 @@
   </div>
   <EndPlaceholder size="lg">{$t(labelKey)}</EndPlaceholder>
   <div
-    class="bg-white dark:bg-zinc-900 rounded p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
+    class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
   >
     <Markdown source={data.content} />
   </div>

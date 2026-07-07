@@ -2,7 +2,7 @@
   /**
    * ETNOS signup: PieFed's API has no signup method, so instead of the
    * Photon instance-picker (which would end in an error), this page
-   * says plainly where the account lives — register on the backend
+   * says plainly where the account lives: register on the backend
    * instance, then log in here. One honest step, no dead buttons.
    * (Lemmy-type deployments still redirect to /signup/[instance] via
    * +page.ts, where the API signup form works.)
@@ -18,11 +18,10 @@
 </script>
 
 <svelte:head>
-  <title>{$t('account.signup')} — ETNOS</title>
+  <title>{$t('account.signup')} · ETNOS</title>
 </svelte:head>
 
 <div class="flex flex-col gap-5 max-w-xl mx-auto w-full my-8">
-  <span class="eyebrow">Akun · {host}</span>
   <EndPlaceholder size="lg">{$t('account.signup')}</EndPlaceholder>
 
   <div
@@ -30,7 +29,7 @@
   >
     <p class="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed">
       ETNOS berjalan di atas jaringan federasi. Akun dibuat di instance
-      <strong>{host}</strong> — satu langkah di situs mereka, lalu kembali ke
+      <strong>{host}</strong>. Satu langkah di situs mereka, lalu kembali ke
       sini dan masuk dengan akun itu.
     </p>
     <ol
@@ -51,7 +50,7 @@
         {/snippet}
       </Button>
       <Button color="secondary" size="lg" href="/accounts/login">
-        Sudah punya akun — masuk
+        Sudah punya akun, masuk
       </Button>
     </div>
   </div>

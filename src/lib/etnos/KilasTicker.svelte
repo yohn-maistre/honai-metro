@@ -1,11 +1,9 @@
 <script lang="ts">
   /**
-   * KILAS: the news marquee, ported from detak-detik's front-page ticker
-   * (ink strip, terracotta source tab, duplicated belt, pause on hover).
-   * News and posts never share a surface: this strip is EXTERNAL press
-   * only. Baked sample is labeled CONTOH on the tab itself; when
+   * KILAS: the news marquee. External press only, never forum posts.
+   * The baked sample is labeled "contoh" on the tab; when
    * PUBLIC_DETAK_URL is set, the detak worker's hourly /ticker feed
-   * flips it to LANGSUNG. Links go out as-is — no tracking, no rewrite.
+   * flips it to "langsung". Links go out as-is, no tracking, no rewrite.
    */
   import { env } from '$env/dynamic/public'
   import {
@@ -28,20 +26,22 @@
 </script>
 
 <div
-  class="ticker"
+  class="ticker flex items-stretch overflow-hidden rounded-xl bg-slate-900 text-slate-50"
   aria-label="Berita kilat dari media lain, tautan keluar apa adanya"
 >
-  <span class="ticker-tab">
-    <i class="pulse-dot" aria-hidden="true"></i>
-    KILAS · {live ? 'LANGSUNG' : 'CONTOH'}
+  <span
+    class="flex-none flex items-center gap-2 bg-primary-500 text-white text-[11px] font-semibold uppercase tracking-wider px-3.5"
+  >
+    <span class="pulse-dot" aria-hidden="true"></span>
+    Kilas {live ? 'langsung' : 'contoh'}
   </span>
-  <div class="ticker-belt">
-    <div class="ticker-track">
+  <div class="belt overflow-hidden flex-1 py-2.5">
+    <div class="track text-[13px]">
       {#each [0, 1] as half (half)}
         {#each items as item, i (`${half}-${i}`)}
           {#if item.url}
             <a
-              class="ticker-link"
+              class="link"
               href={item.url}
               target="_blank"
               rel="noopener"
@@ -50,12 +50,12 @@
               {item.teks}
             </a>
           {:else}
-            <span class="ticker-link">
+            <span class="link">
               <span class="src">{item.src}</span>
               {item.teks}
             </span>
           {/if}
-          <span class="sep" aria-hidden="true">●</span>
+          <span class="sep" aria-hidden="true">•</span>
         {/each}
       {/each}
     </div>
@@ -63,34 +63,11 @@
 </div>
 
 <style>
-  /* detak base.css ticker, remapped onto the etnos theme vars */
-  .ticker {
-    display: flex;
-    align-items: stretch;
-    background: var(--etnos-ink);
-    color: var(--etnos-bg);
-    overflow: hidden;
-    white-space: nowrap;
-    font-family: var(--font-mono);
-    font-size: 12.5px;
-  }
-  .ticker-tab {
-    flex: none;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: var(--etnos-accent);
-    color: #15130e;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    padding: 9px 14px;
-    font-weight: 700;
-  }
   .pulse-dot {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #15130e;
+    background: currentColor;
     animation: tdot 1.4s ease-in-out infinite;
   }
   @keyframes tdot {
@@ -98,41 +75,50 @@
       opacity: 0.25;
     }
   }
-  .ticker-belt {
-    overflow: hidden;
-    flex: 1;
-    mask-image: linear-gradient(90deg, transparent, black 4%, black 96%, transparent);
-    padding: 9px 0;
+  .belt {
+    white-space: nowrap;
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent,
+      black 4%,
+      black 96%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent,
+      black 4%,
+      black 96%,
+      transparent
+    );
   }
-  .ticker-track {
+  .track {
     display: inline-block;
     padding-left: 100%;
     animation: tick 90s linear infinite;
   }
   @media (max-width: 760px) {
-    .ticker-track {
+    .track {
       animation-duration: 120s;
     }
   }
-  .ticker:hover .ticker-track {
+  .ticker:hover .track {
     animation-play-state: paused;
   }
-  .ticker .src {
-    color: var(--etnos-accent);
+  .src {
+    color: var(--color-primary-400);
     font-weight: 600;
+    margin-right: 4px;
   }
-  .ticker-tab .src {
-    color: inherit;
-  }
-  .ticker .sep {
-    opacity: 0.45;
+  .sep {
+    opacity: 0.4;
     margin: 0 14px;
   }
-  .ticker-link {
+  .link {
     color: inherit;
     text-decoration: none;
   }
-  .ticker-link:hover {
+  .link:hover {
     text-decoration: underline;
     text-underline-offset: 2px;
   }
@@ -142,9 +128,10 @@
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .ticker-track {
+    .track {
       animation: none;
       padding-left: 0;
+      white-space: normal;
     }
   }
 </style>

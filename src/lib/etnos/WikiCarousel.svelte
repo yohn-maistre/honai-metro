@@ -79,16 +79,16 @@
 </script>
 
 <section
-  class="bg-white dark:bg-zinc-900 border border-slate-900/70 dark:border-zinc-700 rounded shadow-sm overflow-hidden"
+  class="bg-gradient-to-br from-primary-50 to-amber-50 dark:from-zinc-900 dark:to-zinc-900/60 border border-primary-100 dark:border-zinc-800 rounded-2xl shadow-sm overflow-hidden"
   aria-roledescription="carousel"
 >
   <div class="relative min-h-44 sm:min-h-40">
     {#if index === 0}
       <div class="p-5 flex flex-col gap-2">
-        <span class="eyebrow">
-          {$t('etnos.wiki.today_in_history')}{#if history.year}<span> · {history.year}</span>{/if}
+        <span class="text-xs font-medium uppercase tracking-wide text-primary-700 dark:text-primary-300">
+          {$t('etnos.wiki.today_in_history')}{#if history.year}<span class="text-slate-500 dark:text-zinc-400 normal-case font-normal"> · {history.year}</span>{/if}
         </span>
-        <h3 class="text-lg sm:text-xl font-bold font-display text-slate-900 dark:text-white leading-tight">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 dark:text-white leading-tight">
           {history.title}
         </h3>
         <p class="text-sm text-slate-700 dark:text-zinc-300">{history.body}</p>
@@ -110,15 +110,17 @@
       </div>
     {:else}
       <div class="p-5 flex flex-col gap-2">
-        <span class="eyebrow">
-          {$t('etnos.wiki.word_of_day')} · {word.language}{#if word.region}<span> · {word.region}</span>{/if}
+        <span class="text-xs font-medium uppercase tracking-wide text-primary-700 dark:text-primary-300">
+          {$t('etnos.wiki.word_of_day')} · {word.language}{#if word.region}<span class="text-slate-500 dark:text-zinc-400 normal-case font-normal"> · {word.region}</span>{/if}
         </span>
-        <h3 class="text-2xl sm:text-3xl font-bold font-display text-slate-900 dark:text-white leading-tight">
+        <h3 class="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white leading-tight">
           {word.word}
         </h3>
         <p class="text-sm text-slate-700 dark:text-zinc-300">{word.meaning}</p>
         {#if word.example}
-          <p class="fig text-sm">"{word.example}"</p>
+          <p class="text-sm italic text-slate-500 dark:text-zinc-400">
+            "{word.example}"
+          </p>
         {/if}
         {#if ttsAvail}
           <Button

@@ -7,6 +7,7 @@
   import Location from '$lib/feature/filter/Location.svelte'
   import Sort from '$lib/feature/filter/Sort.svelte'
   import ViewSelect from '$lib/feature/filter/ViewSelect.svelte'
+  import KilasTicker from '$lib/etnos/KilasTicker.svelte'
   import PostFeed from '$lib/feature/post/feed/PostFeed.svelte'
   import VirtualFeed from '$lib/feature/post/feed/VirtualFeed.svelte'
   import Skeleton from '$lib/ui/generic/Skeleton.svelte'
@@ -37,6 +38,8 @@
       : $t('routes.frontpage.title')}
   </title>
 </svelte:head>
+
+<KilasTicker />
 
 <Header pageHeader>
   {$t('routes.frontpage.title')}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
   import KilasTicker from '$lib/etnos/KilasTicker.svelte'
+  import PapanKilas from '$lib/etnos/PapanKilas.svelte'
   import PetaPapua from '$lib/etnos/PetaPapua.svelte'
   import SorotanBoard from '$lib/etnos/SorotanBoard.svelte'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
@@ -24,6 +25,8 @@
 
 <div class="flex flex-col gap-6 max-w-full w-full">
   <KilasTicker />
+
+  <PapanKilas />
 
   <div
     class="bg-white dark:bg-zinc-900 rounded p-4 sm:p-6 shadow-sm border border-slate-200 dark:border-zinc-800"

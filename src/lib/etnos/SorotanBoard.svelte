@@ -6,8 +6,8 @@
    * is the forum speaking. Renders nothing while empty or on a failed
    * fetch — a labeled hole beats a beautiful fake.
    */
-  import { client } from '$lib/api/client.svelte'
   import type { PostView } from '$lib/api/types'
+  import { fetchHotPosts } from '$lib/etnos/hot'
   import { postLink } from '$lib/feature/post/helpers'
 
   interface Props {
@@ -19,16 +19,11 @@
   let posts = $state<PostView[]>([])
 
   $effect(() => {
-    client()
-      .getPosts({ type_: 'Local', sort: 'Hot', limit: 20, page_cursor: '1' })
-      .then((r) => {
-        posts = r.posts
-          .filter((p) => !p.post.deleted && !p.post.removed && !p.post.nsfw)
-          .slice(0, limit)
-      })
-      .catch(() => {
-        /* board stays absent when the backend is dark */
-      })
+    // shared Hot/Local fetch (hot.ts); board stays absent when the
+    // backend is dark
+    fetchHotPosts().then((r) => {
+      posts = r.slice(0, limit)
+    })
   })
 </script>
 

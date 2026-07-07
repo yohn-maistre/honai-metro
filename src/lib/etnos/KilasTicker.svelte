@@ -8,59 +8,22 @@
    * flips it to LANGSUNG. Links go out as-is — no tracking, no rewrite.
    */
   import { env } from '$env/dynamic/public'
+  import {
+    fetchKilas,
+    KILAS_CONTOH,
+    type TickerItem,
+  } from '$lib/etnos/kilas-data'
 
-  interface TickerItem {
-    src: string
-    teks: string
-    url?: string
-  }
-
-  // Sample rundown, Papua-framed: real outlets, generic texts, homepage
-  // links only (never fake article URLs) — detak's edisi-contoh doctrine.
-  const CONTOH: TickerItem[] = [
-    { src: 'JUBI', teks: 'Liputan layanan kesehatan kampung di pegunungan tengah', url: 'https://jubi.id' },
-    { src: 'BMKG', teks: 'Prakiraan cuaca Tanah Papua: hujan sore di pesisir utara', url: 'https://www.bmkg.go.id' },
-    { src: 'SUARA PAPUA', teks: 'Warga soroti akses pendidikan di kabupaten pemekaran', url: 'https://suarapapua.com' },
-    { src: 'GFW', teks: 'Peringatan deforestasi terdeteksi di koridor selatan', url: 'https://www.globalforestwatch.org' },
-    { src: 'ANTARA', teks: 'Pembangunan infrastruktur distrik dilaporkan berlanjut', url: 'https://papua.antaranews.com' },
-    { src: 'BPS', teks: 'Rilis data sosial-ekonomi provinsi terbaru', url: 'https://papua.bps.go.id' },
-  ]
-
-  let items = $state<TickerItem[]>(CONTOH)
+  let items = $state<TickerItem[]>(KILAS_CONTOH)
   let live = $state(false)
 
-  const DETAK_URL = (env.PUBLIC_DETAK_URL as string | undefined)?.replace(
-    /\/$/,
-    '',
-  )
-
   $effect(() => {
-    if (!DETAK_URL) return
-    ;(async () => {
-      try {
-        const res = await fetch(`${DETAK_URL}/ticker`, {
-          signal: AbortSignal.timeout(6000),
-        })
-        if (res.status !== 200) return
-        const d: unknown = await res.json()
-        const arr = Array.isArray(d) ? d : (d as { items?: unknown[] }).items
-        if (!Array.isArray(arr) || !arr.length) return
-        const parsed = arr
-          .map((x) => x as Record<string, unknown>)
-          .filter((x) => typeof x.teks === 'string')
-          .map((x) => ({
-            src: String(x.src ?? ''),
-            teks: String(x.teks),
-            url: typeof x.url === 'string' ? x.url : undefined,
-          }))
-        if (parsed.length) {
-          items = parsed
-          live = true
-        }
-      } catch {
-        /* baked contoh keeps the strip honest when the feed is dark */
+    fetchKilas(env.PUBLIC_DETAK_URL as string | undefined).then((parsed) => {
+      if (parsed) {
+        items = parsed
+        live = true
       }
-    })()
+    })
   })
 </script>
 

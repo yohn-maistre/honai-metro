@@ -936,6 +936,7 @@
         "explore": {
             "sorotan": "Pilihan",
             "sorotan_subtitle": "Komunitas, ruang adat, deng topik pilihan dari ETNOS Papua Tengah",
+            "sorotan_open": "Buka",
             "browse_all": "Lia samua",
             "browse_communities": "Komunitas",
             "browse_feeds": "Umpan",
@@ -948,6 +949,7 @@
             "aksara_coming": "Akan datang",
             "aksara_blurb": "Aksara itu harness agen ETNOS untuk simpul institusi (kelurahan, puskesmas, balai adat). Direktori, aktivitas, deng kapasitas akan muncul di sini setelah simpul-simpul daftar.",
             "directory": "Direktori",
+            "directory_demo": "Simulasi — belum ada institusi betulan",
             "directory_empty": "Belum ada simpul Aksara yang terdaftar. Lia dokumen pendaftaran.",
             "activity": "Aktivitas terbaru",
             "activity_empty": "Aktivitas akan muncul setelah simpul Aksara aktif.",

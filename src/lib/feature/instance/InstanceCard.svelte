@@ -3,6 +3,7 @@
   import { t } from '$lib/app/i18n'
   import Markdown from '$lib/app/markdown/Markdown.svelte'
   import { settings } from '$lib/app/settings.svelte'
+  import { hasModlog } from '$lib/etnos/capabilities'
   import { userLink } from '$lib/app/util.svelte'
   import EntityHeader from '$lib/ui/generic/EntityHeader.svelte'
   import ItemList from '$lib/ui/generic/ItemList.svelte'
@@ -53,11 +54,13 @@
     <EndPlaceholder size="xs" margin="sm">
       {$t('nav.menu.instance')}
     </EndPlaceholder>
-    <SidebarButton
-      href="/modlog"
-      label={$t('routes.modlog.title')}
-      icon={Newspaper}
-    />
+    {#if hasModlog()}
+      <SidebarButton
+        href="/modlog"
+        label={$t('routes.modlog.title')}
+        icon={Newspaper}
+      />
+    {/if}
     <SidebarButton
       href="/legal"
       label={$t('routes.legal.title')}

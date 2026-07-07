@@ -4,6 +4,7 @@
   import { profile } from '$lib/app/auth'
   import { errorMessage } from '$lib/app/error'
   import { t } from '$lib/app/i18n'
+  import { hasModlog } from '$lib/etnos/capabilities'
   import Markdown from '$lib/app/markdown/Markdown.svelte'
   import { settings } from '$lib/app/settings.svelte'
   import { fullCommunityName, userLink } from '$lib/app/util.svelte'
@@ -231,10 +232,12 @@
           icon={EllipsisHorizontal}
         />
       {/snippet}
-      <MenuButton href="/modlog?community={community_view.community.id}">
-        <Icon src={Newspaper} size="16" mini />
-        {$t('cards.community.modlog')}
-      </MenuButton>
+      {#if hasModlog()}
+        <MenuButton href="/modlog?community={community_view.community.id}">
+          <Icon src={Newspaper} size="16" mini />
+          {$t('cards.community.modlog')}
+        </MenuButton>
+      {/if}
       {#if profile.current?.jwt}
         {#if profile.isMod(community_view.community)}
           <MenuButton

@@ -10,6 +10,7 @@
   import { t } from '$lib/app/i18n'
   import { settings } from '$lib/app/settings.svelte'
   import { fullCommunityName, userLink } from '$lib/app/util.svelte'
+  import { hasModlog } from '$lib/etnos/capabilities'
   import EntityHeader from '$lib/ui/generic/EntityHeader.svelte'
   import ItemList from '$lib/ui/generic/ItemList.svelte'
   import { publishedToDate } from '$lib/ui/util/date'
@@ -205,10 +206,12 @@
         <Button {@attach attachment} size="square-lg" icon={EllipsisHorizontal}
         ></Button>
       {/snippet}
-      <MenuButton href="/modlog?community={community.id}">
-        <Icon src={Newspaper} size="16" mini />
-        {$t('cards.community.modlog')}
-      </MenuButton>
+      {#if hasModlog()}
+        <MenuButton href="/modlog?community={community.id}">
+          <Icon src={Newspaper} size="16" mini />
+          {$t('cards.community.modlog')}
+        </MenuButton>
+      {/if}
       {#if profile.isMod(community)}
         <MenuButton
           color="success-subtle"

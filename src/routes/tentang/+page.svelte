@@ -9,18 +9,21 @@
   const body = `
 ## ETNOS — ruang publik komunitas Melanesia
 
-ETNOS adalah forum publik berfederasi per-provinsi, dirancang sebagai *town square*
-digital untuk komunitas dan institusi di Papua. Berbasis ActivityPub
-(kompatibel dengan PieFed, Lemmy, Mastodon), ETNOS menghubungkan komunitas
-suku, kelurahan, puskesmas, balai adat, dan koperasi tanpa platform terpusat.
+ETNOS adalah forum publik berfederasi untuk Tanah Papua, dirancang sebagai
+*town square* digital untuk komunitas dan institusi — satu tanah, melampaui
+batas administratif. Berbasis ActivityPub (kompatibel dengan PieFed, Lemmy,
+Mastodon), ETNOS menghubungkan komunitas suku, kampung, puskesmas, balai adat,
+dan koperasi tanpa platform terpusat.
 
 ### Apa yang ada di sini
 
 - **Forum komunitas** per suku, bahasa, dan wilayah
-- **Wiki Papua** — tempat, sejarah, biodiversitas, suku & bahasa, kuliner
-- **Dashboard publik** — data BPS, OTSUS, pendidikan, infrastruktur, kualitas hidup
-- **Registry MCP** — direktori alat AI terverifikasi (KYC, malware-scan, TKDN)
-- **Ruang Bahasa** — pelestarian bahasa daerah lewat penggunaan
+- **[Wiki Tanah Papua](/wiki)** — tempat, sejarah, biodiversitas, suku & bahasa, kuliner
+- **[Hub Bahasa](/wiki/bahasa)** — pelestarian bahasa daerah lewat penggunaan
+- **[Papan Data](/dashboard)** — data BPS, OTSUS, pendidikan, infrastruktur, kualitas hidup
+- **[Usulan Musrenbang](/musrenbang)** — susun usulan pembangunan kampung (protokol demonstrasi)
+- **[Direktori Organisasi](/org)** — kehadiran Level 0 untuk kantor, puskesmas, dan lembaga adat
+- **[Registry MCP](/agen#registry)** — direktori alat AI terverifikasi (KYC, malware-scan, TKDN)
 
 ### Empat tingkat keanggotaan
 
@@ -32,10 +35,11 @@ suku, kelurahan, puskesmas, balai adat, dan koperasi tanpa platform terpusat.
 
 ### Federasi, bukan platform
 
-Setiap provinsi punya instance ETNOS sendiri (ETNOS Papua, ETNOS Papua Tengah, dst).
-Instance saling terhubung via ActivityPub. Tidak ada satu titik kegagalan politik atau teknis.
-Konten "publik" dapat mengalir antar provinsi; konten "adat" tetap dijaga komunitas asalnya
-melalui kerangka [CARE Principles](https://www.gida-global.org/care).
+Saat ini satu instance melayani seluruh Tanah Papua; ketika komunitas tumbuh,
+wilayah dapat membuka instance-nya sendiri dan tetap saling terhubung via
+ActivityPub — tidak ada satu titik kegagalan politik atau teknis. Konten
+"publik" dapat mengalir antar instance; konten "adat" tetap dijaga komunitas
+asalnya melalui kerangka [CARE Principles](https://www.gida-global.org/care).
 
 ### Dibangun oleh
 

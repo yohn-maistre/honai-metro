@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "description": "Level-0 organization directory (spec etnos/09 staged actor spectrum): listed presence only, no agent, no login. Every entry here is SIMULATED sample data until a real organization claims its page.",
+    "demo": true
+  },
+  "orgs": [
+    {
+      "slug": "kantor-distrik-nabire",
+      "id": "org-distrik-nabire",
+      "name": "Kantor Distrik Nabire (Contoh)",
+      "kind": "org",
+      "actorType": "Organisasi · Level 0",
+      "status": "kontak-wa",
+      "jurisdiction": "Distrik Nabire (simulasi)",
+      "services": [
+        "Surat pengantar ke kabupaten",
+        "Legalisasi dokumen kampung",
+        "Informasi jadwal musrenbang distrik"
+      ],
+      "languages": ["Indonesia"],
+      "hours": "Senin-Jumat 08.00-14.00 WIT",
+      "wa": null,
+      "profile": "Halaman contoh untuk kantor distrik: profil, layanan, dan jam buka dicantumkan tanpa perlu akun. Data di halaman ini simulasi — kantor sebenarnya dapat mengklaim dan memperbarui halamannya."
+    },
+    {
+      "slug": "puskesmas-kampung-contoh",
+      "id": "org-puskesmas-contoh",
+      "name": "Puskesmas Kampung (Contoh)",
+      "kind": "org",
+      "actorType": "Organisasi · Level 0",
+      "status": "luring",
+      "jurisdiction": "Kampung simulasi, pesisir Nabire",
+      "services": [
+        "Layanan kesehatan dasar",
+        "Imunisasi & posyandu",
+        "Rujukan ke RSUD"
+      ],
+      "languages": ["Indonesia", "Melayu Papua"],
+      "hours": "Senin-Sabtu 08.00-13.00 WIT",
+      "wa": null,
+      "profile": "Halaman contoh untuk puskesmas: warga bisa melihat layanan dan jam buka bahkan ketika puskesmas belum punya kehadiran digital sendiri."
+    },
+    {
+      "slug": "dewan-adat-contoh",
+      "id": "org-dewan-adat-contoh",
+      "name": "Sekretariat Dewan Adat (Contoh)",
+      "kind": "org",
+      "actorType": "Organisasi · Level 0",
+      "status": "kontak-wa",
+      "jurisdiction": "Wilayah adat simulasi",
+      "services": [
+        "Mediasi tanah ulayat",
+        "Pencatatan keputusan musyawarah adat",
+        "Penghubung ke pemerintah distrik"
+      ],
+      "languages": ["Indonesia", "bahasa daerah setempat"],
+      "hours": "Sesuai musyawarah",
+      "wa": null,
+      "profile": "Halaman contoh untuk lembaga adat: kehadiran Level 0 menghormati cara kerja lembaga tanpa memaksa pola kantor — jam buka boleh 'sesuai musyawarah'."
+    }
+  ]
+}

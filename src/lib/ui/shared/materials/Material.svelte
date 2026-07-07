@@ -101,7 +101,7 @@
 
   :global {
     .material-default {
-      background-color: white;
+      background-color: var(--color-white);
       border-width: 1px;
       border-color: var(--color-slate-200);
 
@@ -132,7 +132,7 @@
     }
 
     .material-distinct {
-      background-color: white;
+      background-color: var(--color-white);
       border-width: 1px;
       border-color: var(--color-slate-200);
 
@@ -162,7 +162,7 @@
     }
 
     .material-uniform {
-      background-color: white;
+      background-color: var(--color-white);
       border-width: 1px;
       border-color: var(--color-slate-200);
 

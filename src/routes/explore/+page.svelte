@@ -2,6 +2,7 @@
   import { t } from '$lib/app/i18n'
   import KilasTicker from '$lib/etnos/KilasTicker.svelte'
   import PetaPapua from '$lib/etnos/PetaPapua.svelte'
+  import SorotanBoard from '$lib/etnos/SorotanBoard.svelte'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
   import { Badge } from 'mono-svelte'
   import {
@@ -29,6 +30,8 @@
   >
     <PetaPapua {instances} />
   </div>
+
+  <SorotanBoard />
 
   <section class="flex flex-col gap-3">
     <div class="flex flex-col gap-1.5">

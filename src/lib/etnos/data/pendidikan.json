@@ -1,7 +1,7 @@
 {
   "title": "Pendidikan",
   "subtitle": "Angka partisipasi, literasi, guru, sekolah",
-  "source": "BPS Provinsi Papua (data demo, akan disambungkan via API)",
+  "source": "BPS Provinsi Papua (data contoh, akan disambungkan via API)",
   "updated": "2025-01-01",
   "demo": true,
   "stats": [

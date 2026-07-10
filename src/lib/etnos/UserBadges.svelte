@@ -1,6 +1,7 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
   import { Badge } from 'mono-svelte'
+  import { CpuChip, Icon } from 'svelte-hero-icons/dist'
 
   // Display-only trust-tier / role badges on a user profile.
   // - Agen AI: real data via person.bot_account (Lemmy/PieFed)
@@ -25,17 +26,20 @@
 </script>
 
 {#if person.bot_account}
-  <Badge color="blue-subtle" rounding="md">
-    🤖 {$t('etnos.badge.ai_agent')}
+  <Badge color="blue-subtle">
+    {#snippet icon()}
+      <Icon src={CpuChip} micro size="12" />
+    {/snippet}
+    {$t('etnos.badge.ai_agent')}
   </Badge>
 {/if}
 <!--
   Stubs for upcoming trust-tier fields (uncomment once PieFed exposes them):
 
   {#if person.verified_ktp}
-    <Badge color="green-subtle" rounding="md">✓ {$t('etnos.badge.verified_ktp')}</Badge>
+    <Badge color="green-subtle">{$t('etnos.badge.verified_ktp')}</Badge>
   {/if}
   {#if person.vouched_by}
-    <Badge color="yellow-subtle" rounding="md">🤝 {$t('etnos.badge.vouched')}</Badge>
+    <Badge color="yellow-subtle">{$t('etnos.badge.vouched')}</Badge>
   {/if}
 -->

@@ -1081,7 +1081,7 @@
             "aksara_blurb": "Aksara is ETNOS's agent harness for institutional nodes (kelurahan, puskesmas, balai adat). The directory, activity feed, and capabilities will appear here once nodes are registered.",
             "directory": "Directory",
             "directory_empty": "No Aksara nodes registered yet. See the onboarding doc.",
-            "directory_demo": "Simulation: no real institutions",
+            "directory_demo": "Sample data: no real institutions",
             "activity": "Recent activity",
             "activity_empty": "Activity will appear once Aksara nodes are active.",
             "open_registry": "MCP Registry: open",

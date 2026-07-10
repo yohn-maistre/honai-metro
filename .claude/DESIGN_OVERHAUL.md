@@ -125,3 +125,94 @@ Shipped (commits 7578f844 revert, 894adf6c polish, 1916e6d4 Material fix):
 - **Material card-color fix (systemic)**: `.material-*` used literal `background-color: white`, so cream theme's bg-white (#e3dabf) diverged from Material's #fff. Changed to `var(--color-white)` so ALL cards (feed included) use the theme card surface. Cohesive cream in Honai Siang, still white in default themes, dark unaffected. THIS IS THE FIX that made Material reuse consistent - the pre-existing feed was rendering bright white on cream.
 - **Em dashes**: 0 remain site-wide. 65 swept by a background general-purpose agent across 25 data/i18n/code files (colon after label/definition, comma for clause breaks); rest by hand.
 - NEXT / open for Yose review: WikiCarousel keeps its soft primary->amber gradient (original hero, left intact); dark theme (Honai Malam) still deferred; confirm cream Material feed reads well.
+
+---
+
+# MIDAS SWEEP (2026-07-10) — coherence + polish overhaul [EXECUTION STATE]
+
+Supersedes the P0-P8 plan above as the current design truth. Plan file:
+~/.claude/plans/peaceful-stargazing-narwhal.md. Design language named
+**Honai Metro** (per Yose): modern polished forum register ("polished
+Reddit / new Digg"), island-agnostic (NO Papua-specific motifs; ETNOS is a
+template other islands inherit), cream + terracotta kept, dark mode kept.
+
+## Shipped (all CI green, per-wave commits)
+
+- **W0 modal fix** (85c170ca): the onboarding "Mulai jelajah" trap. Root
+  cause: Modal.svelte history effects fought the by-value `open` prop and
+  a pushState during router init could kill the effect tree. Now: one
+  close path (`Modal.close()`, exported), try/catch on pushState,
+  ModalContainer buttons close via the modal ref (history entry always
+  popped), OnboardingModal defers two rAFs past the first navigation.
+- **W1 foundation** (14677bc3): Plus Jakarta Sans variable (27KB latin,
+  static/font/PlusJakartaSansVariable.woff2, default font, settings option
+  'jakarta'; Archivo/GeistMono/InstrumentSerif orphans deleted). Badge
+  redesigned: neutral chip + status DOT (no more tinted pill + ring-black
+  "Lovable" look); new `primary` accent variant. New primitives in
+  src/lib/etnos/ui/: DataChip (langsung=pulsing terracotta dot / contoh=
+  hollow dot / segera=dashed dot), PageHeader (real h1 band, wraps
+  Photon Header), IconTile, BackLink, Board (titled flush-body card).
+  Material got `interactive` prop (hover lift). Theme preset renamed
+  "Honai Metro". Also fixed: font-class remover never removed
+  font--serifs. NOTE: primary-900 == 700 is INTENTIONAL (Photon semantic
+  100/900 accent pair, AA-safe on-light slot) — do not "fix" again.
+- **W2 deck** (7add011e): PetaKabar.svelte = canvas dot-grid Papua plate
+  (port of detak-detik atlas-dots; static/data/papua-kab.geojson, 42 kab,
+  52KB, centroids precomputed) + news layer: fetches
+  `PUBLIC_DETAK_URL/edisi` (CORS-open detak worker, refreshed 04:32/16:32
+  WIB), gazetteer-matches headline text vs kabupaten names+aliases
+  (kabar.ts; "puncak" blocklisted as ambiguous), pins sized by skor,
+  deep-links `https://detak-detik.pages.dev/#/kliping/{id}`. Honest
+  fallback = 6 anchor cities, no fake pins. Feed (/) now carries the deck:
+  ticker → header → [PetaKabar 3col | PapanKilas 2col] (mobile: tab
+  switcher) → feed. Guest redirect to /explore REMOVED. /explore =
+  community directory (clusters w/ hero-icons, SorotanBoard, browse-all;
+  curated sorotan.json grid retired+deleted). Nav: Layanan group
+  (Musrenbang, Organisasi) in sidebar + hamburger. MapLibre no longer
+  imported anywhere (PetaPapua.svelte + PapuaMap.svelte deleted).
+- **W3 wiki** (e7fe2fe6): index = PageHeader + de-gradient carousel +
+  6 category Material cards (icon, description, derived "n bagian · m
+  menit baca" from wiki/index.ts meta). Article page: md's own `# Title`
+  becomes the single page title, TOC from ## headings (sticky aside ≥lg,
+  <details> on mobile, IntersectionObserver active-section), scroll via
+  nth-h2 (no renderer changes), TTS kept.
+- **W4 surfaces** (f7873bec): dashboard/agen/org/musrenbang/tentang all on
+  Material + PageHeader + IconTile + DataChip; Sumber = receipt rows w/
+  DataChips; Sorotan Digg-style rank numerals; CapabilityCard opaque +
+  standard skin, 🤖 dropped; onboarding copy rewritten (deck-aware);
+  stat icon color coding neutralized (live=terracotta, contoh=slate).
+- **W5** (this commit): UserBadges 🤖→CpuChip icon; sorotan.json deleted;
+  Sonnet wording sweep (langsung/contoh vocabulary, no em dashes, formal
+  register, i18n en/id/pmy parity); docs.
+
+## Card skin standard (use everywhere)
+
+Material color="default" rounding="2xl" (padding md=tile lg=card xl=feature),
+or raw: `bg-white dark:bg-zinc-900 rounded-2xl shadow-xs border
+border-slate-200 border-b-slate-300 dark:border-zinc-800
+dark:border-t-zinc-700`. Interactive cards add Material `interactive`.
+No /80 translucency, no gradients, no uppercase-tracking micro labels,
+no colored pill backgrounds (dots carry status).
+
+## Needs-from-Yose (ordered)
+
+1. **PUBLIC_DETAK_URL**: set repo Variable in honai-metro = the detak
+   worker origin (detak-detik repo Variable `AKSARA_URL` has it,
+   `https://detak-detik-worker.<subdomain>.workers.dev`). Flips Peta
+   Kabar + KILAS from contoh to langsung on next deploy. Until then
+   everything is honestly labeled contoh.
+2. Phone screenshots: / (deck, light+dark, 360px), /wiki, /wiki/sejarah,
+   /dashboard, /agen, /explore + first-visit onboarding tap-through test
+   (clear localStorage key `etnos_onboarded_v1` or use incognito).
+3. Decide repo-root implementation_plan.md / walkthrough-1.md (keep/delete).
+
+## Banked / deferred
+
+- Remove maplibre-gl + svelte-maplibre-gl from package.json: needs
+  `bun install` lockfile regen (CI uses --frozen-lockfile); deps are
+  tree-shaken out of the bundle already, so zero user cost. Do on a
+  beefier session.
+- Honai Malam dark-theme dedicated pass (current dark kept per Yose).
+- Per-category wiki hues experiment; island paintings footer.
+- PapanKilas spotlight row could take curated highlights if wanted
+  (sorotan.json data was deleted; directory.json spotlight remains).

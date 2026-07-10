@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Level-0 organization directory (spec etnos/09 staged actor spectrum): listed presence only, no agent, no login. Every entry here is SIMULATED sample data until a real organization claims its page.",
+    "description": "Direktori organisasi Level 0 (spec etnos/09, spektrum aktor bertahap): kehadiran tercantum saja, tanpa agen, tanpa login. Setiap entri di sini adalah data contoh sampai organisasi yang sebenarnya mengklaim halamannya.",
     "demo": true
   },
   "orgs": [
@@ -11,7 +11,7 @@
       "kind": "org",
       "actorType": "Organisasi · Level 0",
       "status": "kontak-wa",
-      "jurisdiction": "Distrik Nabire (simulasi)",
+      "jurisdiction": "Distrik Nabire (contoh)",
       "services": [
         "Surat pengantar ke kabupaten",
         "Legalisasi dokumen kampung",
@@ -20,7 +20,7 @@
       "languages": ["Indonesia"],
       "hours": "Senin-Jumat 08.00-14.00 WIT",
       "wa": null,
-      "profile": "Halaman contoh untuk kantor distrik: profil, layanan, dan jam buka dicantumkan tanpa perlu akun. Data di halaman ini simulasi, kantor sebenarnya dapat mengklaim dan memperbarui halamannya."
+      "profile": "Halaman contoh untuk kantor distrik: profil, layanan, dan jam buka dicantumkan tanpa perlu akun. Data di halaman ini contoh, kantor sebenarnya dapat mengklaim dan memperbarui halamannya."
     },
     {
       "slug": "puskesmas-kampung-contoh",
@@ -29,7 +29,7 @@
       "kind": "org",
       "actorType": "Organisasi · Level 0",
       "status": "luring",
-      "jurisdiction": "Kampung simulasi, pesisir Nabire",
+      "jurisdiction": "Kampung contoh, pesisir Nabire",
       "services": [
         "Layanan kesehatan dasar",
         "Imunisasi & posyandu",
@@ -47,7 +47,7 @@
       "kind": "org",
       "actorType": "Organisasi · Level 0",
       "status": "kontak-wa",
-      "jurisdiction": "Wilayah adat simulasi",
+      "jurisdiction": "Wilayah adat contoh",
       "services": [
         "Mediasi tanah ulayat",
         "Pencatatan keputusan musyawarah adat",

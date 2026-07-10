@@ -1,5 +1,5 @@
 {
-  "note": "SIMULASI / PROTOKOL DEMONSTRASI. Kartu kemampuan contoh untuk memperlihatkan bentuk registri agen institusi (spec etnos/04). Tidak ada institusi nyata yang terdaftar; data ini diganti oleh registrasi node teratestasi saat pilot berjalan.",
+  "note": "Data contoh. Kartu kemampuan contoh untuk memperlihatkan bentuk registri agen institusi (spec etnos/04). Tidak ada institusi nyata yang terdaftar, data ini diganti oleh registrasi node teratestasi saat pilot berjalan.",
   "agents": [
     {
       "id": "sim-kampung",
@@ -9,7 +9,7 @@
       "level": 2,
       "tier": "T2",
       "status": "aktif",
-      "jurisdiction": "Distrik Nabire (simulasi)",
+      "jurisdiction": "Distrik Nabire (contoh)",
       "personas": ["Juru Surat", "Juru Musyawarah"],
       "services": [
         "Surat keterangan domisili",
@@ -27,7 +27,7 @@
       "level": 2,
       "tier": "T2",
       "status": "terganggu",
-      "jurisdiction": "Kabupaten Nabire (simulasi)",
+      "jurisdiction": "Kabupaten Nabire (contoh)",
       "personas": ["Juru Surat"],
       "services": [
         "Countersign surat pengantar kampung",
@@ -45,7 +45,7 @@
       "level": 1,
       "tier": "T1",
       "status": "luring",
-      "jurisdiction": "Distrik Nabire (simulasi)",
+      "jurisdiction": "Distrik Nabire (contoh)",
       "personas": ["Juru Catat"],
       "services": ["Pencatatan layanan (komposisi SATUSEHAT)", "Jadwal posyandu"],
       "languages": ["Indonesia", "Mee"],
@@ -59,7 +59,7 @@
       "level": 0,
       "tier": null,
       "status": "kontak-wa",
-      "jurisdiction": "Papua Tengah (simulasi)",
+      "jurisdiction": "Papua Tengah (contoh)",
       "personas": [],
       "services": ["Halaman profil + kontak WhatsApp", "Pengumuman komunitas"],
       "languages": ["Indonesia", "Mee"],

@@ -1,7 +1,7 @@
 {
   "title": "Infrastruktur",
   "subtitle": "Jalan, listrik, air bersih, telekomunikasi",
-  "source": "BPS, Kementerian PUPR, Kominfo (data demo)",
+  "source": "BPS, Kementerian PUPR, Kominfo (data contoh)",
   "updated": "2025-01-01",
   "demo": true,
   "stats": [
@@ -11,7 +11,7 @@
     { "label": "Desa dengan Sinyal 4G+", "value": "60.0", "unit": "%" }
   ],
   "bars": {
-    "title": "Konektivitas per kategori (demo)",
+    "title": "Konektivitas per kategori (contoh)",
     "unit": "%",
     "data": [
       { "label": "Listrik PLN", "value": 61.4 },

@@ -35,12 +35,9 @@ export const action = (action?: {
   icon?: IconSource
   close?: boolean
 }): Action => ({
-  action: action?.action
-    ? () => {
-        action?.action?.()
-        if (action.close) shownModal.set(undefined)
-      }
-    : () => shownModal.set(undefined),
+  // The bare user callback. Closing is handled by ModalContainer through the
+  // Modal's close() path so the history entry it pushed is always popped.
+  action: action?.action ?? (() => {}),
   type: action?.type ?? 'secondary',
   content: action?.content || t.get('common.back'),
   close: action?.close ?? true,

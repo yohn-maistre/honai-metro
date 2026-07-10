@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { pushState, replaceState } from '$app/navigation'
+  import { pushState } from '$app/navigation'
   import { page } from '$app/state'
   import { Button } from 'mono-svelte'
   import Portal from 'mono-svelte/popover/Portal.svelte'
@@ -43,10 +43,18 @@
 
   $effect(() => {
     if (open && modalId && !hasHistoryEntry) {
-      pushState('', {
-        openModals: [...(page.state.openModals ?? []), modalId],
-      })
-      hasHistoryEntry = true
+      // pushState throws if the router hasn't finished initializing (e.g. a
+      // modal opened during the first navigation). An uncaught throw here
+      // would tear down the whole effect tree, leaving a modal that cannot
+      // be clicked away, so degrade to a modal without a history entry.
+      try {
+        pushState('', {
+          openModals: [...(page.state.openModals ?? []), modalId],
+        })
+        hasHistoryEntry = true
+      } catch {
+        hasHistoryEntry = false
+      }
     }
   })
 
@@ -56,16 +64,15 @@
       const isInHistory = currentModals.includes(modalId)
 
       if (!isInHistory && open) {
-        replaceState('', {
-          openModals: currentModals.filter((id) => id !== modalId),
-        })
+        // Our entry was popped (back button) or wiped by a navigation:
+        // dismiss through the full close path so owners are notified.
         hasHistoryEntry = false
-        open = false
+        close()
       }
     }
   })
 
-  function onclose() {
+  export function close() {
     open = false
 
     if ((page.state.openModals ?? []).includes(modalId)) history.back()
@@ -89,7 +96,7 @@
       transition:fade|global={{ duration: 100 }}
       onclick={(e) => {
         // @ts-expect-error html node hell
-        if (!el.contains(e.target)) onclose()
+        if (!el.contains(e.target)) close()
       }}
     >
       <div
@@ -112,7 +119,7 @@
             class="absolute top-0 right-0 m-2 text-slate-600 dark:text-zinc-400"
             color="tertiary"
             size="square-sm"
-            onclick={onclose}
+            onclick={close}
             icon={XMark}
           ></Button>
         {/if}
@@ -133,7 +140,7 @@
                 class="w-full"
                 onclick={() => {
                   onaction?.()
-                  onclose()
+                  close()
                 }}
                 color="primary"
                 size="lg"

@@ -10,16 +10,22 @@
     if (!browser) return
     if (localStorage.getItem(KEY)) return
     localStorage.setItem(KEY, '1')
-    modal({
-      title: t.get('etnos.onboarding.title'),
-      snippet: onboardingContent,
-      actions: [
-        action({
-          type: 'primary',
-          content: t.get('etnos.onboarding.start'),
+    // Defer two frames so the first navigation (and the router's history
+    // bookkeeping) settles before the modal pushes its own history entry.
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        modal({
+          title: t.get('etnos.onboarding.title'),
+          snippet: onboardingContent,
+          actions: [
+            action({
+              type: 'primary',
+              content: t.get('etnos.onboarding.start'),
+            }),
+          ],
         }),
-      ],
-    })
+      ),
+    )
   })
 </script>
 

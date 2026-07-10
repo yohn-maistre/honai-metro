@@ -2,15 +2,20 @@
   import { Button, Modal } from 'mono-svelte'
   import { Icon } from 'svelte-hero-icons/dist'
   import { shownModal } from './modal'
+
+  // Instance of the currently shown Modal, so action buttons can dismiss
+  // through its close() path (which pops the history entry it pushed).
+  let modalRef = $state<{ close: () => void }>()
 </script>
 
 {#key $shownModal}
   {#if $shownModal}
     <Modal
+      bind:this={modalRef}
       title={$shownModal.title}
       dismissable={$shownModal.dismissable}
       ondismissed={() => shownModal.set(undefined)}
-      open={!!$shownModal}
+      open={true}
     >
       {#if $shownModal.snippet}
         {@render $shownModal.snippet?.()}
@@ -28,7 +33,10 @@
             <Button
               size="lg"
               class="flex-1 w-full"
-              onclick={action.action}
+              onclick={() => {
+                action.action()
+                if (action.close) modalRef?.close()
+              }}
               color={action.type}
             >
               {#if action.icon}

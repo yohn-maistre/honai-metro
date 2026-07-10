@@ -56,19 +56,20 @@
     $effect(() => {
       if (settings) {
         document.documentElement.classList.remove(
+          'font--jakarta',
           'font--inter',
           'font--sans',
           'font--system',
+          'font--serifs',
         )
+        const fontClass: Record<string, string> = {
+          jakarta: 'font--jakarta',
+          inter: 'font--inter',
+          system: 'font--system',
+          serifs: 'font--serifs',
+        }
         document.documentElement.classList.add(
-          // i should be fired for nested ternaries
-          settings.font == 'inter'
-            ? 'font--inter'
-            : settings.font == 'system'
-              ? 'font--system'
-              : settings.font == 'serifs'
-                ? 'font--serifs'
-                : 'font--sans',
+          fontClass[settings.font] ?? 'font--sans',
         )
       }
     })

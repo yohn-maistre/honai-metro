@@ -5,10 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: sans-serif;
+  /* Honai Metro type: Plus Jakarta Sans carries display, UI, and reading;
+     mono is reserved for data (receipts, coordinates, IDs). */
+  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-system: system-ui;
-  --font-display: Inter, system-ui, sans-serif;
-  --font-reading: Inter, system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+  --font-reading: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
 
   --animate-pop-in: pop-in 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
@@ -44,6 +46,8 @@
   --color-primary-600: rgb(166 82 52);
   --color-primary-700: rgb(140 69 41);
   --color-primary-800: rgb(102 50 36);
+  /* 900 intentionally equals 700: Photon uses 100/900 as a semantic
+     on-dark/on-light accent pair, and #8c4529 is the AA-safe on-light slot. */
   --color-primary-900: rgb(140 69 41);
   --color-primary-950: rgb(74 36 25);
 
@@ -69,6 +73,13 @@
 }
 
 @custom-variant hover (&:hover);
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/font/PlusJakartaSansVariable.woff2') format('woff2');
+  font-weight: 200 800;
+  font-display: swap;
+}
 
 @font-face {
   font-family: 'Inter';
@@ -98,6 +109,11 @@
   --font-display: 'Roboto Slab', serif;
   --font-reading: 'Roboto Slab', serif;
   --font-sans: 'Roboto Slab', serif;
+}
+.font--jakarta {
+  --font-display: 'Plus Jakarta Sans', Inter, sans-serif;
+  --font-reading: 'Plus Jakarta Sans', Inter, sans-serif;
+  --font-sans: 'Plus Jakarta Sans', Inter, sans-serif;
 }
 .font--inter {
   --font-display: Inter, sans-serif;

@@ -55,6 +55,8 @@
     color?: Color
     element?: string
     icon?: IconSource
+    /** Tactile hover for card links: slight lift, stronger shadow. */
+    interactive?: boolean
     class?: ClassValue
     children?: import('svelte').Snippet
     [key: string]: any
@@ -67,6 +69,7 @@
     color = 'uniform',
     element = 'div',
     icon,
+    interactive = false,
     class: clazz = '',
     children,
     ...rest
@@ -81,6 +84,8 @@
     paddingClass[padding],
     roundedClass[rounding],
     colorClass[color],
+    interactive &&
+      'transition-all duration-150 hover:shadow-md hover:-translate-y-px active:translate-y-0 active:shadow-2xs motion-reduce:transition-none motion-reduce:hover:translate-y-0',
     'text-sm',
     clazz,
   ]}

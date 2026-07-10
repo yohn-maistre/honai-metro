@@ -290,6 +290,7 @@
       <span>{$t('settings.app.font.description')}</span>
     {/snippet}
     <Select bind:value={settings.font}>
+      <Option value="jakarta">Plus Jakarta Sans</Option>
       <Option value="inter">Inter</Option>
       <Option value="system">System UI</Option>
       <Option value="browser">Browser</Option>

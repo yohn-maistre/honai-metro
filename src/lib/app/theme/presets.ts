@@ -41,7 +41,7 @@ const PHOTON_MONO = {
   },
 }
 
-// ETNOS 'Honai Siang': DINAS cream paper + terracotta, shared design
+// ETNOS 'Honai Metro': DINAS cream paper + terracotta, shared design
 // language with detak-detik (its tokens.css) and the Aksara device
 // (abstraksi/specs/etnos/10_design-language.md is the token truth).
 // Light ramps only this wave: zinc (dark mode) is intentionally carried
@@ -149,7 +149,7 @@ export function getDefaultTheme(): Theme {
   return {
     id: 0,
     colors: getDefaultColors(),
-    name: env.PUBLIC_THEME ? 'Instance Default' : 'Honai Siang',
+    name: env.PUBLIC_THEME ? 'Instance Default' : 'Honai Metro',
   }
 }
 

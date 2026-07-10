@@ -911,6 +911,14 @@
         "created": "Dibuat"
     },
     "etnos": {
+        "chip": {
+            "langsung": "Langsung",
+            "langsung_title": "Data langsung dari server",
+            "contoh": "Data contoh",
+            "contoh_title": "Data contoh sa, belum sambung ke sumber asli",
+            "segera": "Segera datang",
+            "segera_title": "Masih disiapkan, belum ada"
+        },
         "onboarding": {
             "title": "Selamat datang di ETNOS",
             "intro": "Ruang publik komunitas Melanesia, forum, wiki, dan data publik berfederasi per-provinsi.",

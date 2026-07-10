@@ -30,10 +30,14 @@
   aria-label="Berita kilat dari media lain, tautan keluar apa adanya"
 >
   <span
-    class="flex-none flex items-center gap-2 bg-primary-500 text-white text-[11px] font-semibold uppercase tracking-wider px-3.5"
+    class="flex-none flex items-center gap-1.5 bg-primary-500 text-white text-xs font-semibold px-3.5"
+    title={live
+      ? 'Berita langsung dari Detak Detik'
+      : 'Contoh berita, belum tersambung ke sumber langsung'}
   >
     <span class="pulse-dot" aria-hidden="true"></span>
-    Kilas {live ? 'langsung' : 'contoh'}
+    Kilas
+    <span class="font-medium opacity-75">{live ? 'langsung' : 'contoh'}</span>
   </span>
   <div class="belt overflow-hidden flex-1 py-2.5">
     <div class="track text-[13px]">

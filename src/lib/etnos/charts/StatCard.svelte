@@ -1,5 +1,6 @@
 <script lang="ts">
   import { browser } from '$app/environment'
+  import DataChip from '$lib/etnos/ui/DataChip.svelte'
   import { Icon, type IconSource } from 'svelte-hero-icons/dist'
 
   interface Props {
@@ -55,22 +56,12 @@
 </script>
 
 <div
-  class="bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-2 items-center text-center relative"
+  class="bg-white dark:bg-zinc-900 rounded-2xl p-4 shadow-xs border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 flex flex-col gap-2 items-center text-center relative"
 >
   {#if live}
-    <span
-      title="Data langsung dari server"
-      class="absolute top-2 right-2 text-[10px] font-medium uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-primary-100 dark:bg-primary-500/20 text-primary-700 dark:text-primary-300"
-    >
-      Langsung
-    </span>
+    <DataChip state="langsung" class="absolute top-2.5 right-3" />
   {:else if demo}
-    <span
-      title="Data demo"
-      class="absolute top-2 right-2 text-[10px] font-medium uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-yellow-100 dark:bg-yellow-500/20 text-yellow-700 dark:text-yellow-400"
-    >
-      demo
-    </span>
+    <DataChip state="contoh" class="absolute top-2.5 right-3" />
   {/if}
   {#if icon}
     <Icon src={icon} size="24" class={color} />

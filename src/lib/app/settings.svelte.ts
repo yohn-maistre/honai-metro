@@ -65,7 +65,7 @@ interface Settings {
   debugInfo: boolean
   expandImages: boolean
 
-  font: 'inter' | 'system' | 'browser' | 'serifs'
+  font: 'jakarta' | 'inter' | 'system' | 'browser' | 'serifs'
   leftAlign: boolean
 
   newWidth: boolean
@@ -151,7 +151,7 @@ export const defaultSettings: Settings = {
   debugInfo: toBool(env.PUBLIC_DEBUG_INFO) ?? false,
   expandImages: toBool(env.PUBLIC_EXPAND_IMAGES) ?? true,
   view: (env.PUBLIC_VIEW as View) ?? 'compact',
-  font: (env.PUBLIC_FONT as 'inter') ?? 'inter',
+  font: (env.PUBLIC_FONT as 'jakarta') ?? 'jakarta',
   leftAlign: toBool(env.PUBLIC_LEFT_ALIGN) ?? false,
   newWidth: toBool(env.PUBLIC_LIMIT_LAYOUT_WIDTH) ?? true,
   markPostsAsRead: toBool(env.PUBLIC_MARK_POSTS_AS_READ) ?? true,

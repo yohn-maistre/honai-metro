@@ -1029,6 +1029,14 @@
         "admin": "Administrator"
     },
     "etnos": {
+        "chip": {
+            "langsung": "Live",
+            "langsung_title": "Live data from the server",
+            "contoh": "Sample data",
+            "contoh_title": "Sample data, not yet connected to a real source",
+            "segera": "Coming soon",
+            "segera_title": "In preparation, not yet available"
+        },
         "onboarding": {
             "title": "Welcome to ETNOS",
             "intro": "A Melanesian community public square, forum, wiki, and open civic data, federated per province.",

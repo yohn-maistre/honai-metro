@@ -26,6 +26,8 @@
     CodeBracketSquare,
     Cog6Tooth,
     CommandLine,
+    BuildingLibrary,
+    ClipboardDocumentList,
     CpuChip,
     GlobeAmericas,
     InformationCircle,
@@ -77,6 +79,12 @@
 </MenuButton>
 <MenuButton href="/dashboard" icon={ChartBarSquare}>
   {$t('etnos.nav.dashboard')}
+</MenuButton>
+<MenuButton href="/musrenbang" icon={ClipboardDocumentList}>
+  {$t('etnos.nav.musrenbang')}
+</MenuButton>
+<MenuButton href="/org" icon={BuildingLibrary}>
+  {$t('etnos.nav.org')}
 </MenuButton>
 <MenuButton href="/agen" icon={CpuChip}>
   {$t('etnos.nav.agen')}

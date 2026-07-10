@@ -186,8 +186,8 @@
                 "description": "If any are set, you will only see content explicitly tagged as that language. Most content, untagged, falls under 'Undetermined'."
             },
             "credentials": {
-              "title": "Manage how you log in",
-              "description": "You can enable 2FA for greater security, change your password, view logged in devices, or delete your account here."
+                "title": "Manage how you log in",
+                "description": "You can enable 2FA for greater security, change your password, view logged in devices, or delete your account here."
             }
         },
         "email": "Email",
@@ -999,12 +999,12 @@
             "score": "Score: {{default}}"
         },
         "sidebar": {
-          "title": "Sidebar",
-          "accounts": "Accounts selector"
+            "title": "Sidebar",
+            "accounts": "Accounts selector"
         },
         "loading": "Loading",
         "element": {
-          "pageHeader": "Page header"
+            "pageHeader": "Page header"
         },
         "postDecor": {
             "openImage": "Open image: {{default}}",
@@ -1053,7 +1053,10 @@
             "wiki": "Wiki",
             "dashboard": "Data Board",
             "bahasa": "Language Hub",
-            "agen": "Agents"
+            "agen": "Agents",
+            "layanan": "Services",
+            "musrenbang": "Musrenbang",
+            "org": "Organizations"
         },
         "map": {
             "inkbar": "Peta · Tanah Papua",
@@ -1066,7 +1069,9 @@
             "browse_all": "Browse all",
             "browse_communities": "Communities",
             "browse_feeds": "Feeds",
-            "browse_topics": "Topics"
+            "browse_topics": "Topics",
+            "lede": "The community directory of Tanah Papua: by people, language, region, and topic.",
+            "unggulan": "Featured"
         },
         "agen": {
             "title": "AI Agents",

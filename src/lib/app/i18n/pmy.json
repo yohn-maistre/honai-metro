@@ -935,7 +935,10 @@
             "wiki": "Wiki",
             "dashboard": "Papan Data",
             "bahasa": "Ruang Bahasa",
-            "agen": "Agen"
+            "agen": "Agen",
+            "layanan": "Layanan",
+            "musrenbang": "Musrenbang",
+            "org": "Organisasi"
         },
         "map": {
             "inkbar": "Peta · Tanah Papua",
@@ -948,7 +951,9 @@
             "browse_all": "Lia samua",
             "browse_communities": "Komunitas",
             "browse_feeds": "Umpan",
-            "browse_topics": "Topik"
+            "browse_topics": "Topik",
+            "lede": "Daftar komunitas Tanah Papua: per suku, bahasa, wilayah, deng topik.",
+            "unggulan": "Unggulan"
         },
         "agen": {
             "title": "Agen AI",

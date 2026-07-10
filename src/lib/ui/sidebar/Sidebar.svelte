@@ -12,8 +12,10 @@
     ArrowLeftOnRectangle,
     BookOpen,
     Bookmark,
+    BuildingLibrary,
     ChartBarSquare,
     ChevronUpDown,
+    ClipboardDocumentList,
     Cog6Tooth,
     ComputerDesktop,
     CpuChip,
@@ -103,6 +105,17 @@
     href="/dashboard"
     label={$t('etnos.nav.dashboard')}
     icon={ChartBarSquare}
+  />
+  <EndPlaceholder margin="sm" size="xs">{$t('etnos.nav.layanan')}</EndPlaceholder>
+  <SidebarButton
+    href="/musrenbang"
+    label={$t('etnos.nav.musrenbang')}
+    icon={ClipboardDocumentList}
+  />
+  <SidebarButton
+    href="/org"
+    label={$t('etnos.nav.org')}
+    icon={BuildingLibrary}
   />
   <SidebarButton
     href="/agen"

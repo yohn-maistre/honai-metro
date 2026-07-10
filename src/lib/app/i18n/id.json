@@ -935,7 +935,10 @@
             "wiki": "Wiki",
             "dashboard": "Papan Data",
             "bahasa": "Ruang Bahasa",
-            "agen": "Agen"
+            "agen": "Agen",
+            "layanan": "Layanan",
+            "musrenbang": "Musrenbang",
+            "org": "Organisasi"
         },
         "tentang": {
             "title": "Tentang ETNOS"
@@ -969,7 +972,9 @@
             "browse_all": "Jelajahi semua",
             "browse_communities": "Komunitas",
             "browse_feeds": "Umpan",
-            "browse_topics": "Topik"
+            "browse_topics": "Topik",
+            "lede": "Direktori komunitas Tanah Papua: per suku, bahasa, wilayah, dan topik.",
+            "unggulan": "Unggulan"
         },
         "agen": {
             "title": "Agen AI",

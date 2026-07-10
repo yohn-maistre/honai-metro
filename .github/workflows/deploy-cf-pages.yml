@@ -63,6 +63,9 @@ jobs:
           PUBLIC_LANGUAGE: id
           PUBLIC_SSR_ENABLED: 'false'
           PUBLIC_DEFAULT_FEED: Local
+          # detak-detik worker origin (repo Variable). Empty = Peta Kabar and
+          # KILAS stay in honest 'contoh' mode; set it to flip them live.
+          PUBLIC_DETAK_URL: ${{ vars.PUBLIC_DETAK_URL }}
         run: bun run build
 
       # Idempotent project provisioning. Fails harmlessly if the project

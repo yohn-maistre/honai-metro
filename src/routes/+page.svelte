@@ -8,6 +8,8 @@
   import Sort from '$lib/feature/filter/Sort.svelte'
   import ViewSelect from '$lib/feature/filter/ViewSelect.svelte'
   import KilasTicker from '$lib/etnos/KilasTicker.svelte'
+  import PapanKilas from '$lib/etnos/PapanKilas.svelte'
+  import PetaKabar from '$lib/etnos/PetaKabar.svelte'
   import PostFeed from '$lib/feature/post/feed/PostFeed.svelte'
   import VirtualFeed from '$lib/feature/post/feed/VirtualFeed.svelte'
   import Skeleton from '$lib/ui/generic/Skeleton.svelte'
@@ -29,6 +31,10 @@
       ? VirtualFeed
       : PostFeed,
   )
+
+  // Deck: both boards side by side on large screens, tabbed on phones so
+  // the feed stays one swipe away.
+  let deckTab = $state<'peta' | 'papan'>('peta')
 </script>
 
 <svelte:head>
@@ -68,6 +74,40 @@
     </form>
   {/snippet}
 </Header>
+
+<div class="flex flex-col gap-2 mb-4">
+  <div
+    class="lg:hidden flex w-fit rounded-full bg-slate-100 dark:bg-zinc-900 p-1 gap-1"
+    role="tablist"
+    aria-label="Pilih papan"
+  >
+    {#each [['peta', 'Peta Kabar'], ['papan', 'Papan Kilas']] as [id, label] (id)}
+      <button
+        type="button"
+        role="tab"
+        aria-selected={deckTab === id}
+        class={[
+          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
+          deckTab === id
+            ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 shadow-2xs'
+            : 'text-slate-600 dark:text-zinc-400',
+        ]}
+        onclick={() => (deckTab = id as 'peta' | 'papan')}
+      >
+        {label}
+      </button>
+    {/each}
+  </div>
+
+  <div class="grid lg:grid-cols-5 gap-4 items-start">
+    <div class={['lg:col-span-3', deckTab !== 'peta' && 'max-lg:hidden']}>
+      <PetaKabar />
+    </div>
+    <div class={['lg:col-span-2', deckTab !== 'papan' && 'max-lg:hidden']}>
+      <PapanKilas />
+    </div>
+  </div>
+</div>
 
 {#await data.feed.value}
   <div class="space-y-4">

@@ -35,13 +35,13 @@
 </script>
 
 <div
-  class="bg-white/80 dark:bg-zinc-900/80 rounded-2xl p-5 border border-slate-200 dark:border-zinc-800 flex flex-col gap-3"
+  class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-xs border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 flex flex-col gap-3"
 >
   <div class="flex items-start gap-3">
     <div
       class="w-10 h-10 rounded-xl shrink-0 grid place-items-center font-bold text-sm
       {agent.kind === 'agent'
-        ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300'
+        ? 'bg-slate-100 dark:bg-zinc-800 text-primary-600 dark:text-primary-400'
         : 'bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300'}"
     >
       {agent.name.charAt(0)}
@@ -50,14 +50,12 @@
       <h4 class="font-semibold dark:text-white">{agent.name}</h4>
       <div class="flex items-center gap-2 flex-wrap">
         {#if agent.kind === 'agent'}
-          <Badge color="blue-subtle" rounding="md">
-            🤖 {agent.actorType}
-          </Badge>
+          <Badge color="blue-subtle">{agent.actorType}</Badge>
           {#if agent.tier}
-            <Badge color="green-subtle" rounding="md">{agent.tier}</Badge>
+            <Badge color="green-subtle">{agent.tier}</Badge>
           {/if}
         {:else}
-          <Badge color="gray-subtle" rounding="md">{agent.actorType}</Badge>
+          <Badge color="gray-subtle">{agent.actorType}</Badge>
         {/if}
         <span
           class="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400"

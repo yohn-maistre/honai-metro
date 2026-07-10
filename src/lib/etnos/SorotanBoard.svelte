@@ -7,6 +7,7 @@
    */
   import type { PostView } from '$lib/api/types'
   import { fetchHotPosts } from '$lib/etnos/hot'
+  import { Board } from '$lib/etnos/ui'
   import { postLink } from '$lib/feature/post/helpers'
   import { ChatBubbleLeftRight, Icon } from 'svelte-hero-icons/dist'
 
@@ -26,15 +27,7 @@
 </script>
 
 {#if posts.length}
-  <section
-    class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200 dark:border-zinc-800 overflow-hidden"
-  >
-    <div
-      class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 dark:border-zinc-800"
-    >
-      <h2 class="font-semibold dark:text-white">Sedang ramai</h2>
-      <span class="text-xs text-slate-400 dark:text-zinc-500">dari forum</span>
-    </div>
+  <Board title="Sedang ramai" caption="dari forum">
     <ol class="flex flex-col">
       {#each posts as p, i (p.post.id)}
         <a
@@ -42,7 +35,7 @@
           class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-100/60 dark:hover:bg-zinc-800/60 transition-colors border-b border-slate-100 dark:border-zinc-800/50 last:border-none"
         >
           <span
-            class="w-5 shrink-0 text-sm font-semibold tabular-nums text-slate-400 dark:text-zinc-600 text-center"
+            class="w-7 shrink-0 text-lg font-semibold tabular-nums text-slate-300 dark:text-zinc-600 text-center"
           >
             {i + 1}
           </span>
@@ -66,5 +59,5 @@
         </a>
       {/each}
     </ol>
-  </section>
+  </Board>
 {/if}

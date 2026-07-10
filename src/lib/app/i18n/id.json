@@ -921,11 +921,11 @@
         },
         "onboarding": {
             "title": "Selamat datang di ETNOS",
-            "intro": "Ruang publik komunitas Melanesia, forum, wiki, dan data publik berfederasi per-provinsi.",
-            "b1": "Komunitas per suku & bahasa. Bergabung, baca, ikut diskusi.",
-            "b2": "Wiki Papua: tempat, sejarah, biodiversitas, suku & bahasa, kuliner.",
-            "b3": "Dashboard publik: APBD, OTSUS, pendidikan, infrastruktur.",
-            "b4": "Federasi peer-to-peer, terhubung ke ETNOS provinsi lain via ActivityPub.",
+            "intro": "ETNOS adalah ruang publik Tanah Papua: forum komunitas, wiki, dan data publik dalam satu tempat.",
+            "b1": "Forum komunitas per suku, bahasa, dan wilayah. Baca tanpa akun, bergabung untuk berdiskusi.",
+            "b2": "Wiki Tanah Papua: tempat, sejarah, biodiversitas, suku dan bahasa, kuliner.",
+            "b3": "Papan Data: angka hidup forum dan data publik provinsi. Satu angka, satu sumber.",
+            "b4": "Peta Kabar di Beranda: kabar terkini Tanah Papua dari berbagai media.",
             "more": "Pelajari selengkapnya",
             "start": "Mulai jelajah"
         },

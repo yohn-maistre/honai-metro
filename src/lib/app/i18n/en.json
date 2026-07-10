@@ -1039,11 +1039,11 @@
         },
         "onboarding": {
             "title": "Welcome to ETNOS",
-            "intro": "A Melanesian community public square, forum, wiki, and open civic data, federated per province.",
-            "b1": "Communities per ethnic group & language. Join, read, take part.",
-            "b2": "Papua Wiki: places, history, biodiversity, peoples & languages, cuisine.",
-            "b3": "Public dashboard: APBD, OTSUS, education, infrastructure.",
-            "b4": "Peer-to-peer federation, linked to other provincial ETNOS instances via ActivityPub.",
+            "intro": "ETNOS is the public square of Tanah Papua: community forums, a wiki, and open civic data in one place.",
+            "b1": "Community forums by people, language, and region. Read without an account, join to discuss.",
+            "b2": "The Tanah Papua wiki: places, history, biodiversity, peoples and languages, food.",
+            "b3": "The data board: live forum numbers and provincial public data. One number, one source.",
+            "b4": "Peta Kabar on the home page: the latest Tanah Papua news across outlets.",
             "more": "Learn more",
             "start": "Start exploring"
         },

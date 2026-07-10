@@ -6,9 +6,8 @@
    * sample data until a real organization claims one.
    */
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
-  import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
-  import { Badge, Material, Note } from 'mono-svelte'
-  import { ArrowLeft, Icon } from 'svelte-hero-icons/dist'
+  import { BackLink, DataChip } from '$lib/etnos/ui'
+  import { Material, Note } from 'mono-svelte'
 
   let { data } = $props()
 </script>
@@ -18,20 +17,16 @@
 </svelte:head>
 
 <div class="flex flex-col gap-5 max-w-full w-full">
-  <a
-    href="/org"
-    class="inline-flex items-center gap-1 text-sm text-slate-600 dark:text-zinc-400 hover:text-primary-600 dark:hover:text-primary-400"
-  >
-    <Icon src={ArrowLeft} micro size="16" />
-    Direktori Organisasi
-  </a>
+  <BackLink href="/org">Direktori Organisasi</BackLink>
 
-  <EndPlaceholder size="lg">
-    {data.org.name}
-    {#snippet action()}
-      <Badge color="yellow-subtle" rounding="md">Data contoh</Badge>
-    {/snippet}
-  </EndPlaceholder>
+  <header class="flex items-center justify-between gap-3 flex-wrap">
+    <h1
+      class="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-zinc-50"
+    >
+      {data.org.name}
+    </h1>
+    <DataChip state="contoh" />
+  </header>
 
   <CapabilityCard agent={data.org} />
 
@@ -39,7 +34,7 @@
     color="default"
     rounding="2xl"
     padding="lg"
-    class="shadow-sm flex flex-col gap-3"
+    class="flex flex-col gap-3"
   >
     <h3 class="font-semibold dark:text-white">Profil</h3>
     <p class="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed">

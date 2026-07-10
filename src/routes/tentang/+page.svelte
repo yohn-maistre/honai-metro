@@ -1,7 +1,8 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
   import Markdown from '$lib/app/markdown/Markdown.svelte'
-  import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
+  import { PageHeader } from '$lib/etnos/ui'
+  import { Material } from 'mono-svelte'
 
   // ETNOS: Thin "About" page. The main instance description lives in the
   // backend site description (rendered by InstanceCard on the home sidebar).
@@ -62,10 +63,8 @@ Kode sumber: AGPL-3.0. Dokumentasi: CC-BY-SA-4.0. Hardware: CERN-OHL-S.
 </svelte:head>
 
 <div class="flex flex-col gap-4 max-w-full w-full">
-  <EndPlaceholder size="lg">{$t('etnos.tentang.title')}</EndPlaceholder>
-  <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
-  >
+  <PageHeader title={$t('etnos.tentang.title')} />
+  <Material color="default" rounding="2xl" padding="xl">
     <Markdown source={body} />
-  </div>
+  </Material>
 </div>

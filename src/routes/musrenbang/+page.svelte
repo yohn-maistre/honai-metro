@@ -8,7 +8,7 @@
    * says so.
    */
   import { goto } from '$app/navigation'
-  import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
+  import { PageHeader } from '$lib/etnos/ui'
   import {
     Button,
     Material,
@@ -109,17 +109,13 @@
 </svelte:head>
 
 <div class="flex flex-col gap-5 max-w-full w-full">
-  <EndPlaceholder size="lg">Usulan Musrenbang</EndPlaceholder>
-
-  <p class="text-sm text-slate-600 dark:text-zinc-400 max-w-prose">
-    Susun usulan pembangunan kampung dalam format yang rapi dan siap dibawa ke
-    musyawarah. Usulan diposkan ke forum untuk dibahas terbuka. Halaman ini
-    belum tersambung ke sistem musrenbang resmi, dan tidak berpura-pura
-    tersambung.
-  </p>
+  <PageHeader
+    title="Usulan Musrenbang"
+    lede="Susun usulan pembangunan kampung dalam format yang rapi dan siap dibawa ke musyawarah. Usulan diposkan ke forum untuk dibahas terbuka. Halaman ini belum tersambung ke sistem musrenbang resmi, dan tidak berpura-pura tersambung."
+  />
 
   <!-- the road a real usulan travels -->
-  <Material color="default" rounding="2xl" padding="lg" class="shadow-sm">
+  <Material color="default" rounding="2xl" padding="lg">
     <h3 class="font-semibold dark:text-white mb-4">Tahapan usulan</h3>
     <ol class="flex flex-col sm:flex-row gap-4 sm:gap-3">
       {#each TAHAPAN as t, i (t.label)}
@@ -147,7 +143,7 @@
 
   <!-- the composer -->
   <form
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-4"
+    class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-xs border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 flex flex-col gap-4"
     onsubmit={(e) => {
       e.preventDefault()
       if (valid) keForum()

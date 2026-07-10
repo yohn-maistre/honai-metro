@@ -4,8 +4,7 @@
    * each, all sample data until real organizations claim them.
    */
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
-  import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
-  import { Badge } from 'mono-svelte'
+  import { DataChip, PageHeader } from '$lib/etnos/ui'
 
   let { data } = $props()
 </script>
@@ -15,18 +14,14 @@
 </svelte:head>
 
 <div class="flex flex-col gap-5 max-w-full w-full">
-  <EndPlaceholder size="lg">
-    Direktori Organisasi
-    {#snippet action()}
-      <Badge color="yellow-subtle" rounding="md">Data contoh</Badge>
+  <PageHeader
+    title="Direktori Organisasi"
+    lede="Kehadiran Level 0: organisasi tercantum dengan profil, layanan, dan jam buka, tanpa akun dan tanpa kewajiban. Organisasi yang siap dapat mengklaim halamannya dan bertumbuh menjadi Agen Institusi."
+  >
+    {#snippet actions()}
+      <DataChip state="contoh" />
     {/snippet}
-  </EndPlaceholder>
-
-  <p class="text-sm text-slate-600 dark:text-zinc-400 max-w-prose">
-    Kehadiran Level 0: organisasi tercantum dengan profil, layanan, dan jam
-    buka, tanpa akun dan tanpa kewajiban. Organisasi yang siap dapat mengklaim
-    halamannya dan bertumbuh menjadi Agen Institusi.
-  </p>
+  </PageHeader>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     {#each data.orgs as org (org.slug)}

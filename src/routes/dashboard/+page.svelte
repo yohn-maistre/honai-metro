@@ -3,15 +3,17 @@
   import BarChart from '$lib/etnos/charts/BarChart.svelte'
   import LineChart from '$lib/etnos/charts/LineChart.svelte'
   import StatCard from '$lib/etnos/charts/StatCard.svelte'
+  import { DataChip, IconTile, PageHeader } from '$lib/etnos/ui'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
+  import { Material } from 'mono-svelte'
   import {
     AcademicCap,
     Banknotes,
     BuildingOffice2,
     ChartBar,
     ChatBubbleLeftRight,
+    CpuChip,
     GlobeAmericas,
-    Icon,
     type IconSource,
     UserGroup,
   } from 'svelte-hero-icons/dist'
@@ -22,7 +24,7 @@
 
   // ETNOS: Papan Data Tanah Papua.
   // Live row from the PieFed backend (only what the API really answers,
-  // see live.ts); section data from BPS / Satudata (demo JSON for now).
+  // see live.ts); section data from BPS / Satudata (contoh JSON for now).
   // OTSUS tracker per UU 2/2021 transparency.
 
   let live = $state<LiveStats | null>(getCached())
@@ -80,10 +82,13 @@
 </svelte:head>
 
 <div class="flex flex-col gap-6 max-w-full w-full">
-  <EndPlaceholder size="lg">Papan Data Tanah Papua</EndPlaceholder>
+  <PageHeader
+    title="Papan Data Tanah Papua"
+    lede="Angka hidup dari forum ini dan data publik provinsi. Satu angka, satu sumber."
+  />
 
   <!-- Live row: only what the backend really answers; anything the API
-       can't confirm falls back to its demo tile, honestly labeled. -->
+       can't confirm falls back to its contoh tile, honestly labeled. -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
     {#if liveUsers != null}
       <StatCard
@@ -98,7 +103,7 @@
         label="Pengguna Aktif"
         value={data.topStats.active_users}
         icon={UserGroup}
-        color="text-blue-500"
+        color="text-slate-400 dark:text-zinc-500"
         demo
       />
     {/if}
@@ -115,7 +120,7 @@
         label="Postingan Hari Ini"
         value={data.topStats.posts_today}
         icon={ChatBubbleLeftRight}
-        color="text-green-500"
+        color="text-slate-400 dark:text-zinc-500"
         demo
       />
     {/if}
@@ -132,7 +137,7 @@
         label="Komunitas"
         value={data.topStats.communities}
         icon={GlobeAmericas}
-        color="text-amber-500"
+        color="text-slate-400 dark:text-zinc-500"
         demo
       />
     {/if}
@@ -140,7 +145,7 @@
       label="Data Bahasa"
       value={data.topStats.language_data}
       icon={ChartBar}
-      color="text-purple-500"
+      color="text-slate-400 dark:text-zinc-500"
       demo
     />
   </div>
@@ -148,89 +153,80 @@
   <!-- Provincial data sections -->
   <EndPlaceholder size="sm">Data Provinsi</EndPlaceholder>
 
-  {#snippet section(s: Section, icon: IconSource, color: string)}
-    <div
-      class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-4"
+  {#snippet section(s: Section, icon: IconSource)}
+    <Material
+      color="default"
+      rounding="2xl"
+      padding="lg"
+      class="flex flex-col gap-4"
     >
       <div class="flex items-start gap-3">
-        <div class="p-2 rounded-xl bg-slate-50 dark:bg-zinc-800 shrink-0">
-          <Icon src={icon} size="24" class={color} />
-        </div>
+        <IconTile {icon} size="md" />
         <div class="flex flex-col gap-0.5 min-w-0">
           <h3 class="font-semibold dark:text-white">{s.title}</h3>
           <p class="text-sm text-slate-500 dark:text-zinc-400">{s.subtitle}</p>
         </div>
+        {#if s.demo}
+          <DataChip state="contoh" class="ml-auto mt-1" />
+        {/if}
       </div>
 
       {#if s.stats?.length}
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {#each s.stats as st (st.label)}
-            <StatCard
-              label={st.label}
-              value={st.value}
-              unit={st.unit}
-              demo={s.demo}
-            />
+            <StatCard label={st.label} value={st.value} unit={st.unit} />
           {/each}
         </div>
       {/if}
 
       {#if s.bars}
-        <BarChart
-          title={s.bars.title}
-          data={s.bars.data}
-          unit={s.bars.unit}
-        />
+        <BarChart title={s.bars.title} data={s.bars.data} unit={s.bars.unit} />
       {/if}
 
       {#if s.line}
-        <LineChart
-          title={s.line.title}
-          data={s.line.data}
-          unit={s.line.unit}
-        />
+        <LineChart title={s.line.title} data={s.line.data} unit={s.line.unit} />
       {/if}
 
       <p class="text-xs text-slate-400 dark:text-zinc-500 mt-1">
         {$t('etnos.dashboard.data_source')}: {s.source}
       </p>
-    </div>
+    </Material>
   {/snippet}
 
   <div class="grid grid-cols-1 gap-3">
-    {@render section(data.sections.pendidikan, AcademicCap, 'text-blue-500')}
-    {@render section(data.sections.ekonomi, Banknotes, 'text-green-500')}
-    {@render section(
-      data.sections.infrastruktur,
-      BuildingOffice2,
-      'text-orange-500',
-    )}
-    {@render section(data.sections.kualitasHidup, UserGroup, 'text-pink-500')}
+    {@render section(data.sections.pendidikan, AcademicCap)}
+    {@render section(data.sections.ekonomi, Banknotes)}
+    {@render section(data.sections.infrastruktur, BuildingOffice2)}
+    {@render section(data.sections.kualitasHidup, UserGroup)}
   </div>
 
   <!-- OTSUS tracker -->
   <EndPlaceholder size="sm">{$t('etnos.dashboard.otsus')}</EndPlaceholder>
-  <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-4"
+  <Material
+    color="default"
+    rounding="2xl"
+    padding="lg"
+    class="flex flex-col gap-4"
   >
-    <div class="flex flex-col gap-0.5">
-      <h3 class="font-semibold dark:text-white">{data.otsus.title}</h3>
-      <p class="text-sm text-slate-500 dark:text-zinc-400">
-        {data.otsus.subtitle}
-      </p>
-      <p class="text-xs text-slate-400 dark:text-zinc-500 mt-1">
-        Dasar: {data.otsus.regulation}
-      </p>
+    <div class="flex items-start gap-3">
+      <IconTile icon={Banknotes} size="md" />
+      <div class="flex flex-col gap-0.5 min-w-0">
+        <h3 class="font-semibold dark:text-white">{data.otsus.title}</h3>
+        <p class="text-sm text-slate-500 dark:text-zinc-400">
+          {data.otsus.subtitle}
+        </p>
+        <p class="text-xs text-slate-400 dark:text-zinc-500 mt-1">
+          Dasar: {data.otsus.regulation}
+        </p>
+      </div>
+      {#if data.otsus.demo}
+        <DataChip state="contoh" class="ml-auto mt-1" />
+      {/if}
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
       {#each data.otsus.stats as st (st.label)}
-        <StatCard
-          label={st.label}
-          value={st.value}
-          unit={st.unit}
-          demo={data.otsus.demo}
-        />
+        <StatCard label={st.label} value={st.value} unit={st.unit} />
       {/each}
     </div>
 
@@ -249,60 +245,87 @@
     <p class="text-xs text-slate-400 dark:text-zinc-500 mt-1">
       {$t('etnos.dashboard.data_source')}: {data.otsus.source}
     </p>
-  </div>
+  </Material>
 
-  <!-- AI Agents section (Phase 4 placeholder; Batch C wires the AI feed tab) -->
-  <EndPlaceholder size="sm">AI Agents</EndPlaceholder>
-  <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
+  <!-- Agen AI (placeholder until real nodes report in) -->
+  <EndPlaceholder size="sm">Agen AI</EndPlaceholder>
+  <Material
+    color="default"
+    rounding="2xl"
+    padding="lg"
+    class="flex items-start gap-3"
   >
-    <p class="text-slate-500 dark:text-zinc-400 text-sm">
-      Status agen AI Jayapura akan ditampilkan di sini. Agen-agen ini memantau
-      sumber informasi lokal dan memberikan ringkasan pembaruan untuk komunitas.
-    </p>
-  </div>
+    <IconTile icon={CpuChip} size="md" />
+    <div class="flex flex-col gap-1 min-w-0">
+      <div class="flex items-center gap-2 flex-wrap">
+        <h3 class="font-semibold dark:text-white">Status agen AI</h3>
+        <DataChip state="segera" />
+      </div>
+      <p class="text-slate-500 dark:text-zinc-400 text-sm">
+        Status agen AI akan tampil di sini: pemantauan sumber informasi lokal
+        dan ringkasan pembaruan untuk komunitas.
+      </p>
+    </div>
+  </Material>
 
   <!-- Sumber: every number on this board and where it comes from -->
   <EndPlaceholder size="sm">Sumber</EndPlaceholder>
-  <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-3"
+  <Material
+    color="default"
+    rounding="2xl"
+    padding="lg"
+    class="flex flex-col gap-3"
   >
     <h3 class="font-semibold dark:text-white">Satu angka, satu sumber</h3>
-    <dl class="flex flex-col divide-y divide-slate-100 dark:divide-zinc-800 text-sm">
-      <div class="flex justify-between gap-4 py-2">
+    <dl
+      class="flex flex-col divide-y divide-slate-100 dark:divide-zinc-800 text-sm"
+    >
+      <div class="flex justify-between items-center gap-4 py-2">
         <dt class="text-slate-600 dark:text-zinc-400">
           Pengguna, komunitas, postingan 24 jam
         </dt>
-        <dd class="text-right font-medium dark:text-zinc-200">
-          piefed.social, langsung
+        <dd
+          class="text-right font-medium dark:text-zinc-200 flex items-center gap-2"
+        >
+          piefed.social
+          <DataChip state="langsung" />
         </dd>
       </div>
-      <div class="flex justify-between gap-4 py-2">
+      <div class="flex justify-between items-center gap-4 py-2">
         <dt class="text-slate-600 dark:text-zinc-400">
           Pendidikan, ekonomi, infrastruktur, kualitas hidup
         </dt>
-        <dd class="text-right font-medium dark:text-zinc-200">
-          BPS / Satudata, data demo
+        <dd
+          class="text-right font-medium dark:text-zinc-200 flex items-center gap-2"
+        >
+          BPS / Satudata
+          <DataChip state="contoh" />
         </dd>
       </div>
-      <div class="flex justify-between gap-4 py-2">
+      <div class="flex justify-between items-center gap-4 py-2">
         <dt class="text-slate-600 dark:text-zinc-400">Pelacak OTSUS</dt>
-        <dd class="text-right font-medium dark:text-zinc-200">
-          UU 2/2021, data demo
+        <dd
+          class="text-right font-medium dark:text-zinc-200 flex items-center gap-2"
+        >
+          UU 2/2021
+          <DataChip state="contoh" />
         </dd>
       </div>
-      <div class="flex justify-between gap-4 py-2">
+      <div class="flex justify-between items-center gap-4 py-2">
         <dt class="text-slate-600 dark:text-zinc-400">Data bahasa</dt>
-        <dd class="text-right font-medium dark:text-zinc-200">
-          kurasi ETNOS, data demo
+        <dd
+          class="text-right font-medium dark:text-zinc-200 flex items-center gap-2"
+        >
+          kurasi ETNOS
+          <DataChip state="contoh" />
         </dd>
       </div>
     </dl>
     <p class="text-xs text-slate-400 dark:text-zinc-500">
-      Angka berlabel <span class="font-medium uppercase">langsung</span> diambil
-      dari server saat halaman dibuka. Label
-      <span class="font-medium uppercase">demo</span> berarti contoh yang
-      menunggu sumber resmi.
+      Angka berlabel <span class="font-medium">langsung</span> diambil dari
+      server saat halaman dibuka. Label
+      <span class="font-medium">data contoh</span> berarti contoh yang menunggu
+      sumber resmi.
     </p>
-  </div>
+  </Material>
 </div>

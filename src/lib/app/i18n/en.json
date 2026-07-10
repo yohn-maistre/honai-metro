@@ -1107,6 +1107,18 @@
                 "suku_bahasa": "Peoples & Languages",
                 "bahasa": "Languages",
                 "kuliner": "Cuisine"
+            },
+            "lede": "Community-tended knowledge of Tanah Papua: places, history, biodiversity, peoples, languages, and food.",
+            "sections": "sections",
+            "minutes": "min read",
+            "toc": "Contents",
+            "desc": {
+                "tempat": "Regencies, cities, and notable places across Tanah Papua.",
+                "sejarah": "The timeline and events that shaped Tanah Papua.",
+                "biodiversitas": "Endemic flora and fauna, from birds-of-paradise to orchids.",
+                "suku_bahasa": "The major peoples and their language families.",
+                "bahasa": "A directory of regional languages and their vitality.",
+                "kuliner": "Papeda, bakar batu, and other signature dishes."
             }
         },
         "dashboard": {

@@ -1,75 +1,100 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
-  import Markdown from '$lib/app/markdown/Markdown.svelte'
+  import { meta } from '$lib/etnos/wiki'
   import WikiCarousel from '$lib/etnos/WikiCarousel.svelte'
+  import { IconTile, PageHeader } from '$lib/etnos/ui'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
+  import { Material } from 'mono-svelte'
+  import {
+    ArrowRight,
+    ChatBubbleLeftRight,
+    Clock,
+    Fire,
+    GlobeAsiaAustralia,
+    Icon,
+    MapPin,
+    PencilSquare,
+    UserGroup,
+  } from 'svelte-hero-icons/dist'
 
   let { data } = $props()
 
-  // ETNOS: Provincial Wiki page.
-  // - Carousel: Hari Ini Dalam Sejarah Papua + Kata Hari Ini (TTS)
-  // - Category buttons link to /wiki/[category] (markdown rendered from
-  //   src/lib/etnos/wiki/*.md)
-  // - Future: enrich via Wikipedia API (id.wikipedia.org) in load fns,
-  //   community posts via c/wiki, LLM-refreshed carousel content.
+  // ETNOS wiki index: the daily hero (Hari Ini Dalam Sejarah + Kata Hari
+  // Ini, with TTS), a category grid with honest derived metadata, and the
+  // contribution note. Articles live in src/lib/etnos/wiki/*.md.
 
-  type CategoryKey =
-    | 'tempat'
-    | 'sejarah'
-    | 'biodiversitas'
-    | 'suku-bahasa'
-    | 'bahasa'
-    | 'kuliner'
-
-  const categories: { slug: CategoryKey }[] = [
-    { slug: 'tempat' },
-    { slug: 'sejarah' },
-    { slug: 'biodiversitas' },
-    { slug: 'suku-bahasa' },
-    { slug: 'bahasa' },
-    { slug: 'kuliner' },
+  const categories = [
+    { slug: 'tempat', icon: MapPin },
+    { slug: 'sejarah', icon: Clock },
+    { slug: 'biodiversitas', icon: GlobeAsiaAustralia },
+    { slug: 'suku-bahasa', icon: UserGroup },
+    { slug: 'bahasa', icon: ChatBubbleLeftRight },
+    { slug: 'kuliner', icon: Fire },
   ]
-
-  const intro = `
-## Tentang wiki ini
-
-Wiki ini merawat pengetahuan tentang Tanah Papua: budaya, sejarah, bahasa, dan
-kekayaan alam. Isinya dirawat manual dan diperkaya kontribusi komunitas lewat
-forum \`c/wiki\`.
-
-Pilih kategori di atas untuk mulai membaca, atau dengarkan **Hari Ini Dalam
-Sejarah** dan **Kata Hari Ini** di kartu sorotan.
-
-### Cara berkontribusi
-1. **Berbicara**, gunakan bahasa daerah Anda di forum komunitas.
-2. **Menulis**, tambah cerita budaya dan sejarah lewat \`c/wiki\`.
-3. **Memvalidasi**, bantu periksa terjemahan dan konten.
-`
 </script>
 
 <svelte:head>
   <title>Wiki Tanah Papua · ETNOS</title>
 </svelte:head>
 
-<div class="flex flex-col gap-4 max-w-full w-full">
+<div class="flex flex-col gap-5 max-w-full w-full">
+  <PageHeader title="Wiki Tanah Papua" lede={$t('etnos.wiki.lede')} />
+
   <WikiCarousel history={data.todayHistory} word={data.todayWord} />
 
-  <EndPlaceholder size="lg">Wiki Tanah Papua</EndPlaceholder>
-
-  <div class="flex flex-wrap gap-2">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
     {#each categories as cat (cat.slug)}
-      <a
+      {@const key = cat.slug.replace(/-/g, '_')}
+      {@const m = meta[cat.slug]}
+      <Material
+        element="a"
         href="/wiki/{cat.slug}"
-        class="px-3 py-1.5 rounded-full text-sm font-medium bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-primary-100 dark:hover:bg-primary-900/40 hover:text-primary-800 dark:hover:text-primary-200 transition-colors"
+        color="default"
+        rounding="2xl"
+        padding="lg"
+        interactive
+        class="flex flex-col gap-3 no-underline group"
       >
-        {$t(`etnos.wiki.categories.${cat.slug.replace(/-/g, '_')}`)}
-      </a>
+        <div class="flex items-center gap-3">
+          <IconTile icon={cat.icon} size="md" />
+          <span class="text-base font-semibold dark:text-white">
+            {$t(`etnos.wiki.categories.${key}`)}
+          </span>
+          <Icon
+            src={ArrowRight}
+            micro
+            size="16"
+            class="ml-auto text-slate-400 dark:text-zinc-500 transition-transform group-hover:translate-x-0.5"
+          />
+        </div>
+        <p class="text-sm text-slate-600 dark:text-zinc-400 leading-snug">
+          {$t(`etnos.wiki.desc.${key}`)}
+        </p>
+        {#if m}
+          <span
+            class="text-xs text-slate-500 dark:text-zinc-500 tabular-nums mt-auto"
+          >
+            {m.sections}
+            {$t('etnos.wiki.sections')} · {m.minutes}
+            {$t('etnos.wiki.minutes')}
+          </span>
+        {/if}
+      </Material>
     {/each}
   </div>
 
-  <div
-    class="bg-white dark:bg-zinc-900 rounded-2xl p-6 shadow-sm border border-slate-200 dark:border-zinc-800"
-  >
-    <Markdown source={intro} />
-  </div>
+  <EndPlaceholder margin="sm">Berkontribusi</EndPlaceholder>
+  <Material color="default" rounding="2xl" padding="lg" class="flex gap-4">
+    <IconTile icon={PencilSquare} size="md" class="mt-0.5" />
+    <div class="flex flex-col gap-1.5 text-sm">
+      <p class="text-slate-700 dark:text-zinc-300 leading-relaxed">
+        Wiki ini dirawat manual dan diperkaya kontribusi komunitas lewat forum
+        <a
+          href="/c/wiki"
+          class="font-medium text-primary-600 dark:text-primary-400 hover:underline">c/wiki</a
+        >. Gunakan bahasa daerah Anda di forum, tambahkan cerita budaya dan
+        sejarah, dan bantu memeriksa terjemahan serta isi artikel.
+      </p>
+    </div>
+  </Material>
 </div>

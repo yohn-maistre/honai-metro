@@ -66,7 +66,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
     {#each languages as lang (lang.slug)}
       <div
-        class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-sm border border-slate-200 dark:border-zinc-800 flex flex-col gap-2"
+        class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-xs border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 flex flex-col gap-2"
       >
         <div class="flex items-start justify-between gap-2">
           <div class="flex flex-col gap-0.5 min-w-0">
@@ -75,7 +75,7 @@
               {lang.native}
             </p>
           </div>
-          <Badge color={statusColor(lang.status)} rounding="md">
+          <Badge color={statusColor(lang.status)}>
             {statusLabel(lang.status)}
           </Badge>
         </div>

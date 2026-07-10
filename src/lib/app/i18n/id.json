@@ -955,6 +955,18 @@
                 "suku_bahasa": "Suku & Bahasa",
                 "bahasa": "Bahasa",
                 "kuliner": "Kuliner"
+            },
+            "lede": "Pengetahuan Tanah Papua yang dirawat komunitas: tempat, sejarah, biodiversitas, suku, bahasa, dan kuliner.",
+            "sections": "bagian",
+            "minutes": "menit baca",
+            "toc": "Daftar isi",
+            "desc": {
+                "tempat": "Kabupaten, kota, dan tempat penting di Tanah Papua.",
+                "sejarah": "Garis waktu dan peristiwa yang membentuk Tanah Papua.",
+                "biodiversitas": "Flora dan fauna endemik, dari cendrawasih sampai anggrek.",
+                "suku_bahasa": "Suku-suku besar dan rumpun bahasanya.",
+                "bahasa": "Direktori bahasa daerah dan status vitalitasnya.",
+                "kuliner": "Papeda, bakar batu, dan hidangan khas lainnya."
             }
         },
         "dashboard": {

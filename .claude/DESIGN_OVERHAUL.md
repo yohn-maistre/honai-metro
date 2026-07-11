@@ -329,3 +329,88 @@ directly above the posts (his note). Plan file:
   ts-expect, agen Capability union) — not gated by CI, untouched.
 - Feed "No posts" on dev with Lokal+Aktif filter is pre-existing
   (verified against stashed baseline), not a deck regression.
+
+---
+
+# POLISH WAVE (2026-07-12) — density, wire band, dossier, Papan Sinyal
+
+Yose's screenshot review of the REVAMP WAVE surfaced: hover repaints
+read cheap, dark theme had invisible strokes, 100% zoom too big (80%
+ideal), map should be full-width with detak-style region dossiers
+"decoupled from lensa wilayah", ticker + Papan Kilas berita row were
+redundant. Direction confirmed via brainstorm: ticker goes global,
+Papan Kilas becomes Papan Sinyal (his pick from 4 options). Four
+commits P1-P4, each build-verified + screenshot-verified.
+
+## P1 polish foundations (f5a27e76)
+
+- html { font-size: 87.5% } (reads like his 80-85% zoom reference; all
+  rem-based so spacing scales with it).
+- Hover doctrine: surfaces never repaint. Stripped hover:bg from
+  VirtualFeed rows, PostLink (border deepen instead), CommunityItemBig,
+  SorotanBoard rows + musrenbang usulan rows (title color shift
+  instead). Controls keep bg hovers.
+- Dark fix, ROOT CAUSE: canvases read --color-slate-500 for muted
+  strokes, but the slate ramp is cream-tuned (dark warm gray) so dark
+  mode painted boundaries near-black on near-black. New plateColors(el)
+  in atlas.ts: dark swaps muted to zinc #a1a1aa, accent to primary-400,
+  exposes a dark flag; PetaKabar/PetaSimpul/WajahTanah dot alphas
+  boosted in dark. PapanSinyal flap cells: dark bg 0.03->0.06, borders
+  0.07->0.12, tag primary-400, sub zinc-400.
+
+## P2 global wire band + deck order (22716722)
+
+- KilasTicker gains band + class props. Rendered in +layout.svelte
+  TWICE: under Navbar inside the shell-navbar-holder (md+; holder is
+  position:sticky top-0 there) and as a md:hidden sticky top-0 strip at
+  the top of <main> (mobile navbar is a BOTTOM dock; a band in the
+  holder would sit at the bottom).
+- Home deck: inline ticker removed; filter row moved back above the
+  map (his call).
+
+## P3 map dossier (97203537)
+
+- PetaKabar full-width: side aside + bottom pin-chip row deleted;
+  canvas h-72/h-96/h-[30rem]; legend = floating collapsible pill
+  top-right; footer = identity line + "Sumber aktif" (langsung sources
+  only).
+- Kab click -> floating dossier top-left (fixed corner, detak's
+  kb-dossier pattern, never point-anchored). Content: Kemendagri rows
+  (ibukota, penduduk + rank/prov, luas, kepadatan) from NEW
+  src/lib/etnos/data/wilayah.json (42-kab Tanah Papua subset of detak's
+  idn-wilayah.json; names join 1:1 with papua-kab.geojson, verified) +
+  live crosscuts (gempa 24j in-kab, anchor cuaca, banjir/api counts,
+  kabar kliping links, directory komunitas by region tagged contoh,
+  wajah entries by koordinat) with honest empties. Markers win over
+  region clicks; marker cards offer "Buka kartu wilayah"; Esc/X close.
+  Region clicks never filter the feed.
+- FOUND+FIXED (pre-existing): rasterize() encoded the kab index in the
+  red channel in one pass; anti-aliased coastal pixels premultiply and
+  getImageData un-premultiplies them into WRONG indices (probe: Sorong
+  -> "Merauke", Nabire -> "Mimika", Manokwari -> "Lanny Jaya"). Was
+  invisible when the raster only drove dot rendering; fatal once it
+  drove hit-testing + dossier attribution. Fix: one coverage pass per
+  feature reading only alpha (threshold 32 keeps islets + forgiving
+  coastal taps). Probe after: all 6 anchors resolve correctly.
+
+## P4 Papan Sinyal (3829065a)
+
+- PapanKilas.svelte -> PapanSinyal.svelte. Rows now live channels:
+  GEMPA (M + wilayah + WIT, BMKG/USGS, honest nihil line when the feed
+  answers empty, row drops when unreachable), CUACA (rotating anchors,
+  Open-Meteo), FORUM (hot posts), KOMUNITAS (directory). Berita row
+  retired: the wire band owns news. Gempa/cuaca reuse layers.ts SWR
+  caches (one fact, one owner). Header chip "Sinyal langsung" only when
+  a live feed answered. Same flip engine + day seed ('papan-sinyal').
+- i18n: papan.berita_src + rows.berita removed; rows.gempa, rows.cuaca,
+  sinyal_label, gempa_nihil added; peta.lapisan/tutup/lihat_kab/
+  sumber_aktif/dossier.* added. Parity 141/141/141.
+
+## Notes for the next seat (delta)
+
+- raster-probe.js + shot-click.js in scratchpad: probe validates anchor
+  cell attribution in a real browser; shot-click clicks fractional
+  canvas coords before screenshotting. Rebuild them if the scratchpad
+  is gone; both are ~40 lines of playwright-core.
+- The 87.5% root means screenshots at 1440px now show more content;
+  Yose's own 80% zoom habit should no longer be needed.

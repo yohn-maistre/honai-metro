@@ -59,32 +59,61 @@ Hard rules, all learned the expensive way:
   (kills FOUC; SPA, SSR off). **Keep the two in sync.**
 - i18n: every `etnos.*` key must exist in **all three** of
   `src/lib/app/i18n/{en,id,pmy}.json` (pmy = Papuan Malay: "deng", "sa",
-  "ko", simpler grammar). Parity was 126/126/126 as of 2026-07-11.
+  "ko", simpler grammar). Parity was 141/141/141 as of 2026-07-12.
+- **Density**: `html { font-size: 87.5% }` in app.css (owner call: the UI
+  should read like ~85% browser zoom). Everything is rem-based; px values
+  (hairlines, flap cells) intentionally stay fixed.
+- **Hover doctrine: surfaces never repaint.** Cards/rows get no
+  `hover:bg-*`; affordance = cursor, Material `interactive` lift, title
+  color shift on list rows, or border deepen on card links. Background
+  hovers only on small controls (buttons, selects, pills, chips).
 
 ## The deck and the detak-detik integration
 
-`/` (Beranda) is the flagship for guests and members alike: h1 header →
-KILAS ticker → **PetaKabar** full-width live-map hero → **PapanKilas**
-Solari board → filter row (Lokasi/Urutkan/Tampilan, right-aligned) → feed.
-No guest redirect. (The ticker must stay BELOW the header: `Header
-pageHeader`'s -mt-64/pt-64 band paints over anything above it.)
+The **KILAS wire band** is GLOBAL, not a page element: rendered in
+`+layout.svelte` twice, a `band` variant under the Navbar (md+, sticky
+via the shell-navbar-holder) and a mobile-only sticky strip at the top of
+`<main>` (the mobile navbar is a bottom dock, so the band can't live
+there). `KilasTicker.svelte` takes `band` + `class` props.
+
+`/` (Beranda) deck order: h1 header → filter row (Lokasi/Urutkan/
+Tampilan, right-aligned) → **PetaKabar** full-width live-map hero →
+**PapanSinyal** Solari board → feed. No guest redirect.
 
 **PetaKabar** (`src/lib/etnos/PetaKabar.svelte`) is a canvas dot-grid
-plate of Tanah Papua — no MapLibre, no tiles. Dashed kabupaten boundary
-lines ride over the dots (`loadBoundaryPaths` in `atlas.ts`, Path2D per
-kab). Six data layers with legend toggle chips, all through
-`src/lib/etnos/layers.ts` (SWR localStorage, Papua-bbox clip, contract:
-null=segera, []=nihil, points=langsung, **no fake points ever**):
-KABAR (detak /edisi pins via `kabar.ts`, gazetteer match, deep-links
+plate of Tanah Papua — no MapLibre, no tiles. Full-width canvas with
+floating overlays, detak-detik style: layer legend top-right
+(collapsible "Lapisan · n" pill), dossier card top-left, and a footer
+row with the identity line + "Sumber aktif" credits (only langsung
+sources listed). Dashed kabupaten boundary lines ride over the dots
+(`loadBoundaryPaths` in `atlas.ts`, Path2D per kab). Six data layers
+through `src/lib/etnos/layers.ts` (SWR localStorage, Papua-bbox clip,
+contract: null=segera, []=nihil, points=langsung, **no fake points
+ever**): KABAR (detak /edisi pins via `kabar.ts`, deep-links
 `detak-detik.pages.dev/#/kliping/{id}`), GEMPA (BMKG+USGS keyless, 120s,
 default ON), CUACA (Open-Meteo at the 6 anchors, default ON), BANJIR
 (PetaBencana keyless, OFF), TITIK API + UDARA (detak worker
-`/geo/kebakaran` + `/geo/udara`, need `PUBLIC_DETAK_URL`, OFF). The static
-base (dots+boundaries) is cached offscreen; DataChip has a 4th state
-`nihil` (source answered, zero points).
+`/geo/kebakaran` + `/geo/udara`, need `PUBLIC_DETAK_URL`, OFF).
 
-**PapanKilas** = 3-row Solari split-flap (Berita/Forum/Komunitas; KATA
-retired, kata-hari-ini.json is wiki-only): each row is 6 equal
+**Clicking a kabupaten opens its dossier** (markers win over regions;
+Esc/✕ closes; marker cards offer a "Buka kartu wilayah" hop). The kab
+card = Kemendagri reference rows (`src/lib/etnos/data/wilayah.json`, 42
+kab subset vendored from detak's idn-wilayah.json, nama joins 1:1 with
+papua-kab.geojson) + live crosscuts computed from already-fetched layers
+(gempa 24j count, anchor cuaca, banjir/api counts, kabar kliping,
+directory komunitas by region, wajah entries by koordinat). Region
+clicks NEVER filter the feed. **Raster rule:** `atlas.ts rasterize()`
+does one coverage pass PER FEATURE reading only alpha (threshold 32); a
+single indexed-color pass corrupts coastal cells via premultiply
+(Sorong read as "Merauke" before the 2026-07-12 fix). Never revert to
+red-channel-index-in-one-pass.
+
+**PapanSinyal** (`src/lib/etnos/PapanSinyal.svelte`) = 4-row Solari
+split-flap of live channels (Gempa/Cuaca/Forum/Komunitas; berita retired
+to the wire band; KATA retired earlier, kata-hari-ini.json is
+wiki-only). Gempa + cuaca rows reuse the layers.ts SWR caches (one fact
+one owner); an answering-but-empty gempa feed shows an honest nihil
+line, an unreachable feed drops its row. Each row is 6 equal
 overflow-hidden cells holding the full string at `left:-j*100%`, per-CELL
 rotateX half-fold with 45ms stagger (never per-character), WIT clock,
 day-seeded.

@@ -1051,9 +1051,24 @@
                 "api": "Fires",
                 "udara": "Air"
             },
-            "identity": "ETNOS is the federated public square of Tanah Papua: forums, a wiki, and open civic data. Tap a marker to inspect it.",
+            "identity": "ETNOS is the federated public square of Tanah Papua: forums, a wiki, and open civic data. Tap a marker or a regency to open its card.",
             "identity_link": "About ETNOS",
-            "api_note": "satellite thermal anomaly, not necessarily a fire"
+            "api_note": "satellite thermal anomaly, not necessarily a fire",
+            "lapisan": "Layers",
+            "tutup": "Close card",
+            "lihat_kab": "Open the region card",
+            "sumber_aktif": "Active sources",
+            "dossier": {
+                "ibukota": "Capital",
+                "penduduk": "Population",
+                "luas": "Area",
+                "kepadatan": "Density",
+                "sumber_wilayah": "Region reference: Kemendagri 2025, public data.",
+                "gempa24": "Quakes, 24h",
+                "kabar": "In the news",
+                "komunitas": "Communities",
+                "wajah": "From the wiki"
+            }
         },
         "papan": {
             "berita_src": "External press",

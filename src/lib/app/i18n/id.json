@@ -933,9 +933,24 @@
                 "api": "Titik api",
                 "udara": "Udara"
             },
-            "identity": "ETNOS adalah ruang publik berfederasi Tanah Papua: forum, wiki, dan data publik terbuka. Ketuk penanda untuk menyorotnya.",
+            "identity": "ETNOS adalah ruang publik berfederasi Tanah Papua: forum, wiki, dan data publik terbuka. Ketuk penanda atau kabupaten untuk membuka kartunya.",
             "identity_link": "Tentang ETNOS",
-            "api_note": "anomali termal satelit, belum tentu kebakaran"
+            "api_note": "anomali termal satelit, belum tentu kebakaran",
+            "lapisan": "Lapisan",
+            "tutup": "Tutup kartu",
+            "lihat_kab": "Buka kartu wilayah",
+            "sumber_aktif": "Sumber aktif",
+            "dossier": {
+                "ibukota": "Ibu kota",
+                "penduduk": "Penduduk",
+                "luas": "Luas",
+                "kepadatan": "Kepadatan",
+                "sumber_wilayah": "Referensi wilayah: Kemendagri 2025, data publik.",
+                "gempa24": "Gempa 24 jam",
+                "kabar": "Dalam kabar",
+                "komunitas": "Komunitas",
+                "wajah": "Dari wiki"
+            }
         },
         "papan": {
             "berita_src": "Pers luar",

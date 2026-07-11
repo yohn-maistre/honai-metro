@@ -8,11 +8,23 @@
    * titik api (NASA FIRMS via the detak worker), udara (WAQI PM2.5, same
    * worker). Every layer is honest: langsung when fetched, nihil when a
    * source answers with zero points, segera when unreachable. No fake
-   * points, ever. The static base (dots + boundaries) is cached offscreen
-   * so marker redraws stay cheap on phones.
+   * points, ever.
+   *
+   * The canvas spans the full card; everything else floats over it,
+   * detak-detik style: the layer legend top-right, and a dossier card
+   * top-left that opens for a clicked marker OR a clicked kabupaten
+   * (the raster feature index makes region hit-testing an O(1) lookup).
+   * The kabupaten dossier joins the vendored Kemendagri wilayah rows
+   * (ibukota, penduduk, luas) with live crosscuts computed from the
+   * already-fetched layers. Clicking a region only opens the card; it
+   * never filters the feed.
    */
   import { onMount } from 'svelte'
-  import { ArrowTopRightOnSquare, Icon } from 'svelte-hero-icons/dist'
+  import {
+    ArrowTopRightOnSquare,
+    Icon,
+    XMark,
+  } from 'svelte-hero-icons/dist'
   import { t } from '$lib/app/i18n'
   import { theme } from '$lib/app/theme/theme.svelte'
   import {
@@ -24,6 +36,8 @@
     type BoundaryPaths,
     type PlateColors,
   } from './atlas'
+  import directoryData from './data/directory.json'
+  import wilayahData from './data/wilayah.json'
   import { loadKliping, matchPins, klipingUrl, type KabarPin } from './kabar'
   import {
     ANCHORS,
@@ -42,6 +56,7 @@
     type UdaraPoint,
   } from './layers'
   import { Board, DataChip } from './ui'
+  import wajahData from './wiki/wajah.json'
 
   const COLS = 120
   const ROWS = 104
@@ -52,6 +67,20 @@
     api: '#c2410c',
     udara: '#7c5cbf',
   }
+
+  const PROV_NAMA: Record<string, string> = {
+    '91': 'Papua Barat',
+    '92': 'Papua Barat Daya',
+    '94': 'Papua',
+    '95': 'Papua Selatan',
+    '96': 'Papua Tengah',
+    '97': 'Papua Pegunungan',
+  }
+
+  type WilayahRow = (typeof wilayahData.rows)[number]
+  const wilayahByNama = new Map<string, WilayahRow>(
+    wilayahData.rows.map((r) => [r.nama, r]),
+  )
 
   let el = $state<HTMLCanvasElement>()
   let grid: AtlasGrid | null = $state(null)
@@ -75,12 +104,28 @@
     udara: false,
   })
 
+  let legendaBuka = $state(false)
+
   const live = $derived(pins.length > 0)
 
-  type Sel = { layer: LayerId | 'anchor'; i: number } | null
+  type Sel = { layer: LayerId | 'anchor' | 'kab'; i: number } | null
   let sel = $state<Sel>(null)
 
   const LAYERS: LayerId[] = ['kabar', 'gempa', 'cuaca', 'banjir', 'api', 'udara']
+
+  const SUMBER: Record<LayerId, string> = {
+    kabar: 'Detak Detik',
+    gempa: 'BMKG / USGS',
+    cuaca: 'Open-Meteo',
+    banjir: 'PetaBencana',
+    api: 'NASA FIRMS',
+    udara: 'WAQI',
+  }
+  const sumberAktif = $derived(
+    LAYERS.filter((id) => layerOn[id] && status[id] === 'langsung').map(
+      (id) => SUMBER[id],
+    ),
+  )
 
   async function loadLayer(id: LayerId) {
     if (id === 'kabar') {
@@ -136,9 +181,26 @@
     return [p.ox + fx * p.scale, p.oy + fy * p.scale] as [number, number]
   }
 
-  // The kabupaten holding the selected kabar pin gets darker dots + a solid
-  // outline; derived here so both base cache key and detail panel share it.
+  /** Kabupaten index (into grid.kabs) at a lon/lat, or -1 at sea. */
+  function kabAt(lon: number, lat: number): number {
+    if (!grid) return -1
+    const [fx, fy] = lonLatToCellF(lon, lat, COLS, ROWS)
+    const gx = Math.floor(fx)
+    const gy = Math.floor(fy)
+    if (gx < 0 || gy < 0 || gx >= COLS || gy >= ROWS) return -1
+    const cell = grid.cells[gy * COLS + gx]!
+    return cell ? cell - 1 : -1
+  }
+
+  function openKab(i: number) {
+    sel = { layer: 'kab', i }
+  }
+
+  // The selected kabupaten (clicked directly, or holding the selected
+  // kabar pin) gets darker dots + a solid outline; derived here so both
+  // base cache key and dossier share it.
   const selKabIdx = $derived.by(() => {
+    if (sel?.layer === 'kab') return sel.i
     if (sel?.layer !== 'kabar') return -1
     const nama = pins[sel.i]?.kab.nama
     if (!nama || !grid) return -1
@@ -345,7 +407,7 @@
 
     // top-most layer first; first hit within radius wins
     const groups: {
-      layer: NonNullable<Sel>['layer']
+      layer: LayerId | 'anchor'
       pts: [number, number][]
     }[] = []
     if (layerOn.kabar && live)
@@ -365,7 +427,7 @@
 
     for (const g of groups) {
       let best = -1
-      let bestD = 26 * 26
+      let bestD = 22 * 22
       g.pts.forEach(([x, y], i) => {
         const d = (x - mx) ** 2 + (y - my) ** 2
         if (d < bestD) {
@@ -379,6 +441,20 @@
             ? null
             : { layer: g.layer, i: best }
         return
+      }
+    }
+
+    // no marker hit: the kabupaten under the cursor opens its dossier
+    if (grid) {
+      const gx = Math.floor((mx - p.ox) / p.scale)
+      const gy = Math.floor((my - p.oy) / p.scale)
+      if (gx >= 0 && gy >= 0 && gx < COLS && gy < ROWS) {
+        const cell = grid.cells[gy * COLS + gx]!
+        if (cell) {
+          const i = cell - 1
+          sel = sel?.layer === 'kab' && sel.i === i ? null : { layer: 'kab', i }
+          return
+        }
       }
     }
     sel = null
@@ -442,7 +518,82 @@
   const curAnchor = $derived<Anchor | null>(
     sel?.layer === 'anchor' ? (ANCHORS[sel.i] ?? null) : null,
   )
+  const curKab = $derived(
+    sel?.layer === 'kab' && grid ? (grid.kabs[sel.i] ?? null) : null,
+  )
+
+  // The kabupaten a selected marker sits in, for the "open region card" hop.
+  const markerKab = $derived.by(() => {
+    if (!grid) return null
+    if (curKabar) {
+      const i = grid.kabs.findIndex((k) => k.nama === curKabar.kab.nama)
+      return i >= 0 ? { i, nama: curKabar.kab.nama } : null
+    }
+    const pt = curGempa ?? curCuaca ?? curBanjir ?? curApi ?? curUdara
+    if (!pt) return null
+    const i = kabAt(pt.lon, pt.lat)
+    return i >= 0 ? { i, nama: grid.kabs[i]!.nama } : null
+  })
+
+  const fmt = (n: number) => n.toLocaleString('id-ID')
+
+  // Kabupaten filing card: Kemendagri reference rows + live crosscuts
+  // computed from whatever layers have already answered.
+  const kabDossier = $derived.by(() => {
+    if (!curKab || sel?.layer !== 'kab') return null
+    const cellIdx = sel.i + 1
+    const inKab = (lon: number, lat: number) => {
+      const [fx, fy] = lonLatToCellF(lon, lat, COLS, ROWS)
+      const gx = Math.floor(fx)
+      const gy = Math.floor(fy)
+      if (gx < 0 || gy < 0 || gx >= COLS || gy >= ROWS) return false
+      return grid!.cells[gy * COLS + gx] === cellIdx
+    }
+    const w = wilayahByNama.get(curKab.nama) ?? null
+    let nKab = 0
+    let rankPop = 0
+    let kepadatan = 0
+    if (w) {
+      const sib = wilayahData.rows.filter((r) => r.prov === w.prov)
+      nKab = sib.length
+      rankPop = sib.filter((r) => r.pop > w.pop).length + 1
+      kepadatan = w.pop / w.luas
+    }
+    return {
+      w,
+      nKab,
+      rankPop,
+      kepadatan,
+      prov: PROV_NAMA[w?.prov ?? ''] ?? '',
+      gempaN:
+        status.gempa && status.gempa !== 'segera'
+          ? gempa.filter((g) => inKab(g.lon, g.lat)).length
+          : null,
+      cuacaDi: cuaca.find((pt) => inKab(pt.lon, pt.lat)) ?? null,
+      banjirN:
+        status.banjir && status.banjir !== 'segera'
+          ? banjir.filter((b) => inKab(b.lon, b.lat)).length
+          : null,
+      apiN:
+        status.api && status.api !== 'segera'
+          ? api.filter((a) => inKab(a.lon, a.lat)).length
+          : null,
+      kabarDi: pins.filter((pin) => pin.kab.nama === curKab.nama),
+      komunitas: directoryData.groups
+        .flatMap((g) => g.communities)
+        .filter((c) => 'region' in c && c.region === curKab.nama),
+      wajah: wajahData.entries.filter(
+        (e) => e.koordinat && inKab(e.koordinat[1]!, e.koordinat[0]!),
+      ),
+    }
+  })
+
+  function onkeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape' && sel) sel = null
+  }
 </script>
+
+<svelte:window {onkeydown} />
 
 <Board title="Peta Kabar" class="w-full">
   {#snippet action()}
@@ -453,163 +604,332 @@
     {/if}
   {/snippet}
 
-  <div class="lg:flex">
-    <div class="text-slate-800 dark:text-zinc-200 lg:flex-1 min-w-0">
-      <canvas
-        bind:this={el}
-        onclick={hit}
-        class="w-full h-64 sm:h-80 lg:h-[28rem] block cursor-pointer"
-        aria-label={$t('etnos.peta.aria')}
-      ></canvas>
+  <div class="relative text-slate-800 dark:text-zinc-200">
+    <canvas
+      bind:this={el}
+      onclick={hit}
+      class="w-full h-72 sm:h-96 lg:h-[30rem] block cursor-pointer"
+      aria-label={$t('etnos.peta.aria')}
+    ></canvas>
+
+    <!-- floating layer legend, top-right (detak's kb-legenda pattern) -->
+    <div class="absolute top-2 right-2 flex flex-col items-end gap-1.5 max-w-[46%]">
+      <button
+        type="button"
+        aria-expanded={legendaBuka}
+        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium bg-white dark:bg-zinc-900 border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 shadow-xs text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+        onclick={() => (legendaBuka = !legendaBuka)}
+      >
+        {#if sumberAktif.length}
+          <span class="w-1.5 h-1.5 rounded-full bg-primary-500 dot-live"></span>
+        {/if}
+        {$t('etnos.peta.lapisan')} · {LAYERS.filter((id) => layerOn[id]).length}
+      </button>
+      {#if legendaBuka}
+        <div
+          class="flex flex-col gap-1 rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 shadow-sm p-1.5 w-40"
+          role="group"
+          aria-label={$t('etnos.peta.layers_aria')}
+        >
+          {#each LAYERS as id (id)}
+            {@const st = status[id]}
+            <button
+              type="button"
+              aria-pressed={layerOn[id]}
+              class={[
+                'flex items-center gap-2 rounded-lg px-2 py-1 text-xs font-medium transition-colors text-left',
+                layerOn[id]
+                  ? 'bg-slate-200 dark:bg-zinc-700 text-slate-900 dark:text-zinc-100'
+                  : 'text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800',
+              ]}
+              onclick={() => toggle(id)}
+            >
+              {#if st === 'langsung'}
+                <span class="w-1.5 h-1.5 shrink-0 rounded-full bg-primary-500 dot-live"
+                ></span>
+              {:else if st === 'nihil'}
+                <span
+                  class="w-1.5 h-1.5 shrink-0 rounded-full bg-slate-400 dark:bg-zinc-500"
+                ></span>
+              {:else if st === 'segera'}
+                <span
+                  class="w-1.5 h-1.5 shrink-0 rounded-full border-[1.5px] border-dashed border-slate-400 dark:border-zinc-500"
+                ></span>
+              {:else}
+                <span class="w-1.5 h-1.5 shrink-0"></span>
+              {/if}
+              {$t(`etnos.peta.layers.${id}`)}
+            </button>
+          {/each}
+        </div>
+      {/if}
     </div>
 
-    <aside
-      class="lg:w-72 lg:shrink-0 lg:border-l border-slate-200/70 dark:border-zinc-800 flex flex-col"
-    >
-      <!-- layer legend: neutral toggle chips, status dots in DataChip grammar -->
+    <!-- floating dossier, top-left: fixed corner, never chases the click -->
+    {#if sel}
       <div
-        class="flex lg:flex-wrap gap-1.5 overflow-x-auto px-3 py-2 min-h-11 border-t lg:border-t-0 border-slate-200/70 dark:border-zinc-800"
-        role="group"
-        aria-label={$t('etnos.peta.layers_aria')}
+        class="absolute left-2 top-2 w-[min(19rem,calc(100%-1rem))] max-h-[calc(100%-1rem)] overflow-y-auto rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 shadow-sm p-3 flex flex-col gap-2"
       >
-        {#each LAYERS as id (id)}
-          {@const st = status[id]}
-          <button
-            type="button"
-            aria-pressed={layerOn[id]}
-            class={[
-              'shrink-0 inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors',
-              layerOn[id]
-                ? 'bg-slate-200 dark:bg-zinc-700 text-slate-900 dark:text-zinc-100'
-                : 'bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 hover:bg-slate-200 dark:hover:bg-zinc-700',
-            ]}
-            onclick={() => toggle(id)}
-          >
-            {#if st === 'langsung'}
-              <span class="w-1.5 h-1.5 rounded-full bg-primary-500 dot-live"
-              ></span>
-            {:else if st === 'nihil'}
-              <span
-                class="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-500"
-              ></span>
-            {:else if st === 'segera'}
-              <span
-                class="w-1.5 h-1.5 rounded-full border-[1.5px] border-dashed border-slate-400 dark:border-zinc-500"
-              ></span>
-            {/if}
-            {$t(`etnos.peta.layers.${id}`)}
-          </button>
-        {/each}
-      </div>
+        <button
+          type="button"
+          class="absolute top-2 right-2 p-1 rounded-lg text-slate-500 dark:text-zinc-400 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
+          aria-label={$t('etnos.peta.tutup')}
+          onclick={() => (sel = null)}
+        >
+          <Icon src={XMark} micro size="14" />
+        </button>
 
-      <div
-        class="px-4 py-3 border-t border-slate-200/70 dark:border-zinc-800 min-h-14 lg:flex-1"
-      >
-        {#if curKabar}
-          <div class="flex flex-col gap-1">
+        {#if curKab && kabDossier}
+          <div class="flex flex-col gap-0.5 pr-6">
+            <h3 class="text-sm font-semibold text-slate-900 dark:text-zinc-100">
+              {curKab.nama}
+            </h3>
+            {#if kabDossier.prov}
+              <p class="text-xs text-slate-500 dark:text-zinc-400">
+                {kabDossier.prov}
+              </p>
+            {/if}
+          </div>
+
+          {#if kabDossier.w}
+            <dl class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs">
+              <dt class="text-slate-500 dark:text-zinc-400">
+                {$t('etnos.peta.dossier.ibukota')}
+              </dt>
+              <dd class="text-slate-900 dark:text-zinc-100 text-right">
+                {kabDossier.w.ibukota}
+              </dd>
+              <dt class="text-slate-500 dark:text-zinc-400">
+                {$t('etnos.peta.dossier.penduduk')}
+              </dt>
+              <dd class="text-slate-900 dark:text-zinc-100 text-right tabular-nums">
+                {fmt(kabDossier.w.pop)}
+                <span class="text-slate-400 dark:text-zinc-500">
+                  · №{kabDossier.rankPop}/{kabDossier.nKab}
+                </span>
+              </dd>
+              <dt class="text-slate-500 dark:text-zinc-400">
+                {$t('etnos.peta.dossier.luas')}
+              </dt>
+              <dd class="text-slate-900 dark:text-zinc-100 text-right tabular-nums">
+                {fmt(Math.round(kabDossier.w.luas))} km²
+              </dd>
+              <dt class="text-slate-500 dark:text-zinc-400">
+                {$t('etnos.peta.dossier.kepadatan')}
+              </dt>
+              <dd class="text-slate-900 dark:text-zinc-100 text-right tabular-nums">
+                {kabDossier.kepadatan < 100
+                  ? kabDossier.kepadatan.toFixed(1)
+                  : fmt(Math.round(kabDossier.kepadatan))}/km²
+              </dd>
+            </dl>
+            <p class="text-[11px] leading-snug text-slate-400 dark:text-zinc-500">
+              {$t('etnos.peta.dossier.sumber_wilayah')}
+            </p>
+          {/if}
+
+          {#if kabDossier.gempaN !== null || kabDossier.cuacaDi || kabDossier.banjirN || kabDossier.apiN}
+            <div
+              class="flex flex-wrap gap-x-3 gap-y-0.5 text-xs border-t border-slate-100 dark:border-zinc-800 pt-2"
+            >
+              {#if kabDossier.gempaN !== null}
+                <span class="text-slate-600 dark:text-zinc-300 tabular-nums">
+                  {$t('etnos.peta.dossier.gempa24')}:
+                  <span class="font-semibold">{kabDossier.gempaN}</span>
+                </span>
+              {/if}
+              {#if kabDossier.cuacaDi}
+                <span class="text-slate-600 dark:text-zinc-300 tabular-nums">
+                  {kabDossier.cuacaDi.kota}
+                  <span class="font-semibold">{kabDossier.cuacaDi.t}°</span>
+                  {kabDossier.cuacaDi.langit}
+                </span>
+              {/if}
+              {#if kabDossier.banjirN}
+                <span class="text-slate-600 dark:text-zinc-300 tabular-nums">
+                  {$t('etnos.peta.layers.banjir')}:
+                  <span class="font-semibold">{kabDossier.banjirN}</span>
+                </span>
+              {/if}
+              {#if kabDossier.apiN}
+                <span class="text-slate-600 dark:text-zinc-300 tabular-nums">
+                  {$t('etnos.peta.layers.api')}:
+                  <span class="font-semibold">{kabDossier.apiN}</span>
+                </span>
+              {/if}
+            </div>
+          {/if}
+
+          {#if kabDossier.kabarDi.length}
+            <div
+              class="flex flex-col gap-1 border-t border-slate-100 dark:border-zinc-800 pt-2"
+            >
+              <p class="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
+                {$t('etnos.peta.dossier.kabar')}
+              </p>
+              {#each kabDossier.kabarDi.slice(0, 3) as pin (pin.kliping.id)}
+                <a
+                  href={klipingUrl(pin.kliping.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs text-slate-900 dark:text-zinc-100 hover:text-primary-600 dark:hover:text-primary-400 transition-colors line-clamp-2"
+                >
+                  {pin.kliping.utama.judul}
+                </a>
+              {/each}
+            </div>
+          {/if}
+
+          {#if kabDossier.komunitas.length}
+            <div
+              class="flex flex-col gap-1 border-t border-slate-100 dark:border-zinc-800 pt-2"
+            >
+              <p class="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
+                {$t('etnos.peta.dossier.komunitas')}
+                <span class="font-normal">· contoh</span>
+              </p>
+              <p class="text-xs text-slate-700 dark:text-zinc-300">
+                {kabDossier.komunitas.map((c) => c.name).join(' · ')}
+                <a
+                  href="/explore"
+                  class="ml-1 font-medium text-primary-600 dark:text-primary-400 hover:underline"
+                >
+                  Jelajah
+                </a>
+              </p>
+            </div>
+          {/if}
+
+          {#if kabDossier.wajah.length}
+            <div
+              class="flex flex-col gap-1 border-t border-slate-100 dark:border-zinc-800 pt-2"
+            >
+              <p class="text-[11px] font-medium text-slate-500 dark:text-zinc-400">
+                {$t('etnos.peta.dossier.wajah')}
+              </p>
+              <p class="text-xs text-slate-700 dark:text-zinc-300">
+                {#each kabDossier.wajah as e, i (e.id)}
+                  {#if i > 0}{' · '}{/if}
+                  <a
+                    href="/wiki"
+                    class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                  >
+                    {e.nama}
+                  </a>
+                {/each}
+              </p>
+            </div>
+          {/if}
+        {:else if curKabar}
+          <div class="flex flex-col gap-1 pr-6">
             <p
-              class="text-sm font-medium text-slate-900 dark:text-zinc-100 line-clamp-2"
+              class="text-sm font-medium text-slate-900 dark:text-zinc-100 line-clamp-3"
             >
               {curKabar.kliping.utama.judul}
             </p>
             <p class="text-xs text-slate-500 dark:text-zinc-400 tabular-nums">
               {curKabar.kab.nama} · {curKabar.kliping.n_media} media ·
               {curKabar.kliping.n_grup} grup pemilik
-              <a
-                href={klipingUrl(curKabar.kliping.id)}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="ml-2 inline-flex items-center gap-1 font-medium text-primary-600 dark:text-primary-400 hover:underline"
-              >
-                Buka kliping
-                <Icon src={ArrowTopRightOnSquare} micro size="12" />
-              </a>
             </p>
+            <a
+              href={klipingUrl(curKabar.kliping.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline"
+            >
+              Buka kliping
+              <Icon src={ArrowTopRightOnSquare} micro size="12" />
+            </a>
           </div>
         {:else if curGempa}
-          <p class="text-sm text-slate-900 dark:text-zinc-100">
-            <span class="font-semibold tabular-nums">M{curGempa.mag}</span>
-            · {curGempa.wilayah}
-          </p>
-          <p class="text-xs text-slate-500 dark:text-zinc-400 tabular-nums">
-            {curGempa.jam} · BMKG / USGS · langsung
-          </p>
+          <div class="flex flex-col gap-0.5 pr-6">
+            <p class="text-sm text-slate-900 dark:text-zinc-100">
+              <span class="font-semibold tabular-nums">M{curGempa.mag}</span>
+              · {curGempa.wilayah}
+            </p>
+            <p class="text-xs text-slate-500 dark:text-zinc-400 tabular-nums">
+              {curGempa.jam} · BMKG / USGS · langsung
+            </p>
+          </div>
         {:else if curCuaca}
-          <p class="text-sm text-slate-900 dark:text-zinc-100">
-            <span class="font-semibold">{curCuaca.kota}</span>
-            <span class="tabular-nums">{curCuaca.t}°</span> · {curCuaca.langit}
-          </p>
-          <p class="text-xs text-slate-500 dark:text-zinc-400">
-            Open-Meteo · langsung
-          </p>
+          <div class="flex flex-col gap-0.5 pr-6">
+            <p class="text-sm text-slate-900 dark:text-zinc-100">
+              <span class="font-semibold">{curCuaca.kota}</span>
+              <span class="tabular-nums">{curCuaca.t}°</span> · {curCuaca.langit}
+            </p>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">
+              Open-Meteo · langsung
+            </p>
+          </div>
         {:else if curBanjir}
-          <p class="text-sm text-slate-900 dark:text-zinc-100">
-            {curBanjir.nama}
-          </p>
-          <p class="text-xs text-slate-500 dark:text-zinc-400">
-            PetaBencana · langsung
-          </p>
+          <div class="flex flex-col gap-0.5 pr-6">
+            <p class="text-sm text-slate-900 dark:text-zinc-100">
+              {curBanjir.nama}
+            </p>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">
+              PetaBencana · langsung
+            </p>
+          </div>
         {:else if curApi}
-          <p class="text-sm text-slate-900 dark:text-zinc-100">
-            <span class="font-semibold tabular-nums">{curApi.frp} MW</span>
-            · {$t('etnos.peta.api_note')}
-          </p>
-          <p class="text-xs text-slate-500 dark:text-zinc-400">
-            NASA FIRMS · VIIRS · langsung
-          </p>
+          <div class="flex flex-col gap-0.5 pr-6">
+            <p class="text-sm text-slate-900 dark:text-zinc-100">
+              <span class="font-semibold tabular-nums">{curApi.frp} MW</span>
+              · {$t('etnos.peta.api_note')}
+            </p>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">
+              NASA FIRMS · VIIRS · langsung
+            </p>
+          </div>
         {:else if curUdara}
-          <p class="text-sm text-slate-900 dark:text-zinc-100">
-            <span class="font-semibold">{curUdara.nama}</span>
-            · PM2.5 <span class="tabular-nums">{curUdara.aqi}</span>
-          </p>
-          <p class="text-xs text-slate-500 dark:text-zinc-400">
-            WAQI · langsung
-          </p>
+          <div class="flex flex-col gap-0.5 pr-6">
+            <p class="text-sm text-slate-900 dark:text-zinc-100">
+              <span class="font-semibold">{curUdara.nama}</span>
+              · PM2.5 <span class="tabular-nums">{curUdara.aqi}</span>
+            </p>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">
+              WAQI · langsung
+            </p>
+          </div>
         {:else if curAnchor}
-          <p class="text-sm text-slate-700 dark:text-zinc-300">
+          <p class="text-sm text-slate-700 dark:text-zinc-300 pr-6">
             <span class="font-medium text-slate-900 dark:text-zinc-100"
               >{curAnchor.kota}</span
             >, {curAnchor.wilayah} · belum ada instance terpisah
           </p>
-        {:else}
-          <p class="text-xs text-slate-500 dark:text-zinc-400">
-            {$t('etnos.peta.identity')}
-            <a
-              href="/tentang"
-              class="font-medium text-primary-600 dark:text-primary-400 hover:underline"
-            >
-              {$t('etnos.peta.identity_link')}
-            </a>
-          </p>
+        {/if}
+
+        {#if sel.layer !== 'kab' && markerKab}
+          <button
+            type="button"
+            class="self-start text-xs font-medium text-primary-600 dark:text-primary-400 hover:underline"
+            onclick={() => openKab(markerKab.i)}
+          >
+            {$t('etnos.peta.lihat_kab')}: {markerKab.nama}
+          </button>
         {/if}
       </div>
-    </aside>
+    {/if}
   </div>
 
-  {#if live && layerOn.kabar}
-    <div
-      class="flex gap-1.5 overflow-x-auto px-3 py-2 border-t border-slate-200/70 dark:border-zinc-800"
-    >
-      {#each pins as pin, i (pin.kliping.id)}
-        <button
-          type="button"
-          class={[
-            'shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors',
-            sel?.layer === 'kabar' && sel.i === i
-              ? 'bg-primary-900 text-slate-25 dark:bg-primary-100 dark:text-zinc-950'
-              : 'bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700',
-          ]}
-          onclick={() =>
-            (sel =
-              sel?.layer === 'kabar' && sel.i === i
-                ? null
-                : { layer: 'kabar', i })}
-        >
-          {pin.kab.nama}
-        </button>
-      {/each}
-    </div>
-  {/if}
+  <!-- footer: identity line for first-time visitors + active-source credits -->
+  <div
+    class="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-2.5 border-t border-slate-200/70 dark:border-zinc-800 min-h-10"
+  >
+    <p class="text-xs text-slate-500 dark:text-zinc-400">
+      {$t('etnos.peta.identity')}
+      <a
+        href="/tentang"
+        class="font-medium text-primary-600 dark:text-primary-400 hover:underline"
+      >
+        {$t('etnos.peta.identity_link')}
+      </a>
+    </p>
+    {#if sumberAktif.length}
+      <p class="text-xs text-slate-400 dark:text-zinc-500 ml-auto tabular-nums">
+        {$t('etnos.peta.sumber_aktif')}: {sumberAktif.join(' · ')}
+      </p>
+    {/if}
+  </div>
 </Board>
 
 <style>

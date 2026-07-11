@@ -1,0 +1,345 @@
+{
+  "_meta": {
+    "sumber": "Kemendagri 2025 via repo publik cahyadsn/wilayah, subset Tanah Papua dari referensi detak-detik idn-wilayah.json",
+    "catatan": "pop = penduduk (jiwa), luas = km persegi. nama cocok 1:1 dengan properti nama di static/data/papua-kab.geojson.",
+    "diambil": "2026-07-12"
+  },
+  "rows": [
+    {
+      "kode": "9103",
+      "nama": "Jayapura",
+      "prov": "94",
+      "ibukota": "Sentani",
+      "pop": 203772,
+      "luas": 14081.9
+    },
+    {
+      "kode": "9105",
+      "nama": "Kepulauan Yapen",
+      "prov": "94",
+      "ibukota": "Serui",
+      "pop": 116214,
+      "luas": 2425.4
+    },
+    {
+      "kode": "9106",
+      "nama": "Biak Numfor",
+      "prov": "94",
+      "ibukota": "Biak",
+      "pop": 150318,
+      "luas": 2258.9
+    },
+    {
+      "kode": "9110",
+      "nama": "Sarmi",
+      "prov": "94",
+      "ibukota": "Sarmi",
+      "pop": 45084,
+      "luas": null
+    },
+    {
+      "kode": "9111",
+      "nama": "Keerom",
+      "prov": "94",
+      "ibukota": "Waris",
+      "pop": 74332,
+      "luas": 9526.3
+    },
+    {
+      "kode": "9115",
+      "nama": "Waropen",
+      "prov": "94",
+      "ibukota": "Botawa",
+      "pop": 38840,
+      "luas": 10781
+    },
+    {
+      "kode": "9119",
+      "nama": "Supiori",
+      "prov": "94",
+      "ibukota": "Sorendiweri",
+      "pop": 27965,
+      "luas": 660.7
+    },
+    {
+      "kode": "9120",
+      "nama": "Mamberamo Raya",
+      "prov": "94",
+      "ibukota": "Burmeso",
+      "pop": 41036,
+      "luas": null
+    },
+    {
+      "kode": "9171",
+      "nama": "Kota Jayapura",
+      "prov": "94",
+      "ibukota": "Jayapura",
+      "pop": 404799,
+      "luas": 835.4
+    },
+    {
+      "kode": "9202",
+      "nama": "Manokwari",
+      "prov": "91",
+      "ibukota": "Manokwari",
+      "pop": 205212,
+      "luas": 2764.2
+    },
+    {
+      "kode": "9203",
+      "nama": "Fak Fak",
+      "prov": "91",
+      "ibukota": "Fakfak",
+      "pop": 93997,
+      "luas": 9735
+    },
+    {
+      "kode": "9206",
+      "nama": "Teluk Bintuni",
+      "prov": "91",
+      "ibukota": "Bintuni",
+      "pop": 84205,
+      "luas": 84205
+    },
+    {
+      "kode": "9207",
+      "nama": "Teluk Wondama",
+      "prov": "91",
+      "ibukota": "Rasiei",
+      "pop": 47494,
+      "luas": 4848
+    },
+    {
+      "kode": "9208",
+      "nama": "Kaimana",
+      "prov": "91",
+      "ibukota": "Kaimana",
+      "pop": 64938,
+      "luas": 17878.9
+    },
+    {
+      "kode": "9211",
+      "nama": "Manokwari Selatan",
+      "prov": "91",
+      "ibukota": "Ransiki",
+      "pop": 39026,
+      "luas": 39026
+    },
+    {
+      "kode": "9212",
+      "nama": "Pegunungan Arfak",
+      "prov": "91",
+      "ibukota": "Anggi",
+      "pop": 41383,
+      "luas": 3298.8
+    },
+    {
+      "kode": "9301",
+      "nama": "Merauke",
+      "prov": "95",
+      "ibukota": "Merauke",
+      "pop": 255168,
+      "luas": 45016.5
+    },
+    {
+      "kode": "9302",
+      "nama": "Boven Digoel",
+      "prov": "95",
+      "ibukota": "Tanah Merah",
+      "pop": 71997,
+      "luas": 23558.3
+    },
+    {
+      "kode": "9303",
+      "nama": "Mappi",
+      "prov": "95",
+      "ibukota": "Kepi",
+      "pop": 114153,
+      "luas": 24265.6
+    },
+    {
+      "kode": "9304",
+      "nama": "Asmat",
+      "prov": "95",
+      "ibukota": "Agats",
+      "pop": 120902,
+      "luas": 25018.7
+    },
+    {
+      "kode": "9401",
+      "nama": "Nabire",
+      "prov": "96",
+      "ibukota": "Nabire",
+      "pop": 179174,
+      "luas": 11802
+    },
+    {
+      "kode": "9402",
+      "nama": "Puncak Jaya",
+      "prov": "96",
+      "ibukota": "Mulia",
+      "pop": 220393,
+      "luas": 5986.2
+    },
+    {
+      "kode": "9403",
+      "nama": "Paniai",
+      "prov": "96",
+      "ibukota": "Enarotali",
+      "pop": 125763,
+      "luas": 5306.9
+    },
+    {
+      "kode": "9404",
+      "nama": "Mimika",
+      "prov": "96",
+      "ibukota": "Timika",
+      "pop": 318679,
+      "luas": 18309.7
+    },
+    {
+      "kode": "9405",
+      "nama": "Puncak",
+      "prov": "96",
+      "ibukota": "Ilaga",
+      "pop": 178072,
+      "luas": 7701
+    },
+    {
+      "kode": "9406",
+      "nama": "Dogiyai",
+      "prov": "96",
+      "ibukota": "Kigamani",
+      "pop": 116706,
+      "luas": 3792.9
+    },
+    {
+      "kode": "9407",
+      "nama": "Intan Jaya",
+      "prov": "96",
+      "ibukota": "Sugapa",
+      "pop": 137696,
+      "luas": 5334.4
+    },
+    {
+      "kode": "9408",
+      "nama": "Deiyai",
+      "prov": "96",
+      "ibukota": "Tigi",
+      "pop": 92629,
+      "luas": 2846.4
+    },
+    {
+      "kode": "9501",
+      "nama": "Jayawijaya",
+      "prov": "97",
+      "ibukota": "Wamena",
+      "pop": 276288,
+      "luas": 2629
+    },
+    {
+      "kode": "9502",
+      "nama": "Pegunungan Bintang",
+      "prov": "97",
+      "ibukota": "Oksibil",
+      "pop": 114581,
+      "luas": 13751.9
+    },
+    {
+      "kode": "9503",
+      "nama": "Yahukimo",
+      "prov": "97",
+      "ibukota": "Sumohai",
+      "pop": 356021,
+      "luas": 16365.9
+    },
+    {
+      "kode": "9504",
+      "nama": "Tolikara",
+      "prov": "97",
+      "ibukota": "Karubaga",
+      "pop": 252031,
+      "luas": 4285.3
+    },
+    {
+      "kode": "9505",
+      "nama": "Mamberamo Tengah",
+      "prov": "97",
+      "ibukota": "Kobakma",
+      "pop": 50128,
+      "luas": 4101.5
+    },
+    {
+      "kode": "9506",
+      "nama": "Yalimo",
+      "prov": "97",
+      "ibukota": "Elelim",
+      "pop": 105374,
+      "luas": 3148.3
+    },
+    {
+      "kode": "9507",
+      "nama": "Lanny Jaya",
+      "prov": "97",
+      "ibukota": "Tiom",
+      "pop": 203922,
+      "luas": 2339.8
+    },
+    {
+      "kode": "9508",
+      "nama": "Nduga",
+      "prov": "97",
+      "ibukota": "Kenyam",
+      "pop": 112173,
+      "luas": 5886.9
+    },
+    {
+      "kode": "9601",
+      "nama": "Sorong",
+      "prov": "92",
+      "ibukota": "Aimas",
+      "pop": 129669,
+      "luas": 7565
+    },
+    {
+      "kode": "9602",
+      "nama": "Sorong Selatan",
+      "prov": "92",
+      "ibukota": "Teminabuan",
+      "pop": 56979,
+      "luas": 6559.6
+    },
+    {
+      "kode": "9603",
+      "nama": "Raja Ampat",
+      "prov": "92",
+      "ibukota": "Waisai",
+      "pop": 72865,
+      "luas": 7425.2
+    },
+    {
+      "kode": "9604",
+      "nama": "Tambrauw",
+      "prov": "92",
+      "ibukota": "Fef",
+      "pop": 31041,
+      "luas": 11961.7
+    },
+    {
+      "kode": "9605",
+      "nama": "Maybrat",
+      "prov": "92",
+      "ibukota": "Kumurkek",
+      "pop": 46604,
+      "luas": 5385.7
+    },
+    {
+      "kode": "9671",
+      "nama": "Kota Sorong",
+      "prov": "92",
+      "ibukota": "Sorong",
+      "pop": 286028,
+      "luas": 205.8
+    }
+  ]
+}

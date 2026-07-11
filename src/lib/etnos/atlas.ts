@@ -55,8 +55,14 @@ function rasterize(
   off.height = rows
   const ctx = off.getContext('2d', { willReadFrequently: true })
   if (!ctx) throw new Error('ctx')
+  // One coverage pass PER FEATURE, reading only the alpha channel.
+  // (A single indexed-color pass corrupts edge cells: anti-aliased
+  // pixels premultiply, and getImageData un-premultiplies the index
+  // into a neighboring kabupaten's value. Alpha is exact.)
+  const cells = new Uint8Array(cols * rows)
   features.forEach((f, i) => {
-    ctx.fillStyle = `rgb(${i + 1},0,0)`
+    ctx.clearRect(0, 0, cols, rows)
+    ctx.fillStyle = '#fff'
     const polys = (
       f.geometry.type === 'Polygon'
         ? [f.geometry.coordinates]
@@ -75,11 +81,11 @@ function rasterize(
       }
     }
     ctx.fill('evenodd')
+    const px = ctx.getImageData(0, 0, cols, rows).data
+    // low threshold keeps small islands and makes coastal taps forgiving
+    for (let j = 0; j < cells.length; j++)
+      if (px[j * 4 + 3]! >= 32) cells[j] = i + 1
   })
-  const px = ctx.getImageData(0, 0, cols, rows).data
-  const cells = new Uint8Array(cols * rows)
-  for (let i = 0; i < cells.length; i++)
-    cells[i] = px[i * 4 + 3]! > 0 ? px[i * 4]! : 0
   return { cols, rows, cells, kabs: features.map((f) => f.properties) }
 }
 

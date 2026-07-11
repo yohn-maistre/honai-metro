@@ -96,6 +96,51 @@ export function loadAtlasGrid(cols = 120, rows = 104): Promise<AtlasGrid> {
   return p
 }
 
+export type BoundaryPaths = { paths: Path2D[]; kabs: KabInfo[] }
+
+const boundaryCache = new Map<string, Promise<BoundaryPaths>>()
+
+/** One Path2D per kabupaten in grid-cell coordinates (same transform as
+ *  the raster), for stroking the cadastral lines over the dot fill.
+ *  Consumers scale the context to the plate, then stroke. */
+export function loadBoundaryPaths(
+  cols = 120,
+  rows = 104,
+): Promise<BoundaryPaths> {
+  const key = `${cols}x${rows}`
+  let p = boundaryCache.get(key)
+  if (!p) {
+    p = loadGeo().then((features) => ({
+      kabs: features.map((f) => f.properties),
+      paths: features.map((f) => {
+        const path = new Path2D()
+        const polys = (
+          f.geometry.type === 'Polygon'
+            ? [f.geometry.coordinates]
+            : f.geometry.coordinates
+        ) as number[][][][]
+        for (const poly of polys) {
+          for (const ring of poly) {
+            ring.forEach((pt, k) => {
+              const x = ((pt[0]! - LON0) / (LON1 - LON0)) * cols
+              const y = ((LAT0 - pt[1]!) / (LAT0 - LAT1)) * rows
+              if (k === 0) path.moveTo(x, y)
+              else path.lineTo(x, y)
+            })
+            path.closePath()
+          }
+        }
+        return path
+      }),
+    }))
+    p.catch(() => {
+      boundaryCache.delete(key)
+    })
+    boundaryCache.set(key, p)
+  }
+  return p
+}
+
 /** lon/lat to fractional cell coordinates on a grid. */
 export function lonLatToCellF(
   lon: number,

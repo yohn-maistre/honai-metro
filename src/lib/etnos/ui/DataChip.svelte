@@ -2,11 +2,12 @@
   // Data provenance, one voice everywhere: a dot and a word, no pill.
   // 'langsung' pulses terracotta (fetched from a real source right now),
   // 'contoh' is a hollow dot (sample data, honestly labeled),
-  // 'segera' is an outline dot in waiting (announced, not yet live).
+  // 'segera' is an outline dot in waiting (announced, not yet live),
+  // 'nihil' is a solid muted dot (the source answered: zero points today).
   import { t } from '$lib/app/i18n'
 
   interface Props {
-    state: 'langsung' | 'contoh' | 'segera'
+    state: 'langsung' | 'contoh' | 'segera' | 'nihil'
     label?: string
     class?: string
   }
@@ -27,6 +28,8 @@
 >
   {#if state === 'langsung'}
     <span class="w-1.5 h-1.5 rounded-full bg-primary-500 chip-live"></span>
+  {:else if state === 'nihil'}
+    <span class="w-1.5 h-1.5 rounded-full bg-slate-400 dark:bg-zinc-500"></span>
   {:else if state === 'contoh'}
     <span
       class="w-1.5 h-1.5 rounded-full border-[1.5px] border-slate-400 dark:border-zinc-500"

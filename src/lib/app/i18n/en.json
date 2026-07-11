@@ -1035,7 +1035,33 @@
             "contoh": "Sample data",
             "contoh_title": "Sample data, not yet connected to a real source",
             "segera": "Coming soon",
-            "segera_title": "In preparation, not yet available"
+            "segera_title": "In preparation, not yet available",
+            "nihil": "None today",
+            "nihil_title": "The source answered: zero points right now"
+        },
+        "peta": {
+            "kabar_live": "Live news",
+            "aria": "Map of Tanah Papua with live data layers",
+            "layers_aria": "Map data layers",
+            "layers": {
+                "kabar": "News",
+                "gempa": "Quakes",
+                "cuaca": "Weather",
+                "banjir": "Floods",
+                "api": "Fires",
+                "udara": "Air"
+            },
+            "identity": "ETNOS is the federated public square of Tanah Papua: forums, a wiki, and open civic data. Tap a marker to inspect it.",
+            "identity_link": "About ETNOS",
+            "api_note": "satellite thermal anomaly, not necessarily a fire"
+        },
+        "papan": {
+            "berita_src": "External press",
+            "rows": {
+                "berita": "News",
+                "forum": "Forum",
+                "komunitas": "Community"
+            }
         },
         "onboarding": {
             "title": "Welcome to ETNOS",

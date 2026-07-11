@@ -917,7 +917,33 @@
             "contoh": "Data contoh",
             "contoh_title": "Data contoh, belum tersambung ke sumber nyata",
             "segera": "Segera hadir",
-            "segera_title": "Sedang disiapkan, belum tersedia"
+            "segera_title": "Sedang disiapkan, belum tersedia",
+            "nihil": "Nihil hari ini",
+            "nihil_title": "Sumber menjawab: belum ada titik saat ini"
+        },
+        "peta": {
+            "kabar_live": "Kabar langsung",
+            "aria": "Peta Tanah Papua dengan lapisan data langsung",
+            "layers_aria": "Lapisan data peta",
+            "layers": {
+                "kabar": "Kabar",
+                "gempa": "Gempa",
+                "cuaca": "Cuaca",
+                "banjir": "Banjir",
+                "api": "Titik api",
+                "udara": "Udara"
+            },
+            "identity": "ETNOS adalah ruang publik berfederasi Tanah Papua: forum, wiki, dan data publik terbuka. Ketuk penanda untuk menyorotnya.",
+            "identity_link": "Tentang ETNOS",
+            "api_note": "anomali termal satelit, belum tentu kebakaran"
+        },
+        "papan": {
+            "berita_src": "Pers luar",
+            "rows": {
+                "berita": "Berita",
+                "forum": "Forum",
+                "komunitas": "Komunitas"
+            }
         },
         "onboarding": {
             "title": "Selamat datang di ETNOS",

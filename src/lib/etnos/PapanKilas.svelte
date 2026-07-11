@@ -1,49 +1,48 @@
 <script lang="ts">
   /**
-   * Papan Kilas: a split-flap board with four rows (Berita / Forum /
-   * Komunitas / Kata), each flipping through its own pool one at a time
-   * on a calm clock. Per-row half-fold flip only, never per-character,
-   * to stay light on budget phones. Day-clock seeded so every reader
-   * sees the same board on the same day. Berita rows are external press
-   * (labeled until the detak feed is live); Forum rows are real posts.
+   * Papan Kilas: a Solari split-flap board, three rows (Berita / Forum /
+   * Komunitas), each flipping through its own pool on a calm clock. The
+   * text line is divided into equal cells that fold in a staggered
+   * left-to-right sweep: per-CELL half-fold, never per-character, so the
+   * board reads like a real departure board while staying cheap on budget
+   * phones. Day-clock seeded so every reader sees the same board on the
+   * same day. Berita rows are external press (contoh-labeled until the
+   * detak feed is live); Forum rows are real posts.
    */
   import { env } from '$env/dynamic/public'
+  import { t } from '$lib/app/i18n'
   import directory from '$lib/etnos/data/directory.json'
   import { fetchHotPosts } from '$lib/etnos/hot'
   import { fetchKilas, KILAS_CONTOH } from '$lib/etnos/kilas-data'
   import { daySeed, rngFrom } from '$lib/etnos/seed'
-  import kata from '$lib/etnos/wiki/kata-hari-ini.json'
   import { postLink } from '$lib/feature/post/helpers'
+  import { DataChip } from './ui'
 
   interface Flap {
-    tag: string
     teks: string
     sub: string
     href?: string
     external?: boolean
   }
 
+  const SEGS = 6
+  const FLIP_MS = 320
+  const STAGGER_MS = 45
+  const TICK_MS = 6000
+
   const komunitasPool: Flap[] = directory.groups.flatMap((g) =>
     g.communities.map((c) => ({
-      tag: 'Komunitas',
       teks: c.name,
       sub: c.subtitle ?? g.category,
       href: `/c/${c.slug}`,
     })),
   )
 
-  const kataPool: Flap[] = kata.words.map((w) => ({
-    tag: 'Kata',
-    teks: `${w.word}: ${w.meaning}`,
-    sub: `${w.language} · ${w.region}`,
-    href: '/wiki',
-  }))
-
+  let beritaLive = $state(false)
   let beritaPool = $state<Flap[]>(
     KILAS_CONTOH.map((k) => ({
-      tag: 'Berita',
       teks: k.teks,
-      sub: `${k.src} · contoh`,
+      sub: k.src,
       href: k.url,
       external: true,
     })),
@@ -54,58 +53,80 @@
   $effect(() => {
     fetchHotPosts().then((posts) => {
       forumPool = posts.slice(0, 6).map((p) => ({
-        tag: 'Forum',
         teks: p.post.name,
         sub: `${p.community.title} · ▲${p.counts.score}`,
         href: postLink(p.post),
       }))
     })
     fetchKilas(env.PUBLIC_DETAK_URL as string | undefined).then((kilas) => {
-      if (kilas)
+      if (kilas) {
+        beritaLive = true
         beritaPool = kilas.map((k) => ({
-          tag: 'Berita',
           teks: k.teks,
-          sub: `${k.src} · langsung`,
+          sub: k.src,
           href: k.url,
           external: true,
         }))
+      }
     })
   })
 
+  type Row = { key: 'berita' | 'forum' | 'komunitas'; pool: Flap[] }
   // Empty pools drop their row instead of flipping blanks.
-  let pools = $derived(
-    [beritaPool, forumPool, komunitasPool, kataPool].filter((p) => p.length),
+  let rows = $derived(
+    (
+      [
+        { key: 'berita', pool: beritaPool },
+        { key: 'forum', pool: forumPool },
+        { key: 'komunitas', pool: komunitasPool },
+      ] as Row[]
+    ).filter((r) => r.pool.length),
   )
 
   // Day-seeded starting positions so the board is the same for everyone today.
   const rng = rngFrom(daySeed('papan-kilas'))
-  const seedOffsets = Array.from({ length: 4 }, () => rng())
+  const seedOffsets = Array.from({ length: 3 }, () => rng())
 
-  let indices = $state([0, 0, 0, 0])
-  let flipping = $state([false, false, false, false])
+  let indices = $state([0, 0, 0])
+  let flipping = $state([false, false, false])
   let cursor = 0
 
   $effect(() => {
-    indices = pools.map((p, i) => Math.floor(seedOffsets[i] * p.length))
+    indices = rows.map((r, i) => Math.floor(seedOffsets[i]! * r.pool.length))
   })
 
-  const FLIP_MS = 320
-  const TICK_MS = 6000
+  const SWAP_AT = FLIP_MS / 2 + ((SEGS - 1) * STAGGER_MS) / 2
+  const DONE_AT = FLIP_MS + (SEGS - 1) * STAGGER_MS
 
   $effect(() => {
-    if (pools.length === 0) return
+    if (rows.length === 0) return
     const timer = setInterval(() => {
-      const row = cursor % pools.length
+      const row = cursor % rows.length
       cursor++
-      if (pools[row].length < 2) return
+      if (rows[row]!.pool.length < 2) return
       flipping[row] = true
       setTimeout(() => {
-        indices[row] = (indices[row] + 1) % pools[row].length
-      }, FLIP_MS / 2)
+        indices[row] = (indices[row]! + 1) % rows[row]!.pool.length
+      }, SWAP_AT)
       setTimeout(() => {
         flipping[row] = false
-      }, FLIP_MS)
+      }, DONE_AT)
     }, TICK_MS)
+    return () => clearInterval(timer)
+  })
+
+  // Papua wall clock, refreshed on a slow tick.
+  function witNow() {
+    return (
+      new Date(Date.now() + 9 * 3600_000)
+        .toISOString()
+        .slice(11, 16)
+        .replace(':', '.') + ' WIT'
+    )
+  }
+  let wit = $state(witNow())
+  $effect(() => {
+    const timer = setInterval(() => (wit = witNow()), 30_000)
     return () => clearInterval(timer)
   })
 </script>
@@ -117,27 +138,41 @@
     class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 dark:border-zinc-800"
   >
     <h2 class="font-semibold dark:text-white">Papan Kilas</h2>
-    <span class="text-xs text-slate-400 dark:text-zinc-500">
-      berganti tiap hari
-    </span>
+    <div class="flex items-center gap-3">
+      <DataChip
+        state={beritaLive ? 'langsung' : 'contoh'}
+        label={$t('etnos.papan.berita_src')}
+      />
+      <span
+        class="text-xs text-slate-400 dark:text-zinc-500 tabular-nums whitespace-nowrap"
+      >
+        {wit}
+      </span>
+    </div>
   </div>
-  <div class="flex flex-col px-2 sm:px-3 py-1">
-    {#each pools as pool, i (pool[0]?.tag)}
-      {@const item = pool[Math.min(indices[i] ?? 0, pool.length - 1)]}
-      <div class="row" class:flap={flipping[i]}>
-        <span class="tag">{item.tag}</span>
-        {#if item.href}
-          <a
-            class="teks truncate"
-            href={item.href}
-            target={item.external ? '_blank' : undefined}
-            rel={item.external ? 'noopener' : undefined}
-          >
-            {item.teks}
-          </a>
-        {:else}
-          <span class="teks truncate">{item.teks}</span>
-        {/if}
+
+  <div class="flex flex-col px-2 sm:px-3 py-1.5">
+    {#each rows as row, i (row.key)}
+      {@const item = row.pool[Math.min(indices[i] ?? 0, row.pool.length - 1)]!}
+      <div class="row">
+        <span class="tag">{$t(`etnos.papan.rows.${row.key}`)}</span>
+        <svelte:element
+          this={item.href ? 'a' : 'span'}
+          class="flapline"
+          href={item.href}
+          target={item.external ? '_blank' : undefined}
+          rel={item.external ? 'noopener' : undefined}
+        >
+          {#each Array(SEGS) as _, j (j)}
+            <span
+              class="cell"
+              class:flip={flipping[i]}
+              style="--j:{j}"
+            >
+              <span class="clip">{item.teks}</span>
+            </span>
+          {/each}
+        </svelte:element>
         <span class="sub hidden sm:inline">{item.sub}</span>
       </div>
     {/each}
@@ -146,16 +181,14 @@
 
 <style>
   .papan {
-    perspective: 600px;
+    perspective: 700px;
   }
   .row {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 12px;
-    padding: 9px 8px;
+    padding: 7px 8px;
     border-bottom: 1px solid rgb(0 0 0 / 0.06);
-    transform-origin: center top;
-    backface-visibility: hidden;
   }
   :global(.dark) .row {
     border-bottom-color: rgb(255 255 255 / 0.06);
@@ -163,8 +196,79 @@
   .row:last-child {
     border-bottom: none;
   }
-  .row.flap {
+  .tag {
+    width: 84px;
+    flex: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-primary-600);
+  }
+  .flapline {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    text-decoration: none;
+    color: inherit;
+    /* right-edge fade so the last cell truncates softly */
+    mask-image: linear-gradient(to right, black 92%, transparent);
+  }
+  a.flapline:hover .clip {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--color-primary-500);
+  }
+  .cell {
+    flex: 1 1 0;
+    min-width: 0;
+    position: relative;
+    overflow: hidden;
+    height: 28px;
+    border-right: 1px solid rgb(0 0 0 / 0.07);
+    background: rgb(0 0 0 / 0.025);
+    transform-origin: center top;
+    backface-visibility: hidden;
+  }
+  .cell:first-child {
+    border-radius: 4px 0 0 4px;
+  }
+  .cell:last-child {
+    border-right: none;
+    border-radius: 0 4px 4px 0;
+  }
+  :global(.dark) .cell {
+    border-right-color: rgb(255 255 255 / 0.07);
+    background: rgb(255 255 255 / 0.03);
+  }
+  /* the split-flap midline every real board carries */
+  .cell::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;
+    background: rgb(0 0 0 / 0.05);
+    pointer-events: none;
+  }
+  :global(.dark) .cell::after {
+    background: rgb(255 255 255 / 0.05);
+  }
+  .clip {
+    position: absolute;
+    top: 0;
+    line-height: 28px;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    padding-left: 8px;
+    /* each cell shows the next slice of one continuous string:
+       -100% here is a cell width, cells are equal flex columns */
+    left: calc(var(--j) * -100%);
+  }
+  .cell.flip {
     animation: flap 0.32s cubic-bezier(0.7, 0, 0.3, 1);
+    animation-delay: calc(var(--j) * 45ms);
   }
   @keyframes flap {
     0% {
@@ -180,38 +284,20 @@
       transform: rotateX(0);
     }
   }
-  .tag {
-    width: 84px;
-    flex: none;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--color-primary-600);
-  }
-  .teks {
-    font-size: 14px;
-    font-weight: 500;
-    color: inherit;
-    text-decoration: none;
-    flex: 1;
-    min-width: 0;
-  }
-  a.teks:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-color: var(--color-primary-500);
-  }
   .sub {
     flex: none;
+    max-width: 30%;
     font-size: 11px;
     color: var(--color-slate-500);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   :global(.dark) .sub {
     color: var(--color-zinc-500);
   }
   @media (prefers-reduced-motion: reduce) {
-    .row.flap {
+    .cell.flip {
       animation: none;
     }
   }

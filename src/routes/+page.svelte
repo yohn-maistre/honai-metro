@@ -31,10 +31,6 @@
       ? VirtualFeed
       : PostFeed,
   )
-
-  // Deck: both boards side by side on large screens, tabbed on phones so
-  // the feed stays one swipe away.
-  let deckTab = $state<'peta' | 'papan'>('peta')
 </script>
 
 <svelte:head>
@@ -45,68 +41,41 @@
   </title>
 </svelte:head>
 
-<KilasTicker />
-
 <Header pageHeader>
   {$t('routes.frontpage.title')}
-  {#snippet extended()}
-    <form class="contents" method="get" action={page.url.pathname}>
-      <div class="flex flex-row gap-2 max-w-full flex-wrap">
-        <Location
-          name="type"
-          navigate
-          bind:selected={data.filters.value.type_!}
-        />
-        <Sort
-          placement="bottom"
-          name="sort"
-          navigate
-          bind:selected={data.filters.value.sort!}
-        />
-        <ViewSelect placement="bottom" />
-
-        <noscript>
-          <Button class="self-end h-8.5 aspect-square" size="custom" submit>
-            <Icon src={ArrowRight} size="16" micro />
-          </Button>
-        </noscript>
-      </div>
-    </form>
-  {/snippet}
 </Header>
 
-<div class="flex flex-col gap-2 mb-4">
-  <div
-    class="lg:hidden flex w-fit rounded-full bg-slate-100 dark:bg-zinc-900 p-1 gap-1"
-    role="tablist"
-    aria-label="Pilih papan"
-  >
-    {#each [['peta', 'Peta Kabar'], ['papan', 'Papan Kilas']] as [id, label] (id)}
-      <button
-        type="button"
-        role="tab"
-        aria-selected={deckTab === id}
-        class={[
-          'px-3 py-1 rounded-full text-xs font-medium transition-colors',
-          deckTab === id
-            ? 'bg-white dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 shadow-2xs'
-            : 'text-slate-600 dark:text-zinc-400',
-        ]}
-        onclick={() => (deckTab = id as 'peta' | 'papan')}
-      >
-        {label}
-      </button>
-    {/each}
-  </div>
+<div class="flex flex-col gap-4 mb-4">
+  <KilasTicker />
+  <PetaKabar />
+  <PapanKilas />
 
-  <div class="grid lg:grid-cols-5 gap-4 items-start">
-    <div class={['lg:col-span-3', deckTab !== 'peta' && 'max-lg:hidden']}>
-      <PetaKabar />
+  <form
+    class="contents"
+    method="get"
+    action={page.url.pathname}
+  >
+    <div class="flex flex-row gap-2 max-w-full flex-wrap justify-end">
+      <Location
+        name="type"
+        navigate
+        bind:selected={data.filters.value.type_!}
+      />
+      <Sort
+        placement="bottom"
+        name="sort"
+        navigate
+        bind:selected={data.filters.value.sort!}
+      />
+      <ViewSelect placement="bottom" />
+
+      <noscript>
+        <Button class="self-end h-8.5 aspect-square" size="custom" submit>
+          <Icon src={ArrowRight} size="16" micro />
+        </Button>
+      </noscript>
     </div>
-    <div class={['lg:col-span-2', deckTab !== 'papan' && 'max-lg:hidden']}>
-      <PapanKilas />
-    </div>
-  </div>
+  </form>
 </div>
 
 {#await data.feed.value}

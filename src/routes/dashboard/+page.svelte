@@ -19,8 +19,30 @@
   } from 'svelte-hero-icons/dist'
 
   import { getCached, loadLive, type LiveStats } from '$lib/etnos/live'
+  import { fetchGempa } from '$lib/etnos/layers'
+  import { Bolt } from 'svelte-hero-icons/dist'
 
   let { data } = $props()
+
+  // Gempa 24 jam Papua: the same BMKG/USGS fetcher (and SWR cache) as the
+  // front-page map, one fact one owner. null = feed unreachable, tile hidden.
+  let gempa24 = $state<number | null>(null)
+  $effect(() => {
+    fetchGempa().then((r) => {
+      if (r !== null) gempa24 = r.length
+    })
+  })
+
+  const JUMP = [
+    ['forum', 'Forum'],
+    ['pendidikan', 'Pendidikan'],
+    ['ekonomi', 'Ekonomi'],
+    ['infrastruktur', 'Infrastruktur'],
+    ['kualitas-hidup', 'Kualitas hidup'],
+    ['otsus', 'OTSUS'],
+    ['agen', 'Agen AI'],
+    ['sumber', 'Sumber'],
+  ] as const
 
   // ETNOS: Papan Data Tanah Papua.
   // Live row from the PieFed backend (only what the API really answers,
@@ -87,9 +109,27 @@
     lede="Angka hidup dari forum ini dan data publik provinsi. Satu angka, satu sumber."
   />
 
+  <!-- jump-nav: plain anchors, sticky so long boards stay navigable -->
+  <nav
+    class="sticky top-0 z-10 -mx-1 px-1 py-2 bg-slate-25 dark:bg-zinc-925 flex gap-1.5 overflow-x-auto"
+    aria-label="Bagian papan data"
+  >
+    {#each JUMP as [id, label] (id)}
+      <a
+        href="#{id}"
+        class="shrink-0 rounded-full px-3 py-1 text-xs font-medium bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700 no-underline transition-colors"
+      >
+        {label}
+      </a>
+    {/each}
+  </nav>
+
   <!-- Live row: only what the backend really answers; anything the API
        can't confirm falls back to its contoh tile, honestly labeled. -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+  <div
+    id="forum"
+    class="scroll-mt-16 grid grid-cols-2 lg:grid-cols-5 gap-3"
+  >
     {#if liveUsers != null}
       <StatCard
         label="Pengguna Terdaftar"
@@ -148,6 +188,17 @@
       color="text-slate-400 dark:text-zinc-500"
       demo
     />
+    {#if gempa24 != null}
+      <a href="/" class="no-underline" title="Lihat di Peta Kabar">
+        <StatCard
+          label="Gempa 24 Jam Papua"
+          value={gempa24}
+          icon={Bolt}
+          color="text-primary-500"
+          live
+        />
+      </a>
+    {/if}
   </div>
 
   <!-- Provincial data sections -->
@@ -194,19 +245,28 @@
   {/snippet}
 
   <div class="grid grid-cols-1 gap-3">
-    {@render section(data.sections.pendidikan, AcademicCap)}
-    {@render section(data.sections.ekonomi, Banknotes)}
-    {@render section(data.sections.infrastruktur, BuildingOffice2)}
-    {@render section(data.sections.kualitasHidup, UserGroup)}
+    <div id="pendidikan" class="scroll-mt-16">
+      {@render section(data.sections.pendidikan, AcademicCap)}
+    </div>
+    <div id="ekonomi" class="scroll-mt-16">
+      {@render section(data.sections.ekonomi, Banknotes)}
+    </div>
+    <div id="infrastruktur" class="scroll-mt-16">
+      {@render section(data.sections.infrastruktur, BuildingOffice2)}
+    </div>
+    <div id="kualitas-hidup" class="scroll-mt-16">
+      {@render section(data.sections.kualitasHidup, UserGroup)}
+    </div>
   </div>
 
   <!-- OTSUS tracker -->
   <EndPlaceholder size="sm">{$t('etnos.dashboard.otsus')}</EndPlaceholder>
   <Material
+    id="otsus"
     color="default"
     rounding="2xl"
     padding="lg"
-    class="flex flex-col gap-4"
+    class="flex flex-col gap-4 scroll-mt-16"
   >
     <div class="flex items-start gap-3">
       <IconTile icon={Banknotes} size="md" />
@@ -250,10 +310,11 @@
   <!-- Agen AI (placeholder until real nodes report in) -->
   <EndPlaceholder size="sm">Agen AI</EndPlaceholder>
   <Material
+    id="agen"
     color="default"
     rounding="2xl"
     padding="lg"
-    class="flex items-start gap-3"
+    class="flex items-start gap-3 scroll-mt-16"
   >
     <IconTile icon={CpuChip} size="md" />
     <div class="flex flex-col gap-1 min-w-0">
@@ -271,10 +332,11 @@
   <!-- Sumber: every number on this board and where it comes from -->
   <EndPlaceholder size="sm">Sumber</EndPlaceholder>
   <Material
+    id="sumber"
     color="default"
     rounding="2xl"
     padding="lg"
-    class="flex flex-col gap-3"
+    class="flex flex-col gap-3 scroll-mt-16"
   >
     <h3 class="font-semibold dark:text-white">Satu angka, satu sumber</h3>
     <dl
@@ -291,6 +353,17 @@
           <DataChip state="langsung" />
         </dd>
       </div>
+      {#if gempa24 != null}
+        <div class="flex justify-between items-center gap-4 py-2">
+          <dt class="text-slate-600 dark:text-zinc-400">Gempa 24 jam Papua</dt>
+          <dd
+            class="text-right font-medium dark:text-zinc-200 flex items-center gap-2"
+          >
+            BMKG + USGS
+            <DataChip state="langsung" />
+          </dd>
+        </div>
+      {/if}
       <div class="flex justify-between items-center gap-4 py-2">
         <dt class="text-slate-600 dark:text-zinc-400">
           Pendidikan, ekonomi, infrastruktur, kualitas hidup

@@ -46,6 +46,13 @@
   let areaD = $derived(
     `${pathD} L ${xPos(data.length - 1)} ${PADDING.top + innerH} L ${xPos(0)} ${PADDING.top + innerH} Z`,
   )
+
+  // integer-friendly, localized axis labels; thin x labels on dense series
+  const fmtY = (v: number) =>
+    Number.isInteger(Math.round(v * 10) / 10)
+      ? Math.round(v).toLocaleString('id-ID')
+      : v.toFixed(1)
+  let xStep = $derived(data.length > 8 ? 2 : 1)
 </script>
 
 <div class="flex flex-col gap-2 w-full">
@@ -62,7 +69,7 @@
     role="img"
     aria-label={title ?? 'Tren data'}
   >
-    <!-- horizontal gridlines -->
+    <!-- horizontal gridlines; the baseline is solid, the rest dashed -->
     {#each [0, 0.25, 0.5, 0.75, 1] as g (g)}
       {@const y = PADDING.top + innerH * (1 - g)}
       <line
@@ -71,8 +78,8 @@
         y1={y}
         y2={y}
         stroke="currentColor"
-        stroke-opacity="0.1"
-        stroke-dasharray="2 4"
+        stroke-opacity={g === 0 ? 0.25 : 0.1}
+        stroke-dasharray={g === 0 ? undefined : '2 4'}
       />
     {/each}
     <!-- y-axis labels -->
@@ -86,20 +93,22 @@
         font-size="10"
         class="fill-slate-500 dark:fill-zinc-500 tabular-nums"
       >
-        {v.toFixed(1)}
+        {fmtY(v)}
       </text>
     {/each}
-    <!-- x-axis labels -->
+    <!-- x-axis labels, thinned when the series is dense -->
     {#each data as p, i (p.x)}
-      <text
-        x={xPos(i)}
-        y={height - PADDING.bottom + 16}
-        text-anchor="middle"
-        font-size="10"
-        class="fill-slate-500 dark:fill-zinc-500"
-      >
-        {p.x}
-      </text>
+      {#if i % xStep === 0 || i === data.length - 1}
+        <text
+          x={xPos(i)}
+          y={height - PADDING.bottom + 16}
+          text-anchor="middle"
+          font-size="10"
+          class="fill-slate-500 dark:fill-zinc-500"
+        >
+          {p.x}
+        </text>
+      {/if}
     {/each}
     <!-- area under curve -->
     <path d={areaD} fill={color} fill-opacity="0.12" />

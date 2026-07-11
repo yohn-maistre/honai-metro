@@ -28,6 +28,31 @@
     tkdn: { label: 'TKDN', color: 'yellow-subtle' },
   }
 
+  // Trust tiers for MACHINE actors (spec etnos/04): strictly earned by
+  // attestation and verified work, never by payment; humans carry no tiers.
+  const TIERS = [
+    {
+      tier: 'T0',
+      nama: 'Tanpa atestasi',
+      desc: 'Perangkat tanpa rantai atestasi tidak dapat menjadi aktor agen. Tidak ada yang bisa dipercaya, jadi tidak ada yang tampil.',
+    },
+    {
+      tier: 'T1',
+      nama: 'Teratestasi perangkat',
+      desc: 'Rantai secure element terverifikasi. Boleh tercantum di registry dan memposting di ruang institusinya sendiri.',
+    },
+    {
+      tier: 'T2',
+      nama: 'Institusi terverifikasi',
+      desc: 'T1 ditambah verifikasi dokumen institusi oleh operator instance atau dewan. Boleh ikut Transaksi Sipil lintas simpul; kedua ujung wajib minimal T2.',
+    },
+    {
+      tier: 'T3',
+      nama: 'Rekam jejak',
+      desc: 'T2 ditambah minimal satu transaksi lintas simpul yang selesai dan terverifikasi. Permintaan rutin dalam templat yang disepakati diproses tanpa triase manual.',
+    },
+  ]
+
   const byCategory = $derived(
     data.registry.tools.reduce(
       (acc, t) => {
@@ -114,6 +139,49 @@
       </Material>
     </div>
   </Material>
+
+  <!-- Trust tiers: how machine actors earn capability, never bought -->
+  <section class="flex flex-col gap-4">
+    <div class="flex items-center gap-2 flex-wrap">
+      <h2 class="text-lg font-semibold dark:text-white">
+        Tingkat kepercayaan agen
+      </h2>
+      <DataChip state="segera" />
+    </div>
+    <p class="text-sm text-slate-600 dark:text-zinc-400 max-w-prose">
+      Tingkat berlaku untuk mesin, bukan manusia: manusia tidak pernah membawa
+      tingkat atau skor. Tingkat hanya bisa diperoleh lewat atestasi dan kerja
+      terverifikasi, tidak pernah dibeli, dan hanya bisa turun jika syaratnya
+      hilang.
+    </p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      {#each TIERS as t2, i (t2.tier)}
+        <Material
+          color="default"
+          rounding="2xl"
+          padding="lg"
+          class="flex flex-col gap-2"
+        >
+          <div class="flex items-center gap-2">
+            <span
+              class={[
+                'w-9 h-9 rounded-xl grid place-items-center text-sm font-bold tabular-nums',
+                i === 0
+                  ? 'bg-slate-100 dark:bg-zinc-800 text-slate-400 dark:text-zinc-500'
+                  : 'bg-slate-100 dark:bg-zinc-800 text-primary-600 dark:text-primary-400',
+              ]}
+            >
+              {t2.tier}
+            </span>
+            <h3 class="text-sm font-semibold dark:text-white">{t2.nama}</h3>
+          </div>
+          <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
+            {t2.desc}
+          </p>
+        </Material>
+      {/each}
+    </div>
+  </section>
 
   <!-- Open MCP registry -->
   <section id="registry" class="flex flex-col gap-4">

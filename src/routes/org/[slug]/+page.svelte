@@ -6,10 +6,13 @@
    * sample data until a real organization claims one.
    */
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
+  import { bukaSekarang, type Jam } from '$lib/etnos/org'
   import { BackLink, DataChip } from '$lib/etnos/ui'
   import { Material, Note } from 'mono-svelte'
 
   let { data } = $props()
+
+  const open = $derived(bukaSekarang(data.org.jam as Jam | null))
 </script>
 
 <svelte:head>
@@ -28,7 +31,7 @@
     <DataChip state="contoh" />
   </header>
 
-  <CapabilityCard agent={data.org} />
+  <CapabilityCard agent={data.org} {open} />
 
   <Material
     color="default"
@@ -48,6 +51,11 @@
       <dt class="text-slate-500 dark:text-zinc-500">Jam layanan</dt>
       <dd class="text-slate-700 dark:text-zinc-300 text-right">
         {data.org.hours}
+        {#if open !== null}
+          <span class="text-slate-500 dark:text-zinc-500">
+            · {open ? 'buka' : 'tutup'} sekarang (menurut jam tercantum)
+          </span>
+        {/if}
       </dd>
       <dt class="text-slate-500 dark:text-zinc-500">Bahasa</dt>
       <dd class="text-slate-700 dark:text-zinc-300 text-right">

@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Direktori organisasi Level 0 (spec etnos/09, spektrum aktor bertahap): kehadiran tercantum saja, tanpa agen, tanpa login. Setiap entri di sini adalah data contoh sampai organisasi yang sebenarnya mengklaim halamannya.",
+    "description": "Direktori organisasi Level 0 (spec etnos/09, spektrum aktor bertahap): kehadiran tercantum saja, tanpa agen, tanpa login. Setiap entri di sini adalah data contoh sampai organisasi yang sebenarnya mengklaim halamannya. Field jam adalah kembaran terstruktur dari hours (hari = rentang hari ISO 1-7) untuk hitungan buka-sekarang; null berarti tidak dihitung.",
     "demo": true
   },
   "orgs": [
@@ -10,6 +10,7 @@
       "name": "Kantor Distrik Nabire (Contoh)",
       "kind": "org",
       "actorType": "Organisasi · Level 0",
+      "jenis": "pemerintahan",
       "status": "kontak-wa",
       "jurisdiction": "Distrik Nabire (contoh)",
       "services": [
@@ -19,6 +20,7 @@
       ],
       "languages": ["Indonesia"],
       "hours": "Senin-Jumat 08.00-14.00 WIT",
+      "jam": { "hari": [1, 5], "buka": "08:00", "tutup": "14:00" },
       "wa": null,
       "profile": "Halaman contoh untuk kantor distrik: profil, layanan, dan jam buka dicantumkan tanpa perlu akun. Data di halaman ini contoh, kantor sebenarnya dapat mengklaim dan memperbarui halamannya."
     },
@@ -28,6 +30,7 @@
       "name": "Puskesmas Kampung (Contoh)",
       "kind": "org",
       "actorType": "Organisasi · Level 0",
+      "jenis": "kesehatan",
       "status": "luring",
       "jurisdiction": "Kampung contoh, pesisir Nabire",
       "services": [
@@ -37,6 +40,7 @@
       ],
       "languages": ["Indonesia", "Melayu Papua"],
       "hours": "Senin-Sabtu 08.00-13.00 WIT",
+      "jam": { "hari": [1, 6], "buka": "08:00", "tutup": "13:00" },
       "wa": null,
       "profile": "Halaman contoh untuk puskesmas: warga bisa melihat layanan dan jam buka bahkan ketika puskesmas belum punya kehadiran digital sendiri."
     },
@@ -46,6 +50,7 @@
       "name": "Sekretariat Dewan Adat (Contoh)",
       "kind": "org",
       "actorType": "Organisasi · Level 0",
+      "jenis": "adat",
       "status": "kontak-wa",
       "jurisdiction": "Wilayah adat contoh",
       "services": [
@@ -55,8 +60,109 @@
       ],
       "languages": ["Indonesia", "bahasa daerah setempat"],
       "hours": "Sesuai musyawarah",
+      "jam": null,
       "wa": null,
       "profile": "Halaman contoh untuk lembaga adat: kehadiran Level 0 menghormati cara kerja lembaga tanpa memaksa pola kantor, jam buka boleh 'sesuai musyawarah'."
+    },
+    {
+      "slug": "sd-negeri-contoh",
+      "id": "org-sd-contoh",
+      "name": "SD Negeri Kampung (Contoh)",
+      "kind": "org",
+      "actorType": "Organisasi · Level 0",
+      "jenis": "pendidikan",
+      "status": "luring",
+      "jurisdiction": "Kampung contoh, Distrik Nabire",
+      "services": [
+        "Pendaftaran murid baru",
+        "Informasi jadwal dan libur sekolah",
+        "Surat keterangan siswa"
+      ],
+      "languages": ["Indonesia", "Melayu Papua"],
+      "hours": "Senin-Sabtu 07.00-13.00 WIT",
+      "jam": { "hari": [1, 6], "buka": "07:00", "tutup": "13:00" },
+      "wa": null,
+      "profile": "Halaman contoh untuk sekolah dasar: orang tua dapat melihat jadwal pendaftaran dan kontak sekolah tanpa harus datang dua kali."
+    },
+    {
+      "slug": "koperasi-kampung-contoh",
+      "id": "org-koperasi-contoh",
+      "name": "Koperasi Serba Usaha Kampung (Contoh)",
+      "kind": "org",
+      "actorType": "Organisasi · Level 0",
+      "jenis": "ekonomi",
+      "status": "kontak-wa",
+      "jurisdiction": "Kampung contoh, pesisir Nabire",
+      "services": [
+        "Simpan pinjam anggota",
+        "Penjualan hasil kebun dan laut",
+        "Pengadaan barang kebutuhan kampung"
+      ],
+      "languages": ["Indonesia", "Melayu Papua"],
+      "hours": "Senin-Jumat 09.00-15.00 WIT",
+      "jam": { "hari": [1, 5], "buka": "09:00", "tutup": "15:00" },
+      "wa": null,
+      "profile": "Halaman contoh untuk koperasi kampung: daftar layanan dan jam buka membantu anggota dan calon anggota tahu kapan pengurus bisa ditemui."
+    },
+    {
+      "slug": "pkk-kampung-contoh",
+      "id": "org-pkk-contoh",
+      "name": "PKK Kampung (Contoh)",
+      "kind": "org",
+      "actorType": "Organisasi · Level 0",
+      "jenis": "masyarakat",
+      "status": "kontak-wa",
+      "jurisdiction": "Kampung contoh, Distrik Nabire",
+      "services": [
+        "Kegiatan posyandu bersama puskesmas",
+        "Pelatihan keterampilan keluarga",
+        "Arisan dan simpanan ibu-ibu"
+      ],
+      "languages": ["Indonesia", "Melayu Papua"],
+      "hours": "Sesuai jadwal kegiatan",
+      "jam": null,
+      "wa": null,
+      "profile": "Halaman contoh untuk penggerak PKK: kegiatan berkala tercantum terbuka sehingga warga tahu kapan dan di mana ikut serta."
+    },
+    {
+      "slug": "klasis-gereja-contoh",
+      "id": "org-klasis-contoh",
+      "name": "Kantor Klasis (Contoh)",
+      "kind": "org",
+      "actorType": "Organisasi · Level 0",
+      "jenis": "masyarakat",
+      "status": "kontak-wa",
+      "jurisdiction": "Wilayah pelayanan contoh",
+      "services": [
+        "Surat keterangan jemaat",
+        "Koordinasi pelayanan antar jemaat",
+        "Informasi kegiatan sosial gereja"
+      ],
+      "languages": ["Indonesia", "bahasa daerah setempat"],
+      "hours": "Senin-Jumat 08.00-14.00 WIT",
+      "jam": { "hari": [1, 5], "buka": "08:00", "tutup": "14:00" },
+      "wa": null,
+      "profile": "Halaman contoh untuk kantor klasis: lembaga gereja adalah simpul layanan sosial yang nyata di banyak kampung, dan kehadiran Level 0 mencatatnya apa adanya."
+    },
+    {
+      "slug": "bumkam-contoh",
+      "id": "org-bumkam-contoh",
+      "name": "BUMKam Kampung (Contoh)",
+      "kind": "org",
+      "actorType": "Organisasi · Level 0",
+      "jenis": "ekonomi",
+      "status": "luring",
+      "jurisdiction": "Kampung contoh, Distrik Nabire",
+      "services": [
+        "Unit usaha air bersih",
+        "Sewa alat pertanian",
+        "Kios sembako kampung"
+      ],
+      "languages": ["Indonesia", "Melayu Papua"],
+      "hours": "Senin-Sabtu 08.00-16.00 WIT",
+      "jam": { "hari": [1, 6], "buka": "08:00", "tutup": "16:00" },
+      "wa": null,
+      "profile": "Halaman contoh untuk badan usaha milik kampung: unit usaha dan jam layanan tercantum supaya laporan dan keluhan warga punya alamat yang jelas."
     }
   ]
 }

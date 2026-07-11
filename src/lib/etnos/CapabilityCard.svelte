@@ -22,9 +22,11 @@
 
   interface Props {
     agent: Capability
+    /** computed buka-sekarang from stated hours; null/undefined renders nothing */
+    open?: boolean | null
   }
 
-  let { agent }: Props = $props()
+  let { agent, open = null }: Props = $props()
 
   const statusMeta: Record<string, { dot: string; label: string }> = {
     aktif: { dot: 'bg-green-500', label: 'Aktif' },
@@ -66,6 +68,19 @@
           ></span>
           {statusMeta[agent.status]?.label ?? agent.status}
         </span>
+        {#if open !== null}
+          <span
+            class="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-zinc-400"
+            title="Dihitung dari jam yang tercantum"
+          >
+            <span
+              class="w-2 h-2 rounded-full {open
+                ? 'bg-green-500'
+                : 'bg-zinc-400'}"
+            ></span>
+            {open ? 'buka sekarang' : 'tutup sekarang'}
+          </span>
+        {/if}
       </div>
     </div>
   </div>

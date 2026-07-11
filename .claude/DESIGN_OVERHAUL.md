@@ -216,3 +216,116 @@ no colored pill backgrounds (dots carry status).
 - Per-category wiki hues experiment; island paintings footer.
 - PapanKilas spotlight row could take curated highlights if wanted
   (sorotan.json data was deleted; directory.json spotlight remains).
+
+---
+
+# REVAMP WAVE (2026-07-11) — live deck + civic suite [EXECUTION STATE]
+
+Supersedes MIDAS SWEEP as current design truth. Yose brief (laptop session,
+15 screenshots): map to the top full-width "snatched from detak-detik with
+all the real time data stuff", Papan Kilas full-width real flipboard (KATA
+dropped), jelajah/wiki/papan-data/musrenbang/org/agen/tentang all fleshed
+out. Decisions taken with Yose: map IS the home banner (no image banner),
+FULL detak layer set, /tentang kept + redesigned, wiki = curated + live
+Wikipedia. Filter row (Lokasi/Urutkan/Tampilan) moved to sit right-aligned
+directly above the posts (his note). Plan file:
+~/.claude/plans/hey-broski-let-s-pick-drifting-hare.md
+
+## Shipped (each CI green + deployed)
+
+- **W1 deck** (0a2c52da): PetaKabar = full-width hero, lg two-column
+  (canvas left h-64/80/28rem, side panel right: legend chips + detail).
+  New src/lib/etnos/layers.ts: typed fetchers w/ SWR localStorage
+  (etnos.layers.*.v1), Papua bbox clip, contract null=segera / []=nihil /
+  points=langsung, NO fake points ever. Layers: KABAR (existing pins),
+  GEMPA (BMKG gempaterkini + USGS 2.5_day, proximity-dedupe, WIT times,
+  120s interval, default ON), CUACA (Open-Meteo multi-point at 6 anchors,
+  default ON), BANJIR (PetaBencana, OFF), TITIK API + UDARA (detak worker
+  /geo/kebakaran + /geo/udara via PUBLIC_DETAK_URL, OFF, segera until env).
+  atlas.ts gained loadBoundaryPaths() (Path2D per kab, cached); dashed
+  kabupaten stitch drawn over dots, selected kab solid terracotta. Static
+  base (dots+boundaries) cached offscreen, markers drawn per frame.
+  DataChip gained 4th state `nihil` (solid muted dot). PapanKilas rewritten
+  as Solari board: 3 rows (Berita/Forum/Komunitas, KATA killed), SEGS=6
+  equal overflow-hidden cells each holding the full string at
+  left:-j*100%, per-cell rotateX half-fold with 45ms stagger sweep, WIT
+  clock in header, day-seed kept. Home order: Header h1 -> ticker ->
+  PetaKabar -> PapanKilas -> filter row (justify-end) -> feed; deckTab
+  killed. BUG FOUND+FIXED: KilasTicker had been rendered ABOVE Header
+  pageHeader whose -mt-64 pt-64 band painted over it — the ticker was
+  invisible in prod since P5a; now lives below the header.
+- **W2 jelajah** (dcc70813): PetaSimpul.svelte (anchors as node rings +
+  per-province community counts via geojson prov codes 91=PB 92=PBD 94=PA
+  95=PS 96=PT 97=PP, west-east dashed network line, kab-with-community
+  denser dots); directory.json communities gained optional region (exact
+  geojson nama, only where subtitle already stated it); explore page:
+  stats strip (39 komunitas / 9 kategori / 9 bahasa, derived), client
+  search + category filter chips, honest empty state.
+- **W3 wiki** (pushed same day): wajah.json = 13 entries, EVERY ONE
+  live-verified 2026-07-11 (id.wikipedia REST 200 + Commons imageinfo
+  extmetadata license CC/PD + attribution copied exactly; Suku Ekagi/Tifa/
+  Kasuari gelambir-tunggal dropped as 404; Cenderawasih image dropped as
+  unattributable -> gambar null; Arnold Ap has no image -> locator).
+  WajahTanah.svelte: 12h slot floor(now/43200000)%n over id-sorted
+  entries, live REST fetch may only LENGTHEN the reviewed extract (cap 900
+  chars word boundary), langsung chip when live else "arsip redaksi",
+  Commons caption "nama, atribusi (lisensi), via Wikimedia Commons",
+  mini locator plate (60x52 grid + seal ring). Wiki index: WajahTanah ->
+  SejarahHariIni + KataHariIni Board cards (TTS kept) -> categories.
+  WikiCarousel deleted.
+- **W4 papan data** (29158875702 run): sticky pill jump-nav (#forum
+  #pendidikan #ekonomi #infrastruktur #kualitas-hidup #otsus #agen
+  #sumber, scroll-mt-16); Gempa 24 Jam Papua live tile reusing
+  fetchGempa() (same SWR cache as map, one fact one owner, links to /);
+  live row lg:grid-cols-5; BarChart scale ticks 25/50/75 + "skala 0
+  sampai X" label; LineChart solid baseline, id-ID ints, thinned x labels
+  >8 pts; Sumber gained BMKG+USGS row.
+- **W5 musrenbang**: "Apa yang terjadi dengan usulan saya" explainer;
+  stepper with connector hairlines (stage 1 terracotta only); composer
+  untouched (same crosspost handoff); "Usulan di forum" Board via new
+  musrenbang.ts (MUSRENBANG_COMMUNITY: string|null = null — Yose names
+  the slug when a community exists; until then honest empty state + link
+  /search?q=%5BUSULAN%5D); panduan cards x3 (jadwal = contoh chip). No
+  voting UI, no consensus meters, ever.
+- **W6 org+agen** (29159234425 run): orgs.json 3 -> 8 contoh entries
+  (distrik, puskesmas, dewan adat, SD, koperasi, PKK, klasis, BUMKam) w/
+  jenis enum + structured jam {hari:[a,b],buka,tutup}|null; org.ts
+  bukaSekarang() = WIT wall-clock (+9h getUTC*), null jam renders
+  nothing; /org: jenis filter chips, buka/tutup-sekarang dot on cards
+  ("menurut jam tercantum"), tangga kehadiran Level 0/1/2 card, klaim CTA
+  -> /tentang#klaim; CapabilityCard gained optional open prop
+  (behavior-identical when absent); /agen: T0-T3 trust tier cards
+  (wording from abstraksi specs/etnos/04 table, "tingkat untuk mesin,
+  bukan manusia").
+- **W7 tentang+sweep** (this commit): /tentang markdown wall -> cards
+  with anchors #apa #isi #keanggotaan #federasi #agen-register
+  #aksara-onboarding #protocols #consent #klaim #dibangun #lisensi (the
+  /agen standards links finally resolve); i18n parity 126/126/126 etnos.*
+  keys (was 94); banned-string audit clean (0 em dashes, no Simulasi, no
+  maplibre imports, no uppercase-tracking); docs updated.
+
+## Needs-from-Yose (refreshed)
+
+1. PUBLIC_DETAK_URL repo Variable (unchanged ask): now flips KILAS +
+   kabar pins + TITIK API + UDARA layers. Gempa/cuaca/banjir are langsung
+   WITHOUT it since W1.
+2. Musrenbang community: create/designate a community slug, then set
+   MUSRENBANG_COMMUNITY in src/lib/etnos/musrenbang.ts.
+3. Screenshot review: / (deck w/ layers, light+dark, 360px), /explore,
+   /wiki (Wajah feature), /dashboard, /musrenbang, /org, /agen, /tentang.
+4. Approve wajah.json entry list (13 entries, all verified) and the 8
+   contoh org entries' wording.
+5. Standing: repo-root implementation_plan.md / walkthrough-1.md call;
+   maplibre package.json removal (lockfile regen fine on this laptop now
+   — bun 1.3.14 installed via npm/Volta).
+
+## Notes for the next seat
+
+- This laptop: bun installed globally via npm (Volta shim). Local
+  builds ~20-45s. Dev server + playwright-core (msedge channel)
+  screenshot loop in scratchpad works well for visual verification.
+- Wikipedia REST rate-limits: space requests >=3s (429 otherwise).
+- svelte-check has 3 PRE-EXISTING errors (ErrorContainer, StatCard
+  ts-expect, agen Capability union) — not gated by CI, untouched.
+- Feed "No posts" on dev with Lokal+Aktif filter is pre-existing
+  (verified against stashed baseline), not a deck regression.

@@ -11,10 +11,10 @@ cite sources; never invent cultural facts.
 
 ## Read next, in order
 
-1. `.claude/DESIGN_OVERHAUL.md` — the **MIDAS SWEEP** section (2026-07-10)
-   at the bottom is the CURRENT design truth: what shipped, the card-skin
-   standard, needs-from-Yose ledger, banked items. Earlier sections are
-   history (superseded but kept for context).
+1. `.claude/DESIGN_OVERHAUL.md` — the **REVAMP WAVE** section (2026-07-11)
+   at the bottom is the CURRENT design truth: what shipped, needs-from-Yose
+   ledger, notes for the next seat. The MIDAS SWEEP section above it holds
+   the card-skin standard (still binding). Earlier sections are history.
 2. `docs/CODEBASE_GROUNDTRUTH.md` — architecture ground truth.
 3. `docs/etnos/` + `docs/aksara/` — specs and the Aksara framing.
 4. If the `~/workspace/abstraksi` repo exists on this machine, read its
@@ -59,29 +59,42 @@ Hard rules, all learned the expensive way:
   (kills FOUC; SPA, SSR off). **Keep the two in sync.**
 - i18n: every `etnos.*` key must exist in **all three** of
   `src/lib/app/i18n/{en,id,pmy}.json` (pmy = Papuan Malay: "deng", "sa",
-  "ko", simpler grammar). Parity was 94/94/94 as of 2026-07-10.
+  "ko", simpler grammar). Parity was 126/126/126 as of 2026-07-11.
 
 ## The deck and the detak-detik integration
 
-`/` (Beranda) is the flagship for guests and members alike: KILAS ticker →
-sort header → deck (**PetaKabar** map + **PapanKilas** split-flap; tabbed
-on mobile) → feed. No guest redirect.
+`/` (Beranda) is the flagship for guests and members alike: h1 header →
+KILAS ticker → **PetaKabar** full-width live-map hero → **PapanKilas**
+Solari board → filter row (Lokasi/Urutkan/Tampilan, right-aligned) → feed.
+No guest redirect. (The ticker must stay BELOW the header: `Header
+pageHeader`'s -mt-64/pt-64 band paints over anything above it.)
 
 **PetaKabar** (`src/lib/etnos/PetaKabar.svelte`) is a canvas dot-grid
-plate of Tanah Papua — no MapLibre, no tiles, no network beyond
-`static/data/papua-kab.geojson` (42 kabupaten, centroids precomputed).
-The engine (`src/lib/etnos/atlas.ts`) is a port of detak-detik's
-`atlas-dots.ts`: polygons rasterized once to a byte grid offscreen.
+plate of Tanah Papua — no MapLibre, no tiles. Dashed kabupaten boundary
+lines ride over the dots (`loadBoundaryPaths` in `atlas.ts`, Path2D per
+kab). Six data layers with legend toggle chips, all through
+`src/lib/etnos/layers.ts` (SWR localStorage, Papua-bbox clip, contract:
+null=segera, []=nihil, points=langsung, **no fake points ever**):
+KABAR (detak /edisi pins via `kabar.ts`, gazetteer match, deep-links
+`detak-detik.pages.dev/#/kliping/{id}`), GEMPA (BMKG+USGS keyless, 120s,
+default ON), CUACA (Open-Meteo at the 6 anchors, default ON), BANJIR
+(PetaBencana keyless, OFF), TITIK API + UDARA (detak worker
+`/geo/kebakaran` + `/geo/udara`, need `PUBLIC_DETAK_URL`, OFF). The static
+base (dots+boundaries) is cached offscreen; DataChip has a 4th state
+`nihil` (source answered, zero points).
 
-The news layer (`src/lib/etnos/kabar.ts`): fetches
-`{PUBLIC_DETAK_URL}/edisi` (detak-detik's Cloudflare Worker, CORS `*`,
-refreshed 04:32/16:32 WIB), gazetteer-matches cluster headlines against
-kabupaten names from the same GeoJSON (aliases like wamena→Jayawijaya;
-bare "puncak" blocklisted as ambiguous), and deep-links to
-`https://detak-detik.pages.dev/#/kliping/{id}`. Clusters carry **no geo
-field** upstream; the match is honest best-effort over headline text.
-Without `PUBLIC_DETAK_URL`, the map falls back to six anchor cities and
-the ticker to a baked sample — both labeled contoh, no fake data ever.
+**PapanKilas** = 3-row Solari split-flap (Berita/Forum/Komunitas; KATA
+retired, kata-hari-ini.json is wiki-only): each row is 6 equal
+overflow-hidden cells holding the full string at `left:-j*100%`, per-CELL
+rotateX half-fold with 45ms stagger (never per-character), WIT clock,
+day-seeded.
+
+Other maps, one engine three dresses: **PetaSimpul** on /explore (anchor
+node rings + per-province directory counts), mini locator plates in
+**WajahTanah** (wiki). Wiki's Wajah Tanah Papua = `wiki/wajah.json`, 13
+entries each live-verified against id.wikipedia + Commons licensing
+(NEVER add entries without the same verification; unattributable image =
+gambar null), 12h deterministic rotation, live extract may only lengthen.
 
 ## Deploy ritual (non-negotiable)
 
@@ -111,16 +124,19 @@ Local dev: `bun install`, copy `.env.example` → `.env`, `bun run dev`.
 - `implementation_plan.md` + `walkthrough-1.md` at repo root: provenance
   unclear, owner hasn't decided keep-or-delete. Ask before touching.
 
-## Needs-from-Yose (as of 2026-07-10)
+## Needs-from-Yose (as of 2026-07-11)
 
 1. Set repo Variable **`PUBLIC_DETAK_URL`** in honai-metro = the
    detak-detik worker origin (value lives in detak-detik's repo Variable
-   `AKSARA_URL`, not in its code). Next deploy flips Peta Kabar + KILAS
-   from contoh to langsung.
-2. Phone screenshots of /, /wiki, /wiki/sejarah, /dashboard, /agen at
-   360px (light + dark) + first-visit onboarding tap-through (clear
-   localStorage `etnos_onboarded_v1` or use incognito).
-3. Keep-or-delete call on repo-root implementation_plan.md /
+   `AKSARA_URL`, not in its code). Flips KILAS + kabar pins + titik api +
+   udara to langsung; gempa/cuaca/banjir are langsung WITHOUT it.
+2. Musrenbang community: designate a slug, set `MUSRENBANG_COMMUNITY` in
+   `src/lib/etnos/musrenbang.ts` (null = honest empty state).
+3. Screenshot review of /, /explore, /wiki, /dashboard, /musrenbang,
+   /org, /agen, /tentang (light + dark, 360px) + onboarding tap-through
+   (clear localStorage `etnos_onboarded_v1` or incognito).
+4. Approve wajah.json entries (13, all verified) + the 8 contoh orgs.
+5. Keep-or-delete call on repo-root implementation_plan.md /
    walkthrough-1.md.
 
 ## Banked (will come back)

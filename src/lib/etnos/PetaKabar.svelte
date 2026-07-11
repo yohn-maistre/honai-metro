@@ -19,8 +19,10 @@
     loadAtlasGrid,
     loadBoundaryPaths,
     lonLatToCellF,
+    plateColors,
     type AtlasGrid,
     type BoundaryPaths,
+    type PlateColors,
   } from './atlas'
   import { loadKliping, matchPins, klipingUrl, type KabarPin } from './kabar'
   import {
@@ -114,14 +116,10 @@
     if (!layerOn[id] && sel?.layer === id) sel = null
   }
 
-  function colors() {
-    if (!el) return { ink: '#15130e', accent: '#c0633e', muted: '#5a5345' }
-    const css = getComputedStyle(el)
-    return {
-      ink: css.color,
-      accent: css.getPropertyValue('--color-primary-500').trim() || '#c0633e',
-      muted: css.getPropertyValue('--color-slate-500').trim() || '#6f6757',
-    }
+  function colors(): PlateColors {
+    if (!el)
+      return { dark: false, ink: '#15130e', accent: '#c0633e', muted: '#5a5345' }
+    return plateColors(el)
   }
 
   function plate() {
@@ -152,11 +150,7 @@
   let base: HTMLCanvasElement | null = null
   let baseKey = ''
 
-  function ensureBase(
-    p: Plate,
-    dpr: number,
-    c: { ink: string; accent: string; muted: string },
-  ) {
+  function ensureBase(p: Plate, dpr: number, c: PlateColors) {
     if (!grid) return
     const key = [p.w, p.h, dpr, c.ink, c.muted, selKabIdx].join('|')
     if (base && baseKey === key) return
@@ -173,7 +167,8 @@
         const cell = grid.cells[gy * COLS + gx]!
         if (!cell) continue
         ctx.fillStyle = c.ink
-        ctx.globalAlpha = selKabIdx >= 0 && cell === selKabIdx + 1 ? 0.85 : 0.3
+        ctx.globalAlpha =
+          selKabIdx >= 0 && cell === selKabIdx + 1 ? 0.85 : c.dark ? 0.42 : 0.3
         ctx.fillRect(
           p.ox + gx * p.scale + (p.scale - dot) / 2,
           p.oy + gy * p.scale + (p.scale - dot) / 2,

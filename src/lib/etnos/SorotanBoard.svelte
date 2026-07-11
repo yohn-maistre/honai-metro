@@ -32,7 +32,7 @@
       {#each posts as p, i (p.post.id)}
         <a
           href={postLink(p.post)}
-          class="flex items-center gap-3 px-4 py-2.5 hover:bg-slate-100/60 dark:hover:bg-zinc-800/60 transition-colors border-b border-slate-100 dark:border-zinc-800/50 last:border-none"
+          class="group flex items-center gap-3 px-4 py-2.5 border-b border-slate-100 dark:border-zinc-800/50 last:border-none"
         >
           <span
             class="w-7 shrink-0 text-lg font-semibold tabular-nums text-slate-300 dark:text-zinc-600 text-center"
@@ -40,7 +40,9 @@
             {i + 1}
           </span>
           <span class="flex flex-col gap-0.5 min-w-0 flex-1">
-            <span class="text-sm font-medium dark:text-white truncate">
+            <span
+              class="text-sm font-medium dark:text-white truncate transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
+            >
               {p.post.name}
             </span>
             <span class="text-xs text-slate-500 dark:text-zinc-400 truncate">

@@ -141,6 +141,14 @@
   --font-sans: sans-serif;
 }
 
+/* Density: the UI is tuned to read like ~85% browser zoom (owner call,
+   2026-07-12). Type, spacing, and column widths are all rem-based, so one
+   root declaration scales them together; px values (hairlines, board
+   cells) intentionally stay fixed. */
+html {
+  font-size: 87.5%;
+}
+
 body {
   @apply bg-slate-50 text-slate-900 dark:bg-zinc-950 dark:text-zinc-100 accent-slate-950 dark:accent-zinc-50;
 }

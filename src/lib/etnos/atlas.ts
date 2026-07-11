@@ -141,6 +141,32 @@ export function loadBoundaryPaths(
   return p
 }
 
+export type PlateColors = {
+  dark: boolean
+  ink: string
+  accent: string
+  muted: string
+}
+
+/** Theme-aware palette for the canvas plates. The slate ramp is
+ *  cream-tuned (its 500 is a dark warm gray), so reading it in dark mode
+ *  paints boundaries near-black on near-black; dark swaps muted to a zinc
+ *  mid-gray and the accent one stop brighter. */
+export function plateColors(el: Element): PlateColors {
+  const css = getComputedStyle(el)
+  const dark = document.documentElement.classList.contains('dark')
+  return {
+    dark,
+    ink: css.color,
+    accent: dark
+      ? css.getPropertyValue('--color-primary-400').trim() || '#cb7f55'
+      : css.getPropertyValue('--color-primary-500').trim() || '#c0633e',
+    muted: dark
+      ? '#a1a1aa'
+      : css.getPropertyValue('--color-slate-500').trim() || '#6f6757',
+  }
+}
+
 /** lon/lat to fractional cell coordinates on a grid. */
 export function lonLatToCellF(
   lon: number,

@@ -15,7 +15,12 @@
   import { ArrowTopRightOnSquare, Icon } from 'svelte-hero-icons/dist'
   import { t } from '$lib/app/i18n'
   import { theme } from '$lib/app/theme/theme.svelte'
-  import { loadAtlasGrid, lonLatToCellF, type AtlasGrid } from './atlas'
+  import {
+    loadAtlasGrid,
+    lonLatToCellF,
+    plateColors,
+    type AtlasGrid,
+  } from './atlas'
   import wajah from './wiki/wajah.json'
   import { DataChip } from './ui'
   import { Material } from 'mono-svelte'
@@ -85,16 +90,13 @@
     mini.height = Math.round(h * dpr)
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     ctx.clearRect(0, 0, w, h)
-    const css = getComputedStyle(mini)
-    const ink = css.color
-    const accent =
-      css.getPropertyValue('--color-primary-500').trim() || '#c0633e'
+    const { ink, accent, dark } = plateColors(mini)
     const scale = Math.min((w * 0.92) / MINI_COLS, (h * 0.92) / MINI_ROWS)
     const ox = (w - MINI_COLS * scale) / 2
     const oy = (h - MINI_ROWS * scale) / 2
     const dot = Math.max(1, scale * 0.4)
     ctx.fillStyle = ink
-    ctx.globalAlpha = 0.3
+    ctx.globalAlpha = dark ? 0.42 : 0.3
     for (let gy = 0; gy < MINI_ROWS; gy++)
       for (let gx = 0; gx < MINI_COLS; gx++) {
         if (!miniGrid.cells[gy * MINI_COLS + gx]) continue

@@ -203,6 +203,9 @@
     font-weight: 600;
     color: var(--color-primary-600);
   }
+  :global(.dark) .tag {
+    color: var(--color-primary-400);
+  }
   .flapline {
     flex: 1;
     min-width: 0;
@@ -236,8 +239,8 @@
     border-radius: 0 4px 4px 0;
   }
   :global(.dark) .cell {
-    border-right-color: rgb(255 255 255 / 0.07);
-    background: rgb(255 255 255 / 0.03);
+    border-right-color: rgb(255 255 255 / 0.12);
+    background: rgb(255 255 255 / 0.06);
   }
   /* the split-flap midline every real board carries */
   .cell::after {
@@ -251,7 +254,7 @@
     pointer-events: none;
   }
   :global(.dark) .cell::after {
-    background: rgb(255 255 255 / 0.05);
+    background: rgb(255 255 255 / 0.09);
   }
   .clip {
     position: absolute;
@@ -294,7 +297,7 @@
     white-space: nowrap;
   }
   :global(.dark) .sub {
-    color: var(--color-zinc-500);
+    color: var(--color-zinc-400);
   }
   @media (prefers-reduced-motion: reduce) {
     .cell.flip {

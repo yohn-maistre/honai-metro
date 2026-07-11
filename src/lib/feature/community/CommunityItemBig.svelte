@@ -39,7 +39,7 @@
 <div
   class={[
     'flex flex-col items-start gap-2 p-4 h-full cursor-pointer',
-    'rounded-[inherit] overflow-hidden hover:bg-slate-50 hover:dark:bg-zinc-925 relative z-0 transition-colors',
+    'rounded-[inherit] overflow-hidden relative z-0',
   ]}
 >
   <a

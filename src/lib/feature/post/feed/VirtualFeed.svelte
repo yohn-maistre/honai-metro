@@ -227,7 +227,7 @@
                   ? 'compact'
                   : settings.view}
                 onhide={() => removePost(posts[row].post.id)}
-                class="px-3 sm:px-6 hover:bg-slate-100/30 hover:dark:bg-zinc-900/30 transition-colors"
+                class="px-3 sm:px-6"
               ></Post>
             {:else if filter.value.action == 'minimize'}
               <Button

@@ -262,10 +262,10 @@
           <li>
             <a
               href={postLink(p.post)}
-              class="flex items-baseline gap-3 px-4 py-2.5 no-underline hover:bg-slate-50 dark:hover:bg-zinc-800/60"
+              class="group flex items-baseline gap-3 px-4 py-2.5 no-underline"
             >
               <span
-                class="text-sm font-medium text-slate-900 dark:text-zinc-100 truncate flex-1"
+                class="text-sm font-medium text-slate-900 dark:text-zinc-100 truncate flex-1 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
               >
                 {p.post.name}
               </span>

@@ -34,7 +34,7 @@
   <Material
     color="default"
     class={[
-      'post-link group/link hover:bg-slate-50 hover:dark:bg-zinc-800 transition-colors',
+      'post-link group/link hover:border-slate-300 dark:hover:border-zinc-700 transition-colors',
     ]}
     rounding="2xl"
     element="a"

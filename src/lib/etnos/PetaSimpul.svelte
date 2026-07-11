@@ -14,8 +14,10 @@
     loadAtlasGrid,
     loadBoundaryPaths,
     lonLatToCellF,
+    plateColors,
     type AtlasGrid,
     type BoundaryPaths,
+    type PlateColors,
   } from './atlas'
   import { ANCHORS, type Anchor } from './layers'
   import { Board } from './ui'
@@ -59,14 +61,10 @@
     return counts
   })
 
-  function colors() {
-    if (!el) return { ink: '#15130e', accent: '#c0633e', muted: '#5a5345' }
-    const css = getComputedStyle(el)
-    return {
-      ink: css.color,
-      accent: css.getPropertyValue('--color-primary-500').trim() || '#c0633e',
-      muted: css.getPropertyValue('--color-slate-500').trim() || '#6f6757',
-    }
+  function colors(): PlateColors {
+    if (!el)
+      return { dark: false, ink: '#15130e', accent: '#c0633e', muted: '#5a5345' }
+    return plateColors(el)
   }
 
   function plate() {
@@ -87,7 +85,7 @@
     const ctx = el.getContext('2d')
     const p = plate()
     if (!ctx || !p) return
-    const { ink, accent, muted } = colors()
+    const { ink, accent, muted, dark } = colors()
 
     const dpr = Math.min(window.devicePixelRatio ?? 1, 1.75)
     el.width = Math.round(p.w * dpr)
@@ -112,7 +110,7 @@
         const c = grid.cells[gy * COLS + gx]!
         if (!c) continue
         ctx.fillStyle = ink
-        ctx.globalAlpha = denseIdx.has(c) ? 0.65 : 0.28
+        ctx.globalAlpha = denseIdx.has(c) ? (dark ? 0.75 : 0.65) : dark ? 0.38 : 0.28
         ctx.fillRect(
           p.ox + gx * p.scale + (p.scale - dot) / 2,
           p.oy + gy * p.scale + (p.scale - dot) / 2,
@@ -130,7 +128,7 @@
       ctx.setLineDash([2 / p.scale, 3 / p.scale])
       ctx.lineWidth = 1 / p.scale
       ctx.strokeStyle = muted
-      ctx.globalAlpha = 0.4
+      ctx.globalAlpha = dark ? 0.5 : 0.4
       for (const path of bounds.paths) ctx.stroke(path)
       ctx.restore()
       ctx.globalAlpha = 1

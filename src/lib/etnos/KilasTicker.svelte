@@ -11,6 +11,16 @@
     KILAS_CONTOH,
     type TickerItem,
   } from '$lib/etnos/kilas-data'
+  import type { ClassValue } from 'svelte/elements'
+
+  interface Props {
+    /** Full-width header band (global wire strip) instead of the
+     *  rounded in-page card. */
+    band?: boolean
+    class?: ClassValue
+  }
+
+  let { band = false, class: clazz = '' }: Props = $props()
 
   let items = $state<TickerItem[]>(KILAS_CONTOH)
   let live = $state(false)
@@ -26,7 +36,13 @@
 </script>
 
 <div
-  class="ticker flex items-stretch overflow-hidden rounded-xl bg-slate-900 text-slate-50"
+  class={[
+    'ticker flex items-stretch overflow-hidden bg-slate-900 text-slate-50',
+    band
+      ? 'w-full border-b border-slate-800 dark:border-zinc-800'
+      : 'rounded-xl',
+    clazz,
+  ]}
   aria-label="Berita kilat dari media lain, tautan keluar apa adanya"
 >
   <span
@@ -39,7 +55,7 @@
     Kilas
     <span class="font-medium opacity-75">{live ? 'langsung' : 'contoh'}</span>
   </span>
-  <div class="belt overflow-hidden flex-1 py-2.5">
+  <div class={['belt overflow-hidden flex-1', band ? 'py-1.5' : 'py-2.5']}>
     <div class="track text-[13px]">
       {#each [0, 1] as half (half)}
         {#each items as item, i (`${half}-${i}`)}

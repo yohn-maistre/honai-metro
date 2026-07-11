@@ -11,6 +11,7 @@
     rgbToHex,
     theme,
   } from '$lib/app/theme/theme.svelte'
+  import KilasTicker from '$lib/etnos/KilasTicker.svelte'
   import OnboardingModal from '$lib/etnos/OnboardingModal.svelte'
   import InstanceCard from '$lib/feature/instance/InstanceCard.svelte'
   import Moderation from '$lib/feature/moderation/Moderation.svelte'
@@ -152,11 +153,20 @@
       style={s}
       id="main"
     >
+      <!-- ETNOS: mobile wire strip; the md+ band lives under the navbar
+           (the navbar holder is a bottom dock on mobile). -->
+      <div class="md:hidden sticky top-0 z-30 -mx-3 -mt-3 mb-3">
+        <KilasTicker band />
+      </div>
       {@render children?.()}
     </main>
   {/snippet}
   {#snippet navbar({ style: s, class: c })}
     <Navbar class={c} style={s} />
+    <!-- ETNOS: the KILAS wire rides the sticky header site-wide -->
+    <div class="hidden md:block pointer-events-auto">
+      <KilasTicker band />
+    </div>
   {/snippet}
   {#snippet suffix({ class: c })}
     <!--strange issue, proabably to do with dynamic components-->

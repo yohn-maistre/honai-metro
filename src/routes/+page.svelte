@@ -7,7 +7,6 @@
   import Location from '$lib/feature/filter/Location.svelte'
   import Sort from '$lib/feature/filter/Sort.svelte'
   import ViewSelect from '$lib/feature/filter/ViewSelect.svelte'
-  import KilasTicker from '$lib/etnos/KilasTicker.svelte'
   import PapanKilas from '$lib/etnos/PapanKilas.svelte'
   import PetaKabar from '$lib/etnos/PetaKabar.svelte'
   import PostFeed from '$lib/feature/post/feed/PostFeed.svelte'
@@ -46,10 +45,6 @@
 </Header>
 
 <div class="flex flex-col gap-4 mb-4">
-  <KilasTicker />
-  <PetaKabar />
-  <PapanKilas />
-
   <form
     class="contents"
     method="get"
@@ -76,6 +71,9 @@
       </noscript>
     </div>
   </form>
+
+  <PetaKabar />
+  <PapanKilas />
 </div>
 
 {#await data.feed.value}

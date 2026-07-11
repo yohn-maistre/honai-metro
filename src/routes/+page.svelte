@@ -7,7 +7,7 @@
   import Location from '$lib/feature/filter/Location.svelte'
   import Sort from '$lib/feature/filter/Sort.svelte'
   import ViewSelect from '$lib/feature/filter/ViewSelect.svelte'
-  import PapanKilas from '$lib/etnos/PapanKilas.svelte'
+  import PapanSinyal from '$lib/etnos/PapanSinyal.svelte'
   import PetaKabar from '$lib/etnos/PetaKabar.svelte'
   import PostFeed from '$lib/feature/post/feed/PostFeed.svelte'
   import VirtualFeed from '$lib/feature/post/feed/VirtualFeed.svelte'
@@ -73,7 +73,7 @@
   </form>
 
   <PetaKabar />
-  <PapanKilas />
+  <PapanSinyal />
 </div>
 
 {#await data.feed.value}

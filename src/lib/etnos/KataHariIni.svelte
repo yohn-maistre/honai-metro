@@ -1,7 +1,7 @@
 <script lang="ts">
   // Kata hari ini: the daily word as a plain Board card (carousel
   // retired), TTS kept. This is the word's only surface besides the wiki
-  // language hub; the Papan Kilas row was retired.
+  // language hub; the board's KATA row was retired.
   import { t } from '$lib/app/i18n'
   import { Button } from 'mono-svelte'
   import { onDestroy } from 'svelte'

@@ -1,6 +1,6 @@
 /**
  * One Hot/Local fetch per page load, shared by every component that
- * wants trending posts (SorotanBoard, PapanKilas), reuse the system's
+ * wants trending posts (SorotanBoard, PapanSinyal), reuse the system's
  * own primitives instead of hammering the borrowed backend twice.
  */
 import { client } from '$lib/api/client.svelte'

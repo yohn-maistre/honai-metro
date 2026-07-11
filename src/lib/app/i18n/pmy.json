@@ -953,9 +953,11 @@
             }
         },
         "papan": {
-            "berita_src": "Pers luar",
+            "sinyal_label": "Sinyal langsung",
+            "gempa_nihil": "Nihil dalam 24 jam terakhir",
             "rows": {
-                "berita": "Berita",
+                "gempa": "Gempa",
+                "cuaca": "Cuaca",
                 "forum": "Forum",
                 "komunitas": "Komunitas"
             }

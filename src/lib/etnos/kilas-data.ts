@@ -1,6 +1,6 @@
 /**
- * The KILAS sample rundown, one owner for the contoh headlines, shared
- * by the ticker and the Papan Kilas board. Real outlets, generic texts,
+ * The KILAS sample rundown, one owner for the contoh headlines, used
+ * by the KILAS wire band. Real outlets, generic texts,
  * homepage links only (never fake article URLs), detak's edisi-contoh
  * doctrine. Replaced live when PUBLIC_DETAK_URL's /ticker responds.
  */

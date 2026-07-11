@@ -1071,9 +1071,11 @@
             }
         },
         "papan": {
-            "berita_src": "External press",
+            "sinyal_label": "Live signals",
+            "gempa_nihil": "None in the last 24 hours",
             "rows": {
-                "berita": "News",
+                "gempa": "Quakes",
+                "cuaca": "Weather",
                 "forum": "Forum",
                 "komunitas": "Community"
             }

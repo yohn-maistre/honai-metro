@@ -1,19 +1,24 @@
 <script lang="ts">
   /**
-   * Papan Kilas: a Solari split-flap board, three rows (Berita / Forum /
-   * Komunitas), each flipping through its own pool on a calm clock. The
-   * text line is divided into equal cells that fold in a staggered
+   * Papan Sinyal: a Solari split-flap board of live channels, the
+   * station-board answer to "what is happening on the tanah right now".
+   * Four rows: Gempa (latest events, BMKG/USGS), Cuaca (rotating through
+   * the six anchor cities, Open-Meteo), Forum (real hot posts), Komunitas
+   * (directory rotation). News lives in the KILAS wire band up top, never
+   * here. Rows draw from the same SWR caches as Peta Kabar (one fact, one
+   * owner); a feed that answers with nothing shows an honest nihil line,
+   * and a feed that cannot answer drops its row.
+   *
+   * The text line is divided into equal cells that fold in a staggered
    * left-to-right sweep: per-CELL half-fold, never per-character, so the
    * board reads like a real departure board while staying cheap on budget
    * phones. Day-clock seeded so every reader sees the same board on the
-   * same day. Berita rows are external press (contoh-labeled until the
-   * detak feed is live); Forum rows are real posts.
+   * same day.
    */
-  import { env } from '$env/dynamic/public'
   import { t } from '$lib/app/i18n'
   import directory from '$lib/etnos/data/directory.json'
   import { fetchHotPosts } from '$lib/etnos/hot'
-  import { fetchKilas, KILAS_CONTOH } from '$lib/etnos/kilas-data'
+  import { fetchCuaca, fetchGempa } from '$lib/etnos/layers'
   import { daySeed, rngFrom } from '$lib/etnos/seed'
   import { postLink } from '$lib/feature/post/helpers'
   import { DataChip } from './ui'
@@ -29,6 +34,7 @@
   const FLIP_MS = 320
   const STAGGER_MS = 45
   const TICK_MS = 6000
+  const N_ROWS = 4
 
   const komunitasPool: Flap[] = directory.groups.flatMap((g) =>
     g.communities.map((c) => ({
@@ -38,19 +44,30 @@
     })),
   )
 
-  let beritaLive = $state(false)
-  let beritaPool = $state<Flap[]>(
-    KILAS_CONTOH.map((k) => ({
-      teks: k.teks,
-      sub: k.src,
-      href: k.url,
-      external: true,
-    })),
-  )
-
+  let gempaPool = $state<Flap[]>([])
+  let cuacaPool = $state<Flap[]>([])
   let forumPool = $state<Flap[]>([])
+  let sinyalLive = $state(false)
 
   $effect(() => {
+    fetchGempa().then((r) => {
+      if (r === null) return
+      sinyalLive = true
+      gempaPool = r.length
+        ? r.slice(0, 8).map((g) => ({
+            teks: `M${g.mag} · ${g.wilayah}`,
+            sub: `${g.jam} · BMKG / USGS`,
+          }))
+        : [{ teks: $t('etnos.papan.gempa_nihil'), sub: 'BMKG / USGS' }]
+    })
+    fetchCuaca().then((r) => {
+      if (!r || !r.length) return
+      sinyalLive = true
+      cuacaPool = r.map((pt) => ({
+        teks: `${pt.kota} ${pt.t}° · ${pt.langit}`,
+        sub: 'Open-Meteo',
+      }))
+    })
     fetchHotPosts().then((posts) => {
       forumPool = posts.slice(0, 6).map((p) => ({
         teks: p.post.name,
@@ -58,25 +75,15 @@
         href: postLink(p.post),
       }))
     })
-    fetchKilas(env.PUBLIC_DETAK_URL as string | undefined).then((kilas) => {
-      if (kilas) {
-        beritaLive = true
-        beritaPool = kilas.map((k) => ({
-          teks: k.teks,
-          sub: k.src,
-          href: k.url,
-          external: true,
-        }))
-      }
-    })
   })
 
-  type Row = { key: 'berita' | 'forum' | 'komunitas'; pool: Flap[] }
+  type Row = { key: 'gempa' | 'cuaca' | 'forum' | 'komunitas'; pool: Flap[] }
   // Empty pools drop their row instead of flipping blanks.
   let rows = $derived(
     (
       [
-        { key: 'berita', pool: beritaPool },
+        { key: 'gempa', pool: gempaPool },
+        { key: 'cuaca', pool: cuacaPool },
         { key: 'forum', pool: forumPool },
         { key: 'komunitas', pool: komunitasPool },
       ] as Row[]
@@ -84,11 +91,11 @@
   )
 
   // Day-seeded starting positions so the board is the same for everyone today.
-  const rng = rngFrom(daySeed('papan-kilas'))
-  const seedOffsets = Array.from({ length: 3 }, () => rng())
+  const rng = rngFrom(daySeed('papan-sinyal'))
+  const seedOffsets = Array.from({ length: N_ROWS }, () => rng())
 
-  let indices = $state([0, 0, 0])
-  let flipping = $state([false, false, false])
+  let indices = $state([0, 0, 0, 0])
+  let flipping = $state([false, false, false, false])
   let cursor = 0
 
   $effect(() => {
@@ -137,12 +144,11 @@
   <div
     class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 dark:border-zinc-800"
   >
-    <h2 class="font-semibold dark:text-white">Papan Kilas</h2>
+    <h2 class="font-semibold dark:text-white">Papan Sinyal</h2>
     <div class="flex items-center gap-3">
-      <DataChip
-        state={beritaLive ? 'langsung' : 'contoh'}
-        label={$t('etnos.papan.berita_src')}
-      />
+      {#if sinyalLive}
+        <DataChip state="langsung" label={$t('etnos.papan.sinyal_label')} />
+      {/if}
       <span
         class="text-xs text-slate-400 dark:text-zinc-500 tabular-nums whitespace-nowrap"
       >

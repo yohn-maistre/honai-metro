@@ -1089,6 +1089,17 @@
             "caption": "Community anchors of Tanah Papua, six anchor cities, one land."
         },
         "explore": {
+            "search": "Search communities",
+            "filter_all": "All",
+            "empty": "No communities match that search.",
+            "simpul_title": "Node Map",
+            "simpul_caption": "community nodes, one land",
+            "simpul_hint": "Tap an anchor city to see how many directory communities sit in its province.",
+            "stats": {
+                "komunitas": "communities listed",
+                "kategori": "categories",
+                "bahasa": "languages in the hub"
+            },
             "sorotan": "Curated picks",
             "sorotan_subtitle": "Hand-picked communities, ruang adat, and topics across ETNOS Papua Tengah",
             "sorotan_open": "Open",

@@ -1004,6 +1004,17 @@
             "caption": "Simpul komunitas Tanah Papua, enam kota jangkar, satu tanah."
         },
         "explore": {
+            "search": "Cari komunitas",
+            "filter_all": "Semua",
+            "empty": "Tidak ada komunitas yang cocok dengan pencarian itu.",
+            "simpul_title": "Peta Simpul",
+            "simpul_caption": "simpul komunitas, satu tanah",
+            "simpul_hint": "Ketuk kota jangkar untuk melihat jumlah komunitas direktori di provinsinya.",
+            "stats": {
+                "komunitas": "komunitas tercatat",
+                "kategori": "kategori",
+                "bahasa": "bahasa di hub"
+            },
             "sorotan": "Pilihan",
             "sorotan_subtitle": "Pilihan komunitas, ruang adat, dan topik pilihan dari ETNOS Papua Tengah",
             "sorotan_open": "Buka",

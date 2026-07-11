@@ -1,9 +1,11 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
+  import bahasa from '$lib/etnos/data/bahasa.json'
+  import PetaSimpul from '$lib/etnos/PetaSimpul.svelte'
   import SorotanBoard from '$lib/etnos/SorotanBoard.svelte'
   import { IconTile, PageHeader } from '$lib/etnos/ui'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
-  import { Badge, Material } from 'mono-svelte'
+  import { Badge, Material, TextInput } from 'mono-svelte'
   import {
     ArrowRight,
     ArrowTopRightOnSquare,
@@ -13,6 +15,7 @@
     ComputerDesktop,
     HomeModern,
     Icon,
+    MagnifyingGlass,
     MusicalNote,
     Newspaper,
     Trophy,
@@ -34,6 +37,40 @@
     Wiki: BookOpen,
     AI: CpuChip,
   }
+
+  let q = $state('')
+  let kategori = $state<string | null>(null)
+
+  const totalKomunitas = data.directory.groups.reduce(
+    (n: number, g: { communities: unknown[] }) => n + g.communities.length,
+    0,
+  )
+
+  // One community, every region: kab nama -> count, feeds the plate.
+  const regionCounts: Record<string, number> = {}
+  for (const g of data.directory.groups)
+    for (const c of g.communities)
+      if (c.region) regionCounts[c.region] = (regionCounts[c.region] ?? 0) + 1
+
+  const filtered = $derived.by(() => {
+    const needle = q.trim().toLowerCase()
+    return data.directory.groups
+      .filter(
+        (g: { category: string }) => !kategori || g.category === kategori,
+      )
+      .map((g: { communities: { name: string; slug: string; subtitle?: string }[] }) => ({
+        ...g,
+        communities: needle
+          ? g.communities.filter((c) =>
+              [c.name, c.slug, c.subtitle ?? '']
+                .join(' ')
+                .toLowerCase()
+                .includes(needle),
+            )
+          : g.communities,
+      }))
+      .filter((g: { communities: unknown[] }) => g.communities.length > 0)
+  })
 </script>
 
 <svelte:head>
@@ -46,7 +83,69 @@
     lede={$t('etnos.explore.lede')}
   />
 
-  {#each data.directory.groups as group (group.category)}
+  <PetaSimpul {regionCounts} />
+
+  <div class="grid grid-cols-3 gap-3">
+    {#each [{ n: totalKomunitas, label: $t('etnos.explore.stats.komunitas') }, { n: data.directory.groups.length, label: $t('etnos.explore.stats.kategori') }, { n: bahasa.languages.length, label: $t('etnos.explore.stats.bahasa') }] as s (s.label)}
+      <Material color="default" rounding="2xl" padding="md" class="flex flex-col gap-0.5">
+        <span class="text-2xl font-bold tabular-nums dark:text-white">
+          {s.n}
+        </span>
+        <span class="text-xs text-slate-500 dark:text-zinc-400">{s.label}</span>
+      </Material>
+    {/each}
+  </div>
+
+  <div class="flex flex-col gap-3">
+    <TextInput
+      bind:value={q}
+      placeholder={$t('etnos.explore.search')}
+      aria-label={$t('etnos.explore.search')}
+    >
+      {#snippet prefix()}
+        <Icon src={MagnifyingGlass} size="15" micro />
+      {/snippet}
+    </TextInput>
+    <div class="flex gap-1.5 overflow-x-auto">
+      <button
+        type="button"
+        class={[
+          'shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors',
+          kategori === null
+            ? 'bg-primary-900 text-slate-25 dark:bg-primary-100 dark:text-zinc-950'
+            : 'bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700',
+        ]}
+        onclick={() => (kategori = null)}
+      >
+        {$t('etnos.explore.filter_all')}
+      </button>
+      {#each data.directory.groups as g (g.category)}
+        <button
+          type="button"
+          class={[
+            'shrink-0 rounded-full px-3 py-1 text-xs font-medium transition-colors',
+            kategori === g.category
+              ? 'bg-primary-900 text-slate-25 dark:bg-primary-100 dark:text-zinc-950'
+              : 'bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-200 dark:hover:bg-zinc-700',
+          ]}
+          onclick={() => (kategori = kategori === g.category ? null : g.category)}
+        >
+          {g.category}
+          <span class="opacity-60 tabular-nums ml-0.5">
+            {g.communities.length}
+          </span>
+        </button>
+      {/each}
+    </div>
+  </div>
+
+  {#if filtered.length === 0}
+    <p class="text-sm text-slate-500 dark:text-zinc-400">
+      {$t('etnos.explore.empty')}
+    </p>
+  {/if}
+
+  {#each filtered as group (group.category)}
     <section class="flex flex-col gap-3">
       <div class="flex items-center gap-2.5 flex-wrap">
         <IconTile icon={clusterIcon[group.category] ?? UserGroup} size="sm" />

@@ -1,7 +1,9 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
   import { meta } from '$lib/etnos/wiki'
-  import WikiCarousel from '$lib/etnos/WikiCarousel.svelte'
+  import KataHariIni from '$lib/etnos/KataHariIni.svelte'
+  import SejarahHariIni from '$lib/etnos/SejarahHariIni.svelte'
+  import WajahTanah from '$lib/etnos/WajahTanah.svelte'
   import { IconTile, PageHeader } from '$lib/etnos/ui'
   import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
   import { Material } from 'mono-svelte'
@@ -40,7 +42,12 @@
 <div class="flex flex-col gap-5 max-w-full w-full">
   <PageHeader title="Wiki Tanah Papua" lede={$t('etnos.wiki.lede')} />
 
-  <WikiCarousel history={data.todayHistory} word={data.todayWord} />
+  <WajahTanah />
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <SejarahHariIni history={data.todayHistory} />
+    <KataHariIni word={data.todayWord} />
+  </div>
 
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
     {#each categories as cat (cat.slug)}

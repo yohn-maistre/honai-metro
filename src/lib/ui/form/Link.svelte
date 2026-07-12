@@ -34,7 +34,7 @@
   {href}
   class={[
     'hover:underline max-w-full inline-flex items-center gap-1',
-    highlight && 'text-blue-600 dark:text-blue-400',
+    highlight && 'text-primary-700 dark:text-primary-400',
     clazz,
   ]}
 >

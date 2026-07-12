@@ -492,3 +492,38 @@ SectionHead + Figure. Em-dash sweep clean; parity 142/142/142.
 - Settings/admin pages inherit the primitive restyle only; they still
   use their own Material rows (Photon internals, out of scope, look
   fine in the canary).
+
+---
+
+# FINAL POLISH PASS (2026-07-12, third run) — consolidation + inbox
+
+Yose's morning review of the broadsheet wave. Items landed this pass:
+
+- Navbar "Jelajah" now points to /explore (was /explore/communities,
+  duplicating the sidebar entry with a different page).
+- Markdown + highlight link color: blue-600 → primary-700/primary-400
+  (blue clashed with cream). OP/BOT blues kept (semantic), XYLIGHT
+  links kept (env-gated off).
+- Comment thread lines dark: zinc-700 → zinc-600 (still sub-threshold
+  on zinc-925 at 700).
+- Mobile wire strip: fixed the sm-breakpoint margin mismatch
+  (-mt-3 vs sm:pt-6) that let a sliver of page show above the ticker;
+  z-30 → z-40 so Photon's floating post-title pill slides under it.
+- "Lompat" (common.jump) renamed "Lihat percakapan" / "View
+  conversation" ×3 locales.
+- Papan Sinyal is now a <details> instrument: open on lg+, collapsed
+  to its header row on phones (matchMedia on mount). The deck breathes.
+- Quick create: a one-tap composer row above the feed ("Bagikan sesuatu
+  ke komunitas Anda" → /create/post, guests → /login). i18n
+  etnos.deck.quick_create(_cta) ×3. No new posting path; it opens the
+  existing form.
+- MCP registry: new ToolCard.svelte (compact spec-sheet card), inbox
+  items flattened with unread = 2px terracotta left border, messages
+  page restyled as a proper chat (theirs zinc bubbles, mine
+  primary-900/primary-100) with dark mode fixed.
+- Next wave scoped and committed as docs/etnos/10_federation-wave-plan
+  (DRAF): MapLibre Peta Kabar v2, AP location property on Group actors
+  (PieFed patch), Peta Nusantara multi-island Jelajah, agent Service
+  actors with aksara:attestation sandboxed on a throwaway PieFed
+  instance (never piefed.social), notification bell. CLAUDE.md updated
+  (maplibre now KEEP).

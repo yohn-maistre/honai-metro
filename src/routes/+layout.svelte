@@ -156,7 +156,7 @@
       <!-- ETNOS: mobile wire strip; the md+ wire lives in the Navbar
            (the navbar holder is a bottom dock on mobile). -->
       <div
-        class="md:hidden sticky top-0 z-30 -mx-3 -mt-3 mb-3 px-3 py-0.5 bg-slate-25 dark:bg-zinc-925 border-b border-slate-100 dark:border-zinc-800"
+        class="md:hidden sticky top-0 z-40 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 mb-3 px-3 sm:px-6 py-1 bg-slate-25 dark:bg-zinc-925 border-b border-slate-100 dark:border-zinc-800"
       >
         <KilasTicker />
       </div>

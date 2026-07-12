@@ -23,7 +23,7 @@
 <a
   href={photonified ?? href}
   {title}
-  class="hover:underline text-blue-600 dark:text-blue-400"
+  class="hover:underline text-primary-700 dark:text-primary-400"
 >
   {@render children?.()}
 </a>

@@ -579,7 +579,7 @@
         "next": "Berikutnya",
         "debug": "Debug",
         "refresh": "Segarkan",
-        "jump": "Lompat",
+        "jump": "Lihat percakapan",
         "save": "Simpan",
         "enabled": "Diaktifkan",
         "disabled": "Dinonaktifkan",
@@ -951,6 +951,10 @@
                 "komunitas": "Komunitas",
                 "wajah": "Dari wiki"
             }
+        },
+        "deck": {
+            "quick_create": "Bagikan sesuatu ke komunitas Anda",
+            "quick_create_cta": "Tulis"
         },
         "papan": {
             "sinyal_label": "Sinyal langsung",

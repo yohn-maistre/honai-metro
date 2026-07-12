@@ -9,7 +9,7 @@
   import PrivateMessage from '$lib/feature/inbox/PrivateMessage.svelte'
   import Avatar from '$lib/ui/generic/Avatar.svelte'
   import { publishedToDate } from '$lib/ui/util/date'
-  import { Button, ButtonGroup, Expandable, Material } from 'mono-svelte'
+  import { Button, Material } from 'mono-svelte'
   import RelativeDate from 'mono-svelte/util/RelativeDate.svelte'
   import {
     AtSymbol,
@@ -66,7 +66,7 @@
 
 {#snippet actions()}
   <Button
-    color={item.read ? 'secondary' : 'primary'}
+    color="tertiary"
     {loading}
     disabled={loading ||
       item.creator.id == profile.current.user?.local_user_view.person.id}
@@ -75,7 +75,6 @@
       markAsRead(!item.read)
     }}
     size="sm"
-    rounding="pill"
     class="shrink-0"
     icon={item.read ? EyeSlash : Eye}
   >
@@ -84,11 +83,11 @@
       : $t('post.actions.more.markRead')}
   </Button>
   <Button
+    color="tertiary"
     href={item.type == 'private_message'
       ? `/inbox/messages/${item.item.private_message.creator_id}`
       : `/comment/${item.item.comment.id}`}
     size="sm"
-    rounding="pill"
     class="shrink-0"
     onclick={() => markAsRead(true)}
   >
@@ -96,88 +95,78 @@
   </Button>
 {/snippet}
 
-<Expandable open icon={false}>
-  {#snippet title()}
-    <div class="flex flex-row gap-2 items-center w-full">
-      <div class="relative">
-        <Avatar url={item.creator.avatar} width={28} alt={item.creator.name} />
-        <Material
-          color="uniform"
-          padding="none"
-          class="absolute -bottom-2 -right-2 p-1"
-          rounding="full"
-        >
-          <Icon
-            src={item.type == 'comment_reply'
-              ? ChatBubbleOvalLeftEllipsis
-              : item.type == 'person_mention'
-                ? AtSymbol
-                : PaperAirplane}
-            size="12"
-            micro
-          />
-        </Material>
-      </div>
-      <div class="flex flex-col">
-        <div class="text-sm font-normal text-slate-600 dark:text-zinc-400">
-          {#if item.type == 'comment_reply'}
-            <Markdown
-              inline
-              source={$t('routes.inbox.item.reply', {
-                user: `**${item.creator.name}**`,
-                post: `**${escapeHtml(item.item.post.name)}**`,
-              })}
-              noStyle
-            />
-          {:else if item.type == 'person_mention'}
-            <Markdown
-              inline
-              source={$t('routes.inbox.item.mention', {
-                user: `**${item.creator.name}**`,
-                post: `**${escapeHtml(item.item.post.name)}**`,
-              })}
-              noStyle
-            />
-          {:else if item.type == 'private_message'}
-            <Markdown
-              inline
-              source={$t('routes.inbox.item.message', {
-                user: `**${item.creator.name}**`,
-                recipient: `**${escapeHtml(item.item.recipient.name)}**`,
-              })}
-              noStyle
-            />
-          {/if}
-        </div>
-        <div class="text-xs text-slate-600 dark:text-zinc-400">
-          <RelativeDate date={publishedToDate(item.published)} />
-        </div>
-      </div>
-      <div class="flex-1"></div>
-      <ButtonGroup orientation="horizontal" class="md:flex hidden shrink-0">
-        {@render actions()}
-      </ButtonGroup>
+<div class="flex flex-col gap-2">
+  <div class="flex flex-row gap-2 items-center w-full">
+    <div class="relative">
+      <Avatar url={item.creator.avatar} width={28} alt={item.creator.name} />
+      <Material
+        color="uniform"
+        padding="none"
+        class="absolute -bottom-2 -right-2 p-1"
+        rounding="full"
+      >
+        <Icon
+          src={item.type == 'comment_reply'
+            ? ChatBubbleOvalLeftEllipsis
+            : item.type == 'person_mention'
+              ? AtSymbol
+              : PaperAirplane}
+          size="12"
+          micro
+        />
+      </Material>
     </div>
-  {/snippet}
-  {#snippet extended()}
-    <ButtonGroup orientation="horizontal" class="flex md:hidden">
-      {@render actions()}
-    </ButtonGroup>
-  {/snippet}
-  {#snippet content()}
-    {#if item.type == 'comment_reply' || item.type == 'person_mention'}
-      <CommentItem
-        comment={item.item}
-        community={false}
-        meta={false}
-        class="py-0!"
-        commentClass="py-0!"
-      />
-    {:else}
-      <PrivateMessage message={item.item} meta={false} />
-    {/if}
-  {/snippet}
-</Expandable>
+    <div class="flex flex-col">
+      <div class="text-sm font-normal text-slate-600 dark:text-zinc-400">
+        {#if item.type == 'comment_reply'}
+          <Markdown
+            inline
+            source={$t('routes.inbox.item.reply', {
+              user: `**${item.creator.name}**`,
+              post: `**${escapeHtml(item.item.post.name)}**`,
+            })}
+            noStyle
+          />
+        {:else if item.type == 'person_mention'}
+          <Markdown
+            inline
+            source={$t('routes.inbox.item.mention', {
+              user: `**${item.creator.name}**`,
+              post: `**${escapeHtml(item.item.post.name)}**`,
+            })}
+            noStyle
+          />
+        {:else if item.type == 'private_message'}
+          <Markdown
+            inline
+            source={$t('routes.inbox.item.message', {
+              user: `**${item.creator.name}**`,
+              recipient: `**${escapeHtml(item.item.recipient.name)}**`,
+            })}
+            noStyle
+          />
+        {/if}
+      </div>
+      <div class="text-xs text-slate-600 dark:text-zinc-400">
+        <RelativeDate date={publishedToDate(item.published)} />
+      </div>
+    </div>
+  </div>
+  {#if item.type == 'comment_reply' || item.type == 'person_mention'}
+    <CommentItem
+      comment={item.item}
+      community={false}
+      meta={false}
+      class="py-0!"
+      commentClass="py-0!"
+    />
+  {:else}
+    <PrivateMessage message={item.item} meta={false} />
+  {/if}
+  <div class="flex flex-row flex-wrap items-center gap-1">
+    {@render actions()}
+  </div>
+</div>
 
 <style>
   :global(strong) {

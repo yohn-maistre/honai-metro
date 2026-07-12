@@ -136,15 +136,32 @@
     const timer = setInterval(() => (wit = witNow()), 30_000)
     return () => clearInterval(timer)
   })
+
+  // Collapsible board: open on desktop, folded on phones where the deck
+  // gets tall (owner call: the front page was too crowded).
+  let open = $state(true)
+  $effect(() => {
+    open = window.matchMedia('(min-width: 64rem)').matches
+  })
 </script>
 
-<section
+<details
+  bind:open
   class="papan bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 overflow-hidden"
 >
-  <div
-    class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 dark:border-zinc-800"
+  <summary
+    class="flex items-center justify-between gap-3 px-4 py-3 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden"
   >
-    <h2 class="font-semibold dark:text-white">Papan Sinyal</h2>
+    <h2 class="font-semibold dark:text-white flex items-center gap-2">
+      <span
+        class={[
+          'text-slate-400 dark:text-zinc-500 text-xs transition-transform',
+          open && 'rotate-90',
+        ]}
+        aria-hidden="true">▶</span
+      >
+      Papan Sinyal
+    </h2>
     <div class="flex items-center gap-3">
       {#if sinyalLive}
         <DataChip state="langsung" label={$t('etnos.papan.sinyal_label')} />
@@ -155,9 +172,11 @@
         {wit}
       </span>
     </div>
-  </div>
+  </summary>
 
-  <div class="flex flex-col px-2 sm:px-3 py-1.5">
+  <div
+    class="flex flex-col px-2 sm:px-3 py-1.5 border-t border-slate-200 dark:border-zinc-800"
+  >
     {#each rows as row, i (row.key)}
       {@const item = row.pool[Math.min(indices[i] ?? 0, row.pool.length - 1)]!}
       <div class="row">
@@ -183,7 +202,7 @@
       </div>
     {/each}
   </div>
-</section>
+</details>
 
 <style>
   .papan {

@@ -684,7 +684,7 @@
         "next": "Next",
         "debug": "Debug",
         "refresh": "Refresh",
-        "jump": "Jump",
+        "jump": "View conversation",
         "save": "Save",
         "enabled": "Enabled",
         "disabled": "Disabled",
@@ -1069,6 +1069,10 @@
                 "komunitas": "Communities",
                 "wajah": "From the wiki"
             }
+        },
+        "deck": {
+            "quick_create": "Share something with your community",
+            "quick_create_cta": "Write"
         },
         "papan": {
             "sinyal_label": "Live signals",

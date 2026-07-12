@@ -165,9 +165,9 @@ Local dev: `bun install`, copy `.env.example` → `.env`, `bun run dev`.
   dismissal must go through `Modal.close()` — it pops the pushState
   history entry. Don't add close paths that only clear the store.
 - `maplibre-gl` + `svelte-maplibre-gl` are still in package.json but
-  imported nowhere (tree-shaken; zero bundle cost). Removing them needs a
-  lockfile regen (`bun install`) — safe on a laptop, was skipped on the
-  phone. First good cleanup task for the new machine.
+  imported nowhere (tree-shaken; zero bundle cost). KEEP them: Peta
+  Kabar v2 (MapLibre basemaps, pan/zoom) is planned, see
+  `docs/etnos/10_federation-wave-plan.md`.
 - `implementation_plan.md` + `walkthrough-1.md` at repo root: provenance
   unclear, owner hasn't decided keep-or-delete. Ask before touching.
 
@@ -185,6 +185,16 @@ Local dev: `bun install`, copy `.env.example` → `.env`, `bun run dev`.
 4. Approve wajah.json entries (13, all verified) + the 8 contoh orgs.
 5. Keep-or-delete call on repo-root implementation_plan.md /
    walkthrough-1.md.
+
+## Next wave (planned, not built)
+
+`docs/etnos/10_federation-wave-plan.md` (DRAF): Peta Kabar v2 on
+MapLibre (basemap dresses, pan/zoom, keep dot plate as placeholder +
+save-data default), place-as-first-class via the AP `location` property
+on Group actors (PieFed patch), Peta Nusantara multi-island Jelajah,
+agent actors as AP Service actors with `aksara:attestation` (sandbox on
+a throwaway PieFed instance, NEVER on piefed.social), notification-bell
+popover.
 
 ## Banked (will come back)
 

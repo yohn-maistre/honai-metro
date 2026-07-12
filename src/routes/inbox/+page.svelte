@@ -7,7 +7,7 @@
   import { searchParam } from '$lib/app/util.svelte'
   import Fixate from '$lib/ui/generic/Fixate.svelte'
   import Placeholder from '$lib/ui/info/Placeholder.svelte'
-  import { CommonList, Header, Pageination } from '$lib/ui/layout'
+  import { Header, Pageination } from '$lib/ui/layout'
   import { Button, Option, Select } from 'mono-svelte'
   import { ArrowPath, Check, Funnel, Icon, Inbox } from 'svelte-hero-icons/dist'
   import InboxItem from './InboxItem.svelte'
@@ -99,13 +99,19 @@
     class="self-center justify-self-center my-auto"
   />
 {:else}
-  <CommonList size="md">
+  <ul class="flex flex-col">
     {#each data.inbox.value as item}
-      <li class={[!item.read && 'bg-blue-300/10! dark:bg-blue-500/5!']}>
+      <li
+        class={[
+          'py-4 border-b border-b-slate-200/60 dark:border-b-zinc-800',
+          'border-l-2 pl-3',
+          !item.read ? 'border-l-primary-500' : 'border-l-transparent',
+        ]}
+      >
         <InboxItem {item} />
       </li>
     {/each}
-  </CommonList>
+  </ul>
 {/if}
 {#if !(data.page == 1 && (data?.inbox?.value.length ?? 0) == 0)}
   <Fixate placement="bottom">

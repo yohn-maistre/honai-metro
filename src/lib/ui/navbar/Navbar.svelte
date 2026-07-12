@@ -94,7 +94,7 @@
     {/if}
   </div>
   <NavButton
-    href="/explore/communities"
+    href="/explore"
     label={$t('routes.explore.title')}
     icon={GlobeAlt}
     isSelectedFilter={(path) => path.startsWith('/explore')}

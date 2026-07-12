@@ -28,14 +28,12 @@
   class="group relative w-full flex gap-1 items-center {primary
     ? 'flex-row-reverse'
     : 'flex-row'}"
-  style="max-width: min(80vw,24rem)"
 >
   <div>
     <div
       class="{primary
-        ? 'bg-primary-900 dark:bg-primary-100 text-slate-50 dark:text-zinc-900 hover:brightness-75'
-        : 'bg-slate-100 dark:bg-zinc-900 hover:brightness-125'} rounded-2xl w-full p-1.5 px-3
-    font-medium cursor-pointer transition-all"
+        ? 'bg-primary-900 text-slate-50 dark:bg-primary-100 dark:text-zinc-900 rounded-br-md'
+        : 'bg-slate-100 dark:bg-zinc-800 text-slate-900 dark:text-zinc-100 rounded-bl-md'} rounded-2xl w-full px-3.5 py-2"
     >
       <Markdown
         rendererOptions={{ autoloadImages: false }}
@@ -45,7 +43,9 @@
     </div>
     {#if showTimestamp}
       <RelativeDate
-        class="text-xs block -mt-0.5 ml-1 text-slate-600 dark:text-zinc-400"
+        class="text-[11px] block mt-0.5 text-slate-500 dark:text-zinc-400 {primary
+          ? 'mr-1 text-right'
+          : 'ml-1'}"
         date={publishedToDate(message.private_message.published)}
       />
     {/if}

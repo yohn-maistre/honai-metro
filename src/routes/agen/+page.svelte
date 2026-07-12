@@ -1,14 +1,9 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
+  import ToolCard from '$lib/etnos/ToolCard.svelte'
   import { DataChip, PageHeader, SectionHead } from '$lib/etnos/ui'
-  import { Badge } from 'mono-svelte'
-  import {
-    ArrowTopRightOnSquare,
-    CommandLine,
-    DocumentText,
-    Icon,
-  } from 'svelte-hero-icons/dist'
+  import { CommandLine, DocumentText, Icon } from 'svelte-hero-icons/dist'
 
   let { data } = $props()
 
@@ -165,46 +160,9 @@
         >
           {cat}
         </h3>
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-6">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {#each tools as tool (tool.name)}
-            <div
-              class="flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
-            >
-              <div class="flex items-baseline gap-2 min-w-0 flex-wrap">
-                <h4 class="font-semibold dark:text-white">
-                  <code class="font-mono">{tool.name}</code>
-                  <span
-                    class="text-xs font-normal text-slate-400 dark:text-zinc-500"
-                  >
-                    v{tool.version}
-                  </span>
-                </h4>
-                <p class="text-xs text-slate-500 dark:text-zinc-400">
-                  {tool.developer} · {tool.license}
-                </p>
-              </div>
-              <p class="text-sm text-slate-700 dark:text-zinc-300">
-                {tool.description}
-              </p>
-              <div class="flex flex-wrap gap-1.5 items-center">
-                {#each tool.badges as b (b)}
-                  {#if badgeMeta[b]}
-                    <Badge color={badgeMeta[b].color}>
-                      {badgeMeta[b].label}
-                    </Badge>
-                  {/if}
-                {/each}
-                <a
-                  href={tool.repo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="ml-auto text-xs text-primary-600 dark:text-primary-400 hover:underline inline-flex items-center gap-1"
-                >
-                  repo
-                  <Icon src={ArrowTopRightOnSquare} micro size="12" />
-                </a>
-              </div>
-            </div>
+            <ToolCard {tool} {badgeMeta} />
           {/each}
         </div>
       </section>

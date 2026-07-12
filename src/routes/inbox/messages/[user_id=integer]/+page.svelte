@@ -11,7 +11,7 @@
   import UserLink from '$lib/feature/user/UserLink.svelte'
   import { Header } from '$lib/ui/layout'
   import { publishedToDate } from '$lib/ui/util/date'
-  import { Button, Material, TextInput, toast } from 'mono-svelte'
+  import { Button, TextInput, toast } from 'mono-svelte'
   import { onDestroy, onMount, tick } from 'svelte'
   import {
     ArrowLeft,
@@ -166,16 +166,15 @@
   {/snippet}
 </Header>
 
-<Material
-  color="transparent"
-  rounding="2xl"
-  padding="none"
-  class="bg-white dark:bg-zinc-950 dark:border-t-zinc-900 w-full overflow-auto relative flex-1 min-h-0 max-h-[66vh] md:max-h-[64vh]"
+<div
+  class="w-full overflow-auto relative flex-1 min-h-0 max-h-[66vh] md:max-h-[64vh]"
 >
   <div class="h-full overflow-auto max-w-full" bind:this={chatWindow}>
-    <ul id="chat-window" class="flex flex-col gap-1 flex-1 px-4 py-4 min-h-0">
+    <ul id="chat-window" class="flex flex-col gap-1 flex-1 py-4 min-h-0">
       <div class="mt-auto"></div>
-      <p class="mx-auto mt-auto text-slate-400 dark:text-zinc-600 text-center">
+      <p
+        class="mx-auto mt-auto text-xs text-slate-500 dark:text-zinc-400 text-center"
+      >
         {$t('routes.inbox.messages.conversation', {
           user:
             data.creator.value.person_view.person.name +
@@ -204,8 +203,8 @@
         <div
           class={private_message.creator.id ==
           data.creator.value.person_view.person.id
-            ? 'self-start'
-            : 'self-end'}
+            ? 'self-start max-w-[85%]'
+            : 'self-end max-w-[85%]'}
           in:fly|global={{
             duration: 700,
             easing: backOut,
@@ -229,15 +228,15 @@
       {/each}
     </ul>
   </div>
-</Material>
+</div>
 {#await data.message.value then message}
-  <div class="sticky bottom-4 p-4">
+  <div class="sticky bottom-4 py-4">
     <form
       class={[
         'flex w-full',
-        'border-slate-200 dark:border-zinc-800',
-        'p-2 gap-2 backdrop-blur-xl',
-        'bg-white/50 dark:bg-zinc-950/50 border rounded-2xl',
+        'p-2 gap-2',
+        'bg-white dark:bg-zinc-900 rounded-2xl',
+        'border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700',
         settings.messages.fullMarkdown
           ? 'flex flex-col'
           : 'flex-row h-14 items-center',
@@ -305,9 +304,3 @@
     </form>
   </div>
 {/await}
-
-<style>
-  #chat-window {
-    box-shadow: inset 0px -10px 15px -10px rgba(0, 0, 0, 0.1);
-  }
-</style>

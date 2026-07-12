@@ -2,10 +2,13 @@
   /**
    * Papan Sinyal: a Solari split-flap board of live channels, the
    * station-board answer to "what is happening on the tanah right now".
-   * Four rows: Gempa (latest events, BMKG/USGS), Cuaca (rotating through
-   * the six anchor cities, Open-Meteo), Forum (real hot posts), Komunitas
-   * (directory rotation). News lives in the KILAS wire band up top, never
-   * here. Rows draw from the same SWR caches as Peta Kabar (one fact, one
+   * Rows, all optional: Peristiwa (alert row, EXISTS only while
+   * PetaBencana/FIRMS report real points), Gempa (BMKG/USGS), Cuaca
+   * (anchor cities, Open-Meteo), Laut (wave height at nearshore points,
+   * Open-Meteo Marine), Matahari (terbit/terbenam WIT), Forum (top post
+   * per community, so the rotation walks across communities), Komunitas
+   * (directory rotation). News lives in the KILAS wire band, never here.
+   * Rows draw from the same SWR caches as Peta Kabar (one fact, one
    * owner); a feed that answers with nothing shows an honest nihil line,
    * and a feed that cannot answer drops its row.
    *
@@ -18,7 +21,13 @@
   import { t } from '$lib/app/i18n'
   import directory from '$lib/etnos/data/directory.json'
   import { fetchHotPosts } from '$lib/etnos/hot'
-  import { fetchCuaca, fetchGempa } from '$lib/etnos/layers'
+  import {
+    fetchBanjir,
+    fetchCuaca,
+    fetchGempa,
+    fetchLaut,
+    fetchTitikApi,
+  } from '$lib/etnos/layers'
   import { daySeed, rngFrom } from '$lib/etnos/seed'
   import { postLink } from '$lib/feature/post/helpers'
   import { DataChip } from './ui'
@@ -34,7 +43,7 @@
   const FLIP_MS = 320
   const STAGGER_MS = 45
   const TICK_MS = 6000
-  const N_ROWS = 4
+  const N_ROWS = 8
 
   const komunitasPool: Flap[] = directory.groups.flatMap((g) =>
     g.communities.map((c) => ({
@@ -44,10 +53,16 @@
     })),
   )
 
+  let peristiwaPool = $state<Flap[]>([])
   let gempaPool = $state<Flap[]>([])
   let cuacaPool = $state<Flap[]>([])
+  let lautPool = $state<Flap[]>([])
+  let matahariPool = $state<Flap[]>([])
   let forumPool = $state<Flap[]>([])
   let sinyalLive = $state(false)
+
+  /** id-ID decimals for the board ("1,2 m"). */
+  const koma = (n: number) => String(n).replace('.', ',')
 
   $effect(() => {
     fetchGempa().then((r) => {
@@ -67,23 +82,83 @@
         teks: `${pt.kota} ${pt.t}° · ${pt.langit}`,
         sub: 'Open-Meteo',
       }))
+      matahariPool = r
+        .filter((pt) => pt.terbit && pt.terbenam)
+        .map((pt) => ({
+          teks: `${pt.kota} · terbit ${pt.terbit} · terbenam ${pt.terbenam}`,
+          sub: 'Open-Meteo',
+        }))
+    })
+    fetchLaut().then((r) => {
+      if (!r || !r.length) return
+      sinyalLive = true
+      lautPool = r.map((pt) => ({
+        teks: `${pt.kota} · gelombang ${koma(pt.gelombang)} m`,
+        sub: 'Open-Meteo Marine',
+      }))
+    })
+    // Alert row: exists ONLY while a source reports real points. Zero or
+    // unreachable = no row at all; quiet is the honest default.
+    fetchBanjir().then((r) => {
+      if (!r?.length) return
+      sinyalLive = true
+      peristiwaPool = [
+        ...peristiwaPool,
+        {
+          teks: `Banjir · ${r.length} laporan 12 jam terakhir`,
+          sub: 'PetaBencana',
+        },
+      ]
+    })
+    fetchTitikApi().then((r) => {
+      if (!r?.length) return
+      peristiwaPool = [
+        ...peristiwaPool,
+        {
+          teks: `Titik api · ${r.length} anomali termal satelit`,
+          sub: 'NASA FIRMS',
+        },
+      ]
     })
     fetchHotPosts().then((posts) => {
-      forumPool = posts.slice(0, 6).map((p) => ({
-        teks: p.post.name,
-        sub: `${p.community.title} · ▲${p.counts.score}`,
-        href: postLink(p.post),
-      }))
+      // Top post per community: the rotation walks across communities
+      // instead of letting one busy community fill every flap.
+      const seen = new Set<number>()
+      forumPool = posts
+        .filter((p) => {
+          if (seen.has(p.community.id)) return false
+          seen.add(p.community.id)
+          return true
+        })
+        .slice(0, 8)
+        .map((p) => ({
+          teks: p.post.name,
+          sub: `${p.community.title} · ▲${p.counts.score}`,
+          href: postLink(p.post),
+        }))
     })
   })
 
-  type Row = { key: 'gempa' | 'cuaca' | 'forum' | 'komunitas'; pool: Flap[] }
+  type Row = {
+    key:
+      | 'peristiwa'
+      | 'gempa'
+      | 'cuaca'
+      | 'laut'
+      | 'matahari'
+      | 'forum'
+      | 'komunitas'
+    pool: Flap[]
+  }
   // Empty pools drop their row instead of flipping blanks.
   let rows = $derived(
     (
       [
+        { key: 'peristiwa', pool: peristiwaPool },
         { key: 'gempa', pool: gempaPool },
         { key: 'cuaca', pool: cuacaPool },
+        { key: 'laut', pool: lautPool },
+        { key: 'matahari', pool: matahariPool },
         { key: 'forum', pool: forumPool },
         { key: 'komunitas', pool: komunitasPool },
       ] as Row[]
@@ -94,8 +169,8 @@
   const rng = rngFrom(daySeed('papan-sinyal'))
   const seedOffsets = Array.from({ length: N_ROWS }, () => rng())
 
-  let indices = $state([0, 0, 0, 0])
-  let flipping = $state([false, false, false, false])
+  let indices = $state([0, 0, 0, 0, 0, 0, 0, 0])
+  let flipping = $state([false, false, false, false, false, false, false, false])
   let cursor = 0
 
   $effect(() => {

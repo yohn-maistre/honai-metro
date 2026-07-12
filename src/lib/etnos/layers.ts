@@ -27,6 +27,16 @@ export interface CuacaPoint {
   lat: number
   t: number
   langit: string
+  /** Local WIT wall-clock "05.38", from the same Open-Meteo request. */
+  terbit?: string
+  terbenam?: string
+}
+export interface LautPoint {
+  kota: string
+  lon: number
+  lat: number
+  /** Significant wave height in meters. */
+  gelombang: number
 }
 export interface BanjirPoint {
   lon: number
@@ -213,12 +223,20 @@ export function langit(code: number): string {
   return 'badai petir'
 }
 
+/** "2026-07-12T05:38" -> "05.38" (already WIT via timezone param). */
+function jamLokal(iso: string | undefined): string | undefined {
+  if (!iso || iso.length < 16) return undefined
+  return iso.slice(11, 16).replace(':', '.')
+}
+
 export function fetchCuaca(): Promise<CuacaPoint[] | null> {
-  return swr('etnos.layers.cuaca.v1', 30 * 60_000, async () => {
+  // v2: sunrise/sunset ride the same request (one owner for the sky), and
+  // the timezone is Asia/Jayapura so daily times are true WIT wall clock.
+  return swr('etnos.layers.cuaca.v2', 30 * 60_000, async () => {
     const lats = ANCHORS.map((a) => a.lnglat[1]).join(',')
     const lons = ANCHORS.map((a) => a.lnglat[0]).join(',')
     const res = await fetch(
-      `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,weather_code&timezone=Asia%2FJakarta`,
+      `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current=temperature_2m,weather_code&daily=sunrise,sunset&forecast_days=1&timezone=Asia%2FJayapura`,
       { signal: AbortSignal.timeout(6000) },
     )
     if (!res.ok) return null
@@ -227,8 +245,11 @@ export function fetchCuaca(): Promise<CuacaPoint[] | null> {
     const pts: CuacaPoint[] = []
     list.forEach((entry, i) => {
       const anchor = ANCHORS[i]
-      const cur = (entry as { current?: { temperature_2m?: number; weather_code?: number } })
-        .current
+      const e = entry as {
+        current?: { temperature_2m?: number; weather_code?: number }
+        daily?: { sunrise?: string[]; sunset?: string[] }
+      }
+      const cur = e.current
       if (!anchor || cur?.temperature_2m == null) return
       pts.push({
         kota: anchor.kota,
@@ -236,6 +257,49 @@ export function fetchCuaca(): Promise<CuacaPoint[] | null> {
         lat: anchor.lnglat[1],
         t: Math.round(cur.temperature_2m),
         langit: langit(cur.weather_code ?? 3),
+        terbit: jamLokal(e.daily?.sunrise?.[0]),
+        terbenam: jamLokal(e.daily?.sunset?.[0]),
+      })
+    })
+    return pts.length ? pts : null
+  })
+}
+
+/* ---- Laut: Open-Meteo Marine at nearshore sea points ------------------- */
+
+/** Sea points a short way offshore of the coastal anchors (Wamena is
+ *  highland and carries no sea). Coordinates sit in open water so the
+ *  marine model answers; a land-locked cell answers null and is dropped. */
+const LAUT_ANCHORS: Anchor[] = [
+  { kota: 'Sorong', wilayah: 'Papua Barat Daya', lnglat: [131.1, -0.7] },
+  { kota: 'Manokwari', wilayah: 'Papua Barat', lnglat: [134.15, -0.75] },
+  { kota: 'Nabire', wilayah: 'Papua Tengah', lnglat: [135.55, -3.2] },
+  { kota: 'Jayapura', wilayah: 'Papua', lnglat: [140.75, -2.4] },
+  { kota: 'Merauke', wilayah: 'Papua Selatan', lnglat: [140.3, -8.6] },
+]
+
+export function fetchLaut(): Promise<LautPoint[] | null> {
+  return swr('etnos.layers.laut.v1', 30 * 60_000, async () => {
+    const lats = LAUT_ANCHORS.map((a) => a.lnglat[1]).join(',')
+    const lons = LAUT_ANCHORS.map((a) => a.lnglat[0]).join(',')
+    const res = await fetch(
+      `https://marine-api.open-meteo.com/v1/marine?latitude=${lats}&longitude=${lons}&current=wave_height&timezone=Asia%2FJayapura`,
+      { signal: AbortSignal.timeout(6000) },
+    )
+    if (!res.ok) return null
+    const d: unknown = await res.json()
+    const list = Array.isArray(d) ? d : [d]
+    const pts: LautPoint[] = []
+    list.forEach((entry, i) => {
+      const anchor = LAUT_ANCHORS[i]
+      const cur = (entry as { current?: { wave_height?: number | null } })
+        .current
+      if (!anchor || cur?.wave_height == null) return
+      pts.push({
+        kota: anchor.kota,
+        lon: anchor.lnglat[0],
+        lat: anchor.lnglat[1],
+        gelombang: Math.round(cur.wave_height * 10) / 10,
       })
     })
     return pts.length ? pts : null

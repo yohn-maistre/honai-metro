@@ -956,8 +956,11 @@
             "sinyal_label": "Sinyal langsung",
             "gempa_nihil": "Nihil dalam 24 jam terakhir",
             "rows": {
+                "peristiwa": "Kejadian",
                 "gempa": "Gempa",
                 "cuaca": "Cuaca",
+                "laut": "Laut",
+                "matahari": "Matahari",
                 "forum": "Forum",
                 "komunitas": "Komunitas"
             }
@@ -991,6 +994,10 @@
             "search": "Cari komunitas",
             "filter_all": "Samua",
             "empty": "Tra ada komunitas yang cocok deng pencarian itu.",
+            "live_head": "Dari server",
+            "live_loading": "Cari di server dulu...",
+            "live_empty": "Nihil dari server",
+            "live_error": "Server tra jawab, coba lagi nanti",
             "simpul_title": "Peta Simpul",
             "simpul_caption": "simpul komunitas, satu tanah",
             "simpul_hint": "Ketuk kota jangkar untuk lia berapa komunitas direktori di provinsi itu.",
@@ -1033,11 +1040,14 @@
         },
         "wiki": {
             "kategori_head": "Kategori",
+            "almanak": "Almanak",
+            "terbit": "Matahari naik",
+            "terbenam": "Matahari turun",
             "wajah_title": "Wajah Tanah Papua",
             "wajah_arsip": "arsip redaksi",
             "wajah_rotasi": "ganti dua kali sehari · teks apa adanya dari ensiklopedia",
             "wajah_kategori": "Baca di wiki",
-            "wajah_plate": "Lokasi di pelat Tanah Papua",
+            "wajah_plate": "Lokasi di peta Nusantara, Tanah Papua ditebalkan",
             "today_in_history": "Hari Ini Dalam Sejarah Papua",
             "word_of_day": "Kata Hari Ini",
             "read_aloud": "Baca dengan suara",
@@ -1100,6 +1110,13 @@
         },
         "feed": {
             "ai": "AI"
+        },
+        "kartu": {
+            "menu": "Kartu WA",
+            "title": "Bagi sebagai kartu",
+            "share": "Bagi",
+            "download": "Unduh",
+            "wa": "Buka WhatsApp"
         }
     }
 }

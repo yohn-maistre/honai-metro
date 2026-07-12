@@ -8,7 +8,6 @@
   import Sort from '$lib/feature/filter/Sort.svelte'
   import ViewSelect from '$lib/feature/filter/ViewSelect.svelte'
   import PapanSinyal from '$lib/etnos/PapanSinyal.svelte'
-  import PetaKabar from '$lib/etnos/PetaKabar.svelte'
   import PostFeed from '$lib/feature/post/feed/PostFeed.svelte'
   import VirtualFeed from '$lib/feature/post/feed/VirtualFeed.svelte'
   import Skeleton from '$lib/ui/generic/Skeleton.svelte'
@@ -44,8 +43,9 @@
   {$t('routes.frontpage.title')}
 </Header>
 
+<!-- The NOW page: wire (navbar), board, feed. The map lives in the wiki
+     (the reference atlas) and the locator plate in Jelajah. -->
 <div class="flex flex-col gap-5 mb-4">
-  <PetaKabar />
   <PapanSinyal />
 
   <!-- the rule that separates the instruments from the forum -->

@@ -527,3 +527,51 @@ Yose's morning review of the broadsheet wave. Items landed this pass:
   actors with aksara:attestation sandboxed on a throwaway PieFed
   instance (never piefed.social), notification bell. CLAUDE.md updated
   (maplibre now KEEP).
+
+## COHERENCE WAVE (2026-07-12, evening)
+
+Yose's morning review verdict: the quick-create box was a mistake, the
+light board looked flat, and the site needed one story. Doctrine landed
+this wave: every page answers ONE question (Beranda "apa yang terjadi",
+Jelajah "siapa dan di mana", Wiki "siapa kami", Papan Data "bagaimana
+keadaan kita"), and across products detak is the press, ETNOS is the
+square: ETNOS points at press, never rehosts it.
+
+- Quick-create box removed; navbar Buat is the single filled control
+  (solid primary both breakpoints; the old radial gradient in
+  nav-btn-sm-primary was our last gradient violation, now dead).
+- Papan Sinyal recolored: the plate is self-colored INK in both themes
+  (details root carries a literal `dark` class + zinc-900 skin; a
+  split-flap board is black in any light). His "light looks flatter"
+  observation, answered structurally.
+- KILAS wire now carries detak kliping CLUSTERS: fetchKilas reads
+  loadKliping (same /edisi SWR cache as map pins), src label "MEDIA +n",
+  click opens detak-detik/#/kliping/{id}. /ticker retired.
+- Board grew: LAUT (Open-Meteo Marine, 5 nearshore sea points, keyless
+  langsung day one), MATAHARI (terbit/terbenam WIT; sunrise/sunset now
+  ride the cuaca request, tz Asia/Jayapura, cache key cuaca.v2),
+  PERISTIWA (alert row that EXISTS only while banjir/titik-api report
+  real points), FORUM deduped to top post per community. Up to 7 rows,
+  each optional.
+- Peta Kabar moved home -> /wiki (his call: the kab dossier is
+  encyclopedic; wiki = reference desk). Home deck = board, divider,
+  filters, feed. /wiki gained the Almanak strip (tanggal WIT +
+  matahari Figures, langsung chip, same cuaca cache).
+- WajahTanah locator is now the whole-Indonesia plate (atlas-id.ts +
+  static/data/idn-prov.geojson vendored from detak, same per-feature
+  raster rule), Papua provinces printed heavier, seal ring at entry
+  koordinat, always rides the entry.
+- Jelajah is alive: /explore search also queries the server
+  (client().search type Communities, debounced 350ms, stale-response
+  guard), results langsung above the curated contoh directory, honest
+  loading/empty/error lines. Verified live: "news" returns 20 federated
+  communities; "papua" shows the honest nihil (borrowed backend truth).
+- Kartu WA shipped: post share menu -> "Kartu WA" opens a modal with a
+  1080x1080 canvas card (cream, terracotta bar, ETNOS wordmark, wrapped
+  title, c/community, url footer) + Bagikan (navigator.share files) /
+  Unduh / Buka WhatsApp (wa.me text). Distribution mechanic for the
+  WhatsApp-first audience. NOTE: share button now always opens the menu
+  (local posts previously shared directly; one extra tap, accepted).
+- i18n parity 157/157/157. The bigger brainstorm list (Edisi Pagi,
+  Warta Suara, Lembar Kampung, Kampung Saya, Mode Balai, Tolong
+  Dijawab, Musim Musrenbang, Mode Hemat Data) awaits his picks.

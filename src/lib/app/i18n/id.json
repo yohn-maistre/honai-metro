@@ -956,8 +956,11 @@
             "sinyal_label": "Sinyal langsung",
             "gempa_nihil": "Nihil dalam 24 jam terakhir",
             "rows": {
+                "peristiwa": "Peristiwa",
                 "gempa": "Gempa",
                 "cuaca": "Cuaca",
+                "laut": "Laut",
+                "matahari": "Matahari",
                 "forum": "Forum",
                 "komunitas": "Komunitas"
             }
@@ -988,11 +991,14 @@
         },
         "wiki": {
             "kategori_head": "Kategori",
+            "almanak": "Almanak",
+            "terbit": "Matahari terbit",
+            "terbenam": "Matahari terbenam",
             "wajah_title": "Wajah Tanah Papua",
             "wajah_arsip": "arsip redaksi",
             "wajah_rotasi": "berganti dua kali sehari · teks apa adanya dari ensiklopedia",
             "wajah_kategori": "Baca di wiki",
-            "wajah_plate": "Lokasi pada pelat Tanah Papua",
+            "wajah_plate": "Lokasi pada peta Nusantara, Tanah Papua ditebalkan",
             "today_in_history": "Hari Ini Dalam Sejarah Papua",
             "word_of_day": "Kata Hari Ini",
             "read_aloud": "Baca dengan suara",
@@ -1030,6 +1036,10 @@
             "search": "Cari komunitas",
             "filter_all": "Semua",
             "empty": "Tidak ada komunitas yang cocok dengan pencarian itu.",
+            "live_head": "Dari server",
+            "live_loading": "Mencari di server...",
+            "live_empty": "Nihil dari server untuk pencarian ini",
+            "live_error": "Server tidak menjawab, coba lagi nanti",
             "simpul_title": "Peta Simpul",
             "simpul_caption": "simpul komunitas, satu tanah",
             "simpul_hint": "Ketuk kota jangkar untuk melihat jumlah komunitas direktori di provinsinya.",
@@ -1100,6 +1110,13 @@
         },
         "feed": {
             "ai": "AI"
+        },
+        "kartu": {
+            "menu": "Kartu WA",
+            "title": "Bagikan sebagai kartu",
+            "share": "Bagikan",
+            "download": "Unduh",
+            "wa": "Buka WhatsApp"
         }
     }
 }

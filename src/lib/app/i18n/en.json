@@ -1074,8 +1074,11 @@
             "sinyal_label": "Live signals",
             "gempa_nihil": "None in the last 24 hours",
             "rows": {
+                "peristiwa": "Alerts",
                 "gempa": "Quakes",
                 "cuaca": "Weather",
+                "laut": "Sea",
+                "matahari": "Sun",
                 "forum": "Forum",
                 "komunitas": "Community"
             }
@@ -1109,6 +1112,10 @@
             "search": "Search communities",
             "filter_all": "All",
             "empty": "No communities match that search.",
+            "live_head": "From the server",
+            "live_loading": "Searching the server...",
+            "live_empty": "Nothing from the server for this search",
+            "live_error": "The server did not answer, try again later",
             "simpul_title": "Node Map",
             "simpul_caption": "community nodes, one land",
             "simpul_hint": "Tap an anchor city to see how many directory communities sit in its province.",
@@ -1151,11 +1158,14 @@
         },
         "wiki": {
             "kategori_head": "Categories",
+            "almanak": "Almanac",
+            "terbit": "Sunrise",
+            "terbenam": "Sunset",
             "wajah_title": "Faces of Tanah Papua",
             "wajah_arsip": "editorial archive",
             "wajah_rotasi": "changes twice a day · text verbatim from the encyclopedia",
             "wajah_kategori": "Read in the wiki",
-            "wajah_plate": "Location on the Tanah Papua plate",
+            "wajah_plate": "Location on the archipelago plate, Tanah Papua emphasized",
             "today_in_history": "Today in Papuan History",
             "word_of_day": "Word of the Day",
             "read_aloud": "Read aloud",
@@ -1218,6 +1228,13 @@
         },
         "feed": {
             "ai": "AI"
+        },
+        "kartu": {
+            "menu": "Kartu WA",
+            "title": "Share as a card",
+            "share": "Share",
+            "download": "Download",
+            "wa": "Open WhatsApp"
         }
     }
 }

@@ -1,9 +1,12 @@
 <script lang="ts">
+  import { client } from '$lib/api/client.svelte'
+  import type { CommunityView } from '$lib/api/types'
   import { t } from '$lib/app/i18n'
+  import { communityLink } from '$lib/app/util.svelte'
   import bahasa from '$lib/etnos/data/bahasa.json'
   import PetaSimpul from '$lib/etnos/PetaSimpul.svelte'
   import SorotanBoard from '$lib/etnos/SorotanBoard.svelte'
-  import { Figure, PageHeader, SectionHead } from '$lib/etnos/ui'
+  import { DataChip, Figure, PageHeader, SectionHead } from '$lib/etnos/ui'
   import { Badge, TextInput } from 'mono-svelte'
   import {
     ArrowRight,
@@ -16,6 +19,42 @@
 
   let q = $state('')
   let kategori = $state<string | null>(null)
+
+  // Live server search on top of the curated directory. Honest states:
+  // loading, results, nihil, error; never cached, never faked.
+  let live = $state<{
+    status: 'idle' | 'loading' | 'done' | 'error'
+    results: CommunityView[]
+  }>({ status: 'idle', results: [] })
+  let liveReq = 0
+
+  $effect(() => {
+    const needle = q.trim()
+    if (!needle) {
+      liveReq++ // invalidate any in-flight response
+      live = { status: 'idle', results: [] }
+      return
+    }
+    const id = ++liveReq
+    live = { status: 'loading', results: [] }
+    const timer = setTimeout(async () => {
+      try {
+        const res = await client().search({
+          q: needle,
+          type_: 'Communities',
+          listing_type: 'All',
+          sort: 'TopAll',
+          limit: 20,
+        })
+        if (id !== liveReq) return
+        live = { status: 'done', results: res.communities }
+      } catch {
+        if (id !== liveReq) return
+        live = { status: 'error', results: [] }
+      }
+    }, 350)
+    return () => clearTimeout(timer)
+  })
 
   const totalKomunitas = data.directory.groups.reduce(
     (n: number, g: { communities: unknown[] }) => n + g.communities.length,
@@ -111,6 +150,70 @@
       {/each}
     </div>
   </div>
+
+  {#if q.trim()}
+    <section class="flex flex-col gap-2">
+      <SectionHead title={$t('etnos.explore.live_head')}>
+        {#snippet action()}
+          <DataChip state="langsung" />
+        {/snippet}
+      </SectionHead>
+      {#if live.status === 'loading' || live.status === 'idle'}
+        <p class="text-sm text-slate-500 dark:text-zinc-400">
+          {$t('etnos.explore.live_loading')}
+        </p>
+      {:else if live.status === 'error'}
+        <p class="text-sm text-slate-500 dark:text-zinc-400">
+          {$t('etnos.explore.live_error')}
+        </p>
+      {:else if live.results.length === 0}
+        <p class="text-sm text-slate-500 dark:text-zinc-400">
+          {$t('etnos.explore.live_empty')}
+        </p>
+      {:else}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6">
+          {#each live.results as cv (cv.community.id)}
+            <a
+              href={communityLink(cv.community)}
+              class="group flex items-start gap-3 no-underline py-2.5 border-b border-slate-200/60 dark:border-zinc-800"
+            >
+              <div
+                class="w-9 h-9 rounded-xl shrink-0 grid place-items-center font-bold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300 overflow-hidden"
+              >
+                {#if cv.community.icon}
+                  <img
+                    src={cv.community.icon}
+                    alt=""
+                    class="w-full h-full object-cover"
+                  />
+                {:else}
+                  {(cv.community.title || cv.community.name).charAt(0)}
+                {/if}
+              </div>
+              <div class="flex flex-col gap-0.5 min-w-0">
+                <span
+                  class="font-medium dark:text-white truncate transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
+                >
+                  {cv.community.title || cv.community.name}
+                </span>
+                <span class="text-xs text-slate-500 dark:text-zinc-400 truncate">
+                  {communityLink(cv.community)}{' · '}{Intl.NumberFormat(
+                    'id-ID',
+                  ).format(cv.counts.subscribers)} pengikut
+                </span>
+              </div>
+              <Icon
+                src={ArrowTopRightOnSquare}
+                micro
+                size="14"
+                class="ml-auto text-slate-400 dark:text-zinc-500 mt-1 shrink-0"
+              />
+            </a>
+          {/each}
+        </div>
+      {/if}
+    </section>
+  {/if}
 
   {#if filtered.length === 0}
     <p class="text-sm text-slate-500 dark:text-zinc-400">

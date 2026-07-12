@@ -29,6 +29,7 @@
     GlobeAlt,
     Icon,
     MapPin,
+    Photo,
     Share,
     ShieldCheck,
   } from 'svelte-hero-icons/dist'
@@ -38,6 +39,7 @@
 
   let saving = $state(false)
   let editing = $state(false)
+  let kartuOpen = $state(false)
 
   interface Props {
     post: PostView
@@ -103,6 +105,18 @@
       </PostForm>
     {/await}
   </Modal>
+{/if}
+
+{#if kartuOpen}
+  {#await import('$lib/etnos/KartuWA.svelte') then { default: KartuWA }}
+    <KartuWA
+      bind:open={kartuOpen}
+      title={post.post.name}
+      community={post.community.title}
+      author={post.creator.name}
+      url={new URL(postLink(post.post), page.url.origin).toString()}
+    />
+  {/await}
 {/if}
 
 <footer
@@ -195,13 +209,10 @@
   <Menu placement="bottom-end">
     {#snippet target(attachment)}
       <Button
-        {@attach post.post.local ? () => {} : attachment}
+        {@attach attachment}
         rounding="xl"
         size="custom"
         class={buttonSquare}
-        onclick={() => {
-          if (post.post.local) share()
-        }}
         icon={Share}
         title={$t('post.actions.more.share')}
       />
@@ -212,6 +223,9 @@
     </MenuButton>
     <MenuButton onclick={() => share(false)} icon={MapPin}>
       {$t('post.actions.more.share.local')}
+    </MenuButton>
+    <MenuButton onclick={() => (kartuOpen = true)} icon={Photo}>
+      {$t('etnos.kartu.menu')}
     </MenuButton>
     {#if !LINKED_INSTANCE_URL}
       <MenuDivider>

@@ -131,7 +131,7 @@
           rounding="xl"
           class={[
             subscribed && 'text-slate-600 dark:text-zinc-400',
-            ' h-8.5 rounded-full',
+            'h-8.5',
             view == 'compact'
               ? 'aspect-square @md:px-2 @md:min-w-30 @md:aspect-auto'
               : 'px-3',

@@ -123,7 +123,8 @@
   :global(.comment-border) {
     border-color: var(--color-slate-200);
     @variant dark {
-      border-color: var(--color-zinc-800);
+      /* one step up the ladder: zinc-800 on zinc-925 is sub-threshold */
+      border-color: var(--color-zinc-700);
     }
 
     transition: border-color 600ms cubic-bezier(0.075, 0.82, 0.165, 1);
@@ -162,7 +163,7 @@
     border-bottom-width: 1px;
     border-color: var(--color-slate-200);
     @variant dark {
-      border-color: var(--color-zinc-800);
+      border-color: var(--color-zinc-700);
     }
     width: calc(var(--spacing) * 3);
     height: calc(var(--spacing) * 3);

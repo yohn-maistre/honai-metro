@@ -52,7 +52,7 @@
     id = generateID(),
     icon,
     inlineAffixes = !!icon,
-    shadow = 'sm',
+    shadow = 'none',
     element = $bindable(),
     class: clazz = '',
     customLabel: passedCustomLabel,

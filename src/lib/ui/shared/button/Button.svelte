@@ -192,29 +192,24 @@
       cursor: normal !important;
     }
 
+    /* Broadsheet doctrine (2026-07-12): buttons are flat. Primary is a
+       solid accent block (no gradients, house rule); secondary is a quiet
+       neutral fill with no border; ghost is a borderless tint-on-hover.
+       Controls may repaint on hover; surfaces never do. */
     .btn-primary {
       border: 1px solid transparent;
-      background: radial-gradient(
-        circle at 20% 0%,
-        var(--color-primary-800),
-        var(--color-primary-900)
-      );
-      background-size: 110% 110% !important;
+      background-color: var(--color-primary-900);
       color: var(--color-slate-50);
 
       @variant dark {
-        background: radial-gradient(
-          circle at center right,
-          var(--color-primary-200),
-          var(--color-primary-100)
-        );
+        background-color: var(--color-primary-100);
         color: var(--color-zinc-900);
       }
 
       @variant hover {
-        filter: brightness(120%);
+        filter: brightness(112%);
         @variant dark {
-          filter: brightness(90%);
+          filter: brightness(94%);
         }
       }
 
@@ -227,41 +222,27 @@
     }
 
     .btn-secondary {
-      border: 1px solid var(--color-slate-200);
-      border-bottom-color: var(--color-slate-300);
-      background-color: var(--color-white);
+      border: 1px solid transparent;
+      background-color: var(--color-slate-100);
+      color: var(--color-slate-800);
 
       @variant dark {
-        border: 1px solid
-          color-mix(
-            in oklab,
-            var(--color-zinc-800) 50%,
-            var(--color-zinc-900) 50%
-          );
-        background-color: var(--color-zinc-900);
-        border-top-color: var(--color-zinc-800);
+        background-color: var(--color-zinc-800);
+        color: var(--color-zinc-200);
       }
 
       @variant hover {
-        background-color: color-mix(
-          in oklab,
-          var(--color-white),
-          var(--color-slate-50)
-        );
+        background-color: var(--color-slate-200);
         @variant dark {
-          background-color: color-mix(
-            in oklab,
-            var(--color-zinc-925),
-            var(--color-zinc-900)
-          );
+          background-color: var(--color-zinc-700);
         }
       }
 
       @variant active {
-        background-color: var(--color-slate-100);
+        background-color: --alpha(var(--color-slate-300) / 70%);
 
         @variant dark {
-          background-color: var(--color-zinc-925);
+          background-color: var(--color-zinc-900);
         }
       }
     }
@@ -304,7 +285,7 @@
     }
 
     .btn-ghost {
-      border: 1px solid var(--color-slate-200);
+      background-color: transparent;
 
       @variant hover {
         background-color: var(--color-slate-100);
@@ -315,10 +296,8 @@
       }
 
       @variant dark {
-        border-color: var(--color-zinc-800);
         @variant hover {
           background-color: var(--color-zinc-800);
-          border-color: var(--color-zinc-700);
           color: var(--color-zinc-200);
         }
         @variant active {

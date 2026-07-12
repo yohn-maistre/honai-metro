@@ -13,9 +13,8 @@
   import VirtualFeed from '$lib/feature/post/feed/VirtualFeed.svelte'
   import Skeleton from '$lib/ui/generic/Skeleton.svelte'
   import { Header, Pageination } from '$lib/ui/layout'
-  import { profile } from '$lib/app/auth'
   import { Button } from 'mono-svelte'
-  import { ArrowRight, Icon, PencilSquare } from 'svelte-hero-icons/dist'
+  import { ArrowRight, Icon } from 'svelte-hero-icons/dist'
 
   let { data = $bindable() } = $props()
 
@@ -81,28 +80,6 @@
       </noscript>
     </div>
   </form>
-
-  <!-- quick create: one tap into the existing post form, no new path -->
-  <a
-    href={profile.current?.jwt ? '/create/post' : '/login'}
-    class="group flex items-center gap-3 no-underline bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 px-4 py-3"
-  >
-    <div
-      class="w-9 h-9 rounded-full shrink-0 grid place-items-center bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400"
-    >
-      <Icon src={PencilSquare} size="18" mini />
-    </div>
-    <span
-      class="text-sm text-slate-500 dark:text-zinc-400 transition-colors group-hover:text-slate-700 dark:group-hover:text-zinc-200"
-    >
-      {$t('etnos.deck.quick_create')}
-    </span>
-    <span
-      class="ml-auto text-xs font-medium text-primary-600 dark:text-primary-400"
-    >
-      {$t('etnos.deck.quick_create_cta')}
-    </span>
-  </a>
 </div>
 
 {#await data.feed.value}

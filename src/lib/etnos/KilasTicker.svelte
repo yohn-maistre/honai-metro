@@ -3,14 +3,14 @@
    * KILAS: the news wire. External press only, never forum posts; the
    * wire is site chrome and renders for every visitor, so only vetted
    * outlet headlines belong here. The baked sample is labeled contoh;
-   * when PUBLIC_DETAK_URL is set, the detak worker's hourly /ticker feed
-   * flips it to langsung. Links go out as-is, no tracking, no rewrite.
+   * when PUBLIC_DETAK_URL is set, the wire carries detak-detik's kliping
+   * clusters and every click opens the kliping card on detak-detik
+   * (full multi-outlet coverage there, ETNOS never rehosts press).
    *
    * Broadsheet treatment: no band, no box. Ink text on whatever surface
    * hosts it (the navbar on md+, a paper strip on mobile), with a
    * mask-image fade on both edges so the belt dissolves into its host.
    */
-  import { env } from '$env/dynamic/public'
   import {
     fetchKilas,
     KILAS_CONTOH,
@@ -28,7 +28,7 @@
   let live = $state(false)
 
   $effect(() => {
-    fetchKilas(env.PUBLIC_DETAK_URL as string | undefined).then((parsed) => {
+    fetchKilas().then((parsed) => {
       if (parsed) {
         items = parsed
         live = true
@@ -44,7 +44,7 @@
   <span
     class="flex-none flex items-center gap-1.5 text-xs font-semibold text-primary-600 dark:text-primary-400 pr-3"
     title={live
-      ? 'Berita langsung dari Detak Detik'
+      ? 'Kliping berita langsung dari Detak Detik, ketuk untuk membuka lembar klipingnya'
       : 'Contoh berita, belum tersambung ke sumber langsung'}
   >
     <span class="pulse-dot" aria-hidden="true"></span>

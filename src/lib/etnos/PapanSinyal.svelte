@@ -145,17 +145,21 @@
   })
 </script>
 
+<!-- The plate is self-colored ink in BOTH themes: a real split-flap board
+     is black in any light, and the instrument reads as an object on the
+     paper rather than a paper card. The `dark` class opts the children
+     (DataChip, dark: utilities) into their on-ink colors. -->
 <details
   bind:open
-  class="papan bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 overflow-hidden"
+  class="papan dark bg-zinc-900 rounded-2xl border border-zinc-800 border-t-zinc-700 overflow-hidden"
 >
   <summary
     class="flex items-center justify-between gap-3 px-4 py-3 cursor-pointer select-none list-none [&::-webkit-details-marker]:hidden"
   >
-    <h2 class="font-semibold dark:text-white flex items-center gap-2">
+    <h2 class="font-semibold text-zinc-50 flex items-center gap-2">
       <span
         class={[
-          'text-slate-400 dark:text-zinc-500 text-xs transition-transform',
+          'text-zinc-500 text-xs transition-transform',
           open && 'rotate-90',
         ]}
         aria-hidden="true">▶</span
@@ -166,16 +170,14 @@
       {#if sinyalLive}
         <DataChip state="langsung" label={$t('etnos.papan.sinyal_label')} />
       {/if}
-      <span
-        class="text-xs text-slate-400 dark:text-zinc-500 tabular-nums whitespace-nowrap"
-      >
+      <span class="text-xs text-zinc-500 tabular-nums whitespace-nowrap">
         {wit}
       </span>
     </div>
   </summary>
 
   <div
-    class="flex flex-col px-2 sm:px-3 py-1.5 border-t border-slate-200 dark:border-zinc-800"
+    class="flex flex-col px-2 sm:px-3 py-1.5 border-t border-zinc-800 text-zinc-100"
   >
     {#each rows as row, i (row.key)}
       {@const item = row.pool[Math.min(indices[i] ?? 0, row.pool.length - 1)]!}
@@ -208,15 +210,14 @@
   .papan {
     perspective: 700px;
   }
+  /* Ink-plate palette, identical in both themes (the board is an
+     instrument, not a paper surface). */
   .row {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 7px 8px;
-    border-bottom: 1px solid rgb(0 0 0 / 0.06);
-  }
-  :global(.dark) .row {
-    border-bottom-color: rgb(255 255 255 / 0.06);
+    border-bottom: 1px solid rgb(255 255 255 / 0.06);
   }
   .row:last-child {
     border-bottom: none;
@@ -226,9 +227,6 @@
     flex: none;
     font-size: 12px;
     font-weight: 600;
-    color: var(--color-primary-600);
-  }
-  :global(.dark) .tag {
     color: var(--color-primary-400);
   }
   .flapline {
@@ -243,7 +241,7 @@
   a.flapline:hover .clip {
     text-decoration: underline;
     text-underline-offset: 3px;
-    text-decoration-color: var(--color-primary-500);
+    text-decoration-color: var(--color-primary-400);
   }
   .cell {
     flex: 1 1 0;
@@ -251,8 +249,8 @@
     position: relative;
     overflow: hidden;
     height: 28px;
-    border-right: 1px solid rgb(0 0 0 / 0.07);
-    background: rgb(0 0 0 / 0.025);
+    border-right: 1px solid rgb(255 255 255 / 0.12);
+    background: rgb(255 255 255 / 0.06);
     transform-origin: center top;
     backface-visibility: hidden;
   }
@@ -263,10 +261,6 @@
     border-right: none;
     border-radius: 0 4px 4px 0;
   }
-  :global(.dark) .cell {
-    border-right-color: rgb(255 255 255 / 0.12);
-    background: rgb(255 255 255 / 0.06);
-  }
   /* the split-flap midline every real board carries */
   .cell::after {
     content: '';
@@ -275,11 +269,8 @@
     right: 0;
     top: 50%;
     height: 1px;
-    background: rgb(0 0 0 / 0.05);
-    pointer-events: none;
-  }
-  :global(.dark) .cell::after {
     background: rgb(255 255 255 / 0.09);
+    pointer-events: none;
   }
   .clip {
     position: absolute;
@@ -316,13 +307,10 @@
     flex: none;
     max-width: 30%;
     font-size: 11px;
-    color: var(--color-slate-500);
+    color: var(--color-zinc-400);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-  :global(.dark) .sub {
-    color: var(--color-zinc-400);
   }
   @media (prefers-reduced-motion: reduce) {
     .cell.flip {

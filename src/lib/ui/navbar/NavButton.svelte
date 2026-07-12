@@ -165,31 +165,46 @@
       }
     }
 
+    /* Buat: the one filled control in the bar, so the single most
+       important action reads instantly (owner call, 2026-07-12). */
     .nav-btn-sm-primary .prefix {
       @variant max-md {
-        background: radial-gradient(
-          circle at 20% 0%,
-          var(--color-primary-800),
-          var(--color-primary-900)
-        );
+        background-color: var(--color-primary-900);
         color: var(--color-slate-50);
         border-radius: var(--radius-xl);
-        background-size: 110% 110% !important;
 
         @variant hover {
-          filter: brightness(120%);
+          filter: brightness(115%);
           @variant dark {
-            filter: brightness(90%);
+            filter: brightness(95%);
           }
         }
 
         @variant dark {
-          background: radial-gradient(
-            circle at bottom right,
-            var(--color-primary-200),
-            var(--color-primary-100)
-          );
+          background-color: var(--color-primary-100);
           color: var(--color-zinc-900);
+        }
+      }
+    }
+
+    .nav-btn-sm-primary {
+      @variant md {
+        background-color: var(--color-primary-900);
+        color: var(--color-slate-50);
+
+        @variant hover {
+          background-color: var(--color-primary-800);
+          color: var(--color-slate-50);
+        }
+
+        @variant dark {
+          background-color: var(--color-primary-100);
+          color: var(--color-zinc-900);
+
+          @variant hover {
+            background-color: var(--color-primary-200);
+            color: var(--color-zinc-900);
+          }
         }
       }
     }

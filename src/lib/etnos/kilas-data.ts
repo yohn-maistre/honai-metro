@@ -1,9 +1,14 @@
 /**
- * The KILAS sample rundown, one owner for the contoh headlines, used
- * by the KILAS wire band. Real outlets, generic texts,
- * homepage links only (never fake article URLs), detak's edisi-contoh
- * doctrine. Replaced live when PUBLIC_DETAK_URL's /ticker responds.
+ * The KILAS wire's rundown, one owner. The contoh set uses real outlets,
+ * generic texts, homepage links only (never fake article URLs), detak's
+ * edisi-contoh doctrine. Live items are detak-detik's kliping CLUSTERS
+ * (owner call 2026-07-12): each entry is a cluster's lead headline, and
+ * clicking opens the kliping card on detak-detik itself, so readers get
+ * the full multi-outlet coverage and ETNOS never rehosts press. Same
+ * /edisi SWR cache as the map's kabar pins: one fact, one owner.
  */
+import { klipingUrl, loadKliping } from './kabar'
+
 export interface TickerItem {
   src: string
   teks: string
@@ -19,29 +24,17 @@ export const KILAS_CONTOH: TickerItem[] = [
   { src: 'BPS', teks: 'Rilis data sosial-ekonomi provinsi terbaru', url: 'https://papua.bps.go.id' },
 ]
 
-/** Fetch the live rundown from the detak worker; null keeps the contoh. */
-export async function fetchKilas(
-  detakUrl: string | undefined,
-): Promise<TickerItem[] | null> {
-  if (!detakUrl) return null
-  try {
-    const res = await fetch(`${detakUrl.replace(/\/$/, '')}/ticker`, {
-      signal: AbortSignal.timeout(6000),
-    })
-    if (res.status !== 200) return null
-    const d: unknown = await res.json()
-    const arr = Array.isArray(d) ? d : (d as { items?: unknown[] }).items
-    if (!Array.isArray(arr) || !arr.length) return null
-    const parsed = arr
-      .map((x) => x as Record<string, unknown>)
-      .filter((x) => typeof x.teks === 'string')
-      .map((x) => ({
-        src: String(x.src ?? ''),
-        teks: String(x.teks),
-        url: typeof x.url === 'string' ? x.url : undefined,
-      }))
-    return parsed.length ? parsed : null
-  } catch {
-    return null
-  }
+/** Live rundown = detak's published kliping clusters (loadKliping gates
+ *  on PUBLIC_DETAK_URL and SWR-caches); null keeps the contoh. */
+export async function fetchKilas(): Promise<TickerItem[] | null> {
+  const kliping = await loadKliping()
+  if (!kliping?.length) return null
+  return kliping
+    .filter((k) => k.utama?.judul)
+    .slice(0, 12)
+    .map((k) => ({
+      src: k.n_media > 1 ? `${k.utama.media} +${k.n_media - 1}` : k.utama.media,
+      teks: k.utama.judul,
+      url: klipingUrl(k.id),
+    }))
 }

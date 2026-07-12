@@ -71,12 +71,12 @@
       >{/if}
   </span>
   <span
-    class="text-xs text-slate-500 dark:text-zinc-400 flex items-center gap-1.5 min-w-0"
+    class="text-xs text-slate-500 dark:text-zinc-400 flex items-center flex-wrap gap-x-1.5 gap-y-0.5 min-w-0 leading-tight"
   >
     {#if icon}
       <Icon src={icon} micro size="13" class="shrink-0" />
     {/if}
-    <span class="truncate">{label}</span>
+    <span>{label}</span>
     {#if live}
       <DataChip state="langsung" class="shrink-0" />
     {:else if demo}

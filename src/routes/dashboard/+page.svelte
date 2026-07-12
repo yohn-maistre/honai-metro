@@ -2,25 +2,17 @@
   import { t } from '$lib/app/i18n'
   import BarChart from '$lib/etnos/charts/BarChart.svelte'
   import LineChart from '$lib/etnos/charts/LineChart.svelte'
-  import StatCard from '$lib/etnos/charts/StatCard.svelte'
-  import { DataChip, IconTile, PageHeader } from '$lib/etnos/ui'
-  import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
-  import { Material } from 'mono-svelte'
+  import { DataChip, Figure, PageHeader, SectionHead } from '$lib/etnos/ui'
   import {
-    AcademicCap,
-    Banknotes,
-    BuildingOffice2,
+    Bolt,
     ChartBar,
     ChatBubbleLeftRight,
-    CpuChip,
     GlobeAmericas,
-    type IconSource,
     UserGroup,
   } from 'svelte-hero-icons/dist'
 
-  import { getCached, loadLive, type LiveStats } from '$lib/etnos/live'
   import { fetchGempa } from '$lib/etnos/layers'
-  import { Bolt } from 'svelte-hero-icons/dist'
+  import { getCached, loadLive, type LiveStats } from '$lib/etnos/live'
 
   let { data } = $props()
 
@@ -44,7 +36,8 @@
     ['sumber', 'Sumber'],
   ] as const
 
-  // ETNOS: Papan Data Tanah Papua.
+  // ETNOS: Papan Data Tanah Papua, broadsheet edition: figures and charts
+  // sit directly on the paper, sections are heading + rule, no boxes.
   // Live row from the PieFed backend (only what the API really answers,
   // see live.ts); section data from BPS / Satudata (contoh JSON for now).
   // OTSUS tracker per UU 2/2021 transparency.
@@ -103,7 +96,7 @@
   <title>Papan Data Tanah Papua · ETNOS</title>
 </svelte:head>
 
-<div class="flex flex-col gap-6 max-w-full w-full">
+<div class="flex flex-col gap-8 max-w-full w-full">
   <PageHeader
     title="Papan Data Tanah Papua"
     lede="Angka hidup dari forum ini dan data publik provinsi. Satu angka, satu sumber."
@@ -111,7 +104,7 @@
 
   <!-- jump-nav: plain anchors, sticky so long boards stay navigable -->
   <nav
-    class="sticky top-0 z-10 -mx-1 px-1 py-2 bg-slate-25 dark:bg-zinc-925 flex gap-1.5 overflow-x-auto"
+    class="sticky top-0 z-10 -mx-1 px-1 py-2 -my-3 bg-slate-25 dark:bg-zinc-925 flex gap-1.5 overflow-x-auto"
     aria-label="Bagian papan data"
   >
     {#each JUMP as [id, label] (id)}
@@ -124,108 +117,78 @@
     {/each}
   </nav>
 
-  <!-- Live row: only what the backend really answers; anything the API
-       can't confirm falls back to its contoh tile, honestly labeled. -->
+  <!-- Live row: flat figures in a ruled ledger band. Only what the
+       backend really answers; anything the API can't confirm falls back
+       to its contoh figure, honestly labeled. -->
   <div
     id="forum"
-    class="scroll-mt-16 grid grid-cols-2 lg:grid-cols-5 gap-3"
+    class="scroll-mt-16 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-4 border-y border-slate-200/70 dark:border-zinc-800 py-4"
   >
     {#if liveUsers != null}
-      <StatCard
-        label="Pengguna Terdaftar"
-        value={liveUsers}
-        icon={UserGroup}
-        color="text-primary-500"
-        live
-      />
+      <Figure label="Pengguna Terdaftar" value={liveUsers} icon={UserGroup} live />
     {:else}
-      <StatCard
+      <Figure
         label="Pengguna Aktif"
         value={data.topStats.active_users}
         icon={UserGroup}
-        color="text-slate-400 dark:text-zinc-500"
         demo
       />
     {/if}
     {#if livePosts24h != null}
-      <StatCard
+      <Figure
         label="Postingan 24 Jam"
         value={livePosts24h}
         icon={ChatBubbleLeftRight}
-        color="text-primary-500"
         live
       />
     {:else}
-      <StatCard
+      <Figure
         label="Postingan Hari Ini"
         value={data.topStats.posts_today}
         icon={ChatBubbleLeftRight}
-        color="text-slate-400 dark:text-zinc-500"
         demo
       />
     {/if}
     {#if liveCommunities != null}
-      <StatCard
-        label="Komunitas Lokal"
-        value={liveCommunities}
-        icon={GlobeAmericas}
-        color="text-primary-500"
-        live
-      />
+      <Figure label="Komunitas Lokal" value={liveCommunities} icon={GlobeAmericas} live />
     {:else}
-      <StatCard
+      <Figure
         label="Komunitas"
         value={data.topStats.communities}
         icon={GlobeAmericas}
-        color="text-slate-400 dark:text-zinc-500"
         demo
       />
     {/if}
-    <StatCard
+    <Figure
       label="Data Bahasa"
       value={data.topStats.language_data}
       icon={ChartBar}
-      color="text-slate-400 dark:text-zinc-500"
       demo
     />
     {#if gempa24 != null}
       <a href="/" class="no-underline" title="Lihat di Peta Kabar">
-        <StatCard
-          label="Gempa 24 Jam Papua"
-          value={gempa24}
-          icon={Bolt}
-          color="text-primary-500"
-          live
-        />
+        <Figure label="Gempa 24 Jam Papua" value={gempa24} icon={Bolt} live />
       </a>
     {/if}
   </div>
 
-  <!-- Provincial data sections -->
-  <EndPlaceholder size="sm">Data Provinsi</EndPlaceholder>
-
-  {#snippet section(s: Section, icon: IconSource)}
-    <Material
-      color="default"
-      rounding="2xl"
-      padding="lg"
-      class="flex flex-col gap-4"
-    >
-      <div class="flex items-start gap-3">
-        <IconTile {icon} size="md" />
-        <div class="flex flex-col gap-0.5 min-w-0">
-          <h3 class="font-semibold dark:text-white">{s.title}</h3>
-          <p class="text-sm text-slate-500 dark:text-zinc-400">{s.subtitle}</p>
-        </div>
-        {#if s.demo}
-          <DataChip state="contoh" class="ml-auto mt-1" />
-        {/if}
+  {#snippet section(s: Section, id: string)}
+    <section {id} class="scroll-mt-16 flex flex-col gap-4">
+      <div class="flex flex-col gap-1">
+        <SectionHead title={s.title}>
+          {#snippet action()}
+            {#if s.demo}
+              <DataChip state="contoh" />
+            {/if}
+          {/snippet}
+        </SectionHead>
+        <p class="text-sm text-slate-500 dark:text-zinc-400">{s.subtitle}</p>
       </div>
 
       {#if s.stats?.length}
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
           {#each s.stats as st (st.label)}
-            <StatCard label={st.label} value={st.value} unit={st.unit} />
+            <Figure label={st.label} value={st.value} unit={st.unit} />
           {/each}
         </div>
       {/if}
@@ -238,55 +201,38 @@
         <LineChart title={s.line.title} data={s.line.data} unit={s.line.unit} />
       {/if}
 
-      <p class="text-xs text-slate-400 dark:text-zinc-500 mt-1">
+      <p class="text-xs text-slate-400 dark:text-zinc-500">
         {$t('etnos.dashboard.data_source')}: {s.source}
       </p>
-    </Material>
+    </section>
   {/snippet}
 
-  <div class="grid grid-cols-1 gap-3">
-    <div id="pendidikan" class="scroll-mt-16">
-      {@render section(data.sections.pendidikan, AcademicCap)}
-    </div>
-    <div id="ekonomi" class="scroll-mt-16">
-      {@render section(data.sections.ekonomi, Banknotes)}
-    </div>
-    <div id="infrastruktur" class="scroll-mt-16">
-      {@render section(data.sections.infrastruktur, BuildingOffice2)}
-    </div>
-    <div id="kualitas-hidup" class="scroll-mt-16">
-      {@render section(data.sections.kualitasHidup, UserGroup)}
-    </div>
-  </div>
+  {@render section(data.sections.pendidikan, 'pendidikan')}
+  {@render section(data.sections.ekonomi, 'ekonomi')}
+  {@render section(data.sections.infrastruktur, 'infrastruktur')}
+  {@render section(data.sections.kualitasHidup, 'kualitas-hidup')}
 
   <!-- OTSUS tracker -->
-  <EndPlaceholder size="sm">{$t('etnos.dashboard.otsus')}</EndPlaceholder>
-  <Material
-    id="otsus"
-    color="default"
-    rounding="2xl"
-    padding="lg"
-    class="flex flex-col gap-4 scroll-mt-16"
-  >
-    <div class="flex items-start gap-3">
-      <IconTile icon={Banknotes} size="md" />
-      <div class="flex flex-col gap-0.5 min-w-0">
-        <h3 class="font-semibold dark:text-white">{data.otsus.title}</h3>
-        <p class="text-sm text-slate-500 dark:text-zinc-400">
-          {data.otsus.subtitle}
-        </p>
-        <p class="text-xs text-slate-400 dark:text-zinc-500 mt-1">
-          Dasar: {data.otsus.regulation}
-        </p>
-      </div>
-      {#if data.otsus.demo}
-        <DataChip state="contoh" class="ml-auto mt-1" />
-      {/if}
+  <section id="otsus" class="scroll-mt-16 flex flex-col gap-4">
+    <div class="flex flex-col gap-1">
+      <SectionHead title={data.otsus.title}>
+        {#snippet action()}
+          {#if data.otsus.demo}
+            <DataChip state="contoh" />
+          {/if}
+        {/snippet}
+      </SectionHead>
+      <p class="text-sm text-slate-500 dark:text-zinc-400">
+        {data.otsus.subtitle}
+      </p>
+      <p class="text-xs text-slate-400 dark:text-zinc-500">
+        Dasar: {data.otsus.regulation}
+      </p>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-3">
       {#each data.otsus.stats as st (st.label)}
-        <StatCard label={st.label} value={st.value} unit={st.unit} />
+        <Figure label={st.label} value={st.value} unit={st.unit} />
       {/each}
     </div>
 
@@ -302,45 +248,29 @@
       unit={data.otsus.line.unit}
     />
 
-    <p class="text-xs text-slate-400 dark:text-zinc-500 mt-1">
+    <p class="text-xs text-slate-400 dark:text-zinc-500">
       {$t('etnos.dashboard.data_source')}: {data.otsus.source}
     </p>
-  </Material>
+  </section>
 
   <!-- Agen AI (placeholder until real nodes report in) -->
-  <EndPlaceholder size="sm">Agen AI</EndPlaceholder>
-  <Material
-    id="agen"
-    color="default"
-    rounding="2xl"
-    padding="lg"
-    class="flex items-start gap-3 scroll-mt-16"
-  >
-    <IconTile icon={CpuChip} size="md" />
-    <div class="flex flex-col gap-1 min-w-0">
-      <div class="flex items-center gap-2 flex-wrap">
-        <h3 class="font-semibold dark:text-white">Status agen AI</h3>
+  <section id="agen" class="scroll-mt-16 flex flex-col gap-2">
+    <SectionHead title="Status agen AI">
+      {#snippet action()}
         <DataChip state="segera" />
-      </div>
-      <p class="text-slate-500 dark:text-zinc-400 text-sm">
-        Status agen AI akan tampil di sini: pemantauan sumber informasi lokal
-        dan ringkasan pembaruan untuk komunitas.
-      </p>
-    </div>
-  </Material>
+      {/snippet}
+    </SectionHead>
+    <p class="text-slate-500 dark:text-zinc-400 text-sm max-w-prose">
+      Status agen AI akan tampil di sini: pemantauan sumber informasi lokal
+      dan ringkasan pembaruan untuk komunitas.
+    </p>
+  </section>
 
   <!-- Sumber: every number on this board and where it comes from -->
-  <EndPlaceholder size="sm">Sumber</EndPlaceholder>
-  <Material
-    id="sumber"
-    color="default"
-    rounding="2xl"
-    padding="lg"
-    class="flex flex-col gap-3 scroll-mt-16"
-  >
-    <h3 class="font-semibold dark:text-white">Satu angka, satu sumber</h3>
+  <section id="sumber" class="scroll-mt-16 flex flex-col gap-2">
+    <SectionHead title="Satu angka, satu sumber" />
     <dl
-      class="flex flex-col divide-y divide-slate-100 dark:divide-zinc-800 text-sm"
+      class="flex flex-col divide-y divide-slate-200/70 dark:divide-zinc-800 text-sm"
     >
       <div class="flex justify-between items-center gap-4 py-2">
         <dt class="text-slate-600 dark:text-zinc-400">
@@ -400,5 +330,5 @@
       <span class="font-medium">data contoh</span> berarti contoh yang menunggu
       sumber resmi.
     </p>
-  </Material>
+  </section>
 </div>

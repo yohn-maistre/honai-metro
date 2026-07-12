@@ -6,9 +6,8 @@
    */
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
   import { bukaSekarang, type Jam } from '$lib/etnos/org'
-  import { DataChip, IconTile, PageHeader } from '$lib/etnos/ui'
-  import { Material, Note } from 'mono-svelte'
-  import { BuildingLibrary } from 'svelte-hero-icons/dist'
+  import { DataChip, PageHeader, SectionHead } from '$lib/etnos/ui'
+  import { Note } from 'mono-svelte'
 
   let { data } = $props()
 
@@ -52,7 +51,7 @@
   <title>Direktori Organisasi · ETNOS</title>
 </svelte:head>
 
-<div class="flex flex-col gap-5 max-w-full w-full">
+<div class="flex flex-col gap-6 max-w-full w-full">
   <PageHeader
     title="Direktori Organisasi"
     lede="Kehadiran Level 0: organisasi tercantum dengan profil, layanan, dan jam buka, tanpa akun dan tanpa kewajiban. Organisasi yang siap dapat mengklaim halamannya dan bertumbuh menjadi Agen Institusi."
@@ -102,14 +101,13 @@
   </div>
 
   <!-- the ladder: how a listed org grows -->
-  <Material color="default" rounding="2xl" padding="lg" class="flex flex-col gap-4">
-    <div class="flex items-center gap-3">
-      <IconTile icon={BuildingLibrary} size="md" />
-      <h3 class="font-semibold dark:text-white">Tangga kehadiran</h3>
-    </div>
-    <ol class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <section class="flex flex-col gap-3">
+    <SectionHead title="Tangga kehadiran" />
+    <ol class="grid grid-cols-1 sm:grid-cols-3 gap-x-6">
       {#each LADDER as step, i (step.level)}
-        <li class="flex flex-col gap-1.5">
+        <li
+          class="flex flex-col gap-1.5 py-3 border-b border-slate-200/60 dark:border-zinc-800"
+        >
           <span
             class={[
               'w-7 h-7 rounded-full grid place-items-center text-xs font-semibold',
@@ -127,7 +125,7 @@
         </li>
       {/each}
     </ol>
-  </Material>
+  </section>
 
   <Note>
     <strong>Klaim halaman.</strong> Mewakili salah satu jenis organisasi ini?

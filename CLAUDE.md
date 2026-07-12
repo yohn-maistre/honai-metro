@@ -30,11 +30,24 @@ Plus Jakarta Sans.
 
 Hard rules, all learned the expensive way:
 
-- **One card skin.** Use `Material` (`color="default" rounding="2xl"`,
-  padding md=tile / lg=card / xl=feature; add `interactive` for links).
-  Raw equivalent: `bg-white dark:bg-zinc-900 rounded-2xl shadow-xs border
-  border-slate-200 border-b-slate-300 dark:border-zinc-800
-  dark:border-t-zinc-700`. No `/80` translucency, no gradients.
+- **Broadsheet, three layers** (2026-07-12, supersedes MIDAS's
+  "cards everywhere"). Layer 0, the paper: content sits directly on the
+  page field; sections are `SectionHead` (heading + hairline rule) and
+  lists are hairline-separated rows, never boxes. Layer 1, instruments:
+  only self-contained live objects get the card skin (Papan Sinyal,
+  forms/composers, CapabilityCard profiles); the map is full-bleed dots
+  ON the paper. Layer 2, floats: dossier, legend, menus, modals carry
+  the only shadows. Flat stats = `Figure` (big number + label, no box).
+  `Board` and `StatCard` are retired and deleted.
+- **When a card IS warranted** use `Material` (`color="default"
+  rounding="2xl"`; add `interactive` for links). Raw equivalent:
+  `bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200
+  border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700`.
+  No `/80` translucency, no gradients (the old btn-primary radial
+  gradient was a violation and is now a solid block).
+- **Surfaces never repaint on hover; controls may.** Card/row affordance
+  = cursor + title color shift or border deepen. `hover:bg-*` only on
+  buttons, selects, pills, chips.
 - **Dots, not pills.** Status/semantics = a small colored dot on a neutral
   chip (see `Badge.svelte`), never a tinted pill background. Provenance =
   `DataChip` (`langsung` pulsing terracotta / `contoh` hollow / `segera`
@@ -43,9 +56,10 @@ Hard rules, all learned the expensive way:
 - **No em dashes anywhere** in user-visible text (house style). No
   uppercase-tracking micro labels. No emoji in UI strings. Formal-warm
   Indonesian, sentence case.
-- **Every page opens with `PageHeader`** (real h1). `EndPlaceholder` is a
-  section divider only. Icon squares = `IconTile`. Back links = `BackLink`.
-  Titled flush-body cards = `Board`. All in `src/lib/etnos/ui/`.
+- **Every page opens with `PageHeader`** (real h1). Sections open with
+  `SectionHead` (title + optional chip action + rule + optional caption).
+  Flat stats = `Figure`. Icon squares = `IconTile`. Back links =
+  `BackLink`. All in `src/lib/etnos/ui/`.
 - **Honest labels.** A number is langsung only if fetched live; sample
   data is labeled contoh, always. One fact, one owner: never render the
   same number from two components.
@@ -70,22 +84,26 @@ Hard rules, all learned the expensive way:
 
 ## The deck and the detak-detik integration
 
-The **KILAS wire band** is GLOBAL, not a page element: rendered in
-`+layout.svelte` twice, a `band` variant under the Navbar (md+, sticky
-via the shell-navbar-holder) and a mobile-only sticky strip at the top of
-`<main>` (the mobile navbar is a bottom dock, so the band can't live
-there). `KilasTicker.svelte` takes `band` + `class` props.
+The **KILAS wire** is GLOBAL chrome, not a page element, and carries
+external press ONLY (never forum posts: the wire renders for every
+visitor on every page, so only vetted outlet headlines belong in it).
+On md+ it rides the Navbar's center slot (`Navbar.svelte`, mask-image
+fades both edges, no band, ink on the navbar surface); on mobile it is
+a sticky paper strip at the top of `<main>` in `+layout.svelte` (the
+mobile navbar is a bottom dock). `KilasTicker.svelte` takes a `class`
+prop and is flat: no black band anywhere.
 
-`/` (Beranda) deck order: h1 header → filter row (Lokasi/Urutkan/
-Tampilan, right-aligned) → **PetaKabar** full-width live-map hero →
-**PapanSinyal** Solari board → feed. No guest redirect.
+`/` (Beranda) deck order: h1 header → **PetaKabar** full-bleed live-map
+hero → **PapanSinyal** Solari board → hairline divider → filter row
+(Lokasi/Urutkan/Tampilan, right-aligned) → feed. No guest redirect.
 
 **PetaKabar** (`src/lib/etnos/PetaKabar.svelte`) is a canvas dot-grid
-plate of Tanah Papua — no MapLibre, no tiles. Full-width canvas with
-floating overlays, detak-detik style: layer legend top-right
-(collapsible "Lapisan · n" pill), dossier card top-left, and a footer
-row with the identity line + "Sumber aktif" credits (only langsung
-sources listed). Dashed kabupaten boundary lines ride over the dots
+plate of Tanah Papua — no MapLibre, no tiles, and since the broadsheet
+pass NO CARD: the canvas is full-bleed on the page (`-mx-3 sm:-mx-6`)
+under a `SectionHead`, with floating overlays detak-detik style: layer
+legend top-right (collapsible "Lapisan · n" pill), dossier card
+top-left, and a flat footer line with the identity sentence + "Sumber
+aktif" credits (only langsung sources listed). Dashed kabupaten boundary lines ride over the dots
 (`loadBoundaryPaths` in `atlas.ts`, Path2D per kab). Six data layers
 through `src/lib/etnos/layers.ts` (SWR localStorage, Papua-bbox clip,
 contract: null=segera, []=nihil, points=langsung, **no fake points

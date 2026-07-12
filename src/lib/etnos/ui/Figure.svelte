@@ -3,8 +3,8 @@
    * Figure: a flat broadsheet stat. Big number, small label, set directly
    * on the paper; no box, no border, no shadow. Separation between
    * figures is the parent's job (grid gaps or hairline rules). Live
-   * numbers count up like StatCard's; contoh and langsung chips ride
-   * inline with the label.
+   * numbers count up (rAF, ~0.7s ease-out); contoh and langsung chips
+   * ride inline with the label.
    */
   import { browser } from '$app/environment'
   import DataChip from '$lib/etnos/ui/DataChip.svelte'

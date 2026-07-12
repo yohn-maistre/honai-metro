@@ -414,3 +414,81 @@ commits P1-P4, each build-verified + screenshot-verified.
   is gone; both are ~40 lines of playwright-core.
 - The 87.5% root means screenshots at 1440px now show more content;
   Yose's own 80% zoom habit should no longer be needed.
+
+---
+
+# BROADSHEET WAVE (2026-07-12, same night) — the de-carding
+
+Yose's second screenshot review after POLISH WAVE: "I think it's the
+cards, and the material ui like components that look so ugly... let's
+rethink everything from the bottoms up." Diagnosis confirmed by count:
+dashboard alone nested 15 Material cards; cream's two surface tones are
+~8% apart so borders did all the separating and every page read as an
+admin template. Direction (approved, all five waves): the three-layer
+broadsheet model.
+
+## The doctrine (now in CLAUDE.md hard rules)
+
+- Layer 0 paper: content directly on the page field; SectionHead
+  (heading + rule) + hairline rows structure everything.
+- Layer 1 instruments: card skin ONLY for self-contained live objects
+  (Papan Sinyal, forms/composers, CapabilityCard profiles).
+- Layer 2 floats: dossier/legend/menus/modals carry the only shadows.
+- New primitives src/lib/etnos/ui: SectionHead (title + action snippet
+  + rule + caption), Figure (flat stat, count-up kept). Board + StatCard
+  RETIRED and deleted.
+- Wire = external press only, never posts (chrome renders for every
+  visitor; post titles from federated instances cannot be site chrome
+  until ETNOS runs its own moderated server). Papan Sinyal owns the
+  forum-post highlight (FORUM row).
+
+## F1 primitives (d8e0d02e)
+btn-primary radial gradient (house-rule violation, vendored) → solid
+primary-900/primary-100; btn-secondary bordered-white-pill → flat
+neutral fill, no border (Selects render as btn-secondary so every
+select flattened for free); btn-ghost border removed; TextInput default
+shadow off; CommunityItem subscribe no longer rounded-full; comment
+thread lines + corners dark zinc-800 → zinc-700 (were sub-threshold on
+zinc-925).
+
+## F2 deck (9c0b775a)
+KilasTicker rewritten flat (no black band; terracotta Kilas dot-label,
+ink belt, mask fades) and mounted in Navbar's center flex slot on md+;
+mobile keeps a sticky paper strip in +layout. Map hero de-carded:
+SectionHead + full-bleed canvas (-mx-3 sm:-mx-6, h-80/26rem/32rem, fit
+0.97), floats realigned to content padding, footer flat. PapanSinyal
+lost its shadow. Deck order: map → board → hairline divider → filter
+row → feed (his call: filters right above the feed, divider between).
+
+## F3 dashboard (6f0fc15c)
+15 Materials → 0. Hero stats = Figure ledger band (border-y); sections
+= SectionHead + subtitle + Figure grids + unboxed charts; sumber dl
+flat. Figure labels wrap (truncation fix).
+
+## F4 explore + wiki (ed56daa2)
+PetaSimpul + SorotanBoard de-carded (SectionHead + flat rows);
+explore stats → Figure band; directory groups → SectionHead + hairline
+row grid (gap-x-6, group-hover title shift); browse-all rows flat.
+Wiki: WajahTanah = editorial lead story between border-y rules;
+Sejarah/Kata daily Boards → flat sections; category grid → IconTile
+rows; kontribusi flat. New i18n key etnos.wiki.kategori_head ×3.
+
+## F5 civic pages + sweep (this commit)
+agen: flagship/directory/tiers/registry/standards all flat (tool cards
+→ hairline rows, tier cards → celled rows). tentang: all 11 anchors
+survive as flat sections (verified). org index: ladder flat; org cards
+stay CapabilityCard (instrument profiles). org/[slug]: profil dl →
+ruled rows. musrenbang: explainer/stepper/usulan/panduan flat; the
+composer form remains the page's single card, deliberately.
+Board.svelte + charts/StatCard.svelte deleted; ui/index exports
+SectionHead + Figure. Em-dash sweep clean; parity 142/142/142.
+
+## Notes for the next seat
+- If a new surface wants a "titled flush card", that is the smell that
+  Board used to satisfy: use SectionHead + rows on paper instead.
+- mono-svelte Button/Select styling now lives further from upstream
+  Photon; when merging upstream, keep .btn-primary solid and
+  .btn-secondary borderless.
+- Settings/admin pages inherit the primitive restyle only; they still
+  use their own Material rows (Photon internals, out of scope, look
+  fine in the canary).

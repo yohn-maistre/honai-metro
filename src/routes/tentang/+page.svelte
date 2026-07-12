@@ -2,12 +2,11 @@
   /**
    * Tentang ETNOS: the canonical deep explainer. The right-sidebar About
    * card belongs to the INSTANCE (short, backend-owned); this page owns
-   * the ETNOS story in scannable cards, and carries the anchor targets
+   * the ETNOS story in broadsheet sections, and carries the anchor targets
    * that /agen (standards) and /org (klaim) link to.
    */
   import { t } from '$lib/app/i18n'
-  import { DataChip, IconTile, PageHeader } from '$lib/etnos/ui'
-  import { Material } from 'mono-svelte'
+  import { DataChip, IconTile, PageHeader, SectionHead } from '$lib/etnos/ui'
   import {
     ArrowRight,
     BookOpen,
@@ -17,7 +16,6 @@
     CommandLine,
     CpuChip,
     DocumentText,
-    GlobeAsiaAustralia,
     Icon,
     UserGroup,
   } from 'svelte-hero-icons/dist'
@@ -95,23 +93,15 @@
   />
 </svelte:head>
 
-<div class="flex flex-col gap-5 max-w-full w-full">
+<div class="flex flex-col gap-8 max-w-full w-full">
   <PageHeader
     title={$t('etnos.tentang.title')}
     lede="Ruang publik berfederasi Tanah Papua: satu tanah, melampaui batas administratif."
   />
 
   <!-- apa itu -->
-  <Material
-    id="apa"
-    color="default"
-    rounding="2xl"
-    padding="xl"
-    class="scroll-mt-16"
-  >
-    <h2 class="text-xl font-semibold dark:text-white mb-3">
-      ETNOS, ruang publik komunitas Melanesia
-    </h2>
+  <section id="apa" class="scroll-mt-16 flex flex-col gap-3">
+    <SectionHead title="ETNOS, ruang publik komunitas Melanesia" />
     <p class="text-sm sm:text-base text-slate-700 dark:text-zinc-300 leading-relaxed max-w-prose">
       ETNOS adalah forum publik berfederasi untuk Tanah Papua, dirancang
       sebagai alun-alun digital untuk komunitas dan institusi. Berbasis
@@ -120,25 +110,22 @@
       koperasi tanpa platform terpusat. ETNOS adalah satu komponen dari
       Aksara, prakarsa Communal AI untuk layanan publik lapis pertama.
     </p>
-  </Material>
+  </section>
 
   <!-- isi -->
   <section id="isi" class="scroll-mt-16 flex flex-col gap-3">
-    <h2 class="text-lg font-semibold dark:text-white">Apa yang ada di sini</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <SectionHead title="Apa yang ada di sini" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
       {#each ISI as item (item.href)}
-        <Material
-          element="a"
+        <a
           href={item.href}
-          color="default"
-          rounding="2xl"
-          padding="md"
-          interactive
-          class="flex items-center gap-3 no-underline"
+          class="group flex items-start gap-3 no-underline py-2.5 border-b border-slate-200/60 dark:border-zinc-800"
         >
           <IconTile icon={item.icon} size="sm" />
-          <div class="flex flex-col min-w-0">
-            <span class="text-sm font-medium dark:text-white">
+          <div class="flex flex-col gap-0.5 min-w-0">
+            <span
+              class="text-sm font-medium dark:text-white transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
+            >
               {item.label}
             </span>
             <span class="text-xs text-slate-500 dark:text-zinc-400 truncate">
@@ -149,25 +136,20 @@
             src={ArrowRight}
             micro
             size="16"
-            class="ml-auto shrink-0 text-slate-400 dark:text-zinc-500"
+            class="ml-auto shrink-0 mt-1 text-slate-400 dark:text-zinc-500"
           />
-        </Material>
+        </a>
       {/each}
     </div>
   </section>
 
   <!-- keanggotaan -->
   <section id="keanggotaan" class="scroll-mt-16 flex flex-col gap-3">
-    <h2 class="text-lg font-semibold dark:text-white">
-      Empat tingkat keanggotaan
-    </h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <SectionHead title="Empat tingkat keanggotaan" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-6">
       {#each KEANGGOTAAN as k, i (k.nama)}
-        <Material
-          color="default"
-          rounding="2xl"
-          padding="lg"
-          class="flex flex-col gap-2"
+        <div
+          class="flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
         >
           <span
             class="w-7 h-7 rounded-full grid place-items-center text-xs font-semibold bg-slate-100 dark:bg-zinc-800 text-slate-600 dark:text-zinc-300"
@@ -178,7 +160,7 @@
           <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
             {k.desc}
           </p>
-        </Material>
+        </div>
       {/each}
     </div>
     <p class="text-xs text-slate-500 dark:text-zinc-400">
@@ -189,19 +171,8 @@
   </section>
 
   <!-- federasi -->
-  <Material
-    id="federasi"
-    color="default"
-    rounding="2xl"
-    padding="xl"
-    class="scroll-mt-16"
-  >
-    <div class="flex items-center gap-3 mb-3">
-      <IconTile icon={GlobeAsiaAustralia} size="md" />
-      <h2 class="text-lg font-semibold dark:text-white">
-        Federasi, bukan platform
-      </h2>
-    </div>
+  <section id="federasi" class="scroll-mt-16 flex flex-col gap-3">
+    <SectionHead title="Federasi, bukan platform" />
     <p class="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed max-w-prose">
       Saat ini satu instance melayani seluruh Tanah Papua. Ketika komunitas
       tumbuh, wilayah dapat membuka instance-nya sendiri dan tetap saling
@@ -215,18 +186,15 @@
         class="font-medium text-primary-600 dark:text-primary-400 hover:underline"
       >CARE Principles</a>.
     </p>
-  </Material>
+  </section>
 
   <!-- standar & protokol: the anchors /agen links to -->
   <section class="flex flex-col gap-3">
-    <h2 class="text-lg font-semibold dark:text-white">Standar dan protokol</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <Material
+    <SectionHead title="Standar dan protokol" />
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6">
+      <div
         id="agen-register"
-        color="default"
-        rounding="2xl"
-        padding="lg"
-        class="scroll-mt-16 flex flex-col gap-2"
+        class="scroll-mt-16 flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
       >
         <div class="flex items-center gap-2 flex-wrap">
           <h3 class="text-sm font-semibold dark:text-white">
@@ -240,13 +208,10 @@
           sosial: kepercayaan diperoleh lewat atestasi dan kerja terverifikasi.
           Pendaftaran dibuka ketika simpul Aksara pertama aktif.
         </p>
-      </Material>
-      <Material
+      </div>
+      <div
         id="aksara-onboarding"
-        color="default"
-        rounding="2xl"
-        padding="lg"
-        class="scroll-mt-16 flex flex-col gap-2"
+        class="scroll-mt-16 flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
       >
         <div class="flex items-center gap-2 flex-wrap">
           <h3 class="text-sm font-semibold dark:text-white">
@@ -260,13 +225,10 @@
           memisahkan penalaran model bahasa dari eksekusi deterministik
           bertanda tangan. Panduan lengkap terbit bersama pilot pertama.
         </p>
-      </Material>
-      <Material
+      </div>
+      <div
         id="protocols"
-        color="default"
-        rounding="2xl"
-        padding="lg"
-        class="scroll-mt-16 flex flex-col gap-2"
+        class="scroll-mt-16 flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
       >
         <div class="flex items-center gap-2">
           <IconTile icon={CommandLine} size="sm" />
@@ -281,13 +243,10 @@
           institusi. Semua format sipil (rekaman bertanda tangan, paket
           keterampilan) dipublikasikan sebagai standar terbuka.
         </p>
-      </Material>
-      <Material
+      </div>
+      <div
         id="consent"
-        color="default"
-        rounding="2xl"
-        padding="lg"
-        class="scroll-mt-16 flex flex-col gap-2"
+        class="scroll-mt-16 flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
       >
         <div class="flex items-center gap-2">
           <IconTile icon={UserGroup} size="sm" />
@@ -302,21 +261,13 @@
           korpus, pembagian manfaatnya 70 persen komunitas dan kontributor, 20
           persen operasional, 10 persen dana ekosistem bahasa.
         </p>
-      </Material>
+      </div>
     </div>
   </section>
 
   <!-- klaim -->
-  <Material
-    id="klaim"
-    color="default"
-    rounding="2xl"
-    padding="lg"
-    class="scroll-mt-16 flex flex-col gap-2"
-  >
-    <h2 class="text-lg font-semibold dark:text-white">
-      Klaim halaman organisasi
-    </h2>
+  <section id="klaim" class="scroll-mt-16 flex flex-col gap-2">
+    <SectionHead title="Klaim halaman organisasi" />
     <p class="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed max-w-prose">
       Direktori organisasi berisi halaman Level 0 dengan data contoh. Bila
       Anda mewakili organisasi yang tercantum atau ingin dicantumkan, poskan
@@ -330,18 +281,12 @@
     >
       Buka Direktori Organisasi
     </a>
-  </Material>
+  </section>
 
   <!-- dibangun + lisensi -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-    <Material
-      id="dibangun"
-      color="default"
-      rounding="2xl"
-      padding="lg"
-      class="scroll-mt-16 flex flex-col gap-2"
-    >
-      <h2 class="text-sm font-semibold dark:text-white">Dibangun oleh</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
+    <section id="dibangun" class="scroll-mt-16 flex flex-col gap-2">
+      <SectionHead title="Dibangun oleh" />
       <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
         <a
           href="https://abstraksi.id"
@@ -352,20 +297,14 @@
         infrastruktur AI komunitas (Communal AI) berdaulat, dideploy sebagai
         teknologi sipil di Melanesia.
       </p>
-    </Material>
-    <Material
-      id="lisensi"
-      color="default"
-      rounding="2xl"
-      padding="lg"
-      class="scroll-mt-16 flex flex-col gap-2"
-    >
-      <h2 class="text-sm font-semibold dark:text-white">Lisensi</h2>
+    </section>
+    <section id="lisensi" class="scroll-mt-16 flex flex-col gap-2">
+      <SectionHead title="Lisensi" />
       <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
         Kode sumber: AGPL-3.0. Dokumentasi: CC-BY-SA-4.0. Perangkat keras:
         CERN-OHL-S. Konten wiki yang bersumber dari Wikipedia mengikuti CC
         BY-SA dengan atribusi tercantum di tempat.
       </p>
-    </Material>
+    </section>
   </div>
 </div>

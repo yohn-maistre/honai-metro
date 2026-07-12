@@ -7,8 +7,8 @@
    */
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
   import { bukaSekarang, type Jam } from '$lib/etnos/org'
-  import { BackLink, DataChip } from '$lib/etnos/ui'
-  import { Material, Note } from 'mono-svelte'
+  import { BackLink, DataChip, SectionHead } from '$lib/etnos/ui'
+  import { Note } from 'mono-svelte'
 
   let { data } = $props()
 
@@ -19,7 +19,7 @@
   <title>{data.org.name} · ETNOS</title>
 </svelte:head>
 
-<div class="flex flex-col gap-5 max-w-full w-full">
+<div class="flex flex-col gap-6 max-w-full w-full">
   <BackLink href="/org">Direktori Organisasi</BackLink>
 
   <header class="flex items-center justify-between gap-3 flex-wrap">
@@ -33,40 +33,47 @@
 
   <CapabilityCard agent={data.org} {open} />
 
-  <Material
-    color="default"
-    rounding="2xl"
-    padding="lg"
-    class="flex flex-col gap-3"
-  >
-    <h3 class="font-semibold dark:text-white">Profil</h3>
+  <section class="flex flex-col gap-3">
+    <SectionHead title="Profil" />
     <p class="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed">
       {data.org.profile}
     </p>
-    <dl class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-sm mt-1">
-      <dt class="text-slate-500 dark:text-zinc-500">Wilayah kerja</dt>
-      <dd class="text-slate-700 dark:text-zinc-300 text-right">
-        {data.org.jurisdiction}
-      </dd>
-      <dt class="text-slate-500 dark:text-zinc-500">Jam layanan</dt>
-      <dd class="text-slate-700 dark:text-zinc-300 text-right">
-        {data.org.hours}
-        {#if open !== null}
-          <span class="text-slate-500 dark:text-zinc-500">
-            · {open ? 'buka' : 'tutup'} sekarang (menurut jam tercantum)
-          </span>
-        {/if}
-      </dd>
-      <dt class="text-slate-500 dark:text-zinc-500">Bahasa</dt>
-      <dd class="text-slate-700 dark:text-zinc-300 text-right">
-        {data.org.languages.join(', ')}
-      </dd>
-      <dt class="text-slate-500 dark:text-zinc-500">Kontak WA</dt>
-      <dd class="text-slate-700 dark:text-zinc-300 text-right">
-        {data.org.wa ?? 'belum tersedia'}
-      </dd>
+    <dl
+      class="flex flex-col divide-y divide-slate-200/70 dark:divide-zinc-800 text-sm"
+    >
+      <div class="flex justify-between items-baseline gap-4 py-2">
+        <dt class="text-slate-500 dark:text-zinc-500 shrink-0">
+          Wilayah kerja
+        </dt>
+        <dd class="text-slate-700 dark:text-zinc-300 text-right">
+          {data.org.jurisdiction}
+        </dd>
+      </div>
+      <div class="flex justify-between items-baseline gap-4 py-2">
+        <dt class="text-slate-500 dark:text-zinc-500 shrink-0">Jam layanan</dt>
+        <dd class="text-slate-700 dark:text-zinc-300 text-right">
+          {data.org.hours}
+          {#if open !== null}
+            <span class="text-slate-500 dark:text-zinc-500">
+              · {open ? 'buka' : 'tutup'} sekarang (menurut jam tercantum)
+            </span>
+          {/if}
+        </dd>
+      </div>
+      <div class="flex justify-between items-baseline gap-4 py-2">
+        <dt class="text-slate-500 dark:text-zinc-500 shrink-0">Bahasa</dt>
+        <dd class="text-slate-700 dark:text-zinc-300 text-right">
+          {data.org.languages.join(', ')}
+        </dd>
+      </div>
+      <div class="flex justify-between items-baseline gap-4 py-2">
+        <dt class="text-slate-500 dark:text-zinc-500 shrink-0">Kontak WA</dt>
+        <dd class="text-slate-700 dark:text-zinc-300 text-right">
+          {data.org.wa ?? 'belum tersedia'}
+        </dd>
+      </div>
     </dl>
-  </Material>
+  </section>
 
   <Note>
     <strong>Naik kelas.</strong> Halaman Level 0 ini hanya direktori, tanpa akun

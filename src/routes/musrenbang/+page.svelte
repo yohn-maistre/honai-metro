@@ -9,12 +9,11 @@
    */
   import { goto } from '$app/navigation'
   import { fetchUsulan, MUSRENBANG_COMMUNITY } from '$lib/etnos/musrenbang'
-  import { Board, DataChip, IconTile, PageHeader } from '$lib/etnos/ui'
+  import { DataChip, IconTile, PageHeader, SectionHead } from '$lib/etnos/ui'
   import { postLink } from '$lib/feature/post/helpers'
   import type { PostView } from '$lib/api/types'
   import {
     Button,
-    Material,
     Note,
     Option,
     Select,
@@ -25,7 +24,6 @@
   import {
     CalendarDays,
     DocumentText,
-    QuestionMarkCircle,
     UserGroup,
   } from 'svelte-hero-icons/dist'
 
@@ -133,32 +131,27 @@
   <title>Usulan Musrenbang · ETNOS</title>
 </svelte:head>
 
-<div class="flex flex-col gap-5 max-w-full w-full">
+<div class="flex flex-col gap-6 max-w-full w-full">
   <PageHeader
     title="Usulan Musrenbang"
     lede="Susun usulan pembangunan kampung dalam format yang rapi dan siap dibawa ke musyawarah. Usulan diposkan ke forum untuk dibahas terbuka. Halaman ini belum tersambung ke sistem musrenbang resmi, dan tidak berpura-pura tersambung."
   />
 
   <!-- the question this page exists to answer -->
-  <Material color="default" rounding="2xl" padding="lg" class="flex gap-4">
-    <IconTile icon={QuestionMarkCircle} size="md" class="mt-0.5" />
-    <div class="flex flex-col gap-1.5 min-w-0">
-      <h3 class="font-semibold dark:text-white">
-        Apa yang terjadi dengan usulan saya?
-      </h3>
-      <p class="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed">
-        Setiap tahun warga menyampaikan usulan pembangunan, dan setiap tahun
-        sebagian besar tidak pernah tahu nasib usulannya. Halaman ini membuat
-        langkah pertama tercatat terbuka: usulan disusun rapi, dibahas di
-        forum, dan bisa dirujuk kembali tahun depan. Tahapan berikutnya
-        tercatat di sini ketika kerja sama resmi dengan pemerintah terjalin.
-      </p>
-    </div>
-  </Material>
+  <section class="flex flex-col gap-3">
+    <SectionHead title="Apa yang terjadi dengan usulan saya?" />
+    <p class="text-sm text-slate-700 dark:text-zinc-300 leading-relaxed max-w-prose">
+      Setiap tahun warga menyampaikan usulan pembangunan, dan setiap tahun
+      sebagian besar tidak pernah tahu nasib usulannya. Halaman ini membuat
+      langkah pertama tercatat terbuka: usulan disusun rapi, dibahas di
+      forum, dan bisa dirujuk kembali tahun depan. Tahapan berikutnya
+      tercatat di sini ketika kerja sama resmi dengan pemerintah terjalin.
+    </p>
+  </section>
 
   <!-- the road a real usulan travels -->
-  <Material color="default" rounding="2xl" padding="lg">
-    <h3 class="font-semibold dark:text-white mb-4">Tahapan usulan</h3>
+  <section class="flex flex-col gap-4">
+    <SectionHead title="Tahapan usulan" />
     <ol class="flex flex-col sm:flex-row gap-4 sm:gap-0">
       {#each TAHAPAN as t, i (t.label)}
         {#if i > 0}
@@ -187,7 +180,7 @@
         </li>
       {/each}
     </ol>
-  </Material>
+  </section>
 
   <!-- the composer -->
   <form
@@ -250,19 +243,21 @@
   </form>
 
   <!-- usulan already on the forum: real posts or an honest empty state -->
-  <Board title="Usulan di forum">
-    {#snippet action()}
-      {#if MUSRENBANG_COMMUNITY && usulan.length}
-        <DataChip state="langsung" />
-      {/if}
-    {/snippet}
+  <section class="flex flex-col gap-2">
+    <SectionHead title="Usulan di forum">
+      {#snippet action()}
+        {#if MUSRENBANG_COMMUNITY && usulan.length}
+          <DataChip state="langsung" />
+        {/if}
+      {/snippet}
+    </SectionHead>
     {#if MUSRENBANG_COMMUNITY && usulan.length}
-      <ul class="flex flex-col divide-y divide-slate-100 dark:divide-zinc-800">
+      <ul class="flex flex-col divide-y divide-slate-200/60 dark:divide-zinc-800">
         {#each usulan as p (p.post.id)}
           <li>
             <a
               href={postLink(p.post)}
-              class="group flex items-baseline gap-3 px-4 py-2.5 no-underline"
+              class="group flex items-baseline gap-3 py-2.5 no-underline"
             >
               <span
                 class="text-sm font-medium text-slate-900 dark:text-zinc-100 truncate flex-1 transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
@@ -279,7 +274,7 @@
         {/each}
       </ul>
     {:else}
-      <div class="px-4 py-4 flex flex-col gap-2">
+      <div class="flex flex-col gap-2">
         <p class="text-sm text-slate-600 dark:text-zinc-400">
           Komunitas musrenbang belum dibuka di instance ini. Usulan yang
           diposkan lewat halaman ini memakai awalan
@@ -293,46 +288,52 @@
         </a>
       </div>
     {/if}
-  </Board>
+  </section>
 
   <!-- panduan: who, when, how -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-    <Material color="default" rounding="2xl" padding="lg" class="flex flex-col gap-2">
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-6">
+    <div
+      class="flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
+    >
       <IconTile icon={UserGroup} size="sm" />
-      <h4 class="text-sm font-semibold dark:text-white">
+      <h3 class="text-sm font-semibold dark:text-white">
         Siapa bisa mengusulkan
-      </h4>
+      </h3>
       <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
         Setiap warga. Usulan paling kuat datang dari kesepakatan bersama:
         bicarakan dulu di tingkat RT atau kampung, lalu satu orang menyusunnya
         di sini atas nama musyawarah.
       </p>
-    </Material>
-    <Material color="default" rounding="2xl" padding="lg" class="flex flex-col gap-2">
+    </div>
+    <div
+      class="flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
+    >
       <div class="flex items-center justify-between">
         <IconTile icon={CalendarDays} size="sm" />
         <DataChip state="contoh" />
       </div>
-      <h4 class="text-sm font-semibold dark:text-white">
+      <h3 class="text-sm font-semibold dark:text-white">
         Jadwal musim musrenbang
-      </h4>
+      </h3>
       <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
         Pola umum tiap tahun: musyawarah kampung sekitar Januari, musrenbang
         distrik Februari, kabupaten Maret, lalu penyusunan APBD hingga akhir
         tahun. Jadwal pasti ditetapkan tiap pemerintah daerah.
       </p>
-    </Material>
-    <Material color="default" rounding="2xl" padding="lg" class="flex flex-col gap-2">
+    </div>
+    <div
+      class="flex flex-col gap-2 py-3 border-b border-slate-200/60 dark:border-zinc-800"
+    >
       <IconTile icon={DocumentText} size="sm" />
-      <h4 class="text-sm font-semibold dark:text-white">
+      <h3 class="text-sm font-semibold dark:text-white">
         Format usulan yang baik
-      </h4>
+      </h3>
       <p class="text-xs text-slate-600 dark:text-zinc-400 leading-relaxed">
         Sebut masalahnya, siapa yang terdampak dan berapa orang, apa yang
         diusulkan, dan kira-kira biayanya. Satu usulan untuk satu kebutuhan
         lebih mudah dibahas daripada daftar panjang.
       </p>
-    </Material>
+    </div>
   </div>
 
   <Note>

@@ -20,7 +20,7 @@
     type PlateColors,
   } from './atlas'
   import { ANCHORS, type Anchor } from './layers'
-  import { Board } from './ui'
+  import { SectionHead } from './ui'
 
   interface Props {
     /** kabupaten nama (GeoJSON exact) -> number of communities there */
@@ -217,25 +217,22 @@
   })
 </script>
 
-<Board title={$t('etnos.explore.simpul_title')} class="w-full">
-  {#snippet action()}
-    <span class="text-xs text-slate-500 dark:text-zinc-400">
-      {$t('etnos.explore.simpul_caption')}
-    </span>
-  {/snippet}
+<section class="flex flex-col gap-2 w-full">
+  <SectionHead
+    title={$t('etnos.explore.simpul_title')}
+    caption={$t('etnos.explore.simpul_caption')}
+  />
 
-  <div class="text-slate-800 dark:text-zinc-200">
+  <div class="text-slate-800 dark:text-zinc-200 -mx-3 sm:-mx-6">
     <canvas
       bind:this={el}
       onclick={hit}
-      class="w-full h-56 sm:h-72 block cursor-pointer"
+      class="w-full h-64 sm:h-80 block cursor-pointer"
       aria-label={$t('etnos.explore.simpul_title')}
     ></canvas>
   </div>
 
-  <div
-    class="px-4 py-3 border-t border-slate-200/70 dark:border-zinc-800 min-h-12"
-  >
+  <div class="min-h-6">
     {#if selected}
       <p class="text-sm text-slate-700 dark:text-zinc-300">
         <span class="font-medium text-slate-900 dark:text-zinc-100"
@@ -249,4 +246,4 @@
       </p>
     {/if}
   </div>
-</Board>
+</section>

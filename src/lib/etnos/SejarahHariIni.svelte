@@ -6,7 +6,7 @@
   import { onDestroy } from 'svelte'
   import { Icon, SpeakerWave, Stop } from 'svelte-hero-icons/dist'
   import { isTtsAvailable, speak, stop } from './tts'
-  import { Board } from './ui'
+  import { SectionHead } from './ui'
 
   interface Props {
     history: { title: string; body: string; year?: number | null }
@@ -33,23 +33,22 @@
   let ttsAvail = $derived(isTtsAvailable())
 </script>
 
-<Board
-  title={$t('etnos.wiki.today_in_history')}
-  caption={history.year ? String(history.year) : undefined}
-  class="h-full"
->
-  <div class="p-4 flex flex-col gap-2">
-    <h3 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">
-      {history.title}
-    </h3>
-    <p class="text-sm text-slate-700 dark:text-zinc-300">{history.body}</p>
-    {#if ttsAvail}
-      <Button size="sm" color="tertiary" onclick={toggleSpeak} class="self-start mt-1">
-        {#snippet prefix()}
-          <Icon src={speaking ? Stop : SpeakerWave} micro size="16" />
-        {/snippet}
-        {speaking ? $t('etnos.wiki.stop_reading') : $t('etnos.wiki.read_aloud')}
-      </Button>
-    {/if}
-  </div>
-</Board>
+<section class="h-full flex flex-col gap-2">
+  <SectionHead
+    title={$t('etnos.wiki.today_in_history')}
+    element="h3"
+    caption={history.year ? String(history.year) : undefined}
+  />
+  <h4 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">
+    {history.title}
+  </h4>
+  <p class="text-sm text-slate-700 dark:text-zinc-300">{history.body}</p>
+  {#if ttsAvail}
+    <Button size="sm" color="tertiary" onclick={toggleSpeak} class="self-start mt-1">
+      {#snippet prefix()}
+        <Icon src={speaking ? Stop : SpeakerWave} micro size="16" />
+      {/snippet}
+      {speaking ? $t('etnos.wiki.stop_reading') : $t('etnos.wiki.read_aloud')}
+    </Button>
+  {/if}
+</section>

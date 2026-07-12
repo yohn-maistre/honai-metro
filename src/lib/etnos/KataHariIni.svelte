@@ -7,7 +7,7 @@
   import { onDestroy } from 'svelte'
   import { Icon, SpeakerWave, Stop } from 'svelte-hero-icons/dist'
   import { isTtsAvailable, speak, stop } from './tts'
-  import { Board } from './ui'
+  import { SectionHead } from './ui'
 
   interface Props {
     word: {
@@ -40,28 +40,27 @@
   let ttsAvail = $derived(isTtsAvailable())
 </script>
 
-<Board
-  title={$t('etnos.wiki.word_of_day')}
-  caption={word.region ? `${word.language} · ${word.region}` : word.language}
-  class="h-full"
->
-  <div class="p-4 flex flex-col gap-2">
-    <h3 class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
-      {word.word}
-    </h3>
-    <p class="text-sm text-slate-700 dark:text-zinc-300">{word.meaning}</p>
-    {#if word.example}
-      <p class="text-sm italic text-slate-500 dark:text-zinc-400">
-        "{word.example}"
-      </p>
-    {/if}
-    {#if ttsAvail}
-      <Button size="sm" color="tertiary" onclick={toggleSpeak} class="self-start mt-1">
-        {#snippet prefix()}
-          <Icon src={speaking ? Stop : SpeakerWave} micro size="16" />
-        {/snippet}
-        {speaking ? $t('etnos.wiki.stop_reading') : $t('etnos.wiki.read_aloud')}
-      </Button>
-    {/if}
-  </div>
-</Board>
+<section class="h-full flex flex-col gap-2">
+  <SectionHead
+    title={$t('etnos.wiki.word_of_day')}
+    element="h3"
+    caption={word.region ? `${word.language} · ${word.region}` : word.language}
+  />
+  <h4 class="text-2xl font-bold text-slate-900 dark:text-white leading-tight">
+    {word.word}
+  </h4>
+  <p class="text-sm text-slate-700 dark:text-zinc-300">{word.meaning}</p>
+  {#if word.example}
+    <p class="text-sm italic text-slate-500 dark:text-zinc-400">
+      "{word.example}"
+    </p>
+  {/if}
+  {#if ttsAvail}
+    <Button size="sm" color="tertiary" onclick={toggleSpeak} class="self-start mt-1">
+      {#snippet prefix()}
+        <Icon src={speaking ? Stop : SpeakerWave} micro size="16" />
+      {/snippet}
+      {speaking ? $t('etnos.wiki.stop_reading') : $t('etnos.wiki.read_aloud')}
+    </Button>
+  {/if}
+</section>

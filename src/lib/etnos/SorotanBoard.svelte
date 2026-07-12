@@ -7,7 +7,7 @@
    */
   import type { PostView } from '$lib/api/types'
   import { fetchHotPosts } from '$lib/etnos/hot'
-  import { Board } from '$lib/etnos/ui'
+  import { SectionHead } from '$lib/etnos/ui'
   import { postLink } from '$lib/feature/post/helpers'
   import { ChatBubbleLeftRight, Icon } from 'svelte-hero-icons/dist'
 
@@ -27,12 +27,13 @@
 </script>
 
 {#if posts.length}
-  <Board title="Sedang ramai" caption="dari forum">
+  <section class="flex flex-col gap-2">
+    <SectionHead title="Sedang ramai" caption="dari forum" />
     <ol class="flex flex-col">
       {#each posts as p, i (p.post.id)}
         <a
           href={postLink(p.post)}
-          class="group flex items-center gap-3 px-4 py-2.5 border-b border-slate-100 dark:border-zinc-800/50 last:border-none"
+          class="group flex items-center gap-3 py-2 border-b border-slate-200/60 dark:border-zinc-800 last:border-none"
         >
           <span
             class="w-7 shrink-0 text-lg font-semibold tabular-nums text-slate-300 dark:text-zinc-600 text-center"
@@ -61,5 +62,5 @@
         </a>
       {/each}
     </ol>
-  </Board>
+  </section>
 {/if}

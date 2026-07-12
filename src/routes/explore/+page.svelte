@@ -3,40 +3,16 @@
   import bahasa from '$lib/etnos/data/bahasa.json'
   import PetaSimpul from '$lib/etnos/PetaSimpul.svelte'
   import SorotanBoard from '$lib/etnos/SorotanBoard.svelte'
-  import { IconTile, PageHeader } from '$lib/etnos/ui'
-  import EndPlaceholder from '$lib/ui/layout/EndPlaceholder.svelte'
-  import { Badge, Material, TextInput } from 'mono-svelte'
+  import { Figure, PageHeader, SectionHead } from '$lib/etnos/ui'
+  import { Badge, TextInput } from 'mono-svelte'
   import {
     ArrowRight,
     ArrowTopRightOnSquare,
-    BuildingLibrary,
-    ChatBubbleLeftRight,
-    CpuChip,
-    ComputerDesktop,
-    HomeModern,
     Icon,
     MagnifyingGlass,
-    MusicalNote,
-    Newspaper,
-    Trophy,
-    UserGroup,
-    BookOpen,
   } from 'svelte-hero-icons/dist'
 
   let { data } = $props()
-
-  // Cluster icons: hero-icons keyed by category (JSON emoji retired).
-  const clusterIcon: Record<string, typeof UserGroup> = {
-    Adat: HomeModern,
-    Bahasa: ChatBubbleLeftRight,
-    Berita: Newspaper,
-    Sport: Trophy,
-    Teknologi: ComputerDesktop,
-    Musik: MusicalNote,
-    Pemerintah: BuildingLibrary,
-    Wiki: BookOpen,
-    AI: CpuChip,
-  }
 
   let q = $state('')
   let kategori = $state<string | null>(null)
@@ -85,14 +61,11 @@
 
   <PetaSimpul {regionCounts} />
 
-  <div class="grid grid-cols-3 gap-3">
+  <div
+    class="grid grid-cols-3 gap-x-6 border-y border-slate-200/70 dark:border-zinc-800 py-4"
+  >
     {#each [{ n: totalKomunitas, label: $t('etnos.explore.stats.komunitas') }, { n: data.directory.groups.length, label: $t('etnos.explore.stats.kategori') }, { n: bahasa.languages.length, label: $t('etnos.explore.stats.bahasa') }] as s (s.label)}
-      <Material color="default" rounding="2xl" padding="md" class="flex flex-col gap-0.5">
-        <span class="text-2xl font-bold tabular-nums dark:text-white">
-          {s.n}
-        </span>
-        <span class="text-xs text-slate-500 dark:text-zinc-400">{s.label}</span>
-      </Material>
+      <Figure value={s.n} label={s.label} />
     {/each}
   </div>
 
@@ -146,34 +119,29 @@
   {/if}
 
   {#each filtered as group (group.category)}
-    <section class="flex flex-col gap-3">
-      <div class="flex items-center gap-2.5 flex-wrap">
-        <IconTile icon={clusterIcon[group.category] ?? UserGroup} size="sm" />
-        <h2 class="text-base font-semibold dark:text-white">
-          {group.category}
-        </h2>
-        <Badge>{group.communities.length}</Badge>
-        {#if group.stronghold}
-          <Badge color="yellow-subtle">{$t('etnos.explore.unggulan')}</Badge>
-        {/if}
-        <span class="text-sm text-slate-500 dark:text-zinc-400 ml-1">
+    <section class="flex flex-col gap-2">
+      <div class="flex flex-col gap-1">
+        <SectionHead title={group.category}>
+          {#snippet action()}
+            <Badge>{group.communities.length}</Badge>
+            {#if group.stronghold}
+              <Badge color="yellow-subtle">{$t('etnos.explore.unggulan')}</Badge>
+            {/if}
+          {/snippet}
+        </SectionHead>
+        <p class="text-sm text-slate-500 dark:text-zinc-400">
           {group.description}
-        </span>
+        </p>
       </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6">
         {#each group.communities as c (c.slug)}
-          <Material
-            element="a"
+          <a
             href="/c/{c.slug}"
-            color="default"
-            rounding="2xl"
-            padding="md"
-            interactive
-            class="flex items-start gap-3 no-underline"
+            class="group flex items-start gap-3 no-underline py-2.5 border-b border-slate-200/60 dark:border-zinc-800"
           >
             <div
               class={[
-                'w-10 h-10 rounded-xl shrink-0 grid place-items-center font-bold',
+                'w-9 h-9 rounded-xl shrink-0 grid place-items-center font-bold',
                 'bg-slate-100 dark:bg-zinc-800',
                 group.stronghold
                   ? 'text-primary-600 dark:text-primary-400'
@@ -183,25 +151,22 @@
               {c.name.charAt(0)}
             </div>
             <div class="flex flex-col gap-0.5 min-w-0">
-              <span class="font-medium dark:text-white truncate">
+              <span
+                class="font-medium dark:text-white truncate transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
+              >
                 {c.name}
               </span>
               <span class="text-xs text-slate-500 dark:text-zinc-400 truncate">
-                /c/{c.slug}
+                /c/{c.slug}{#if c.subtitle}{' · '}{c.subtitle}{/if}
               </span>
-              {#if c.subtitle}
-                <span class="text-xs text-slate-500 dark:text-zinc-400 mt-1">
-                  {c.subtitle}
-                </span>
-              {/if}
             </div>
             <Icon
               src={ArrowTopRightOnSquare}
               micro
               size="14"
-              class="ml-auto text-slate-400 dark:text-zinc-500 mt-1"
+              class="ml-auto text-slate-400 dark:text-zinc-500 mt-1 shrink-0"
             />
-          </Material>
+          </a>
         {/each}
       </div>
     </section>
@@ -209,23 +174,27 @@
 
   <SorotanBoard />
 
-  <EndPlaceholder margin="md">
-    {$t('etnos.explore.browse_all')}
-  </EndPlaceholder>
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-    {#each [{ href: '/explore/communities', label: $t('etnos.explore.browse_communities') }, { href: '/explore/feeds', label: $t('etnos.explore.browse_feeds') }, { href: '/explore/topics', label: $t('etnos.explore.browse_topics') }] as link (link.href)}
-      <Material
-        element="a"
-        href={link.href}
-        color="default"
-        rounding="2xl"
-        padding="md"
-        interactive
-        class="flex items-center gap-3 no-underline"
-      >
-        <span class="font-medium dark:text-white">{link.label}</span>
-        <Icon src={ArrowRight} micro size="16" class="ml-auto text-slate-400" />
-      </Material>
-    {/each}
-  </div>
+  <section class="flex flex-col gap-2">
+    <SectionHead title={$t('etnos.explore.browse_all')} />
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-x-6">
+      {#each [{ href: '/explore/communities', label: $t('etnos.explore.browse_communities') }, { href: '/explore/feeds', label: $t('etnos.explore.browse_feeds') }, { href: '/explore/topics', label: $t('etnos.explore.browse_topics') }] as link (link.href)}
+        <a
+          href={link.href}
+          class="group flex items-center gap-3 no-underline py-2.5 border-b border-slate-200/60 dark:border-zinc-800"
+        >
+          <span
+            class="font-medium dark:text-white transition-colors group-hover:text-primary-600 dark:group-hover:text-primary-400"
+          >
+            {link.label}
+          </span>
+          <Icon
+            src={ArrowRight}
+            micro
+            size="16"
+            class="ml-auto text-slate-400"
+          />
+        </a>
+      {/each}
+    </div>
+  </section>
 </div>

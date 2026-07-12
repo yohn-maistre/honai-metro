@@ -23,7 +23,6 @@
   } from './atlas'
   import wajah from './wiki/wajah.json'
   import { DataChip } from './ui'
-  import { Material } from 'mono-svelte'
 
   interface Entry {
     id: string
@@ -155,7 +154,10 @@
   })
 </script>
 
-<Material color="default" rounding="2xl" padding="xl" class="w-full">
+<!-- lead story: pure editorial on the paper, rules above and below -->
+<article
+  class="w-full border-y border-slate-200/70 dark:border-zinc-800 py-5"
+>
   <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem] items-start">
     <div class="flex flex-col gap-3 min-w-0">
       <div class="flex items-center gap-2 flex-wrap">
@@ -235,4 +237,4 @@
       {/if}
     </figure>
   </div>
-</Material>
+</article>

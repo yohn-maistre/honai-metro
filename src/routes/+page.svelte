@@ -44,7 +44,16 @@
   {$t('routes.frontpage.title')}
 </Header>
 
-<div class="flex flex-col gap-4 mb-4">
+<div class="flex flex-col gap-5 mb-4">
+  <PetaKabar />
+  <PapanSinyal />
+
+  <!-- the rule that separates the instruments from the forum -->
+  <div
+    class="border-b border-slate-200 dark:border-zinc-800 -mx-3 sm:-mx-6"
+    aria-hidden="true"
+  ></div>
+
   <form
     class="contents"
     method="get"
@@ -71,9 +80,6 @@
       </noscript>
     </div>
   </form>
-
-  <PetaKabar />
-  <PapanSinyal />
 </div>
 
 {#await data.feed.value}

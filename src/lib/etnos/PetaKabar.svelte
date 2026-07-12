@@ -55,7 +55,7 @@
     type TitikApiPoint,
     type UdaraPoint,
   } from './layers'
-  import { Board, DataChip } from './ui'
+  import { DataChip, SectionHead } from './ui'
   import wajahData from './wiki/wajah.json'
 
   const COLS = 120
@@ -171,7 +171,7 @@
     if (!el) return null
     const w = el.clientWidth
     const h = el.clientHeight
-    const scale = Math.min((w * 0.94) / COLS, (h * 0.94) / ROWS)
+    const scale = Math.min((w * 0.97) / COLS, (h * 0.97) / ROWS)
     return { w, h, scale, ox: (w - COLS * scale) / 2, oy: (h - ROWS * scale) / 2 }
   }
   type Plate = NonNullable<ReturnType<typeof plate>>
@@ -595,25 +595,31 @@
 
 <svelte:window {onkeydown} />
 
-<Board title="Peta Kabar" class="w-full">
-  {#snippet action()}
-    {#if live}
-      <DataChip state="langsung" label={$t('etnos.peta.kabar_live')} />
-    {:else}
-      <span class="text-xs text-slate-500 dark:text-zinc-400">Tanah Papua</span>
-    {/if}
-  {/snippet}
+<section class="flex flex-col gap-2 w-full">
+  <SectionHead
+    title="Peta Kabar"
+    caption={live ? undefined : 'Tanah Papua'}
+  >
+    {#snippet action()}
+      {#if live}
+        <DataChip state="langsung" label={$t('etnos.peta.kabar_live')} />
+      {/if}
+    {/snippet}
+  </SectionHead>
 
-  <div class="relative text-slate-800 dark:text-zinc-200">
+  <!-- the plate is the page itself: full-bleed dots on paper, no card -->
+  <div class="relative -mx-3 sm:-mx-6 text-slate-800 dark:text-zinc-200">
     <canvas
       bind:this={el}
       onclick={hit}
-      class="w-full h-72 sm:h-96 lg:h-[30rem] block cursor-pointer"
+      class="w-full h-80 sm:h-[26rem] lg:h-[32rem] block cursor-pointer"
       aria-label={$t('etnos.peta.aria')}
     ></canvas>
 
     <!-- floating layer legend, top-right (detak's kb-legenda pattern) -->
-    <div class="absolute top-2 right-2 flex flex-col items-end gap-1.5 max-w-[46%]">
+    <div
+      class="absolute top-2 right-3 sm:right-6 flex flex-col items-end gap-1.5 max-w-[46%]"
+    >
       <button
         type="button"
         aria-expanded={legendaBuka}
@@ -668,7 +674,7 @@
     <!-- floating dossier, top-left: fixed corner, never chases the click -->
     {#if sel}
       <div
-        class="absolute left-2 top-2 w-[min(19rem,calc(100%-1rem))] max-h-[calc(100%-1rem)] overflow-y-auto rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 shadow-sm p-3 flex flex-col gap-2"
+        class="absolute left-3 sm:left-6 top-2 w-[min(19rem,calc(100%-1.5rem))] max-h-[calc(100%-1rem)] overflow-y-auto rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 shadow-sm p-3 flex flex-col gap-2"
       >
         <button
           type="button"
@@ -912,9 +918,7 @@
   </div>
 
   <!-- footer: identity line for first-time visitors + active-source credits -->
-  <div
-    class="flex flex-wrap items-baseline gap-x-4 gap-y-1 px-4 py-2.5 border-t border-slate-200/70 dark:border-zinc-800 min-h-10"
-  >
+  <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 min-h-6">
     <p class="text-xs text-slate-500 dark:text-zinc-400">
       {$t('etnos.peta.identity')}
       <a
@@ -930,7 +934,7 @@
       </p>
     {/if}
   </div>
-</Board>
+</section>
 
 <style>
   @keyframes dot-pulse {

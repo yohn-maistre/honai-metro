@@ -3,6 +3,7 @@
   import { profile } from '$lib/app/auth'
   import { t } from '$lib/app/i18n'
   import { LINKED_INSTANCE_URL } from '$lib/app/instance.svelte'
+  import KilasTicker from '$lib/etnos/KilasTicker.svelte'
   import { Menu, Spinner } from 'mono-svelte'
   import {
     Bars3,
@@ -69,7 +70,10 @@
       {/if}
     {/snippet}
   </NavButton>
-  <div class="hidden md:block md:flex-1"></div>
+  <!-- ETNOS: the KILAS wire rides the navbar center, fading into it -->
+  <div class="hidden md:flex md:flex-1 items-center min-w-0 px-4 lg:px-8">
+    <KilasTicker class="w-full" />
+  </div>
   <div class="sr-only md:not-sr-only md:contents">
     {#if profile.isAdmin}
       <NavButton

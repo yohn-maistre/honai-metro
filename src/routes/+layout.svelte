@@ -153,20 +153,18 @@
       style={s}
       id="main"
     >
-      <!-- ETNOS: mobile wire strip; the md+ band lives under the navbar
+      <!-- ETNOS: mobile wire strip; the md+ wire lives in the Navbar
            (the navbar holder is a bottom dock on mobile). -->
-      <div class="md:hidden sticky top-0 z-30 -mx-3 -mt-3 mb-3">
-        <KilasTicker band />
+      <div
+        class="md:hidden sticky top-0 z-30 -mx-3 -mt-3 mb-3 px-3 py-0.5 bg-slate-25 dark:bg-zinc-925 border-b border-slate-100 dark:border-zinc-800"
+      >
+        <KilasTicker />
       </div>
       {@render children?.()}
     </main>
   {/snippet}
   {#snippet navbar({ style: s, class: c })}
     <Navbar class={c} style={s} />
-    <!-- ETNOS: the KILAS wire rides the sticky header site-wide -->
-    <div class="hidden md:block pointer-events-auto">
-      <KilasTicker band />
-    </div>
   {/snippet}
   {#snippet suffix({ class: c })}
     <!--strange issue, proabably to do with dynamic components-->

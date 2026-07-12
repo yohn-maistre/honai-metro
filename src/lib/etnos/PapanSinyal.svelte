@@ -139,7 +139,7 @@
 </script>
 
 <section
-  class="papan bg-white dark:bg-zinc-900 rounded-2xl shadow-xs border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 overflow-hidden"
+  class="papan bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 overflow-hidden"
 >
   <div
     class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-200 dark:border-zinc-800"

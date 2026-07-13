@@ -575,3 +575,89 @@ square: ETNOS points at press, never rehosts it.
 - i18n parity 157/157/157. The bigger brainstorm list (Edisi Pagi,
   Warta Suara, Lembar Kampung, Kampung Saya, Mode Balai, Tolong
   Dijawab, Musim Musrenbang, Mode Hemat Data) awaits his picks.
+
+# BETA WAVE (2026-07-13) — map into the board, broadsheet wiki, beta sweep
+
+Yose's Round-5 review (screenshots 48-57), aimed at public beta. Verdict:
+the ticker rows were useless on phones, the Forum row never appeared, the
+filter labels looked wrong stacked, wiki articles were bland, and the
+site had beta-blockers (no link previews, duplicate nav, scrollbar over
+chips). His two locked calls: filter row below the board with inline
+labels; enable Melayu Papua now. Everything below shipped, `bun run
+check` clean (0 errors), `bun run build` green, verified locally on the
+fused board (desktop + 400px) and the wiki broadsheet.
+
+**Part 1 — Papan Sinyal v2 (the map is the instrument):**
+- Peta Kabar moved home INTO Papan Sinyal (reverses the COHERENCE WAVE
+  move to /wiki). New `variant: 'paper' | 'ink'` prop: `ink` = no
+  SectionHead, no bleed, shorter canvas, legend/dossier at right-2/left-2,
+  padded footer. Mounted with `<PetaKabar variant="ink" onstatus={...}>`.
+- `atlas.ts plateColors` dark detection changed `documentElement` ->
+  `el.closest('.dark')` so the board's literal `dark` class flips the
+  canvas palette (and the `ink` color) together. Audited all four callers
+  (PetaKabar/PetaSimpul/WajahTanah/LocatorPlate); global behavior
+  unchanged (`.dark` lives on `<html>`).
+- `onstatus` lifts the per-layer status map; the board's "Sinyal
+  langsung" chip is `$derived` from it (one owner: map computes status).
+- LAUT is a MAP layer now (was board-only): added to `LayerId`, exported
+  `LAUT_ANCHORS`, `LAYER_COLOR.laut = #0e7490`, wave-height label
+  below-right so it never collides with the cuaca temp above-right,
+  dossier card, hit-test, default ON. Seven layers total.
+- PapanSinyal pruned to three flap rows (PERISTIWA/FORUM/KOMUNITAS); the
+  sky/sea rows deleted (they're on the map). **Forum row un-broken**:
+  `hot.ts` (and `live.ts`) hardcoded `page_cursor:'1'`, a PieFed cursor
+  Lemmy backends reject -> silent `[]`; dropped it + reset `inflight` on
+  empty success. Mobile flaps: `segs` is a `MediaQuery` (6 sm+, 1 on
+  phones) so long lines truncate softly instead of slicing; swap/done
+  timings derive from segs; 13px clip font on phones. Board now opens on
+  every breakpoint (was folded < lg).
+- Filter row is a single baseline below the board: `baseClass="flex
+  flex-row items-center gap-2 *:my-0"` on each Select renders the Label
+  inline-left; `Sort.svelte` forwards baseClass to both its selects.
+- /wiki dropped Peta Kabar; opens with the Almanak strip (reference desk).
+
+**Part 2 — Wiki broadsheet articles:**
+- NEW `LocatorPlate.svelte` (Papua-only seal-ring plate, extracted from
+  WajahTanah, atlas.ts grid, module-cached). WajahTanah consumes it;
+  atlas-id.ts now unimported (kept tree-shaken for Peta Nusantara).
+- `[category]/+page.svelte` rewritten: markdown split by `## ` into
+  standfirst + numbered sections (terracotta `01` + h2 + rule, no Material
+  card, on paper). Wajah figures name-matched to sections (verified
+  placements: tempat Danau Sentani/Lembah Baliem/Raja Ampat/Danau Paniai
+  each get a right-column figure + LocatorPlate; suku-bahasa 4 suku ->
+  "Suku-suku besar" grid; noken + frans-kaisiepo -> terkait strip;
+  biodiversitas mambruk -> "Burung"; kuliner/bahasa typographic). TOC:
+  sticky rail with terracotta active tick (IO in an `$effect` keyed on
+  parsed sections) + de-carded mobile details. End matter: terkait strip
+  -> BahasaHub (now hairline ledger, was card grid) -> prev/next pager.
+
+**Part 3 — beta sweep:**
+- Post pages got a BackLink (afterNavigate captures the referrer, falls
+  back to `/`).
+- /explore: curated rows whose slug matches a live server result are
+  dropped (no double-listing); chip counts follow the needle-filtered set
+  (fixes the "Bahasa 6 vs 5" mismatch).
+- `.scrollbar-none` utility in app.css, applied to the three overflow-x
+  chip rows (explore/dashboard/org) — the 3px track was painting over the
+  chips on Windows.
+- Sidebar ETNOS group dropped Jelajah (navbar + mobile dock are canonical;
+  it was listed twice).
+- Melayu Papua LIVE in the picker (loader + settings entry uncommented);
+  new etnos.* keys carry real pmy, core strings mirror id until a full pass.
+- Social meta: `src/app.html` now carries static OG/Twitter tags +
+  `static/og.png` (1200x630 cream/terracotta card) so WhatsApp link
+  previews work (SSR is off, client-injected tags were invisible to
+  scrapers). theme-color per scheme.
+- Onboarding b4 reworded to the fused board (no key bump).
+- `bun run check` taken to 0 errors (fixed 6 pre-existing: 2 comment-route
+  `resolve` route-id typos, 3 PetaKabar dossier null-safety, 1 agen
+  Capability `tier: null`). 147 warnings remain, all Tailwind-4
+  `@variant`/`@reference` CSS parser noise, not ours.
+
+i18n: added etnos.peta.layers.laut, etnos.wiki.wajah_terkait/prev/next,
+etnos.post.back; updated wajah_plate; removed dead papan.gempa_nihil +
+rows.{gempa,cuaca,laut,matahari}. Parity held across en/id/pmy.
+
+Still banked from COHERENCE: Edisi Pagi, Warta Suara, Lembar Kampung,
+Kampung Saya, Mode Balai, Tolong Dijawab, Musim Musrenbang, Mode Hemat
+Data. Standing gates unchanged (PUBLIC_DETAK_URL, musrenbang slug).

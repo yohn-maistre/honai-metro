@@ -73,7 +73,11 @@ Hard rules, all learned the expensive way:
   (kills FOUC; SPA, SSR off). **Keep the two in sync.**
 - i18n: every `etnos.*` key must exist in **all three** of
   `src/lib/app/i18n/{en,id,pmy}.json` (pmy = Papuan Malay: "deng", "sa",
-  "ko", simpler grammar). Parity was 141/141/141 as of 2026-07-12.
+  "ko", simpler grammar). **pmy is LIVE in the picker as of 2026-07-13**
+  (loader in `i18n/index.ts` + entry in `settings/app/+page.svelte`
+  uncommented): the `etnos.*` strings are real Melayu Papua; the Photon
+  CORE strings still mirror id.json until a full translation pass, so the
+  UI reads mostly Indonesian with ETNOS surfaces in pmy.
 - **Density**: `html { font-size: 87.5% }` in app.css (owner call: the UI
   should read like ~85% browser zoom). Everything is rem-based; px values
   (hairlines, flap cells) intentionally stay fixed.
@@ -103,33 +107,49 @@ Page jobs (coherence doctrine, 2026-07-12): Beranda answers "apa yang
 terjadi hari ini", Jelajah "siapa dan di mana", Wiki "siapa kami"
 (reference desk + almanac), Papan Data "bagaimana keadaan kita".
 
-`/` (Beranda) deck order: h1 header → **PapanSinyal** Solari board →
-hairline divider → filter row (Lokasi/Urutkan/Tampilan, right-aligned)
-→ feed. NO map on the homepage; no guest redirect; no quick-create box
-(removed 2026-07-12, Buat in the navbar is the one create entry).
+`/` (Beranda) deck order: h1 header → **PapanSinyal** (the map rides
+INSIDE it now) → filter row (Lokasi/Urutkan/Tampilan) → hairline divider
+→ feed. No guest redirect; no quick-create box (Buat in the navbar is
+the one create entry). The **filter row is a single baseline** below the
+board: each mono-svelte `Select` gets `baseClass="flex flex-row
+items-center gap-2 *:my-0"` so its `<Label>` renders inline-left of the
+select instead of stacked above; `Sort.svelte` forwards `baseClass` to
+BOTH its selects (the chained Top-range one has no `...rest`).
 
-**PetaKabar** (`src/lib/etnos/PetaKabar.svelte`) lives on **/wiki**
-(owner call 2026-07-12: the kab dossier is encyclopedic, so the atlas
-belongs to the reference desk). It is a canvas dot-grid plate of Tanah
-Papua — no MapLibre, no tiles, NO CARD: the canvas is full-bleed on the
-page (`-mx-3 sm:-mx-6`) under a `SectionHead`, with floating overlays
-detak-detik style: layer legend top-right (collapsible "Lapisan · n"
-pill), dossier card top-left, and a flat footer line with the identity
-sentence + "Sumber aktif" credits (only langsung sources listed).
-Dashed kabupaten boundary lines ride over the dots (`loadBoundaryPaths`
-in `atlas.ts`, Path2D per kab). Six data layers through
-`src/lib/etnos/layers.ts` (SWR localStorage, Papua-bbox clip, contract:
-null=segera, []=nihil, points=langsung, **no fake points ever**): KABAR
-(detak /edisi pins via `kabar.ts`, deep-links
+**PetaKabar** (`src/lib/etnos/PetaKabar.svelte`) lives INSIDE Papan
+Sinyal on the homepage (owner call 2026-07-13: the ticker rows were
+useless on phones, the map is the useful thing — so it became the
+instrument). It takes `variant: 'paper' | 'ink'` and `onstatus` props.
+`variant="ink"` (the board mount): no `SectionHead`, no `-mx` bleed,
+shorter canvas (`h-56 sm:h-72 lg:h-80`), legend/dossier pulled to
+`right-2`/`left-2`, footer padded. `variant="paper"` is the standalone
+full-bleed dress (still available, no longer used on any route). The
+palette flips correctly inside the board because `atlas.ts plateColors`
+now detects dark via `el.closest('.dark')` (was `documentElement`), so
+the board's literal `dark` class forces the ink palette AND the canvas
+`ink` color agrees. `onstatus` lifts the per-layer status map up so the
+board's "Sinyal langsung" chip derives from it (one owner: the map
+computes status). It is a canvas dot-grid of Tanah Papua — no MapLibre,
+no tiles: floating overlays detak-detik style (collapsible "Lapisan · n"
+legend, kabupaten dossier), dashed kabupaten boundary lines over the
+dots (`loadBoundaryPaths` in `atlas.ts`, Path2D per kab). **Seven** data
+layers through `src/lib/etnos/layers.ts` (SWR localStorage, Papua-bbox
+clip, contract: null=segera, []=nihil, points=langsung, **no fake points
+ever**): KABAR (detak /edisi pins via `kabar.ts`, deep-links
 `detak-detik.pages.dev/#/kliping/{id}`), GEMPA (BMKG+USGS keyless, 120s,
-default ON), CUACA (Open-Meteo at the 6 anchors, default ON, now also
-carries daily sunrise/sunset per anchor, tz Asia/Jayapura, cache key
-`etnos.layers.cuaca.v2`), BANJIR (PetaBencana keyless, OFF), TITIK API +
-UDARA (detak worker `/geo/kebakaran` + `/geo/udara`, need
-`PUBLIC_DETAK_URL`, OFF). LAUT (`fetchLaut`, Open-Meteo Marine at 5
-nearshore sea points, keyless) feeds the board only, not the map.
-Under the map /wiki shows the **Almanak strip** (tanggal WIT + matahari
-terbit/terbenam from the shared cuaca cache, Figures, langsung chip).
+default ON), CUACA (Open-Meteo at the 6 anchors, default ON, daily
+sunrise/sunset per anchor, tz Asia/Jayapura, cache key
+`etnos.layers.cuaca.v2`), LAUT (now a MAP layer: `fetchLaut`, Open-Meteo
+Marine wave heights at 5 nearshore sea points, keyless, default ON,
+`LAYER_COLOR.laut = #0e7490`, label below-right so it never collides
+with the cuaca temp above-right at the same anchor), BANJIR (PetaBencana
+keyless, OFF), TITIK API + UDARA (detak worker `/geo/kebakaran` +
+`/geo/udara`, need `PUBLIC_DETAK_URL`, OFF).
+
+**/wiki opens with the Almanak strip** (tanggal WIT + matahari
+terbit/terbenam from the shared cuaca cache, Figures, langsung chip) —
+Peta Kabar is gone from /wiki (it moved home). Wiki is now purely the
+reference desk: Almanak → Wajah → Sejarah/Kata → categories.
 
 **Clicking a kabupaten opens its dossier** (markers win over regions;
 Esc/✕ closes; marker cards offer a "Buka kartu wilayah" hop). The kab
@@ -144,22 +164,28 @@ single indexed-color pass corrupts coastal cells via premultiply
 (Sorong read as "Merauke" before the 2026-07-12 fix). Never revert to
 red-channel-index-in-one-pass.
 
-**PapanSinyal** (`src/lib/etnos/PapanSinyal.svelte`) = Solari
-split-flap of live channels, up to 7 rows, each optional (empty pool =
-row absent): PERISTIWA (alert row, exists ONLY while banjir/titik-api
-report real points), GEMPA, CUACA, LAUT (wave height, Open-Meteo
-Marine), MATAHARI (terbit/terbenam WIT), FORUM (top post PER community,
-deduped so the rotation walks across communities), KOMUNITAS (directory
-rotation). Berita lives in the wire band; KATA is wiki-only. Rows reuse
-the layers.ts SWR caches (one fact one owner); an answering-but-empty
-gempa feed shows an honest nihil line, an unreachable feed drops its
-row. **The plate is self-colored ink in BOTH themes** (a split-flap
-board is black in any light): the `<details>` root carries a literal
-`dark` class + explicit zinc-900 skin so children render their on-ink
-colors; do not re-theme it per scheme. Each row is 6 equal
-overflow-hidden cells holding the full string at `left:-j*100%`, per-CELL
-rotateX half-fold with 45ms stagger (never per-character), WIT clock,
-day-seeded, collapsible (open lg+).
+**PapanSinyal** (`src/lib/etnos/PapanSinyal.svelte`) = the front-page
+instrument: the Peta Kabar canvas (`variant="ink"`) on top, then a
+Solari split-flap strip of the three rows a map cannot carry, each
+optional (empty pool = row absent): PERISTIWA (alert row, exists ONLY
+while banjir/titik-api report real points), FORUM (top post PER
+community, deduped so the rotation walks across communities), KOMUNITAS
+(directory rotation). The sky/sea channels (gempa, cuaca, laut) are map
+markers now, NOT flap rows. Berita lives in the wire band; KATA is
+wiki-only. The FORUM row uses `fetchHotPosts` (`hot.ts`); it was silently
+empty on Lemmy backends because `getPosts` hardcoded `page_cursor:'1'`
+(a PieFed-ism Lemmy rejects) — fixed 2026-07-13 (dropped the cursor +
+reset `inflight` on empty success; `live.ts` had the same bug).
+**The plate is self-colored ink in BOTH themes** (a split-flap board is
+black in any light): the `<details>` root carries a literal `dark` class
++ explicit zinc-900 skin so children render their on-ink colors; do not
+re-theme it per scheme. Each row is `segs` equal overflow-hidden cells
+holding the full string at `left:-j*100%`; `segs` is a `MediaQuery` (6
+on sm+, **1 on phones** so long lines truncate softly instead of slicing,
+`clip` font drops to 13px), swap/done timings derive from `segs` so the
+text swap lands at the fold midpoint; per-CELL rotateX half-fold with
+45ms stagger (never per-character), WIT clock, day-seeded, **open on all
+breakpoints** (the map is the hero; details stays collapsible).
 
 **Kartu WA** (`src/lib/etnos/kartu.ts` + `KartuWA.svelte`): the post
 share menu offers "Kartu WA", a 1080×1080 canvas card (cream, terracotta
@@ -172,15 +198,35 @@ to share directly).
 Other maps, one engine: **PetaSimpul** on /explore (anchor node rings +
 per-province directory counts; /explore also has LIVE community search
 against the server via `client().search`, results labeled langsung
-above the curated contoh directory), and the **whole-Indonesia locator**
-in **WajahTanah** (`atlas-id.ts` + `static/data/idn-prov.geojson`
-vendored from detak, same per-feature raster rule, Papua provinces
-printed heavier + seal ring at the entry koordinat; always rides the
-entry, under the image when one exists). Wiki's Wajah Tanah Papua =
-`wiki/wajah.json`, 13 entries each live-verified against id.wikipedia +
-Commons licensing (NEVER add entries without the same verification;
-unattributable image = gambar null), 12h deterministic rotation, live
-extract may only lengthen.
+above the curated contoh directory — and curated rows whose slug matches
+a live result are DROPPED so nothing double-lists; the category-chip
+counts follow the same needle-filtered set, killing the old "Bahasa 6
+chip vs 5 header" mismatch). The **Papua-only locator** is now
+`LocatorPlate.svelte` (`loadAtlasGrid` + `lonLatToCellF` from `atlas.ts`,
+module-cached so N plates share one rasterize; seal ring r=4/8 + center
+dot at the koordinat). **WajahTanah** consumes it (was the whole-Indonesia
+`atlas-id.ts` grid; that file + `static/data/idn-prov.geojson` are now
+unimported, kept tree-shaken for a future Peta Nusantara, same as
+maplibre). Wiki's Wajah Tanah Papua = `wiki/wajah.json`, 13 entries each
+live-verified against id.wikipedia + Commons licensing (NEVER add entries
+without the same verification; unattributable image = gambar null), 12h
+deterministic rotation, live extract may only lengthen.
+
+**Wiki article pages** (`src/routes/wiki/[category]/+page.svelte`) are
+broadsheet features (2026-07-13): the markdown body is split by `## `
+into a standfirst (intro's first paragraph, large) + numbered sections
+(terracotta `01` numeral + h2 + hairline rule, NO Material card, content
+straight on paper). `wajah.json` entries with `kategori === slug` and an
+image attach as figures to the section whose heading or body contains the
+entry `nama` (candidate tiers: full nama → strip `Suku|Kepulauan` prefix
+→ first word ≥6 letters); single figures sit in an lg right column, and
+tempat entries also render a `LocatorPlate`; unmatched entries go to a
+"Wajah terkait" end strip. TOC = sticky desktop rail (terracotta active
+tick, IntersectionObserver in an `$effect` keyed on the parsed sections)
++ de-carded mobile `<details>`. End matter: terkait strip → BahasaHub
+(now hairline ledger rows, was a card grid) → prev/next category pager.
+Never invent images: kuliner/bahasa have no verified Commons entries and
+stay purely typographic.
 
 ## Deploy ritual (non-negotiable)
 
@@ -193,6 +239,19 @@ on a laptop `bun install && bun run build` is fine — repo is
 **bun-canonical**, `bun.lock` tracked, CI uses `--frozen-lockfile`.)
 
 Local dev: `bun install`, copy `.env.example` → `.env`, `bun run dev`.
+
+## Social meta / link previews
+
+SSR is off (`PUBLIC_SSR_ENABLED` unset → `+layout.ts` sets `ssr=false`),
+so `<svelte:head>` tags are client-injected and INVISIBLE to non-JS
+scrapers (WhatsApp, most crawlers). The **static shell** `src/app.html`
+therefore carries the baseline OG/Twitter tags (title, description,
+og:image → `static/og.png`, a 1200×630 cream/terracotta card, theme-color
+per scheme). Per-page `<svelte:head>` tags (e.g. the post page's
+og:title/og:image) still layer on top for JS-capable clients. If you
+change the card, regenerate `static/og.png` (the scratchpad
+`og-card.js` renders it on a canvas inside the live site so Plus Jakarta
+Sans is loaded).
 
 ## Known sharp edges
 

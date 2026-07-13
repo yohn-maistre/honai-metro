@@ -2,13 +2,18 @@
   /**
    * Peta Kabar: Tanah Papua as a canvas dot-grid plate (no tiles, no
    * MapLibre), doubling as the real-time layer board. The dithered fill
-   * carries dashed kabupaten lines (the cadastral stitch), and six data
+   * carries dashed kabupaten lines (the cadastral stitch), and seven data
    * layers ride on top: kabar (detak-detik kliping pins), gempa (BMKG +
-   * USGS), cuaca (Open-Meteo at the anchor cities), banjir (PetaBencana),
+   * USGS), cuaca (Open-Meteo at the anchor cities), laut (Open-Meteo
+   * Marine wave heights at nearshore sea points), banjir (PetaBencana),
    * titik api (NASA FIRMS via the detak worker), udara (WAQI PM2.5, same
    * worker). Every layer is honest: langsung when fetched, nihil when a
    * source answers with zero points, segera when unreachable. No fake
    * points, ever.
+   *
+   * Two dresses: variant="paper" (standalone, full-bleed on the page) and
+   * variant="ink" (mounted inside the Papan Sinyal plate, no bleed,
+   * shorter canvas; the plate's literal .dark class flips plateColors).
    *
    * The canvas spans the full card; everything else floats over it,
    * detak-detik style: the layer legend top-right, and a dossier card
@@ -44,12 +49,14 @@
     fetchBanjir,
     fetchCuaca,
     fetchGempa,
+    fetchLaut,
     fetchTitikApi,
     fetchUdara,
     type Anchor,
     type BanjirPoint,
     type CuacaPoint,
     type GempaPoint,
+    type LautPoint,
     type LayerId,
     type LayerStatus,
     type TitikApiPoint,
@@ -58,15 +65,31 @@
   import { DataChip, SectionHead } from './ui'
   import wajahData from './wiki/wajah.json'
 
+  interface Props {
+    /** 'paper' = standalone page plate (full bleed on the page field);
+     *  'ink' = inside the Papan Sinyal plate: no bleed, shorter canvas,
+     *  palette forced dark by the plate's literal .dark class. */
+    variant?: 'paper' | 'ink'
+    /** Fires whenever a layer status changes; the board derives its
+     *  langsung chip from this (one owner: the map computes status). */
+    onstatus?: (s: Partial<Record<LayerId, LayerStatus>>) => void
+  }
+  let { variant = 'paper', onstatus }: Props = $props()
+  const ink = variant === 'ink'
+
   const COLS = 120
   const ROWS = 104
 
   // Fixed data-layer colors, same in both themes (detak convention).
   const LAYER_COLOR: Record<string, string> = {
+    laut: '#0e7490',
     banjir: '#3f6fa0',
     api: '#c2410c',
     udara: '#7c5cbf',
   }
+
+  /** id-ID decimal comma for canvas labels ("1,2 m"). */
+  const koma = (n: number) => String(n).replace('.', ',')
 
   const PROV_NAMA: Record<string, string> = {
     '91': 'Papua Barat',
@@ -90,6 +113,7 @@
   let pins = $state<KabarPin[]>([])
   let gempa = $state<GempaPoint[]>([])
   let cuaca = $state<CuacaPoint[]>([])
+  let laut = $state<LautPoint[]>([])
   let banjir = $state<BanjirPoint[]>([])
   let api = $state<TitikApiPoint[]>([])
   let udara = $state<UdaraPoint[]>([])
@@ -99,6 +123,7 @@
     kabar: true,
     gempa: true,
     cuaca: true,
+    laut: true,
     banjir: false,
     api: false,
     udara: false,
@@ -111,12 +136,21 @@
   type Sel = { layer: LayerId | 'anchor' | 'kab'; i: number } | null
   let sel = $state<Sel>(null)
 
-  const LAYERS: LayerId[] = ['kabar', 'gempa', 'cuaca', 'banjir', 'api', 'udara']
+  const LAYERS: LayerId[] = [
+    'kabar',
+    'gempa',
+    'cuaca',
+    'laut',
+    'banjir',
+    'api',
+    'udara',
+  ]
 
   const SUMBER: Record<LayerId, string> = {
     kabar: 'Detak Detik',
     gempa: 'BMKG / USGS',
     cuaca: 'Open-Meteo',
+    laut: 'Open-Meteo Marine',
     banjir: 'PetaBencana',
     api: 'NASA FIRMS',
     udara: 'WAQI',
@@ -140,6 +174,10 @@
       const r = await fetchCuaca()
       if (r) cuaca = r
       status.cuaca = r === null ? 'segera' : 'langsung'
+    } else if (id === 'laut') {
+      const r = await fetchLaut()
+      if (r) laut = r
+      status.laut = r === null ? 'segera' : 'langsung'
     } else if (id === 'banjir') {
       const r = await fetchBanjir()
       if (r) banjir = r
@@ -288,7 +326,7 @@
     ensureBase(p, dpr, c)
     if (base) ctx.drawImage(base, 0, 0, p.w, p.h)
 
-    // markers, bottom to top: udara, api, banjir, cuaca, gempa, kabar
+    // markers, bottom to top: udara, api, banjir, laut, cuaca, gempa, kabar
     if (layerOn.udara) {
       ctx.fillStyle = LAYER_COLOR.udara!
       udara.forEach((pt, i) => {
@@ -326,6 +364,25 @@
         ctx.lineTo(x, y + s)
         ctx.stroke()
         if (sel?.layer === 'banjir' && sel.i === i) halo(ctx, x, y, s, LAYER_COLOR.banjir!)
+      })
+    }
+    if (layerOn.laut && laut.length) {
+      // wave heights at the nearshore sea points; label sits below-right
+      // (the cuaca temp at the same anchor city sits above-right)
+      ctx.font = '600 10px ui-sans-serif, system-ui, sans-serif'
+      ctx.textAlign = 'left'
+      ctx.textBaseline = 'middle'
+      laut.forEach((pt, i) => {
+        const [x, y] = pinXY([pt.lon, pt.lat], p)
+        ctx.fillStyle = LAYER_COLOR.laut!
+        ctx.beginPath()
+        ctx.arc(x, y, 1.6, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.globalAlpha = 0.9
+        ctx.fillText(`${koma(pt.gelombang)} m`, x + 4, y + 6)
+        ctx.globalAlpha = 1
+        if (sel?.layer === 'laut' && sel.i === i)
+          halo(ctx, x, y, 4, LAYER_COLOR.laut!)
       })
     }
     if (layerOn.cuaca && cuaca.length) {
@@ -422,6 +479,8 @@
       groups.push({ layer: 'udara', pts: udara.map((u) => pinXY([u.lon, u.lat], p)) })
     if (layerOn.cuaca && cuaca.length)
       groups.push({ layer: 'cuaca', pts: cuaca.map((cu) => pinXY([cu.lon, cu.lat], p)) })
+    if (layerOn.laut && laut.length)
+      groups.push({ layer: 'laut', pts: laut.map((l) => pinXY([l.lon, l.lat], p)) })
     if (!live && !(layerOn.cuaca && cuaca.length))
       groups.push({ layer: 'anchor', pts: ANCHORS.map((a) => pinXY(a.lnglat, p)) })
 
@@ -474,6 +533,7 @@
         void loadLayer('kabar')
         void loadLayer('gempa')
         void loadLayer('cuaca')
+        void loadLayer('laut')
         gempaTimer = setInterval(() => {
           if (layerOn.gempa) void loadLayer('gempa')
         }, 120_000)
@@ -497,30 +557,43 @@
     void pins
     void gempa
     void cuaca
+    void laut
     void banjir
     void api
     void udara
     void layerOn.kabar
     void layerOn.gempa
     void layerOn.cuaca
+    void layerOn.laut
     void layerOn.banjir
     void layerOn.api
     void layerOn.udara
     draw()
   })
 
+  // Lift layer statuses to the parent (Papan Sinyal derives its langsung
+  // chip from these). snapshot() deep-reads the proxy so late-arriving
+  // layers re-fire; PetaKabar never reads the lifted value back.
+  $effect(() => {
+    onstatus?.(
+      $state.snapshot(status) as Partial<Record<LayerId, LayerStatus>>,
+    )
+  })
+
   const curKabar = $derived(sel?.layer === 'kabar' ? pins[sel.i] : null)
   const curGempa = $derived(sel?.layer === 'gempa' ? gempa[sel.i] : null)
   const curCuaca = $derived(sel?.layer === 'cuaca' ? cuaca[sel.i] : null)
+  const curLaut = $derived(sel?.layer === 'laut' ? laut[sel.i] : null)
   const curBanjir = $derived(sel?.layer === 'banjir' ? banjir[sel.i] : null)
   const curApi = $derived(sel?.layer === 'api' ? api[sel.i] : null)
   const curUdara = $derived(sel?.layer === 'udara' ? udara[sel.i] : null)
   const curAnchor = $derived<Anchor | null>(
     sel?.layer === 'anchor' ? (ANCHORS[sel.i] ?? null) : null,
   )
-  const curKab = $derived(
-    sel?.layer === 'kab' && grid ? (grid.kabs[sel.i] ?? null) : null,
-  )
+  const curKab = $derived.by(() => {
+    if (sel?.layer !== 'kab' || !grid) return null
+    return grid.kabs[sel.i] ?? null
+  })
 
   // The kabupaten a selected marker sits in, for the "open region card" hop.
   const markerKab = $derived.by(() => {
@@ -529,7 +602,7 @@
       const i = grid.kabs.findIndex((k) => k.nama === curKabar.kab.nama)
       return i >= 0 ? { i, nama: curKabar.kab.nama } : null
     }
-    const pt = curGempa ?? curCuaca ?? curBanjir ?? curApi ?? curUdara
+    const pt = curGempa ?? curCuaca ?? curLaut ?? curBanjir ?? curApi ?? curUdara
     if (!pt) return null
     const i = kabAt(pt.lon, pt.lat)
     return i >= 0 ? { i, nama: grid.kabs[i]!.nama } : null
@@ -557,7 +630,7 @@
       const sib = wilayahData.rows.filter((r) => r.prov === w.prov)
       nKab = sib.length
       rankPop = sib.filter((r) => r.pop > w.pop).length + 1
-      kepadatan = w.pop / w.luas
+      kepadatan = w.luas ? w.pop / w.luas : 0
     }
     return {
       w,
@@ -595,30 +668,44 @@
 
 <svelte:window {onkeydown} />
 
-<section class="flex flex-col gap-2 w-full">
-  <SectionHead
-    title="Peta Kabar"
-    caption={live ? undefined : 'Tanah Papua'}
-  >
-    {#snippet action()}
-      {#if live}
-        <DataChip state="langsung" label={$t('etnos.peta.kabar_live')} />
-      {/if}
-    {/snippet}
-  </SectionHead>
+<section class={['flex flex-col w-full', ink ? 'gap-0' : 'gap-2']}>
+  {#if !ink}
+    <SectionHead
+      title="Peta Kabar"
+      caption={live ? undefined : 'Tanah Papua'}
+    >
+      {#snippet action()}
+        {#if live}
+          <DataChip state="langsung" label={$t('etnos.peta.kabar_live')} />
+        {/if}
+      {/snippet}
+    </SectionHead>
+  {/if}
 
-  <!-- the plate is the page itself: full-bleed dots on paper, no card -->
-  <div class="relative -mx-3 sm:-mx-6 text-slate-800 dark:text-zinc-200">
+  <!-- paper: the plate is the page itself, full-bleed dots, no card.
+       ink: the plate sits inside the Papan Sinyal instrument, no bleed. -->
+  <div
+    class={[
+      'relative text-slate-800 dark:text-zinc-200',
+      !ink && '-mx-3 sm:-mx-6',
+    ]}
+  >
     <canvas
       bind:this={el}
       onclick={hit}
-      class="w-full h-80 sm:h-[26rem] lg:h-[32rem] block cursor-pointer"
+      class={[
+        'w-full block cursor-pointer',
+        ink ? 'h-56 sm:h-72 lg:h-80' : 'h-80 sm:h-[26rem] lg:h-[32rem]',
+      ]}
       aria-label={$t('etnos.peta.aria')}
     ></canvas>
 
     <!-- floating layer legend, top-right (detak's kb-legenda pattern) -->
     <div
-      class="absolute top-2 right-3 sm:right-6 flex flex-col items-end gap-1.5 max-w-[46%]"
+      class={[
+        'absolute top-2 flex flex-col items-end gap-1.5 max-w-[46%]',
+        ink ? 'right-2' : 'right-3 sm:right-6',
+      ]}
     >
       <button
         type="button"
@@ -674,7 +761,10 @@
     <!-- floating dossier, top-left: fixed corner, never chases the click -->
     {#if sel}
       <div
-        class="absolute left-3 sm:left-6 top-2 w-[min(19rem,calc(100%-1.5rem))] max-h-[calc(100%-1rem)] overflow-y-auto rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 shadow-sm p-3 flex flex-col gap-2"
+        class={[
+          'absolute top-2 w-[min(19rem,calc(100%-1.5rem))] max-h-[calc(100%-1rem)] overflow-y-auto rounded-xl bg-white dark:bg-zinc-900 border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 shadow-sm p-3 flex flex-col gap-2',
+          ink ? 'left-2' : 'left-3 sm:left-6',
+        ]}
       >
         <button
           type="button"
@@ -714,20 +804,22 @@
                   · №{kabDossier.rankPop}/{kabDossier.nKab}
                 </span>
               </dd>
-              <dt class="text-slate-500 dark:text-zinc-400">
-                {$t('etnos.peta.dossier.luas')}
-              </dt>
-              <dd class="text-slate-900 dark:text-zinc-100 text-right tabular-nums">
-                {fmt(Math.round(kabDossier.w.luas))} km²
-              </dd>
-              <dt class="text-slate-500 dark:text-zinc-400">
-                {$t('etnos.peta.dossier.kepadatan')}
-              </dt>
-              <dd class="text-slate-900 dark:text-zinc-100 text-right tabular-nums">
-                {kabDossier.kepadatan < 100
-                  ? kabDossier.kepadatan.toFixed(1)
-                  : fmt(Math.round(kabDossier.kepadatan))}/km²
-              </dd>
+              {#if kabDossier.w.luas != null}
+                <dt class="text-slate-500 dark:text-zinc-400">
+                  {$t('etnos.peta.dossier.luas')}
+                </dt>
+                <dd class="text-slate-900 dark:text-zinc-100 text-right tabular-nums">
+                  {fmt(Math.round(kabDossier.w.luas))} km²
+                </dd>
+                <dt class="text-slate-500 dark:text-zinc-400">
+                  {$t('etnos.peta.dossier.kepadatan')}
+                </dt>
+                <dd class="text-slate-900 dark:text-zinc-100 text-right tabular-nums">
+                  {kabDossier.kepadatan < 100
+                    ? kabDossier.kepadatan.toFixed(1)
+                    : fmt(Math.round(kabDossier.kepadatan))}/km²
+                </dd>
+              {/if}
             </dl>
             <p class="text-[11px] leading-snug text-slate-400 dark:text-zinc-500">
               {$t('etnos.peta.dossier.sumber_wilayah')}
@@ -867,6 +959,17 @@
               Open-Meteo · langsung
             </p>
           </div>
+        {:else if curLaut}
+          <div class="flex flex-col gap-0.5 pr-6">
+            <p class="text-sm text-slate-900 dark:text-zinc-100">
+              <span class="font-semibold">{curLaut.kota}</span>
+              · gelombang
+              <span class="tabular-nums">{koma(curLaut.gelombang)} m</span>
+            </p>
+            <p class="text-xs text-slate-500 dark:text-zinc-400">
+              Open-Meteo Marine · langsung
+            </p>
+          </div>
         {:else if curBanjir}
           <div class="flex flex-col gap-0.5 pr-6">
             <p class="text-sm text-slate-900 dark:text-zinc-100">
@@ -918,7 +1021,12 @@
   </div>
 
   <!-- footer: identity line for first-time visitors + active-source credits -->
-  <div class="flex flex-wrap items-baseline gap-x-4 gap-y-1 min-h-6">
+  <div
+    class={[
+      'flex flex-wrap items-baseline gap-x-4 gap-y-1 min-h-6',
+      ink && 'px-3 sm:px-4 pb-2 pt-1',
+    ]}
+  >
     <p class="text-xs text-slate-500 dark:text-zinc-400">
       {$t('etnos.peta.identity')}
       <a

@@ -43,43 +43,51 @@
   {$t('routes.frontpage.title')}
 </Header>
 
-<!-- The NOW page: wire (navbar), board, feed. The map lives in the wiki
-     (the reference atlas) and the locator plate in Jelajah. -->
+<!-- The NOW page: wire (navbar), board (Peta Kabar rides inside Papan
+     Sinyal), feed. Filters sit right above the feed they control, one
+     baseline, labels inline-left of each select. -->
 <div class="flex flex-col gap-5 mb-4">
   <PapanSinyal />
-
-  <!-- the rule that separates the instruments from the forum -->
-  <div
-    class="border-b border-slate-200 dark:border-zinc-800 -mx-3 sm:-mx-6"
-    aria-hidden="true"
-  ></div>
 
   <form
     class="contents"
     method="get"
     action={page.url.pathname}
   >
-    <div class="flex flex-row gap-2 max-w-full flex-wrap justify-end">
+    <div
+      class="flex flex-row items-center gap-x-4 gap-y-2 max-w-full flex-wrap justify-end"
+    >
       <Location
         name="type"
         navigate
+        baseClass="flex flex-row items-center gap-2 *:my-0"
         bind:selected={data.filters.value.type_!}
       />
       <Sort
         placement="bottom"
         name="sort"
         navigate
+        baseClass="flex flex-row items-center gap-2 *:my-0"
         bind:selected={data.filters.value.sort!}
       />
-      <ViewSelect placement="bottom" />
+      <ViewSelect
+        placement="bottom"
+        baseClass="flex flex-row items-center gap-2 *:my-0"
+      />
 
       <noscript>
-        <Button class="self-end h-8.5 aspect-square" size="custom" submit>
+        <Button class="h-8.5 aspect-square" size="custom" submit>
           <Icon src={ArrowRight} size="16" micro />
         </Button>
       </noscript>
     </div>
   </form>
+
+  <!-- the rule that separates the instruments from the forum -->
+  <div
+    class="border-b border-slate-200 dark:border-zinc-800 -mx-3 sm:-mx-6 -mt-1"
+    aria-hidden="true"
+  ></div>
 </div>
 
 {#await data.feed.value}

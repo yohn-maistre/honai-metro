@@ -929,6 +929,7 @@
                 "kabar": "Kabar",
                 "gempa": "Gempa",
                 "cuaca": "Cuaca",
+                "laut": "Laut",
                 "banjir": "Banjir",
                 "api": "Titik api",
                 "udara": "Udara"
@@ -954,16 +955,14 @@
         },
         "papan": {
             "sinyal_label": "Sinyal langsung",
-            "gempa_nihil": "Nihil dalam 24 jam terakhir",
             "rows": {
                 "peristiwa": "Peristiwa",
-                "gempa": "Gempa",
-                "cuaca": "Cuaca",
-                "laut": "Laut",
-                "matahari": "Matahari",
                 "forum": "Forum",
                 "komunitas": "Komunitas"
             }
+        },
+        "post": {
+            "back": "Kembali"
         },
         "onboarding": {
             "title": "Selamat datang di ETNOS",
@@ -971,7 +970,7 @@
             "b1": "Forum komunitas per suku, bahasa, dan wilayah. Baca tanpa akun, bergabung untuk berdiskusi.",
             "b2": "Wiki Tanah Papua: tempat, sejarah, biodiversitas, suku dan bahasa, kuliner.",
             "b3": "Papan Data: angka hidup forum dan data publik provinsi. Satu angka, satu sumber.",
-            "b4": "Peta Kabar di Beranda: kabar terkini Tanah Papua dari berbagai media.",
+            "b4": "Papan Sinyal di Beranda: peta kabar dan sinyal langsung Tanah Papua.",
             "more": "Pelajari selengkapnya",
             "start": "Mulai jelajah"
         },
@@ -998,7 +997,10 @@
             "wajah_arsip": "arsip redaksi",
             "wajah_rotasi": "berganti dua kali sehari · teks apa adanya dari ensiklopedia",
             "wajah_kategori": "Baca di wiki",
-            "wajah_plate": "Lokasi pada peta Nusantara, Tanah Papua ditebalkan",
+            "wajah_plate": "Lokasi pada peta Tanah Papua",
+            "wajah_terkait": "Wajah terkait",
+            "prev": "Sebelumnya",
+            "next": "Berikutnya",
             "today_in_history": "Hari Ini Dalam Sejarah Papua",
             "word_of_day": "Kata Hari Ini",
             "read_aloud": "Baca dengan suara",

@@ -3,7 +3,6 @@
   import { meta } from '$lib/etnos/wiki'
   import KataHariIni from '$lib/etnos/KataHariIni.svelte'
   import { fetchCuaca, type CuacaPoint } from '$lib/etnos/layers'
-  import PetaKabar from '$lib/etnos/PetaKabar.svelte'
   import SejarahHariIni from '$lib/etnos/SejarahHariIni.svelte'
   import WajahTanah from '$lib/etnos/WajahTanah.svelte'
   import { DataChip, Figure, IconTile, PageHeader, SectionHead } from '$lib/etnos/ui'
@@ -20,11 +19,11 @@
 
   let { data } = $props()
 
-  // ETNOS wiki index: the reference desk. Peta Kabar (the atlas with the
-  // kabupaten dossiers, owner call 2026-07-12: it reads as knowledge, not
-  // news chrome), the Almanak strip, the daily hero (Wajah + Sejarah +
-  // Kata, with TTS), a category grid with honest derived metadata, and
-  // the contribution note. Articles live in src/lib/etnos/wiki/*.md.
+  // ETNOS wiki index: the reference desk. The Almanak dateline strip, the
+  // daily hero (Wajah + Sejarah + Kata, with TTS), a category grid with
+  // honest derived metadata, and the contribution note. Peta Kabar moved
+  // home into Papan Sinyal (owner call 2026-07-13: buried in the wiki it
+  // was not useful on phones). Articles live in src/lib/etnos/wiki/*.md.
 
   // Almanak: WIT wall-clock date + sunrise/sunset from the same Open-Meteo
   // cache the map and board read (one fact, one owner). Jayapura anchor.
@@ -65,8 +64,6 @@
 
 <div class="flex flex-col gap-5 max-w-full w-full">
   <PageHeader title="Wiki Tanah Papua" lede={$t('etnos.wiki.lede')} />
-
-  <PetaKabar />
 
   <section class="flex flex-col gap-3">
     <SectionHead title={$t('etnos.wiki.almanak')}>

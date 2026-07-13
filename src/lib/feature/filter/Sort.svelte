@@ -35,6 +35,7 @@
     selected = $bindable(),
     navigate = true,
     class: clazz = '',
+    baseClass = '',
     ...rest
   }: Props = $props()
 
@@ -42,10 +43,11 @@
   const setSelected = () => (selected = sort)
 </script>
 
-<div class="flex flex-row {clazz}">
+<div class="flex flex-row {baseClass ? 'gap-2' : ''} {clazz}">
   <Select
     {...rest}
-    class={selected?.startsWith('Top') ? 'rounded-r-none' : ''}
+    {baseClass}
+    class={selected?.startsWith('Top') && !baseClass ? 'rounded-r-none' : ''}
     bind:value={sort}
     onchange={() => {
       setSelected()
@@ -90,7 +92,8 @@
   </Select>
   {#if selected?.startsWith('Top')}
     <Select
-      class="border-l-0 rounded-l-none"
+      {baseClass}
+      class={baseClass ? '' : 'border-l-0 rounded-l-none'}
       bind:value={selected}
       onchange={() => {
         sort = 'TopAll'

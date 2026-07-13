@@ -160,7 +160,9 @@ export type PlateColors = {
  *  mid-gray and the accent one stop brighter. */
 export function plateColors(el: Element): PlateColors {
   const css = getComputedStyle(el)
-  const dark = document.documentElement.classList.contains('dark')
+  // closest() sees the global <html class="dark"> AND local ink plates
+  // (Papan Sinyal carries a literal `dark` class in both themes).
+  const dark = el.closest('.dark') !== null
   return {
     dark,
     ink: css.color,

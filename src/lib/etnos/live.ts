@@ -81,11 +81,11 @@ async function fetchPosts24h(): Promise<{
   saturated: boolean
 }> {
   try {
+    // No page_cursor: '1' is a PieFed-ism that Lemmy backends reject.
     const res = await client().getPosts({
       type_: 'Local',
       sort: 'New',
       limit: 50,
-      page_cursor: '1',
     })
     const cutoff = Date.now() - 24 * 60 * 60 * 1000
     const recent = res.posts.filter(

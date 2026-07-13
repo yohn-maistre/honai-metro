@@ -9,11 +9,17 @@ import type { PostView } from '$lib/api/types'
 let inflight: Promise<PostView[]> | null = null
 
 export function fetchHotPosts(): Promise<PostView[]> {
+  // No page_cursor on the first page: '1' is a PieFed convention that
+  // Lemmy backends reject as an undecodable cursor (silent empty board).
   inflight ??= client()
-    .getPosts({ type_: 'Local', sort: 'Hot', limit: 20, page_cursor: '1' })
-    .then((r) =>
-      r.posts.filter((p) => !p.post.deleted && !p.post.removed && !p.post.nsfw),
-    )
+    .getPosts({ type_: 'Local', sort: 'Hot', limit: 20 })
+    .then((r) => {
+      const posts = r.posts.filter(
+        (p) => !p.post.deleted && !p.post.removed && !p.post.nsfw,
+      )
+      if (!posts.length) inflight = null // empty answer: let a later visit retry
+      return posts
+    })
     .catch(() => {
       inflight = null // let a later page visit retry
       return []

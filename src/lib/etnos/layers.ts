@@ -11,7 +11,14 @@
 import { env } from '$env/dynamic/public'
 import { LAT0, LAT1, LON0, LON1 } from './atlas'
 
-export type LayerId = 'kabar' | 'gempa' | 'cuaca' | 'banjir' | 'api' | 'udara'
+export type LayerId =
+  | 'kabar'
+  | 'gempa'
+  | 'cuaca'
+  | 'laut'
+  | 'banjir'
+  | 'api'
+  | 'udara'
 export type LayerStatus = 'langsung' | 'nihil' | 'contoh' | 'segera'
 
 export interface GempaPoint {
@@ -270,7 +277,7 @@ export function fetchCuaca(): Promise<CuacaPoint[] | null> {
 /** Sea points a short way offshore of the coastal anchors (Wamena is
  *  highland and carries no sea). Coordinates sit in open water so the
  *  marine model answers; a land-locked cell answers null and is dropped. */
-const LAUT_ANCHORS: Anchor[] = [
+export const LAUT_ANCHORS: Anchor[] = [
   { kota: 'Sorong', wilayah: 'Papua Barat Daya', lnglat: [131.1, -0.7] },
   { kota: 'Manokwari', wilayah: 'Papua Barat', lnglat: [134.15, -0.75] },
   { kota: 'Nabire', wilayah: 'Papua Tengah', lnglat: [135.55, -3.2] },

@@ -1,35 +1,35 @@
 <script lang="ts">
   /**
-   * Papan Sinyal: a Solari split-flap board of live channels, the
-   * station-board answer to "what is happening on the tanah right now".
-   * Rows, all optional: Peristiwa (alert row, EXISTS only while
-   * PetaBencana/FIRMS report real points), Gempa (BMKG/USGS), Cuaca
-   * (anchor cities, Open-Meteo), Laut (wave height at nearshore points,
-   * Open-Meteo Marine), Matahari (terbit/terbenam WIT), Forum (top post
-   * per community, so the rotation walks across communities), Komunitas
-   * (directory rotation). News lives in the KILAS wire band, never here.
-   * Rows draw from the same SWR caches as Peta Kabar (one fact, one
-   * owner); a feed that answers with nothing shows an honest nihil line,
-   * and a feed that cannot answer drops its row.
+   * Papan Sinyal: the live instrument of the front page. Top half is the
+   * Peta Kabar canvas in its ink dress (seven data layers, legend,
+   * kabupaten dossier); below it a Solari split-flap strip with the rows
+   * a map cannot carry: Peristiwa (alert row, EXISTS only while
+   * PetaBencana/FIRMS report real points), Forum (top post per community,
+   * so the rotation walks across communities), Komunitas (directory
+   * rotation). News lives in the KILAS wire band, never here. The sky and
+   * sea channels (gempa, cuaca, laut) live on the map as markers; the
+   * langsung chip in the summary derives from the map's layer statuses.
    *
    * The text line is divided into equal cells that fold in a staggered
    * left-to-right sweep: per-CELL half-fold, never per-character, so the
    * board reads like a real departure board while staying cheap on budget
-   * phones. Day-clock seeded so every reader sees the same board on the
-   * same day.
+   * phones. On phones (<sm) each row is a single flap cell so long lines
+   * truncate softly instead of slicing. Day-clock seeded so every reader
+   * sees the same board on the same day.
    */
+  import { MediaQuery } from 'svelte/reactivity'
   import { t } from '$lib/app/i18n'
   import directory from '$lib/etnos/data/directory.json'
   import { fetchHotPosts } from '$lib/etnos/hot'
   import {
     fetchBanjir,
-    fetchCuaca,
-    fetchGempa,
-    fetchLaut,
     fetchTitikApi,
+    type LayerId,
+    type LayerStatus,
   } from '$lib/etnos/layers'
   import { daySeed, rngFrom } from '$lib/etnos/seed'
   import { postLink } from '$lib/feature/post/helpers'
+  import PetaKabar from './PetaKabar.svelte'
   import { DataChip } from './ui'
 
   interface Flap {
@@ -43,7 +43,15 @@
   const FLIP_MS = 320
   const STAGGER_MS = 45
   const TICK_MS = 6000
-  const N_ROWS = 8
+  const N_ROWS = 3
+
+  // Single flap on phones: with 6 slices the visible window is the same
+  // but the swap timing drifts and long lines hard-clip; one cell keeps
+  // the fold and lets the right-edge mask truncate softly.
+  const smUp = new MediaQuery('(min-width: 40rem)')
+  const segs = $derived(smUp.current ? SEGS : 1)
+  const swapAt = $derived(FLIP_MS / 2 + ((segs - 1) * STAGGER_MS) / 2)
+  const doneAt = $derived(FLIP_MS + (segs - 1) * STAGGER_MS)
 
   const komunitasPool: Flap[] = directory.groups.flatMap((g) =>
     g.communities.map((c) => ({
@@ -54,54 +62,21 @@
   )
 
   let peristiwaPool = $state<Flap[]>([])
-  let gempaPool = $state<Flap[]>([])
-  let cuacaPool = $state<Flap[]>([])
-  let lautPool = $state<Flap[]>([])
-  let matahariPool = $state<Flap[]>([])
   let forumPool = $state<Flap[]>([])
-  let sinyalLive = $state(false)
 
-  /** id-ID decimals for the board ("1,2 m"). */
-  const koma = (n: number) => String(n).replace('.', ',')
+  // The map computes layer statuses once (one fact, one owner); the
+  // summary chip only mirrors them.
+  let petaStatus = $state<Partial<Record<LayerId, LayerStatus>>>({})
+  const sinyalLive = $derived(
+    Object.values(petaStatus).some((s) => s === 'langsung'),
+  )
 
   $effect(() => {
-    fetchGempa().then((r) => {
-      if (r === null) return
-      sinyalLive = true
-      gempaPool = r.length
-        ? r.slice(0, 8).map((g) => ({
-            teks: `M${g.mag} · ${g.wilayah}`,
-            sub: `${g.jam} · BMKG / USGS`,
-          }))
-        : [{ teks: $t('etnos.papan.gempa_nihil'), sub: 'BMKG / USGS' }]
-    })
-    fetchCuaca().then((r) => {
-      if (!r || !r.length) return
-      sinyalLive = true
-      cuacaPool = r.map((pt) => ({
-        teks: `${pt.kota} ${pt.t}° · ${pt.langit}`,
-        sub: 'Open-Meteo',
-      }))
-      matahariPool = r
-        .filter((pt) => pt.terbit && pt.terbenam)
-        .map((pt) => ({
-          teks: `${pt.kota} · terbit ${pt.terbit} · terbenam ${pt.terbenam}`,
-          sub: 'Open-Meteo',
-        }))
-    })
-    fetchLaut().then((r) => {
-      if (!r || !r.length) return
-      sinyalLive = true
-      lautPool = r.map((pt) => ({
-        teks: `${pt.kota} · gelombang ${koma(pt.gelombang)} m`,
-        sub: 'Open-Meteo Marine',
-      }))
-    })
     // Alert row: exists ONLY while a source reports real points. Zero or
-    // unreachable = no row at all; quiet is the honest default.
+    // unreachable = no row at all; quiet is the honest default. The SWR
+    // caches are shared with the map's banjir/api layers.
     fetchBanjir().then((r) => {
       if (!r?.length) return
-      sinyalLive = true
       peristiwaPool = [
         ...peristiwaPool,
         {
@@ -140,14 +115,7 @@
   })
 
   type Row = {
-    key:
-      | 'peristiwa'
-      | 'gempa'
-      | 'cuaca'
-      | 'laut'
-      | 'matahari'
-      | 'forum'
-      | 'komunitas'
+    key: 'peristiwa' | 'forum' | 'komunitas'
     pool: Flap[]
   }
   // Empty pools drop their row instead of flipping blanks.
@@ -155,10 +123,6 @@
     (
       [
         { key: 'peristiwa', pool: peristiwaPool },
-        { key: 'gempa', pool: gempaPool },
-        { key: 'cuaca', pool: cuacaPool },
-        { key: 'laut', pool: lautPool },
-        { key: 'matahari', pool: matahariPool },
         { key: 'forum', pool: forumPool },
         { key: 'komunitas', pool: komunitasPool },
       ] as Row[]
@@ -169,16 +133,13 @@
   const rng = rngFrom(daySeed('papan-sinyal'))
   const seedOffsets = Array.from({ length: N_ROWS }, () => rng())
 
-  let indices = $state([0, 0, 0, 0, 0, 0, 0, 0])
-  let flipping = $state([false, false, false, false, false, false, false, false])
+  let indices = $state([0, 0, 0])
+  let flipping = $state([false, false, false])
   let cursor = 0
 
   $effect(() => {
     indices = rows.map((r, i) => Math.floor(seedOffsets[i]! * r.pool.length))
   })
-
-  const SWAP_AT = FLIP_MS / 2 + ((SEGS - 1) * STAGGER_MS) / 2
-  const DONE_AT = FLIP_MS + (SEGS - 1) * STAGGER_MS
 
   $effect(() => {
     if (rows.length === 0) return
@@ -189,10 +150,10 @@
       flipping[row] = true
       setTimeout(() => {
         indices[row] = (indices[row]! + 1) % rows[row]!.pool.length
-      }, SWAP_AT)
+      }, swapAt)
       setTimeout(() => {
         flipping[row] = false
-      }, DONE_AT)
+      }, doneAt)
     }, TICK_MS)
     return () => clearInterval(timer)
   })
@@ -212,12 +173,9 @@
     return () => clearInterval(timer)
   })
 
-  // Collapsible board: open on desktop, folded on phones where the deck
-  // gets tall (owner call: the front page was too crowded).
+  // Open on every breakpoint: the map is the hero now, and details stays
+  // collapsible for anyone who wants a feed-first page.
   let open = $state(true)
-  $effect(() => {
-    open = window.matchMedia('(min-width: 64rem)').matches
-  })
 </script>
 
 <!-- The plate is self-colored ink in BOTH themes: a real split-flap board
@@ -251,33 +209,37 @@
     </div>
   </summary>
 
-  <div
-    class="flex flex-col px-2 sm:px-3 py-1.5 border-t border-zinc-800 text-zinc-100"
-  >
-    {#each rows as row, i (row.key)}
-      {@const item = row.pool[Math.min(indices[i] ?? 0, row.pool.length - 1)]!}
-      <div class="row">
-        <span class="tag">{$t(`etnos.papan.rows.${row.key}`)}</span>
-        <svelte:element
-          this={item.href ? 'a' : 'span'}
-          class="flapline"
-          href={item.href}
-          target={item.external ? '_blank' : undefined}
-          rel={item.external ? 'noopener' : undefined}
-        >
-          {#each Array(SEGS) as _, j (j)}
-            <span
-              class="cell"
-              class:flip={flipping[i]}
-              style="--j:{j}"
-            >
-              <span class="clip">{item.teks}</span>
-            </span>
-          {/each}
-        </svelte:element>
-        <span class="sub hidden sm:inline">{item.sub}</span>
-      </div>
-    {/each}
+  <div class="border-t border-zinc-800">
+    <PetaKabar variant="ink" onstatus={(s) => (petaStatus = s)} />
+
+    <div
+      class="flex flex-col px-2 sm:px-3 py-1.5 border-t border-zinc-800 text-zinc-100"
+    >
+      {#each rows as row, i (row.key)}
+        {@const item = row.pool[Math.min(indices[i] ?? 0, row.pool.length - 1)]!}
+        <div class="row">
+          <span class="tag">{$t(`etnos.papan.rows.${row.key}`)}</span>
+          <svelte:element
+            this={item.href ? 'a' : 'span'}
+            class="flapline"
+            href={item.href}
+            target={item.external ? '_blank' : undefined}
+            rel={item.external ? 'noopener' : undefined}
+          >
+            {#each Array(segs) as _, j (j)}
+              <span
+                class="cell"
+                class:flip={flipping[i]}
+                style="--j:{j}"
+              >
+                <span class="clip">{item.teks}</span>
+              </span>
+            {/each}
+          </svelte:element>
+          <span class="sub hidden sm:inline">{item.sub}</span>
+        </div>
+      {/each}
+    </div>
   </div>
 </details>
 
@@ -386,6 +348,11 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  @media (width < 40rem) {
+    .clip {
+      font-size: 13px;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     .cell.flip {

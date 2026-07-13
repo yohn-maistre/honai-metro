@@ -1047,6 +1047,7 @@
                 "kabar": "News",
                 "gempa": "Quakes",
                 "cuaca": "Weather",
+                "laut": "Sea",
                 "banjir": "Floods",
                 "api": "Fires",
                 "udara": "Air"
@@ -1072,16 +1073,14 @@
         },
         "papan": {
             "sinyal_label": "Live signals",
-            "gempa_nihil": "None in the last 24 hours",
             "rows": {
                 "peristiwa": "Alerts",
-                "gempa": "Quakes",
-                "cuaca": "Weather",
-                "laut": "Sea",
-                "matahari": "Sun",
                 "forum": "Forum",
                 "komunitas": "Community"
             }
+        },
+        "post": {
+            "back": "Back"
         },
         "onboarding": {
             "title": "Welcome to ETNOS",
@@ -1089,7 +1088,7 @@
             "b1": "Community forums by people, language, and region. Read without an account, join to discuss.",
             "b2": "The Tanah Papua wiki: places, history, biodiversity, peoples and languages, food.",
             "b3": "The data board: live forum numbers and provincial public data. One number, one source.",
-            "b4": "Peta Kabar on the home page: the latest Tanah Papua news across outlets.",
+            "b4": "The Signal Board on the home page: a live news map and signals for Tanah Papua.",
             "more": "Learn more",
             "start": "Start exploring"
         },
@@ -1165,7 +1164,10 @@
             "wajah_arsip": "editorial archive",
             "wajah_rotasi": "changes twice a day · text verbatim from the encyclopedia",
             "wajah_kategori": "Read in the wiki",
-            "wajah_plate": "Location on the archipelago plate, Tanah Papua emphasized",
+            "wajah_plate": "Location on the Tanah Papua map",
+            "wajah_terkait": "Related faces",
+            "prev": "Previous",
+            "next": "Next",
             "today_in_history": "Today in Papuan History",
             "word_of_day": "Word of the Day",
             "read_aloud": "Read aloud",

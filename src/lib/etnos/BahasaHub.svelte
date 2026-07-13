@@ -6,6 +6,7 @@
    * Speaker counts are estimates and say so.
    */
   import { Badge } from 'mono-svelte'
+  import { SectionHead } from './ui'
 
   interface Language {
     name: string
@@ -55,51 +56,38 @@
   }
 </script>
 
-<div class="flex flex-col gap-3">
-  <div class="flex items-baseline justify-between gap-3 flex-wrap">
-    <h2 class="text-lg font-semibold dark:text-white">Direktori bahasa</h2>
-    <span class="text-xs text-slate-400 dark:text-zinc-500">
-      Ethnologue / Badan Bahasa, angka perkiraan
-    </span>
-  </div>
+<div class="flex flex-col gap-1">
+  <SectionHead
+    title="Direktori bahasa"
+    caption="Ethnologue / Badan Bahasa, angka perkiraan"
+  />
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+  <ul class="flex flex-col">
     {#each languages as lang (lang.slug)}
-      <div
-        class="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-xs border border-slate-200 border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700 flex flex-col gap-2"
+      <li
+        class="flex flex-col gap-1 py-3 border-b border-slate-200/60 dark:border-zinc-800 last:border-b-0"
       >
-        <div class="flex items-start justify-between gap-2">
-          <div class="flex flex-col gap-0.5 min-w-0">
-            <h3 class="font-semibold dark:text-white">{lang.name}</h3>
-            <p class="text-sm italic text-slate-500 dark:text-zinc-400">
-              {lang.native}
-            </p>
-          </div>
-          <Badge color={statusColor(lang.status)}>
-            {statusLabel(lang.status)}
-          </Badge>
+        <div class="flex items-center gap-2 flex-wrap min-w-0">
+          <h3 class="font-semibold dark:text-white">{lang.name}</h3>
+          <span class="text-sm italic text-slate-500 dark:text-zinc-400">
+            {lang.native}
+          </span>
+          <span class="ml-auto shrink-0">
+            <Badge color={statusColor(lang.status)}>
+              {statusLabel(lang.status)}
+            </Badge>
+          </span>
         </div>
-        <dl class="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
-          <dt class="text-slate-500 dark:text-zinc-500">Penutur</dt>
-          <dd class="text-slate-700 dark:text-zinc-300 text-right">
-            {lang.speakers}
-          </dd>
-          <dt class="text-slate-500 dark:text-zinc-500">Wilayah</dt>
-          <dd class="text-slate-700 dark:text-zinc-300 text-right">
-            {lang.region}
-          </dd>
-          <dt class="text-slate-500 dark:text-zinc-500">Rumpun</dt>
-          <dd class="text-slate-700 dark:text-zinc-300 text-right">
-            {lang.family}
-          </dd>
-        </dl>
-        <a
-          href="/c/bahasa-{lang.slug}"
-          class="text-sm text-primary-600 dark:text-primary-400 hover:underline mt-1"
-        >
-          /c/bahasa-{lang.slug}
-        </a>
-      </div>
+        <p class="text-xs text-slate-500 dark:text-zinc-400">
+          Penutur {lang.speakers} · {lang.region} · {lang.family} ·
+          <a
+            href="/c/bahasa-{lang.slug}"
+            class="font-medium text-primary-600 dark:text-primary-400 hover:underline"
+          >
+            /c/bahasa-{lang.slug}
+          </a>
+        </p>
+      </li>
     {/each}
-  </div>
+  </ul>
 </div>

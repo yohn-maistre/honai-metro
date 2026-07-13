@@ -14,13 +14,7 @@
   import { onMount } from 'svelte'
   import { ArrowTopRightOnSquare, Icon } from 'svelte-hero-icons/dist'
   import { t } from '$lib/app/i18n'
-  import { theme } from '$lib/app/theme/theme.svelte'
-  import { plateColors } from './atlas'
-  import {
-    idLonLatToCellF,
-    loadIdAtlasGrid,
-    type IdAtlasGrid,
-  } from './atlas-id'
+  import LocatorPlate from './LocatorPlate.svelte'
   import wajah from './wiki/wajah.json'
   import { DataChip } from './ui'
 
@@ -69,90 +63,6 @@
         live = true
       })
       .catch(() => {})
-  })
-
-  /* Locator plate: the whole archipelago as a dot grid, Papua's
-     provinces printed a shade heavier, seal ring on the entry's
-     coordinates. Always rides with the entry (owner call 2026-07-12:
-     the wiki places Papua inside Indonesia, the seal says "here"). */
-  const MINI_COLS = 96
-  const MINI_ROWS = 40
-  let mini = $state<HTMLCanvasElement>()
-  let miniGrid: IdAtlasGrid | null = null
-  let papuaProv: boolean[] = []
-
-  function drawMini() {
-    if (!mini || !miniGrid || !entry.koordinat) return
-    const ctx = mini.getContext('2d')
-    if (!ctx) return
-    const w = mini.clientWidth
-    const h = mini.clientHeight
-    const dpr = Math.min(window.devicePixelRatio ?? 1, 1.75)
-    mini.width = Math.round(w * dpr)
-    mini.height = Math.round(h * dpr)
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    ctx.clearRect(0, 0, w, h)
-    const { ink, accent, dark } = plateColors(mini)
-    const scale = Math.min((w * 0.96) / MINI_COLS, (h * 0.92) / MINI_ROWS)
-    const ox = (w - MINI_COLS * scale) / 2
-    const oy = (h - MINI_ROWS * scale) / 2
-    const dot = Math.max(1, scale * 0.42)
-    const loAlpha = dark ? 0.3 : 0.22
-    const hiAlpha = dark ? 0.72 : 0.55
-    ctx.fillStyle = ink
-    for (let gy = 0; gy < MINI_ROWS; gy++)
-      for (let gx = 0; gx < MINI_COLS; gx++) {
-        const c = miniGrid.cells[gy * MINI_COLS + gx]
-        if (!c) continue
-        ctx.globalAlpha = papuaProv[c - 1] ? hiAlpha : loAlpha
-        ctx.fillRect(
-          ox + gx * scale + (scale - dot) / 2,
-          oy + gy * scale + (scale - dot) / 2,
-          dot,
-          dot,
-        )
-      }
-    ctx.globalAlpha = 1
-    const [lat, lon] = entry.koordinat
-    const [fx, fy] = idLonLatToCellF(lon!, lat!, MINI_COLS, MINI_ROWS)
-    const x = ox + fx * scale
-    const y = oy + fy * scale
-    ctx.strokeStyle = accent
-    ctx.fillStyle = accent
-    for (const r of [4, 8]) {
-      ctx.lineWidth = r === 4 ? 1.6 : 0.8
-      ctx.beginPath()
-      ctx.arc(x, y, r, 0, Math.PI * 2)
-      ctx.stroke()
-    }
-    ctx.beginPath()
-    ctx.arc(x, y, 1.6, 0, Math.PI * 2)
-    ctx.fill()
-  }
-
-  const showPlate = $derived(!!entry.koordinat)
-
-  onMount(() => {
-    if (!entry.koordinat) return
-    let dead = false
-    void loadIdAtlasGrid(MINI_COLS, MINI_ROWS)
-      .then((g) => {
-        if (dead) return
-        miniGrid = g
-        papuaProv = g.provs.map((p) => p.nama.toLowerCase().includes('papua'))
-        drawMini()
-      })
-      .catch(() => {})
-    return () => {
-      dead = true
-    }
-  })
-
-  $effect(() => {
-    void theme.colorScheme
-    void showPlate
-    void imgBroken
-    drawMini()
   })
 
   const koordinatLabel = $derived.by(() => {
@@ -236,16 +146,11 @@
           Wikimedia Commons
         </figcaption>
       {/if}
-      {#if showPlate}
-        <div class="text-slate-800 dark:text-zinc-200">
-          <canvas
-            bind:this={mini}
-            class={[
-              'w-full block',
-              entry.gambar && !imgBroken ? 'h-20 mt-2' : 'h-28',
-            ]}
-          ></canvas>
-        </div>
+      {#if entry.koordinat}
+        <LocatorPlate
+          koordinat={entry.koordinat}
+          class={entry.gambar && !imgBroken ? 'h-20 mt-2' : 'h-28'}
+        />
         <figcaption class="text-xs text-slate-500 dark:text-zinc-400">
           {$t('etnos.wiki.wajah_plate')}
         </figcaption>

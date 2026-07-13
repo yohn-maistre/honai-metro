@@ -219,3 +219,12 @@ button:focus-visible {
 .dark ::-webkit-scrollbar-thumb {
   @apply bg-zinc-800;
 }
+
+/* Horizontal chip rows scroll without a visible bar (the 3px track
+   otherwise paints over the chips on Windows). */
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

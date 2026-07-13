@@ -19,7 +19,6 @@
     Cog6Tooth,
     ComputerDesktop,
     CpuChip,
-    GlobeAmericas,
     Icon,
     Identification,
     InformationCircle,
@@ -93,13 +92,9 @@
       icon={UserGroup}
     />
   {/if}
-  <!-- ETNOS: custom pages (order + labels mirror navbar/Profile.svelte) -->
+  <!-- ETNOS: custom pages. Jelajah lives in the navbar/dock (global
+       chrome), so this group only lists the destinations that are not. -->
   <EndPlaceholder margin="sm" size="xs">ETNOS</EndPlaceholder>
-  <SidebarButton
-    href="/explore"
-    label={$t('etnos.nav.jelajah')}
-    icon={GlobeAmericas}
-  />
   <SidebarButton href="/wiki" label={$t('etnos.nav.wiki')} icon={BookOpen} />
   <SidebarButton
     href="/dashboard"

@@ -6,7 +6,7 @@ export function load({ params }) {
   // If you somehow got to /comment/instance, it likely means you passed in an ID, not an instance.
   redirect(
     302,
-    resolve('/comment/[instance]/[id]', {
+    resolve('/comment/[instance]/[id=integer]', {
       instance: encodeURIComponent(instance.data.toLowerCase()),
       id: params.instance,
     }),

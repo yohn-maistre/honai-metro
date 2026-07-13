@@ -67,25 +67,54 @@
     for (const c of g.communities)
       if (c.region) regionCounts[c.region] = (regionCounts[c.region] ?? 0) + 1
 
-  const filtered = $derived.by(() => {
+  // Server truth wins: once a community exists on the backend, its live
+  // search row replaces the curated contoh row (no double listing).
+  const liveNames = $derived(
+    new Set(live.results.map((cv) => cv.community.name.toLowerCase())),
+  )
+
+  type DirCommunity = {
+    name: string
+    slug: string
+    subtitle?: string
+    region?: string
+  }
+  type DirGroup = {
+    category: string
+    description?: string
+    stronghold?: boolean
+    communities: DirCommunity[]
+  }
+
+  // Needle + live dedupe applied across ALL groups (no kategori narrowing),
+  // so the chip badges can count from it without following the active chip.
+  const narrowed = $derived.by(() => {
     const needle = q.trim().toLowerCase()
-    return data.directory.groups
-      .filter(
-        (g: { category: string }) => !kategori || g.category === kategori,
-      )
-      .map((g: { communities: { name: string; slug: string; subtitle?: string }[] }) => ({
-        ...g,
-        communities: needle
-          ? g.communities.filter((c) =>
-              [c.name, c.slug, c.subtitle ?? '']
-                .join(' ')
-                .toLowerCase()
-                .includes(needle),
-            )
-          : g.communities,
-      }))
-      .filter((g: { communities: unknown[] }) => g.communities.length > 0)
+    return (data.directory.groups as DirGroup[]).map((g) => ({
+      ...g,
+      communities: (needle
+        ? g.communities.filter((c) =>
+            [c.name, c.slug, c.subtitle ?? '']
+              .join(' ')
+              .toLowerCase()
+              .includes(needle),
+          )
+        : g.communities
+      ).filter((c) => !liveNames.has(c.slug.toLowerCase())),
+    }))
   })
+
+  const chipCounts = $derived(
+    new Map<string, number>(
+      narrowed.map((g) => [g.category, g.communities.length]),
+    ),
+  )
+
+  const filtered = $derived(
+    narrowed
+      .filter((g) => !kategori || g.category === kategori)
+      .filter((g) => g.communities.length > 0),
+  )
 </script>
 
 <svelte:head>
@@ -118,7 +147,7 @@
         <Icon src={MagnifyingGlass} size="15" micro />
       {/snippet}
     </TextInput>
-    <div class="flex gap-1.5 overflow-x-auto">
+    <div class="flex gap-1.5 overflow-x-auto scrollbar-none">
       <button
         type="button"
         class={[
@@ -144,7 +173,7 @@
         >
           {g.category}
           <span class="opacity-60 tabular-nums ml-0.5">
-            {g.communities.length}
+            {chipCounts.get(g.category) ?? 0}
           </span>
         </button>
       {/each}

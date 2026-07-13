@@ -11,7 +11,8 @@
     name: string
     kind: string
     actorType: string
-    tier?: string
+    /** null in the contoh registry rows that have no ladder tier yet */
+    tier?: string | null
     status: string
     jurisdiction: string
     personas?: string[]

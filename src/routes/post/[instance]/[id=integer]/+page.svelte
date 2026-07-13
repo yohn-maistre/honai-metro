@@ -23,10 +23,19 @@
   import FormattedNumber from '$lib/ui/util/FormattedNumber.svelte'
   import { Button, Expandable, toast } from 'mono-svelte'
   import { onMount } from 'svelte'
+  import { afterNavigate } from '$app/navigation'
+  import { BackLink } from '$lib/etnos/ui'
   import { ChatBubbleLeftRight, ChevronDoubleUp } from 'svelte-hero-icons/dist'
   import CommentProvider from './CommentProvider.svelte'
 
   let { data } = $props()
+
+  // Back to wherever the reader came from (feed, community, board row);
+  // direct loads fall back to the front page.
+  let backHref = $state('/')
+  afterNavigate(({ from }) => {
+    if (from?.url) backHref = from.url.pathname + from.url.search
+  })
 
   onMount(() => {
     data.data.value.meta.then((i) => data.data.value.post == i.post_view)
@@ -124,6 +133,7 @@
 </svelte:head>
 
 <article class="flex flex-col gap-2">
+  <BackLink href={backHref}>{$t('etnos.post.back')}</BackLink>
   <header class="flex flex-col gap-2">
     <div class="flex flex-row items-center gap-2 flex-wrap">
       <PostMeta

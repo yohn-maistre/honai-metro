@@ -13,14 +13,14 @@ const config: Config = {
       key: '',
       loader: async () => (await import('./id.json')).default,
     },
-    // ETNOS: Melayu Papua hidden from picker until manual translation pass
-    // lands, currently a duplicate of id.json. Loader retained (commented) so
-    // we can re-enable in one line once the translation work is done.
-    // {
-    //   locale: 'pmy',
-    //   key: '',
-    //   loader: async () => (await import('./pmy.json')).default,
-    // },
+    // ETNOS: Melayu Papua live (owner call 2026-07-13). The etnos.* keys
+    // carry real Papuan Malay; Photon core strings still mirror id.json
+    // until the full translation pass lands.
+    {
+      locale: 'pmy',
+      key: '',
+      loader: async () => (await import('./pmy.json')).default,
+    },
     // ETNOS: upstream loaders commented out, uncomment to re-enable
     // { locale: 'he', key: '', loader: async () => (await import('./he.json')).default },
     // { locale: 'ar', key: '', loader: async () => (await import('./ar.json')).default },

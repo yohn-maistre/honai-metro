@@ -61,7 +61,7 @@
     {/snippet}
   </PageHeader>
 
-  <div class="flex gap-1.5 overflow-x-auto">
+  <div class="flex gap-1.5 overflow-x-auto scrollbar-none">
     <button
       type="button"
       class={[

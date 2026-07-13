@@ -104,7 +104,7 @@
 
   <!-- jump-nav: plain anchors, sticky so long boards stay navigable -->
   <nav
-    class="sticky top-0 z-10 -mx-1 px-1 py-2 -my-3 bg-slate-25 dark:bg-zinc-925 flex gap-1.5 overflow-x-auto"
+    class="sticky top-0 z-10 -mx-1 px-1 py-2 -my-3 bg-slate-25 dark:bg-zinc-925 flex gap-1.5 overflow-x-auto scrollbar-none"
     aria-label="Bagian papan data"
   >
     {#each JUMP as [id, label] (id)}

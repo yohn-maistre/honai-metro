@@ -1,14 +1,19 @@
 # Decentralized Agent Memory for Aksara
 
+> **Historical research memo.** The current boundary and implementation waves
+> are in `docs/etnos/11_agentic-infrastructure-plan.md` (2026-07-21). This file
+> remains useful as a landscape review, but its prescribed runtime stack,
+> UCAN transport, and automatic agent-memory assumptions are not binding.
+
 A skeptical pass at running HippoRAG-class memory per Aksara node and federating queries through UCAN-gated retrieval, June 2026.
 
-> **Premise.** Each Aksara node — kelurahan, puskesmas, balai adat, BPP, sekolah — needs a local memory it owns, plus a way to *traverse* a peer's memory under scoped permission. The user named HippoRAG 2 as the candidate substrate and asked whether we can run it per-node and federate. This memo answers that, picks a stack, and stages it.
+> **Premise.** Each Aksara node — kelurahan, puskesmas, balai adat, BPP, sekolah — needs a local memory it owns, plus a way to _traverse_ a peer's memory under scoped permission. The user named HippoRAG 2 as the candidate substrate and asked whether we can run it per-node and federate. This memo answers that, picks a stack, and stages it.
 
 ---
 
 ## TL;DR
 
-**Yes — but not with HippoRAG 2, and not as "decentralized RAG" in the chain sense.** Build a per-Aksara memory now as **SQLite + sqlite-vec + Ollama + LightRAG + OpenViking** (the latter as the hierarchical long-term store built into Hermes Agent, confirmed by the founder), federate queries over **A2A + UCAN-attached JSON-RPC**, no custom protocol or PIR. HippoRAG 2 in its OSU-NLP form needs four H100s to index 10k documents in 4 hours ([HippoRAG 2 paper, arXiv:2502.14802](https://arxiv.org/html/2502.14802v1)) and depends on NV-Embed-v2 and vLLM; that is not deployable on an Orange Pi 5 in Wamena. We keep HippoRAG's *idea* — passage + phrase nodes with personalized PageRank for multi-hop sense-making — and reimplement a 10%-of-the-paper version on top of LightRAG. **Now (alpha):** local-only per-Aksara retrieval. **6 months (beta):** A2A + UCAN federation between two pilot nodes, no PIR, no homomorphic anything. **24 months:** maybe ActivityPods quad-store integration if NextGraph ever ships; PIR stays research-only.
+**Yes — but not with HippoRAG 2, and not as "decentralized RAG" in the chain sense.** Build a per-Aksara memory now as **SQLite + sqlite-vec + Ollama + LightRAG + OpenViking** (the latter as the hierarchical long-term store built into Hermes Agent, confirmed by the founder), federate queries over **A2A + UCAN-attached JSON-RPC**, no custom protocol or PIR. HippoRAG 2 in its OSU-NLP form needs four H100s to index 10k documents in 4 hours ([HippoRAG 2 paper, arXiv:2502.14802](https://arxiv.org/html/2502.14802v1)) and depends on NV-Embed-v2 and vLLM; that is not deployable on an Orange Pi 5 in Wamena. We keep HippoRAG's _idea_ — passage + phrase nodes with personalized PageRank for multi-hop sense-making — and reimplement a 10%-of-the-paper version on top of LightRAG. **Now (alpha):** local-only per-Aksara retrieval. **6 months (beta):** A2A + UCAN federation between two pilot nodes, no PIR, no homomorphic anything. **24 months:** maybe ActivityPods quad-store integration if NextGraph ever ships; PIR stays research-only.
 
 ## Updates per founder clarification (2026-06-08)
 
@@ -26,23 +31,23 @@ These updates reconcile this memo with the Master Proposal as amended in `docs/a
 
 **What the code actually requires.** The OSU-NLP reference ([github.com/OSU-NLP-Group/HippoRAG](https://github.com/OSU-NLP-Group/HippoRAG)) pins `torch==2.5.1`, `vllm==0.6.6.post1`, NV-Embed-v2 (7.85B params, ~16 GB FP16) as embedder, Llama-3.3-70B for triple extraction. **Reported config: 4× H100 with tensor parallelism, ~4 hours to index 10k documents.** A kelurahan with five years of surat-domisili plus immunization logs is comfortably 100k–500k records. This is a wrong-substrate problem on a CAX21, not a 5× scaling problem. Swapping the 70B for Qwen 3B via Ollama (~2–5 tok/s on a Pi 5 per [Stratosphere Lab](https://www.stratosphereips.org/blog/2025/6/5/how-well-do-llms-perform-on-a-raspberry-pi-5)) still leaves the embedder dependency.
 
-**What we keep from HippoRAG 2 — three ideas, not the code.** (1) Passage + phrase dual nodes: also embed entities (citizen DID, dusun, hutan adat) and connect them as graph nodes — that's what makes multi-hop kinship queries tractable. (2) Personalized PageRank seeded by query entities; networkx handles it on a Pi. (3) LLM-filtered triple extraction *at ingest, not at query* — pay the cloud-model cost once when a surat-domisili is filed, not on each Q&A.
+**What we keep from HippoRAG 2 — three ideas, not the code.** (1) Passage + phrase dual nodes: also embed entities (citizen DID, dusun, hutan adat) and connect them as graph nodes — that's what makes multi-hop kinship queries tractable. (2) Personalized PageRank seeded by query entities; networkx handles it on a Pi. (3) LLM-filtered triple extraction _at ingest, not at query_ — pay the cloud-model cost once when a surat-domisili is filed, not on each Q&A.
 
 **Verdict.** Research-grade, not deployable per-Aksara. **2/5 deployment, 5/5 architecture vocabulary.** The 90% alternative — **LightRAG** ([repo](https://github.com/LarFii/LightRAG-hku), EMNLP 2025; [paper](https://arxiv.org/html/2410.05779v1)) — has 34k+ stars, runs against external LLMs (no GPU required), supports Postgres/Neo4j/SQLite/Faiss backends, and shipped role-specific LLM configs in May 2026 (cheap extractor, smarter query model). Ship LightRAG.
 
 ## 2. Graph-RAG landscape — pick LightRAG, hold the rest
 
-| System | Per-node deploy on CAX21 | License | Cost-to-index | 2026 maturity | Verdict |
-|---|---|---|---|---|---|
-| **HippoRAG 2** | No (4× H100 in paper) | Apache 2.0 | High | Research code | Borrow ideas |
-| **LightRAG** | Yes (LLM remote, store local) | MIT | Low (~$0.10/1k docs w/ cheap model) | Prod, active | **Adopt** |
-| **GraphRAG (MSR)** | Marginal | MIT | $50–200 / 500 pages ([Paperclipped 2026](https://www.paperclipped.de/en/blog/graph-rag-production/)) | Prod, slow | Skip |
-| **LazyGraphRAG / Fast GraphRAG** | Yes | MIT | 50-6000× cheaper than GraphRAG | Prod, new | Watch |
-| **KAG (Ant Group, OpenSPG)** | No (heavy JVM stack) | Apache 2.0 | Medium | Prod inside Alipay ([aibase.com](https://www.aibase.com/news/11733)) | Skip — wrong shape |
-| **Memori (GibsonAI)** | Yes (SQL-native, no vector DB needed) | Apache 2.0 | Very low ([MarkTechPost](https://www.marktechpost.com/2025/09/08/gibsonai-releases-memori-an-open-source-sql-native-memory-engine-for-ai-agents/)) | Prod, young | **Adopt for conversation memory** |
-| **Cognee** | Yes, self-hosted Docker | Apache 2.0 | Medium | Prod, GraphRAG-native ([cognee.ai](https://www.cognee.ai/)) | Pilot for adat KG |
-| **RAGFlow** | Slim 2 GB / full 9 GB Docker ([Firecrawl 2026 list](https://www.firecrawl.dev/blog/best-open-source-rag-frameworks)) | Apache 2.0 | Medium | Prod, doc-centric | Skip — wrong shape |
-| **OpenViking (ByteDance)** | Untested on ARM | Apache 2.0 | Unknown | New, 13k stars | Defer, ByteDance origin concerns |
+| System                           | Per-node deploy on CAX21                                                                                             | License    | Cost-to-index                                                                                                                                      | 2026 maturity                                                        | Verdict                           |
+| -------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------- |
+| **HippoRAG 2**                   | No (4× H100 in paper)                                                                                                | Apache 2.0 | High                                                                                                                                               | Research code                                                        | Borrow ideas                      |
+| **LightRAG**                     | Yes (LLM remote, store local)                                                                                        | MIT        | Low (~$0.10/1k docs w/ cheap model)                                                                                                                | Prod, active                                                         | **Adopt**                         |
+| **GraphRAG (MSR)**               | Marginal                                                                                                             | MIT        | $50–200 / 500 pages ([Paperclipped 2026](https://www.paperclipped.de/en/blog/graph-rag-production/))                                               | Prod, slow                                                           | Skip                              |
+| **LazyGraphRAG / Fast GraphRAG** | Yes                                                                                                                  | MIT        | 50-6000× cheaper than GraphRAG                                                                                                                     | Prod, new                                                            | Watch                             |
+| **KAG (Ant Group, OpenSPG)**     | No (heavy JVM stack)                                                                                                 | Apache 2.0 | Medium                                                                                                                                             | Prod inside Alipay ([aibase.com](https://www.aibase.com/news/11733)) | Skip — wrong shape                |
+| **Memori (GibsonAI)**            | Yes (SQL-native, no vector DB needed)                                                                                | Apache 2.0 | Very low ([MarkTechPost](https://www.marktechpost.com/2025/09/08/gibsonai-releases-memori-an-open-source-sql-native-memory-engine-for-ai-agents/)) | Prod, young                                                          | **Adopt for conversation memory** |
+| **Cognee**                       | Yes, self-hosted Docker                                                                                              | Apache 2.0 | Medium                                                                                                                                             | Prod, GraphRAG-native ([cognee.ai](https://www.cognee.ai/))          | Pilot for adat KG                 |
+| **RAGFlow**                      | Slim 2 GB / full 9 GB Docker ([Firecrawl 2026 list](https://www.firecrawl.dev/blog/best-open-source-rag-frameworks)) | Apache 2.0 | Medium                                                                                                                                             | Prod, doc-centric                                                    | Skip — wrong shape                |
+| **OpenViking (ByteDance)**       | Untested on ARM                                                                                                      | Apache 2.0 | Unknown                                                                                                                                            | New, 13k stars                                                       | Defer, ByteDance origin concerns  |
 
 **Mix that ships:** LightRAG for the document-rooted KG; Memori for conversation memory; Cognee revisited at 12 months only if LightRAG's adat KG modeling proves too lossy.
 
@@ -62,14 +67,14 @@ One process tree per node: Hermes harness → MCP → local skill server → SQL
 
 The user's four query shapes map to different protocol problems:
 
-| Query | Routing | Permission | Privacy |
-|---|---|---|---|
-| Citizen X's immunization | A→B direct via X's DID Document `service` chain | UCAN scoped `subject=DID(X)`, `relation=read:immunization` | TLS + signed result |
-| Dewan kinship vouch | A→{B,C,…} fan-out in Dewan peer set | UCAN issued by Dewan, M-of-N witness | TLS |
-| Dinas Kesehatan public publication | A→Dinas | None — public lexicon | None |
-| Cross-Aksara semantic search "hutan adat Asmat" | A→peer set, semantic match | UCAN per peer opted-in | Hard — public-only in v1 |
+| Query                                           | Routing                                         | Permission                                                 | Privacy                  |
+| ----------------------------------------------- | ----------------------------------------------- | ---------------------------------------------------------- | ------------------------ |
+| Citizen X's immunization                        | A→B direct via X's DID Document `service` chain | UCAN scoped `subject=DID(X)`, `relation=read:immunization` | TLS + signed result      |
+| Dewan kinship vouch                             | A→{B,C,…} fan-out in Dewan peer set             | UCAN issued by Dewan, M-of-N witness                       | TLS                      |
+| Dinas Kesehatan public publication              | A→Dinas                                         | None — public lexicon                                      | None                     |
+| Cross-Aksara semantic search "hutan adat Asmat" | A→peer set, semantic match                      | UCAN per peer opted-in                                     | Hard — public-only in v1 |
 
-**Routing — no broadcast.** Two complementary patterns. (1) **Capability registry per ETNOS instance:** each Aksara publishes an A2A Agent Card listing lexicons, scopes, and a capability sentence; the ETNOS AppView builds a small HNSW index over those sentences. This is the *Federation of Agents* pattern with Versioned Capability Vectors ([arXiv:2509.20175](https://arxiv.org/abs/2509.20175)), and it composes natively with the A2A stack from `unified-federation-protocol.md`. (2) **DID-Document `service` entries for canonical routing:** a citizen's DID has a `service` of type `PrimaryPuskesmas`; for "X's immunization?" we resolve the DID and route directly. Use semantic routing only when canonical lookup is empty.
+**Routing — no broadcast.** Two complementary patterns. (1) **Capability registry per ETNOS instance:** each Aksara publishes an A2A Agent Card listing lexicons, scopes, and a capability sentence; the ETNOS AppView builds a small HNSW index over those sentences. This is the _Federation of Agents_ pattern with Versioned Capability Vectors ([arXiv:2509.20175](https://arxiv.org/abs/2509.20175)), and it composes natively with the A2A stack from `unified-federation-protocol.md`. (2) **DID-Document `service` entries for canonical routing:** a citizen's DID has a `service` of type `PrimaryPuskesmas`; for "X's immunization?" we resolve the DID and route directly. Use semantic routing only when canonical lookup is empty.
 
 **Transport.** A2A v1.0 ([a2a-protocol.org spec](https://a2a-protocol.org/v0.2.6/specification/)) over JSON-RPC: one A2A Task per `query/retrieve`. UCAN rides in `Authorization: Bearer ucan:...`; receiver verifies the chain locally (no authority callback) and returns a typed `RetrievalResponse` with PDS record URIs as provenance.
 
@@ -85,7 +90,7 @@ The user's four query shapes map to different protocol problems:
 
 `unified-federation-protocol.md` committed us to PieFed + atproto PDS + A2A + UCAN. The memory layer slots in cleanly:
 
-- **The PDS *is* part of local memory.** Typed records under `id.papua.*` lexicons are the canonical, signed, hash-addressed source. The Aksara node's SQLite is a **derived index**, rebuildable from the PDS firehose. Structurally a per-Aksara AppView.
+- **The PDS _is_ part of local memory.** Typed records under `id.papua.*` lexicons are the canonical, signed, hash-addressed source. The Aksara node's SQLite is a **derived index**, rebuildable from the PDS firehose. Structurally a per-Aksara AppView.
 - **A2A is the retrieval transport.** `query/retrieve` is one Task type; `ingest/notify` (peer pushes a relevant record to A's index) is another.
 - **ActivityPub `Search` is not a real thing in 2026.** No FEP for federated semantic search exists; FEP-6606 (collections addressing) is unrelated. We do not invent FEP-search; we use A2A.
 - **ActivityPods quad-store: defer** until NextGraph's self-hostable broker actually ships (mid-late 2026 target per `sovereign-stack-architecture.md` §1; tracked monthly). Re-evaluate then whether to re-project SQLite into a SPARQL quad-store for cross-Aksara analytics.
@@ -93,19 +98,19 @@ The user's four query shapes map to different protocol problems:
 
 ## 6. Readiness scorecard
 
-| Piece | Prod-ready 2026? | CPU-only Aksara? | Verdict |
-|---|---|---|---|
-| LightRAG, Memori, sqlite-vec, networkx, A2A v1.0, UCAN delegation, libsodium sealed-box | Yes | Yes | **Now** |
-| Ollama 3B-class | Yes | Batch yes, interactive marginal | **Now** for batch |
-| Capability-vector routing (FoA) | Yes | Yes | 2026 H2 |
-| HippoRAG 2 as-shipped | No (GPU) | No | **Skip — borrow ideas** |
-| GraphRAG MSR | Yes | No (cost) | **Skip** |
-| KAG / OpenSPG | Yes (JVM) | No | **Skip** |
-| Kùzu | Archived | n/a | **Skip** |
-| RyuGraph, OpenViking, Cognee | New | Maybe | **2027 revisit** |
-| Oxigraph | Beta | Yes | 2027 quad-store sidecar |
-| PIR / FHE retrieval | Research | No | **Research-only** |
-| ActivityPub Search FEP | Doesn't exist | n/a | **Skip** |
+| Piece                                                                                   | Prod-ready 2026? | CPU-only Aksara?                | Verdict                 |
+| --------------------------------------------------------------------------------------- | ---------------- | ------------------------------- | ----------------------- |
+| LightRAG, Memori, sqlite-vec, networkx, A2A v1.0, UCAN delegation, libsodium sealed-box | Yes              | Yes                             | **Now**                 |
+| Ollama 3B-class                                                                         | Yes              | Batch yes, interactive marginal | **Now** for batch       |
+| Capability-vector routing (FoA)                                                         | Yes              | Yes                             | 2026 H2                 |
+| HippoRAG 2 as-shipped                                                                   | No (GPU)         | No                              | **Skip — borrow ideas** |
+| GraphRAG MSR                                                                            | Yes              | No (cost)                       | **Skip**                |
+| KAG / OpenSPG                                                                           | Yes (JVM)        | No                              | **Skip**                |
+| Kùzu                                                                                    | Archived         | n/a                             | **Skip**                |
+| RyuGraph, OpenViking, Cognee                                                            | New              | Maybe                           | **2027 revisit**        |
+| Oxigraph                                                                                | Beta             | Yes                             | 2027 quad-store sidecar |
+| PIR / FHE retrieval                                                                     | Research         | No                              | **Research-only**       |
+| ActivityPub Search FEP                                                                  | Doesn't exist    | n/a                             | **Skip**                |
 
 ## 7. Phased plan
 
@@ -113,7 +118,7 @@ The user's four query shapes map to different protocol problems:
 
 **End-2026 → mid-2027 (beta).** Two Aksaras federate — pilot kelurahan + pilot puskesmas, both exposing an A2A endpoint. Kelurahan asks puskesmas about immunization for citizen X; UCAN issued by the kelurahan steward against the kelurahan DID, scoped `read:immunization` for `subject=DID(X)`, 7-day expiry. Puskesmas verifies, evaluates, returns with provenance. A2A Agent Cards published; routing still by hand-edited registry, not semantic.
 
-**Mid-2027 → end-2028.** ETNOS AppView ingests Agent Cards and builds the HNSW capability-vector index per Federation-of-Agents. Cross-Aksara semantic search ships, public-by-default; sacred and sealed lexicons require pre-issued UCANs from the respective Dewan. Cognee / LightRAG-with-quad-projection re-evaluated for adat KG depth. ActivityPods + NextGraph re-evaluated *only if* the NextGraph broker actually self-hosts and Pod ACLs subsume our UCAN+sealed-box story. PIR stays research-only — possibly a grant-track paper, not production.
+**Mid-2027 → end-2028.** ETNOS AppView ingests Agent Cards and builds the HNSW capability-vector index per Federation-of-Agents. Cross-Aksara semantic search ships, public-by-default; sacred and sealed lexicons require pre-issued UCANs from the respective Dewan. Cognee / LightRAG-with-quad-projection re-evaluated for adat KG depth. ActivityPods + NextGraph re-evaluated _only if_ the NextGraph broker actually self-hosts and Pod ACLs subsume our UCAN+sealed-box story. PIR stays research-only — possibly a grant-track paper, not production.
 
 ## 8. What we'd be inventing (be honest)
 
@@ -129,7 +134,7 @@ The user's four query shapes map to different protocol problems:
 
 ## 9. Adversarial and governance
 
-**Threat model.** Minimum: a *curious Aksara operator* who would read more than allowed if granted access. Medium-term: a *malicious Aksara* that lies in its responses. Out of scope for v1: state-level adversary compromising keys end-to-end.
+**Threat model.** Minimum: a _curious Aksara operator_ who would read more than allowed if granted access. Medium-term: a _malicious Aksara_ that lies in its responses. Out of scope for v1: state-level adversary compromising keys end-to-end.
 
 **Defenses shipped.** No synthesized fact without provenance (peer DID + record URI) — lies become attributable. Per-peer trust weighting in the reranker; pemerintah-weighted for civic, adat-weighted for cultural. UCAN scoping mandatory: no "read everything" capability is issuable; default expiry 7 days. Both ends log requester DID, UCAN CID, scope, response hash, timestamp; logs append-only, Merkle-anchored daily per `sovereign-stack-architecture.md`.
 

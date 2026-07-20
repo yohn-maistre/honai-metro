@@ -57,9 +57,11 @@ jobs:
           # Production env vars — edit here when they change.
           # These are PUBLIC_* so they are intentionally not secrets;
           # they end up inlined into the client JS bundle.
-          PUBLIC_INSTANCE_URL: piefed.social
-          PUBLIC_INSTANCE_TYPE: piefedalpha
-          PUBLIC_LOCK_TO_INSTANCE: 'true'
+          # Repo variables make the Oracle cutover reversible without a code
+          # change. Empty or absent variables retain the current public beta.
+          PUBLIC_INSTANCE_URL: ${{ vars.PUBLIC_INSTANCE_URL || 'piefed.social' }}
+          PUBLIC_INSTANCE_TYPE: ${{ vars.PUBLIC_INSTANCE_TYPE || 'piefedalpha' }}
+          PUBLIC_LOCK_TO_INSTANCE: ${{ vars.PUBLIC_LOCK_TO_INSTANCE || 'true' }}
           PUBLIC_LANGUAGE: id
           PUBLIC_SSR_ENABLED: 'false'
           PUBLIC_DEFAULT_FEED: Local

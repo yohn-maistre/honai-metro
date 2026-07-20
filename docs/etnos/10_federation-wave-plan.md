@@ -1,5 +1,9 @@
 # Federation wave plan (DRAF, 2026-07-12)
 
+> Historical plan. The agent, memory, identity, and deployment sections are
+> superseded by `11_agentic-infrastructure-plan.md` (2026-07-21). The map and
+> place sections remain useful product context.
+
 Internal spec, English per house rules. This is the roadmap agreed in
 principle on 2026-07-12 for the work that follows the broadsheet pass:
 the interactive map upgrade, place as first-class federated data, the
@@ -15,6 +19,7 @@ re-expressed as MapLibre sources/layers, kab click-to-dossier kept
 (native feature hit-testing replaces the raster lookup).
 
 Facts that make this cheap(er):
+
 - maplibre-gl + svelte-maplibre-gl are ALREADY in package.json
   (imported nowhere today, tree-shaken; bundle cost arrives only when
   imported, and only on the route that imports it: keep it lazy).
@@ -25,6 +30,7 @@ Facts that make this cheap(er):
   unchanged; only the rendering swaps.
 
 Open questions before building:
+
 - Tile source and cost: detak uses public vector/raster styles; pick
   sources that are keyless or self-hosted (PMTiles on Cloudflare R2 is
   the sovereign option and fits the Aksara posture). Satellite tiles
@@ -44,15 +50,16 @@ can place a community on a map without a side-channel registry.
 Mechanism: ActivityStreams already defines a `location` property
 (as:Object -> as:Place with name, latitude, longitude) valid on Group
 actors. PieFed patch sketch:
+
 - DB: add nullable place_name, place_lat, place_lon to community.
 - Serializer: emit `location: {type: "Place", name, latitude,
-  longitude}` on the Group actor JSON-LD.
+longitude}` on the Group actor JSON-LD.
 - Ingest: parse the same property from remote Groups when present.
 - UI: one optional field on community create/settings.
-Lemmy/Mastodon ignore unknown properties gracefully; this degrades to
-exactly today's behavior everywhere else. Upstream this to PieFed as a
-PR (Rimu has been receptive to civic-flavored features); if upstream
-stalls, carry it as an instance patch.
+  Lemmy/Mastodon ignore unknown properties gracefully; this degrades to
+  exactly today's behavior everywhere else. Upstream this to PieFed as a
+  PR (Rimu has been receptive to civic-flavored features); if upstream
+  stalls, carry it as an instance patch.
 
 Until the ETNOS server exists, the honest interim stays what we have:
 `region` fields in the client-side directory registry, clearly contoh.
@@ -67,6 +74,7 @@ This is the template story made visible: the map IS the pitch that
 other islands can inherit the stack.
 
 Build notes:
+
 - detak's atlas-dots covers all Indonesia (COLS=188 ROWS=72,
   province-indexed, per-feature coverage passes: port the same fix we
   made in atlas.ts). Vendor detak's idn-prov geojson.
@@ -86,6 +94,7 @@ lives in Memori Aksara (aksara-mem), which subscribes to the AP
 firehose rather than being stored in it.
 
 Sketch:
+
 - Actor: type Service, one per agent instance, owned by an institution
   actor (attributedTo). Human-readable profile links the institution's
   /org page.
@@ -104,6 +113,7 @@ borrowed backend violates our own published T0 rule (no attestation
 chain exists yet) and burns goodwill with the piefed.social admins.
 
 First experiment (gates on the own-server decision, LEDGER item):
+
 1. Spin a throwaway PieFed instance (upstream docker-compose) on a VPS
    or laptop.
 2. Land the `location` patch there (section 2) and verify it federates

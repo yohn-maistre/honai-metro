@@ -40,9 +40,9 @@ Hard rules, all learned the expensive way:
   the only shadows. Flat stats = `Figure` (big number + label, no box).
   `Board` and `StatCard` are retired and deleted.
 - **When a card IS warranted** use `Material` (`color="default"
-  rounding="2xl"`; add `interactive` for links). Raw equivalent:
+rounding="2xl"`; add `interactive` for links). Raw equivalent:
   `bg-white dark:bg-zinc-900 rounded-2xl border border-slate-200
-  border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700`.
+border-b-slate-300 dark:border-zinc-800 dark:border-t-zinc-700`.
   No `/80` translucency, no gradients (the old btn-primary radial
   gradient was a violation and is now a solid block).
 - **Surfaces never repaint on hover; controls may.** Card/row affordance
@@ -178,14 +178,15 @@ empty on Lemmy backends because `getPosts` hardcoded `page_cursor:'1'`
 reset `inflight` on empty success; `live.ts` had the same bug).
 **The plate is self-colored ink in BOTH themes** (a split-flap board is
 black in any light): the `<details>` root carries a literal `dark` class
-+ explicit zinc-900 skin so children render their on-ink colors; do not
-re-theme it per scheme. Each row is `segs` equal overflow-hidden cells
-holding the full string at `left:-j*100%`; `segs` is a `MediaQuery` (6
-on sm+, **1 on phones** so long lines truncate softly instead of slicing,
-`clip` font drops to 13px), swap/done timings derive from `segs` so the
-text swap lands at the fold midpoint; per-CELL rotateX half-fold with
-45ms stagger (never per-character), WIT clock, day-seeded, **open on all
-breakpoints** (the map is the hero; details stays collapsible).
+
+- explicit zinc-900 skin so children render their on-ink colors; do not
+  re-theme it per scheme. Each row is `segs` equal overflow-hidden cells
+  holding the full string at `left:-j*100%`; `segs` is a `MediaQuery` (6
+  on sm+, **1 on phones** so long lines truncate softly instead of slicing,
+  `clip` font drops to 13px), swap/done timings derive from `segs` so the
+  text swap lands at the fold midpoint; per-CELL rotateX half-fold with
+  45ms stagger (never per-character), WIT clock, day-seeded, **open on all
+  breakpoints** (the map is the hero; details stays collapsible).
 
 **Kartu WA** (`src/lib/etnos/kartu.ts` + `KartuWA.svelte`): the post
 share menu offers "Kartu WA", a 1080×1080 canvas card (cream, terracotta
@@ -223,10 +224,11 @@ entry `nama` (candidate tiers: full nama → strip `Suku|Kepulauan` prefix
 tempat entries also render a `LocatorPlate`; unmatched entries go to a
 "Wajah terkait" end strip. TOC = sticky desktop rail (terracotta active
 tick, IntersectionObserver in an `$effect` keyed on the parsed sections)
-+ de-carded mobile `<details>`. End matter: terkait strip → BahasaHub
-(now hairline ledger rows, was a card grid) → prev/next category pager.
-Never invent images: kuliner/bahasa have no verified Commons entries and
-stay purely typographic.
+
+- de-carded mobile `<details>`. End matter: terkait strip → BahasaHub
+  (now hairline ledger rows, was a card grid) → prev/next category pager.
+  Never invent images: kuliner/bahasa have no verified Commons entries and
+  stay purely typographic.
 
 ## Deploy ritual (non-negotiable)
 
@@ -286,13 +288,13 @@ Sans is loaded).
 
 ## Next wave (planned, not built)
 
-`docs/etnos/10_federation-wave-plan.md` (DRAF): Peta Kabar v2 on
-MapLibre (basemap dresses, pan/zoom, keep dot plate as placeholder +
-save-data default), place-as-first-class via the AP `location` property
-on Group actors (PieFed patch), Peta Nusantara multi-island Jelajah,
-agent actors as AP Service actors with `aksara:attestation` (sandbox on
-a throwaway PieFed instance, NEVER on piefed.social), notification-bell
-popover.
+`docs/etnos/11_agentic-infrastructure-plan.md` (DRAF, 2026-07-21) is
+the current implementation plan for the owned PieFed deployment,
+`aksara` command, `aksara-agent`, `aksara-mem`, A2A task plane, OASF
+capability manifests, grants, receipts, and long-horizon agent network.
+The map and place work remains in the historical
+`docs/etnos/10_federation-wave-plan.md`. Never run experimental agent
+actors on piefed.social.
 
 ## Banked (will come back)
 

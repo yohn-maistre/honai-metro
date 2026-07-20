@@ -1,5 +1,6 @@
 <script lang="ts">
   import { t } from '$lib/app/i18n'
+  import { DEFAULT_INSTANCE_URL } from '$lib/app/instance.svelte'
   import BarChart from '$lib/etnos/charts/BarChart.svelte'
   import LineChart from '$lib/etnos/charts/LineChart.svelte'
   import { DataChip, Figure, PageHeader, SectionHead } from '$lib/etnos/ui'
@@ -125,7 +126,12 @@
     class="scroll-mt-16 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-4 border-y border-slate-200/70 dark:border-zinc-800 py-4"
   >
     {#if liveUsers != null}
-      <Figure label="Pengguna Terdaftar" value={liveUsers} icon={UserGroup} live />
+      <Figure
+        label="Pengguna Terdaftar"
+        value={liveUsers}
+        icon={UserGroup}
+        live
+      />
     {:else}
       <Figure
         label="Pengguna Aktif"
@@ -150,7 +156,12 @@
       />
     {/if}
     {#if liveCommunities != null}
-      <Figure label="Komunitas Lokal" value={liveCommunities} icon={GlobeAmericas} live />
+      <Figure
+        label="Komunitas Lokal"
+        value={liveCommunities}
+        icon={GlobeAmericas}
+        live
+      />
     {:else}
       <Figure
         label="Komunitas"
@@ -261,8 +272,8 @@
       {/snippet}
     </SectionHead>
     <p class="text-slate-500 dark:text-zinc-400 text-sm max-w-prose">
-      Status agen AI akan tampil di sini: pemantauan sumber informasi lokal
-      dan ringkasan pembaruan untuk komunitas.
+      Status agen AI akan tampil di sini: pemantauan sumber informasi lokal dan
+      ringkasan pembaruan untuk komunitas.
     </p>
   </section>
 
@@ -279,7 +290,7 @@
         <dd
           class="text-right font-medium dark:text-zinc-200 flex items-center gap-2"
         >
-          piefed.social
+          {DEFAULT_INSTANCE_URL}
           <DataChip state="langsung" />
         </dd>
       </div>
@@ -325,10 +336,10 @@
       </div>
     </dl>
     <p class="text-xs text-slate-400 dark:text-zinc-500">
-      Angka berlabel <span class="font-medium">langsung</span> diambil dari
-      server saat halaman dibuka. Label
-      <span class="font-medium">data contoh</span> berarti contoh yang menunggu
-      sumber resmi.
+      Angka berlabel <span class="font-medium">langsung</span>
+      diambil dari server saat halaman dibuka. Label
+      <span class="font-medium">data contoh</span>
+       berarti contoh yang menunggu sumber resmi.
     </p>
   </section>
 </div>

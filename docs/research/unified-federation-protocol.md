@@ -1,8 +1,14 @@
 # ETNOS Unified Federation Protocol — Complexity Review
 
+> **Historical research memo.** Its “finalized” wording and several protocol
+> version claims are superseded by `docs/etnos/11_agentic-infrastructure-plan.md`
+> (2026-07-21). In particular, DID:WBA and UCAN are no longer mandatory v0.x
+> dependencies, A2A is the task plane rather than the full substrate, and memory
+> remains behind a storage adapter. Keep this file as the reasoning archive.
+
 Opinionated re-evaluation of the prior PieFed + ActivityPods/NextGraph recommendation, June 2026.
 
-> **Why this exists.** The prior research (`sovereign-stack-architecture.md`) recommended PieFed for content and ActivityPods + NextGraph for memory, with `did:web` everywhere. The pushback is correct: that is two runtimes, two ops stories, two failure modes, two SDKs, and two roadmaps to track. This memo revisits the question under one lens — *complexity* — and answers the four-quadrant question (forum + permissioned memory + agent↔agent + agent↔human) with one substrate.
+> **Why this exists.** The prior research (`sovereign-stack-architecture.md`) recommended PieFed for content and ActivityPods + NextGraph for memory, with `did:web` everywhere. The pushback is correct: that is two runtimes, two ops stories, two failure modes, two SDKs, and two roadmaps to track. This memo revisits the question under one lens — _complexity_ — and answers the four-quadrant question (forum + permissioned memory + agent↔agent + agent↔human) with one substrate.
 
 ---
 
@@ -63,7 +69,7 @@ A community sets its social reach and its memory access as **two different decis
 
 ## TL;DR
 
-**Keep PieFed for the public square. Stop trying to make ActivityPods + NextGraph the memory layer. For Aksara memory and agent↔agent, adopt AT Protocol PDS repos as our second (and only other) substrate — used internally, federated externally through a thin atproto↔ActivityPub bridge.** Use `did:web` as the everyday identifier and `did:wba` (ANP's web-based DID method) for agent actors; mint a `did:plc` only when an Aksara node opts into atproto-native discovery. No chain. No Solid Pods. No DWN. No third runtime. The Foundation Protocol paper (arXiv:2605.23218, 22 May 2026) is a coordination *overlay* on top of whichever substrate we pick — we adopt its vocabulary, not its plumbing. Two substrates beat three; one substrate is not currently realistic given that no production system covers A+B+C+D under one roof in 2026. The PieFed-only path (strip-and-expand) is a five-engineer-year fork; the AT-Protocol-only path forfeits the threadiverse audience and bets on a permissioned-data spec that is still mid-summer-2026 work. The composition below is the smallest two-substrate stack that ships.
+**Keep PieFed for the public square. Stop trying to make ActivityPods + NextGraph the memory layer. For Aksara memory and agent↔agent, adopt AT Protocol PDS repos as our second (and only other) substrate — used internally, federated externally through a thin atproto↔ActivityPub bridge.** Use `did:web` as the everyday identifier and `did:wba` (ANP's web-based DID method) for agent actors; mint a `did:plc` only when an Aksara node opts into atproto-native discovery. No chain. No Solid Pods. No DWN. No third runtime. The Foundation Protocol paper (arXiv:2605.23218, 22 May 2026) is a coordination _overlay_ on top of whichever substrate we pick — we adopt its vocabulary, not its plumbing. Two substrates beat three; one substrate is not currently realistic given that no production system covers A+B+C+D under one roof in 2026. The PieFed-only path (strip-and-expand) is a five-engineer-year fork; the AT-Protocol-only path forfeits the threadiverse audience and bets on a permissioned-data spec that is still mid-summer-2026 work. The composition below is the smallest two-substrate stack that ships.
 
 ---
 
@@ -74,26 +80,26 @@ A community sets its social reach and its memory access as **two different decis
 - arXiv:[2602.15831](https://arxiv.org/abs/2602.15831) — **A2H: Agent-to-Human Protocol** (Feb 2026). Defines a "Human Card", a formal agent↔human schema, and a unified messaging abstraction. Scope is narrower than FP and overlaps with our Tier-3/Tier-4 vouching model; useful as a vocabulary, not as a substrate.
 - arXiv:[2602.15055](https://arxiv.org/abs/2602.15055) — **ACP: Unified Agent Communication Protocol** (Feb 2026). Federated orchestration with DID-based identity verification, semantic intent mapping, and machine-readable SLAs. Closer to a competitor of A2A than a substrate.
 
-**Summary of FP.** A *graph-first coordination layer* treating agents, tools, resources, humans, institutions, and organizations as first-class addressable nodes in a shared graph. Relationships, memberships, sessions, and activities are protocol objects. Four planes: Entity & Trust (DIDs + VCs), Transport & Routing (pluggable; wraps MCP/A2A/ANP), Interaction & Organization (multi-party sessions, role binding), Regulation & Oversight (policy, provenance, audit, value exchange). The paper explicitly states it is meant to *wrap and bridge existing protocols rather than replace them.*
+**Summary of FP.** A _graph-first coordination layer_ treating agents, tools, resources, humans, institutions, and organizations as first-class addressable nodes in a shared graph. Relationships, memberships, sessions, and activities are protocol objects. Four planes: Entity & Trust (DIDs + VCs), Transport & Routing (pluggable; wraps MCP/A2A/ANP), Interaction & Organization (multi-party sessions, role binding), Regulation & Oversight (policy, provenance, audit, value exchange). The paper explicitly states it is meant to _wrap and bridge existing protocols rather than replace them._
 
-**Fit assessment.** FP is not a substrate we can deploy; no production implementation, no public reference code. It is **vocabulary and architecture** for the layer above whatever transport we choose. ETNOS adopts three FP concepts: (i) Entity Plane mapping — every Aksara, citizen, agent, tool, dinas is one node in one graph; (ii) Regulation Plane primitives — policy/provenance/audit as data, not log lines; (iii) the "wrap, don't replace" stance, which is the answer to the complexity question. FP makes the case for *two substrates with one coordination overlay,* not for one omnibus runtime.
+**Fit assessment.** FP is not a substrate we can deploy; no production implementation, no public reference code. It is **vocabulary and architecture** for the layer above whatever transport we choose. ETNOS adopts three FP concepts: (i) Entity Plane mapping — every Aksara, citizen, agent, tool, dinas is one node in one graph; (ii) Regulation Plane primitives — policy/provenance/audit as data, not log lines; (iii) the "wrap, don't replace" stance, which is the answer to the complexity question. FP makes the case for _two substrates with one coordination overlay,_ not for one omnibus runtime.
 
 ## 2. Decision matrix — six candidates, one lens
 
 Scores 1–5 (5 = best). The columns capture the user's actual constraint: complexity per ops-headcount-month, not technical elegance.
 
-| Substrate | A+B+C+D under one roof | 2026 prod-ready | DX (Svelte+Py+Hermes) | Ops complexity (lower = better) | Federation / sovereignty | Papua fit |
-|---|---|---|---|---|---|---|
-| **PieFed as-is + Postgres** | 1 (forum only) | 5 | 5 | 5 (one runtime) | 4 | 5 |
-| **PieFed++ (strip-and-expand)** | 4 (forum + memory + agent actor) | 2 | 3 (we maintain the fork) | 3 (one runtime, our fork) | 4 | 3 |
-| **PieFed + ActivityPods+NextGraph** | 4 | 2 (broker self-host mid-late 2026) | 2 (Rust core, JS SDK, Python shim) | 1 (three runtimes effectively) | 5 | 2 |
-| **AT Protocol unified (PDS + AppView only)** | 3 (no native ACL until permissioned-data lands) | 3 (PDS prod; permissioned-data H2 2026) | 4 | 4 (one runtime per node) | 3 (PLC + Bluesky AppView dependency) | 3 |
-| **PieFed + AT-Protocol-as-memory (recommended)** | 4 | 4 | 4 | 3 (two runtimes, both boring) | 4 | 4 |
-| **DWN / Web5** | 2 | 1 (TBD sunset 2024; DIF caretaker) | 2 | 1 (no clear home) | 2 | 1 |
-| **Custom (build our own)** | 0 | 0 | 0 | 0 | 5 | 0 |
-| **Permissioned chain (Cosmos/Substrate)** | 1 | 4 | 1 | 1 (validator set ops) | 1 | 1 |
+| Substrate                                        | A+B+C+D under one roof                          | 2026 prod-ready                         | DX (Svelte+Py+Hermes)              | Ops complexity (lower = better) | Federation / sovereignty             | Papua fit |
+| ------------------------------------------------ | ----------------------------------------------- | --------------------------------------- | ---------------------------------- | ------------------------------- | ------------------------------------ | --------- |
+| **PieFed as-is + Postgres**                      | 1 (forum only)                                  | 5                                       | 5                                  | 5 (one runtime)                 | 4                                    | 5         |
+| **PieFed++ (strip-and-expand)**                  | 4 (forum + memory + agent actor)                | 2                                       | 3 (we maintain the fork)           | 3 (one runtime, our fork)       | 4                                    | 3         |
+| **PieFed + ActivityPods+NextGraph**              | 4                                               | 2 (broker self-host mid-late 2026)      | 2 (Rust core, JS SDK, Python shim) | 1 (three runtimes effectively)  | 5                                    | 2         |
+| **AT Protocol unified (PDS + AppView only)**     | 3 (no native ACL until permissioned-data lands) | 3 (PDS prod; permissioned-data H2 2026) | 4                                  | 4 (one runtime per node)        | 3 (PLC + Bluesky AppView dependency) | 3         |
+| **PieFed + AT-Protocol-as-memory (recommended)** | 4                                               | 4                                       | 4                                  | 3 (two runtimes, both boring)   | 4                                    | 4         |
+| **DWN / Web5**                                   | 2                                               | 1 (TBD sunset 2024; DIF caretaker)      | 2                                  | 1 (no clear home)               | 2                                    | 1         |
+| **Custom (build our own)**                       | 0                                               | 0                                       | 0                                  | 0                               | 5                                    | 0         |
+| **Permissioned chain (Cosmos/Substrate)**        | 1                                               | 4                                       | 1                                  | 1 (validator set ops)           | 1                                    | 1         |
 
-The number that matters is the *product* of "prod-ready × ops simplicity × DX." On that product, only **PieFed as-is** and **PieFed + atproto-as-memory** clear the bar. PieFed as-is doesn't serve B+C+D, so by elimination the two-substrate answer is PieFed + atproto.
+The number that matters is the _product_ of "prod-ready × ops simplicity × DX." On that product, only **PieFed as-is** and **PieFed + atproto-as-memory** clear the bar. PieFed as-is doesn't serve B+C+D, so by elimination the two-substrate answer is PieFed + atproto.
 
 ## 3. The strip-and-expand-PieFed analysis
 
@@ -115,7 +121,7 @@ The honest question: can PieFed (Python/Flask, Lemmy-shaped API, Postgres) absor
 
 **Total greenfield effort:** ~9 engineer-months for a usable v1, ~18–24 months to harden through one Aksara cohort. Add an ongoing fork tax of ~25% of one engineer FTE indefinitely. **Plausible with two senior engineers and one year, but it commits ETNOS to maintaining a private fork of a federation server for the lifetime of the platform.** That's a real ops burden the prior architecture analysis didn't account for.
 
-**The trap.** PieFed++ is one runtime in the deployment but one runtime *we maintain alone.* Mainline ships a forum; PieFed++ would be a Solid-Pod-ActivityPub-MCP-UCAN polyglot existing only on our Codeberg. That is not "one substrate" — it is "two substrates collapsed into one process that we own all the bugs in." Reject.
+**The trap.** PieFed++ is one runtime in the deployment but one runtime _we maintain alone._ Mainline ships a forum; PieFed++ would be a Solid-Pod-ActivityPub-MCP-UCAN polyglot existing only on our Codeberg. That is not "one substrate" — it is "two substrates collapsed into one process that we own all the bugs in." Reject.
 
 ## 4. AT Protocol as the substrate — honest re-examination
 
@@ -138,7 +144,7 @@ Prior research treated atproto as a sidecar. Re-examined as a candidate primary:
 - **PLC dependency.** Even with the [Swiss Association transition](https://docs.bsky.app/blog/plc-directory-org), `did:plc` resolution is a shared bottleneck. Mitigation: use `did:web` for civic actors, fall back to `did:plc` only where the atproto ecosystem requires it.
 - **ActivityPub bridging.** Bridging atproto and ActivityPub is non-trivial. Bridgy Fed exists but is a third-party service; an ETNOS-controlled bridge is a small server we'd have to write.
 
-**Net.** If we are anyway adding (a) Pod-like containers, (b) agent DIDs, and (c) capability tokens to PieFed, *most of that is in atproto already.* The honest gap is **encrypted-at-rest sacred content,** which atproto does not plan to solve. The fix is small: an encrypted-blob sidecar (libsodium sealed boxes keyed to Dewan Adat threshold keys) addressed by a record in the PDS. Three weeks of engineering, not three years of NextGraph waiting.
+**Net.** If we are anyway adding (a) Pod-like containers, (b) agent DIDs, and (c) capability tokens to PieFed, _most of that is in atproto already._ The honest gap is **encrypted-at-rest sacred content,** which atproto does not plan to solve. The fix is small: an encrypted-blob sidecar (libsodium sealed boxes keyed to Dewan Adat threshold keys) addressed by a record in the PDS. Three weeks of engineering, not three years of NextGraph waiting.
 
 ## 5. The chain reconsideration — settle it
 
@@ -148,14 +154,14 @@ The user's instinct ("web3/web5 is what chains are for") is reasonable from a ma
 
 1. **Programmable economics.** ETNOS has no token, no DEX, no on-chain settlement. The "civic dividend" in OTSUS budget tracking is a Postgres ledger with audit log, not a smart contract. If it ever becomes on-chain, it lives on QRIS rails, not our chain.
 2. **Public bonded curation markets.** We have Dewan Adat. Bonded curation in Wamena is a category error.
-3. **Censorship resistance vs state actors.** Our threat model is *cooperating with* the Indonesian state (BSSN, Dukcapil, OTSUS sekretariat) via BSrE. A chain that routes around state moderation is the wrong tool — it's actively hostile to our gov-bridge story.
+3. **Censorship resistance vs state actors.** Our threat model is _cooperating with_ the Indonesian state (BSSN, Dukcapil, OTSUS sekretariat) via BSrE. A chain that routes around state moderation is the wrong tool — it's actively hostile to our gov-bridge story.
 4. **Cross-jurisdiction settlement.** Single jurisdiction.
 
 What chains charge in return: validator-set governance (6–12 months of design at Cosmos SDK pace per [Chainscore on hidden Cosmos cost](https://www.chainscorelabs.com/en/blog/the-appchain-thesis-cosmos-and-polkadot/appchain-development-frameworks/the-hidden-cost-of-choosing-cosmos-sdk-over-substrate)), per-tx fees that bite at scale, cold-start liveness, key-loss-equals-identity-loss UX disasters, and a public-by-default model that breaks CARE.
 
 **Web5 specifically.** Block sunsetted TBD in November 2024 ([crypto.news](https://crypto.news/block-inc-shifts-focus-to-bitcoin-mining-amid-plans-to-sunset-web5-focused-tbd/)). DWN code was handed to DIF; a DIF-operated community node runs on Google Cloud. There is no longer a vendor pushing this stack. DWN is a viable spec but a frozen one. Adopting DWN today is adopting an orphan. Reject.
 
-**Where chain genuinely fits in ETNOS, if anywhere.** One place only: a Merkle root of the day's Aksara memory + civic-action receipts published to OpenTimestamps and a pinned PieFed post. That is the *anchor*, and it is free. We get tamper-evidence, public auditability, and independent verification — without running a validator network or asking Dewan Adat to hold an Ed25519 key under threat of identity loss. The prior architecture memo called this "poor-person's chain" and it remains correct.
+**Where chain genuinely fits in ETNOS, if anywhere.** One place only: a Merkle root of the day's Aksara memory + civic-action receipts published to OpenTimestamps and a pinned PieFed post. That is the _anchor_, and it is free. We get tamper-evidence, public auditability, and independent verification — without running a validator network or asking Dewan Adat to hold an Ed25519 key under threat of identity loss. The prior architecture memo called this "poor-person's chain" and it remains correct.
 
 ## 6. Permissioned access — concrete UX flow
 
@@ -169,7 +175,7 @@ The Dewan-grants-researcher-30-day-read flow on the recommended stack:
 6. Researcher's client presents the UCAN to the Aksara AppView; AppView verifies the chain, decrypts sacred-tagged blobs with the Dewan-side threshold key, and serves.
 7. Revocation = a new signed record in the Aksara PDS that supersedes the grant; AppView checks revocation list on every read.
 
-Why UCAN and not WebACL: WebACL is per-resource ACL state held centrally, which is exactly the Solid model that requires a Pod server. UCAN is a *token* carried by the requester — verifiable offline, attenuates across hops, no server-side ACL store. Better fit for a peer-to-peer agent model where any Aksara might serve any other Aksara. GNAP and OAuth 2.0 are alternatives; UCAN composes with DIDs natively, which the other two do not.
+Why UCAN and not WebACL: WebACL is per-resource ACL state held centrally, which is exactly the Solid model that requires a Pod server. UCAN is a _token_ carried by the requester — verifiable offline, attenuates across hops, no server-side ACL store. Better fit for a peer-to-peer agent model where any Aksara might serve any other Aksara. GNAP and OAuth 2.0 are alternatives; UCAN composes with DIDs natively, which the other two do not.
 
 ## 7. Agent-to-agent protocols — what we adopt
 
@@ -222,7 +228,7 @@ Hermes agents talk MCP to local skills, A2A to peer agents, and read/write to th
 
 ## 9. Stop-doing list
 
-1. **Stop waiting for ActivityPods 2.x to ship the NextGraph swap.** Mid-late 2026 is the stated target; permissioned data on atproto is *also* mid-late 2026. We are no later by leaving ActivityPods.
+1. **Stop waiting for ActivityPods 2.x to ship the NextGraph swap.** Mid-late 2026 is the stated target; permissioned data on atproto is _also_ mid-late 2026. We are no later by leaving ActivityPods.
 2. **Stop tracking NextGraph as a memory substrate.** It is a beautiful CRDT engine for a different shape of app. Revisit in 2028 if local-first conflict resolution becomes a primary requirement.
 3. **Stop evaluating DWN / Web5.** TBD shutdown; DIF caretaker mode; no vendor push. Adopting it costs lock-in to a frozen spec.
 4. **Stop talking about a permissioned chain.** Including "civic appchain" framings in proposals to NLnet or OTSUS. It actively damages the gov-bridge story.

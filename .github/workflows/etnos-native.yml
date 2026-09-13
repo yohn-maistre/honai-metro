@@ -49,3 +49,23 @@ jobs:
           path: |
             .svelte-kit/cloudflare
             bun.lock
+  browser:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Prepare browser checks
+        run: |
+          npm install --prefix /tmp/etnos-browser --no-package-lock playwright@1.58.2
+          /tmp/etnos-browser/node_modules/.bin/playwright install --with-deps chromium
+          cp scripts/verify-etnos-browser.mjs /tmp/etnos-browser/verify.mjs
+      - name: Exercise live forum and engine
+        run: node /tmp/etnos-browser/verify.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: etnos-native-browser
+          path: etnos-evidence

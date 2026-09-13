@@ -10,7 +10,9 @@ for (const [name,viewport] of [['desktop',{width:1440,height:1000}],['mobile',{w
  const context=await browser.newContext({viewport});const page=await context.newPage();const errors=[];
  page.on('pageerror',e=>errors.push(e.message));
  try {
+  const feedResponse=page.waitForResponse(r=>r.url().startsWith('https://piefed.social/api/alpha/post/list')&&r.status()===200,{timeout:60000});
   await page.goto(base,{waitUntil:'domcontentloaded'});
+  const feed=await (await feedResponse).json();assert.ok(feed.posts?.length,'PieFed feed is empty');
   const post=page.locator('a[href*="/post/"]').first();
   await post.waitFor({state:'visible',timeout:60000});
   const href=await post.getAttribute('href');

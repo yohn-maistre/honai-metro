@@ -3,5 +3,12 @@
   "pages_build_output_dir": ".svelte-kit/cloudflare",
   "compatibility_date": "2026-09-01",
   "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "PUBLIC_INSTANCE_URL": "piefed.social",
+    "PUBLIC_INSTANCE_TYPE": "piefedalpha",
+    "PUBLIC_LOCK_TO_INSTANCE": "true",
+    "PUBLIC_LANGUAGE": "id",
+    "PUBLIC_SSR_ENABLED": "false"
+  },
   "services": [{"binding": "WATCH_ENGINE", "service": "westpapua-watch-engine"}]
 }

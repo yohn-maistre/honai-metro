@@ -1,0 +1,7 @@
+{
+  "name": "etnos-native-lab",
+  "pages_build_output_dir": ".svelte-kit/cloudflare",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "services": [{"binding": "WATCH_ENGINE", "service": "westpapua-watch-engine"}]
+}

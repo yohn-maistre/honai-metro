@@ -36,9 +36,7 @@
   ></Tabs>
 {/if}
 
-<svelte:head>
-  <title>{$t('routes.explore.title')}</title>
-</svelte:head>
+
 
 <Header pageHeader>
   {$t('routes.explore.title')}

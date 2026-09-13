@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {publicTarget,readWatch} from '../src/lib/server/etnos/watch.mjs';
+import {services,wikiDomains} from '../src/lib/etnos/features/services/catalog.mjs';
+for(const path of ['admin/run','ask','health','../admin','resources/candidate','development/1/edit'])assert.equal(publicTarget(path,new URLSearchParams()),null);
+const target=publicTarget('resources',new URLSearchParams('status=candidate&q=Papua&token=secret'));
+assert.equal(target.href,'https://watch.internal/resources?q=Papua');
+assert.equal((await readWatch(null,'current',new URLSearchParams())).status,503);
+let called=false;const engine={fetch:async req=>{called=true;assert.equal(req.method,'GET');assert.equal(req.headers.get('authorization'),null);return Response.json({items:[{id:1}]})}};
+assert.equal((await readWatch(engine,'admin/run',new URLSearchParams())).status,404);assert.equal(called,false);
+assert.deepEqual(await (await readWatch(engine,'current',new URLSearchParams())).json(),{items:[{id:1}]});
+assert.equal((await readWatch({fetch:async()=>{throw Error('offline')}},'issues',new URLSearchParams())).status,502);
+assert(services.every(s=>s.state==='planned'));assert(wikiDomains.includes('Musik'));
+console.log('PASS: native service binding, public route/query boundary, no auth forwarding, failure states, honest service catalog');

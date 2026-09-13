@@ -22,7 +22,11 @@ declare global {
       openImage?: string
       openModals?: string[]
     }
-    // interface Platform {}
+    interface Platform {
+      env: {
+        WATCH_ENGINE?: { fetch(request: Request): Promise<Response> }
+      }
+    }
   }
   declare const __VERSION__: string
 }

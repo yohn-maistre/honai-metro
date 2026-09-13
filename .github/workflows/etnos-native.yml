@@ -1,0 +1,41 @@
+name: ETNOS native validation
+on:
+  push:
+    branches: [feat/etnos-native-platform]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: etnos-native-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    if: github.ref == 'refs/heads/feat/etnos-native-platform'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Resolve upstream lock on CI
+        run: bun install
+      - run: node scripts/check-etnos-native.mjs
+      - name: Build complete Svelte application
+        run: bun run build
+        env:
+          CF_PAGES: '1'
+          PUBLIC_INSTANCE_URL: piefed.social
+          PUBLIC_INSTANCE_TYPE: piefedalpha
+          PUBLIC_LOCK_TO_INSTANCE: 'true'
+          PUBLIC_LANGUAGE: id
+          PUBLIC_SSR_ENABLED: 'false'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: etnos-native-build
+          path: |
+            .svelte-kit/cloudflare
+            bun.lock

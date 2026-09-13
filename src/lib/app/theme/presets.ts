@@ -1,4 +1,5 @@
 import { env } from '$env/dynamic/public'
+import { etnosThemes } from '$lib/etnos/design/themes'
 import type { Theme, ThemeColors } from './theme.svelte'
 
 const PHOTON_DEFAULT = {
@@ -41,19 +42,20 @@ const PHOTON_DEFAULT = {
 }
 
 export function getDefaultColors(): ThemeColors {
-  return env.PUBLIC_THEME ? JSON.parse(env.PUBLIC_THEME) : PHOTON_DEFAULT
+  return env.PUBLIC_THEME ? JSON.parse(env.PUBLIC_THEME) : etnosThemes[0].colors
 }
 
 export function getDefaultTheme(): Theme {
   return {
     id: 0,
     colors: getDefaultColors(),
-    name: env.PUBLIC_THEME ? 'Instance Default' : 'Mono',
+    name: env.PUBLIC_THEME ? 'Instance Default' : 'Watch',
   }
 }
 
 export const presets: Theme[] = [
   getDefaultTheme(),
+  ...etnosThemes,
   ...(env.PUBLIC_THEME
     ? [{ colors: PHOTON_DEFAULT, id: -10, name: 'Mono' }]
     : []),

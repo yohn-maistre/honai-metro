@@ -14,7 +14,7 @@
   import InstanceCard from '$lib/feature/instance/InstanceCard.svelte'
   import Moderation from '$lib/feature/moderation/Moderation.svelte'
   import ExpandableImage from '$lib/ui/generic/ExpandableImage.svelte'
-  import { Shell } from '$lib/ui/layout'
+  import Shell from '$lib/etnos/shell/Shell.svelte'
   import Navbar from '$lib/ui/navbar/Navbar.svelte'
   import Sidebar from '$lib/ui/sidebar/Sidebar.svelte'
   import { App } from '@capacitor/app'

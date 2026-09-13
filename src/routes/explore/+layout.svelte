@@ -16,6 +16,7 @@
   let form = $state<HTMLFormElement>()
 </script>
 
+{#if page.url.pathname !== '/explore' && !page.url.pathname.startsWith('/explore/news/') && !page.url.pathname.startsWith('/explore/issues/')}
 {#if client().getTopics && client().getFeeds}
   <Tabs
     routes={[
@@ -84,5 +85,6 @@
     {/if}
   {/snippet}
 </Header>
+{/if}
 
 {@render children?.()}

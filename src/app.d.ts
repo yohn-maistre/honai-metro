@@ -22,7 +22,16 @@ declare global {
       openImage?: string
       openModals?: string[]
     }
-    // interface Platform {}
+    interface Platform {
+      env: {
+        /** Cloudflare service binding to the canonical Watch engine.
+         * ETNOS only receives the public, allowlisted surface through
+         * src/lib/server/etnos/watch.ts. */
+        WATCH_ENGINE?: {
+          fetch(input: Request): Promise<Response>
+        }
+      }
+    }
   }
   declare const __VERSION__: string
 }

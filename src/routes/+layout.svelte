@@ -11,13 +11,11 @@
     rgbToHex,
     theme,
   } from '$lib/app/theme/theme.svelte'
-  import KilasTicker from '$lib/etnos/KilasTicker.svelte'
   import OnboardingModal from '$lib/etnos/OnboardingModal.svelte'
+  import SignalShell from '$lib/etnos/shell/SignalShell.svelte'
   import InstanceCard from '$lib/feature/instance/InstanceCard.svelte'
   import Moderation from '$lib/feature/moderation/Moderation.svelte'
   import ExpandableImage from '$lib/ui/generic/ExpandableImage.svelte'
-  import { Shell } from '$lib/ui/layout'
-  import Navbar from '$lib/ui/navbar/Navbar.svelte'
   import Sidebar from '$lib/ui/sidebar/Sidebar.svelte'
   import { Button, ModalContainer, Spinner, ToastContainer } from 'mono-svelte'
   import nProgress from 'nprogress'
@@ -136,7 +134,7 @@
   Skip Navigation
 </Button>
 
-<Shell>
+<SignalShell>
   <Moderation />
   <ToastContainer />
   <ExpandableImage />
@@ -149,22 +147,12 @@
   {/snippet}
   {#snippet main({ style: s, class: c })}
     <main
-      class="px-3 pt-3 sm:px-6 sm:pt-6 min-w-0 w-full flex flex-col h-full relative {c}"
+      class="min-w-0 w-full relative {c}"
       style={s}
       id="main"
     >
-      <!-- ETNOS: mobile wire strip; the md+ wire lives in the Navbar
-           (the navbar holder is a bottom dock on mobile). -->
-      <div
-        class="md:hidden sticky top-0 z-40 -mx-3 -mt-3 sm:-mx-6 sm:-mt-6 mb-3 px-3 sm:px-6 py-1 bg-slate-25 dark:bg-zinc-925 border-b border-slate-100 dark:border-zinc-800"
-      >
-        <KilasTicker />
-      </div>
       {@render children?.()}
     </main>
-  {/snippet}
-  {#snippet navbar({ style: s, class: c })}
-    <Navbar class={c} style={s} />
   {/snippet}
   {#snippet suffix({ class: c })}
     <!--strange issue, proabably to do with dynamic components-->
@@ -191,4 +179,4 @@
       {/if}
     {/key}
   {/snippet}
-</Shell>
+</SignalShell>

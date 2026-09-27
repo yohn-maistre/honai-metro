@@ -1,0 +1,77 @@
+@import 'tw-animate-css';
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource/instrument-serif';
+
+/* shadcn-svelte is behavior/infrastructure here, not ETNOS's identity.
+   Map its semantic tokens onto the same family as West Papua Watch. */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  --background: #f6f4ef;
+  --foreground: #15161a;
+  --card: #fbfaf7;
+  --card-foreground: #15161a;
+  --popover: #fffdfa;
+  --popover-foreground: #15161a;
+  --primary: #20222a;
+  --primary-foreground: #f7f6fb;
+  --secondary: #ece9e2;
+  --secondary-foreground: #20222a;
+  --muted: #ece9e2;
+  --muted-foreground: #6e7079;
+  --accent: #e6e8ff;
+  --accent-foreground: #171a2b;
+  --destructive: #c85959;
+  --border: rgba(20, 22, 30, 0.12);
+  --input: rgba(20, 22, 30, 0.12);
+  --ring: #7078bd;
+  --radius: 0.78rem;
+}
+
+.dark {
+  --background: #080a10;
+  --foreground: #f4f3fb;
+  --card: #0d1119;
+  --card-foreground: #f4f3fb;
+  --popover: #111622;
+  --popover-foreground: #f4f3fb;
+  --primary: #eef0ff;
+  --primary-foreground: #121421;
+  --secondary: #151b28;
+  --secondary-foreground: #e8e7f2;
+  --muted: #151b28;
+  --muted-foreground: #a7a8b7;
+  --accent: #20263a;
+  --accent-foreground: #f4f3fb;
+  --destructive: #ef8e8e;
+  --border: rgba(226, 229, 255, 0.1);
+  --input: rgba(226, 229, 255, 0.12);
+  --ring: #c4c7ff;
+}
+
+.etnos-serif {
+  font-family: 'Instrument Serif', Georgia, serif;
+}

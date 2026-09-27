@@ -5,12 +5,13 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  /* Honai Metro type: Plus Jakarta Sans carries display, UI, and reading;
-     mono is reserved for data (receipts, coordinates, IDs). */
-  --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
+  /* Signal v4 moves the product toward Watch's quieter Swiss/editorial
+     grammar using the already self-hosted Inter face. Instrument Sans/Serif
+     lands in the dependency pass so the frozen Bun lockfile stays honest. */
+  --font-sans: 'Inter', system-ui, sans-serif;
   --font-system: system-ui;
-  --font-display: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
-  --font-reading: 'Plus Jakarta Sans', Inter, system-ui, sans-serif;
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-reading: 'Inter', system-ui, sans-serif;
   --font-mono: ui-monospace, monospace;
 
   --animate-pop-in: pop-in 0.8s cubic-bezier(0.075, 0.82, 0.165, 1) forwards;
@@ -227,4 +228,101 @@ button:focus-visible {
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+/* -------------------------------------------------------------------------
+   ETNOS Signal v4 product layer
+   -------------------------------------------------------------------------
+   These tokens deliberately sit beside Photon's legacy palette instead of
+   pretending the shell rewrite is already finished. Feature surfaces can move
+   over incrementally while federation/auth/moderation behavior stays stable. */
+:root {
+  --etnos-bg: #080a10;
+  --etnos-panel: #0d1119;
+  --etnos-panel-2: #111622;
+  --etnos-ink: #f4f3fb;
+  --etnos-muted: #a7a8b7;
+  --etnos-line: rgba(226, 229, 255, 0.09);
+  --etnos-line-strong: rgba(226, 229, 255, 0.17);
+  --etnos-accent: #c4c7ff;
+  --etnos-accent-2: #a6d7ff;
+  --etnos-warm: #c0633e;
+}
+
+.etnos-feed-head {
+  min-height: 4.4rem;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.15rem 0 0.9rem;
+  border-bottom: 1px solid var(--etnos-line-strong);
+}
+
+.etnos-feed-head > div > span,
+.etnos-editorial-heading > span {
+  display: block;
+  color: var(--color-slate-500);
+  font-size: 0.64rem;
+  font-weight: 650;
+  letter-spacing: 0.14em;
+}
+
+.etnos-feed-head h1 {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.8rem, 5vw, 2.55rem);
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  font-weight: 680;
+}
+
+.etnos-feed-explore {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-bottom: 0.2rem;
+  color: var(--color-slate-600);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.dark .etnos-feed-explore {
+  color: var(--color-zinc-400);
+}
+
+.etnos-feed-controls {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--etnos-line);
+}
+
+.etnos-editorial-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.etnos-editorial-heading {
+  padding: 0.35rem 0 1rem;
+  border-bottom: 1px solid var(--etnos-line-strong);
+}
+
+.etnos-editorial-heading h1 {
+  margin: 0.35rem 0 0;
+  font-size: clamp(3.4rem, 10vw, 6.6rem);
+  line-height: 0.84;
+  letter-spacing: -0.075em;
+}
+
+.etnos-editorial-heading p {
+  max-width: 42rem;
+  margin: 0.9rem 0 0;
+  color: var(--color-slate-500);
+  font-size: 0.92rem;
+}
+
+.dark .etnos-editorial-heading p {
+  color: var(--color-zinc-400);
 }

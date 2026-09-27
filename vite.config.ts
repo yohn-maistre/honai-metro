@@ -4,6 +4,11 @@ import { defineConfig } from 'vite'
 
 export default defineConfig({
   plugins: [sveltekit(), tailwindcss()],
+  // Bits UI ships Svelte source. Keep it in Vite's transform pipeline so
+  // Cloudflare/SvelteKit builds never hand raw .svelte files to Node SSR.
+  ssr: {
+    noExternal: ['bits-ui'],
+  },
   build: {
     sourcemap: true,
   },

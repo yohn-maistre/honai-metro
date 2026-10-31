@@ -30,6 +30,11 @@ export function speak(text: string, lang: string = 'id-ID'): void {
   const voice = pickVoice(lang)
   if (voice) u.voice = voice
   currentUtterance = u
+  const release = () => {
+    if (currentUtterance === u) currentUtterance = null
+  }
+  u.onend = release
+  u.onerror = release
   window.speechSynthesis.speak(u)
 }
 

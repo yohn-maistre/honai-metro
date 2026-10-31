@@ -9,6 +9,7 @@
   import { BackLink, SectionHead } from '$lib/etnos/ui'
   import { Button } from 'mono-svelte'
   import { onDestroy } from 'svelte'
+  import { SvelteMap } from 'svelte/reactivity'
   import {
     ArrowLeft,
     ArrowRight,
@@ -87,7 +88,7 @@
   }
 
   const placement = $derived.by(() => {
-    const bySection = new Map<number, WajahFig[]>()
+    const bySection = new SvelteMap<number, WajahFig[]>()
     const unmatched: WajahFig[] = []
     const secs = parsed.sections
     for (const e of eligible) {
@@ -111,9 +112,7 @@
   let broken = $state<Record<string, boolean>>({})
 
   function goToSection(i: number) {
-    articleEl
-      ?.querySelectorAll('h2')
-      [i]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    articleEl?.querySelectorAll('h2').item(i)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   // The page-authored section h2s are the only h2s inside articleEl (end

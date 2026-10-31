@@ -12,7 +12,6 @@
 
   interface Person {
     bot_account?: boolean
-    admin?: boolean
     // Future PieFed custom fields:
     // verified_ktp?: boolean
     // vouched_by?: string | null

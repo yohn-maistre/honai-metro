@@ -226,7 +226,7 @@
                   {cv.community.title || cv.community.name}
                 </span>
                 <span class="text-xs text-slate-500 dark:text-zinc-400 truncate">
-                  {communityLink(cv.community)}{' · '}{Intl.NumberFormat(
+                  {communityLink(cv.community)} · {Intl.NumberFormat(
                     'id-ID',
                   ).format(cv.counts.subscribers)} pengikut
                 </span>
@@ -289,7 +289,7 @@
                 {c.name}
               </span>
               <span class="text-xs text-slate-500 dark:text-zinc-400 truncate">
-                /c/{c.slug}{#if c.subtitle}{' · '}{c.subtitle}{/if}
+                /c/{c.slug}{#if c.subtitle} · {c.subtitle}{/if}
               </span>
             </div>
             <Icon

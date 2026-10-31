@@ -11,3 +11,5 @@ AT publishing, PDS signup/migration, private-only account onboarding, institutio
 Live preview: https://strata-preview.giyaibo.workers.dev
 
 See UPSTREAM.md for source provenance.
+
+The future interface model is documented in [contexts and identities](../../docs/strata/context-and-identity-ui.md). It keeps the general ETNOS deployment, regional lenses, governed Groups/Spaces, institutional PublicWork, AI editorial proposals and a later hotline distinct from current delivered controls.

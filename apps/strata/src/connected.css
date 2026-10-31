@@ -1,1 +1,339 @@
-html,body{margin:0;min-width:320px}button,input,textarea,select{font:inherit}button,a,input,textarea,select{-webkit-tap-highlight-color:transparent}a{color:inherit;text-decoration:none}button{cursor:pointer}button:disabled{cursor:default;opacity:.5}button{color:inherit}button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--cx-accent);outline-offset:3px}button{background:none;border:0}h1,h2,h3,p{overflow-wrap:anywhere}dialog.cx-dialog{position:fixed;inset:50% auto auto 50%;transform:translate(-50%,-50%);margin:0;max-height:88dvh;overflow:auto;width:min(560px,calc(100vw - 28px));padding:24px;border:1px solid var(--cx-line);border-radius:20px;background:var(--cx-panel);z-index:100}dialog::backdrop{background:rgb(0 0 0/.65);backdrop-filter:blur(3px)}.strata-status{font-size:11px;color:var(--cx-muted)}.strata-status.public{color:var(--cx-success)}.strata-body{white-space:pre-wrap;line-height:1.65}.strata-mosaic{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:24px}.strata-tile{border:1px solid var(--cx-line);border-radius:18px;min-height:145px;padding:20px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(135deg,var(--cx-panel-2),var(--cx-panel));transition:transform .2s,border-color .2s}.strata-tile:hover{transform:translateY(-2px);border-color:var(--cx-accent)}.strata-tile:nth-child(4n+2){background:linear-gradient(135deg,#18352d,var(--cx-panel));color:#cde6d8}.strata-tile:nth-child(4n+3){background:linear-gradient(135deg,#382a27,var(--cx-panel));color:#f0d7c8}.strata-tile:nth-child(4n){background:linear-gradient(135deg,#29243f,var(--cx-panel));color:#e0d6fb}.strata-tile h2{font-size:20px;margin-top:16px}.strata-tile p{font-size:12px;opacity:.75}.strata-alert{padding:12px 16px;border:1px solid var(--cx-line);border-radius:12px;color:var(--cx-muted);font-size:13px}.strata-card{padding:24px;border-bottom:1px solid var(--cx-line)}.strata-preferences{display:grid;gap:20px;max-width:520px}.strata-review{border:1px solid var(--cx-line);border-radius:14px;padding:18px;margin:16px 0}.strata-source{display:block;overflow-wrap:anywhere;color:var(--cx-accent);font-size:13px;margin:7px 0}.strata-caption{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--cx-muted)}.strata-stack{display:grid;gap:14px}.strata-pending{animation:strata-pulse 1s ease-in-out infinite alternate}@keyframes strata-pulse{to{opacity:.35}}.strata-replies{margin-top:18px}.strata-reply{border-left:1px solid var(--cx-line);padding:12px 0 12px 16px;margin:0 0 8px 10px}.strata-intro{padding:30px 24px}.strata-intro h2{font-size:25px;letter-spacing:-.7px;margin-bottom:10px}.strata-intro p{color:var(--cx-muted);max-width:430px}.strata-hero-symbol{display:flex;gap:9px;margin-bottom:25px}.strata-hero-symbol span{display:block;width:35px;height:35px;border-radius:10px;background:var(--cx-accent-soft);transform:rotate(-7deg)}.strata-hero-symbol span:nth-child(2){background:#274e40;transform:rotate(7deg)}.strata-hero-symbol span:nth-child(3){background:#68483a;transform:rotate(-4deg)}.strata-pill{padding:4px 8px;border-radius:6px;background:var(--cx-panel-2);font-size:11px}.strata-inline{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.strata-muted-button{font-size:12px;color:var(--cx-muted)}.strata-narrow{max-width:440px;margin:auto;padding:30px 24px}.strata-csrf-error{color:var(--cx-danger)}.strata-internal{padding:8px 12px;border-radius:9px;background:var(--cx-panel-2);font-size:12px}.strata-empty-graphic{width:70px;height:70px;border-radius:23px;background:var(--cx-accent-soft);display:grid;place-items:center;color:var(--cx-accent);margin:0 auto 18px}.strata-nodata{padding:40px 24px;text-align:center}.strata-nodata h2{font-size:20px}.strata-nodata p{color:var(--cx-muted);font-size:13px;margin:10px auto 20px;max-width:350px}.strata-feed-heading{display:flex;justify-content:space-between;align-items:center}.strata-tabs{display:flex;gap:18px;padding:0 24px;border-bottom:1px solid var(--cx-line)}.strata-tabs button{padding:15px 0;color:var(--cx-muted);border-bottom:2px solid transparent}.strata-tabs button.active{color:var(--cx-ink);border-color:var(--cx-accent)}.strata-small{font-size:12px}.strata-grid{display:grid;gap:12px}.strata-publication{font-size:11px;display:flex;gap:6px;align-items:center;margin-top:10px;color:var(--cx-muted)}@media(max-width:640px){.strata-mosaic{padding:18px;gap:10px}.strata-tile{padding:16px;min-height:135px}.strata-tile h2{font-size:18px}.strata-card{padding:20px 18px}.strata-intro{padding:26px 18px}.strata-intro h2{font-size:23px}.strata-narrow{padding:26px 18px}.cx-post-body{font-size:15px}.strata-tabs{padding:0 18px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+html,
+body {
+  margin: 0;
+  min-width: 320px;
+}
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+button,
+a,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: transparent;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+button {
+  color: inherit;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--cx-accent);
+  outline-offset: 3px;
+}
+button {
+  background: none;
+  border: 0;
+}
+h1,
+h2,
+h3,
+p {
+  overflow-wrap: anywhere;
+}
+dialog.cx-dialog {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  max-height: 88dvh;
+  overflow: auto;
+  width: min(560px, calc(100vw - 28px));
+  padding: 24px;
+  border: 1px solid var(--cx-line);
+  border-radius: 20px;
+  background: var(--cx-panel);
+  z-index: 100;
+}
+dialog::backdrop {
+  background: rgb(0 0 0/0.65);
+  backdrop-filter: blur(3px);
+}
+.strata-status {
+  font-size: 11px;
+  color: var(--cx-muted);
+}
+.strata-status.public {
+  color: var(--cx-success);
+}
+.strata-body {
+  white-space: pre-wrap;
+  line-height: 1.65;
+}
+.strata-mosaic {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding: 24px;
+}
+.strata-tile {
+  border: 1px solid var(--cx-line);
+  border-radius: 18px;
+  min-height: 145px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(135deg, var(--cx-panel-2), var(--cx-panel));
+  transition:
+    transform 0.2s,
+    border-color 0.2s;
+}
+.strata-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--cx-accent);
+}
+.strata-tile:nth-child(4n + 2) {
+  background: linear-gradient(135deg, #18352d, var(--cx-panel));
+  color: #cde6d8;
+}
+.strata-tile:nth-child(4n + 3) {
+  background: linear-gradient(135deg, #382a27, var(--cx-panel));
+  color: #f0d7c8;
+}
+.strata-tile:nth-child(4n) {
+  background: linear-gradient(135deg, #29243f, var(--cx-panel));
+  color: #e0d6fb;
+}
+.strata-tile h2 {
+  font-size: 20px;
+  margin-top: 16px;
+}
+.strata-tile p {
+  font-size: 12px;
+  opacity: 0.75;
+}
+.strata-alert {
+  padding: 12px 16px;
+  border: 1px solid var(--cx-line);
+  border-radius: 12px;
+  color: var(--cx-muted);
+  font-size: 13px;
+}
+.strata-card {
+  padding: 24px;
+  border-bottom: 1px solid var(--cx-line);
+}
+.strata-preferences {
+  display: grid;
+  gap: 20px;
+  max-width: 520px;
+}
+.strata-review {
+  border: 1px solid var(--cx-line);
+  border-radius: 14px;
+  padding: 18px;
+  margin: 16px 0;
+}
+.strata-source {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--cx-accent);
+  font-size: 13px;
+  margin: 7px 0;
+}
+.strata-caption {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--cx-muted);
+}
+.strata-stack {
+  display: grid;
+  gap: 14px;
+}
+.strata-pending {
+  animation: strata-pulse 1s ease-in-out infinite alternate;
+}
+@keyframes strata-pulse {
+  to {
+    opacity: 0.35;
+  }
+}
+.strata-replies {
+  margin-top: 18px;
+}
+.strata-reply {
+  border-left: 1px solid var(--cx-line);
+  padding: 12px 0 12px 16px;
+  margin: 0 0 8px 10px;
+}
+.strata-intro {
+  padding: 30px 24px;
+}
+.strata-intro h2 {
+  font-size: 25px;
+  letter-spacing: -0.7px;
+  margin-bottom: 10px;
+}
+.strata-intro p {
+  color: var(--cx-muted);
+  max-width: 430px;
+}
+.strata-hero-symbol {
+  display: flex;
+  gap: 9px;
+  margin-bottom: 25px;
+}
+.strata-hero-symbol span {
+  display: block;
+  width: 35px;
+  height: 35px;
+  border-radius: 10px;
+  background: var(--cx-accent-soft);
+  transform: rotate(-7deg);
+}
+.strata-hero-symbol span:nth-child(2) {
+  background: #274e40;
+  transform: rotate(7deg);
+}
+.strata-hero-symbol span:nth-child(3) {
+  background: #68483a;
+  transform: rotate(-4deg);
+}
+.strata-pill {
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--cx-panel-2);
+  font-size: 11px;
+}
+.strata-inline {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.strata-muted-button {
+  font-size: 12px;
+  color: var(--cx-muted);
+}
+.strata-narrow {
+  max-width: 440px;
+  margin: auto;
+  padding: 30px 24px;
+}
+.strata-csrf-error {
+  color: var(--cx-danger);
+}
+.strata-internal {
+  padding: 8px 12px;
+  border-radius: 9px;
+  background: var(--cx-panel-2);
+  font-size: 12px;
+}
+.strata-empty-graphic {
+  width: 70px;
+  height: 70px;
+  border-radius: 23px;
+  background: var(--cx-accent-soft);
+  display: grid;
+  place-items: center;
+  color: var(--cx-accent);
+  margin: 0 auto 18px;
+}
+.strata-nodata {
+  padding: 40px 24px;
+  text-align: center;
+}
+.strata-nodata h2 {
+  font-size: 20px;
+}
+.strata-nodata p {
+  color: var(--cx-muted);
+  font-size: 13px;
+  margin: 10px auto 20px;
+  max-width: 350px;
+}
+.strata-feed-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.strata-tabs {
+  display: flex;
+  gap: 18px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--cx-line);
+}
+.strata-tabs button {
+  padding: 15px 0;
+  color: var(--cx-muted);
+  border-bottom: 2px solid transparent;
+}
+.strata-tabs button.active {
+  color: var(--cx-ink);
+  border-color: var(--cx-accent);
+}
+.strata-small {
+  font-size: 12px;
+}
+.strata-grid {
+  display: grid;
+  gap: 12px;
+}
+.strata-publication {
+  font-size: 11px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 10px;
+  color: var(--cx-muted);
+}
+@media (max-width: 640px) {
+  .strata-mosaic {
+    padding: 18px;
+    gap: 10px;
+  }
+  .strata-tile {
+    padding: 16px;
+    min-height: 135px;
+  }
+  .strata-tile h2 {
+    font-size: 18px;
+  }
+  .strata-card {
+    padding: 20px 18px;
+  }
+  .strata-intro {
+    padding: 26px 18px;
+  }
+  .strata-intro h2 {
+    font-size: 23px;
+  }
+  .strata-narrow {
+    padding: 26px 18px;
+  }
+  .cx-post-body {
+    font-size: 15px;
+  }
+  .strata-tabs {
+    padding: 0 18px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

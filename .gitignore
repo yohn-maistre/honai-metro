@@ -22,3 +22,6 @@ test-results
 # CUSTOMIZATIONS.md
 # local pnpm convenience (repo is bun-canonical)
 pnpm-lock.yaml
+
+# Independently built Strata surface
+/apps/strata/dist/

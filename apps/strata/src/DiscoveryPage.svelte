@@ -8,6 +8,7 @@
   } from '@lucide/svelte'
   import PixelLoader from './PixelLoader.svelte'
   import NewsSection from './NewsSection.svelte'
+  import { news } from './news.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { request, initials, type Auth } from './api'
   import type { SearchResult } from './search'
@@ -95,7 +96,7 @@
               </span>{/if}
           </div>
           <ArrowUpRight size={18} />
-        </a>{/each}{:else}
+        </a>{/each}{:else if !news.pending && !news.feed?.items.length}
       <a
         class="explore-feature-tile lead"
         href={data.communities[0]

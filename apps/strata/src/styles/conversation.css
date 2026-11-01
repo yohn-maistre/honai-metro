@@ -2606,3 +2606,17 @@ body {
 .vault-transfer details button {
   margin-top: 12px;
 }
+
+@media (max-width: 767px) {
+  .news-item.news-lead {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    min-height: 150px;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+  .news-item.news-lead strong {
+    font-size: 19px;
+    line-height: 1.35;
+  }
+}

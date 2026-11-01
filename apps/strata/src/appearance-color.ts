@@ -31,6 +31,6 @@ export function accentRoles(seed: string, dark: boolean) {
       contrast(ink, '#ffffff') > contrast(ink, '#000000')
         ? '#ffffff'
         : '#000000',
-    soft: hex(rgb(background).map((n, i) => n * 0.87 + rgb(ink)[i] * 0.13)),
+    soft: hex(rgb(background).map((n, i) => n * 0.95 + rgb(ink)[i] * 0.05)),
   }
 }

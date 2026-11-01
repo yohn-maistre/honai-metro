@@ -292,7 +292,16 @@
         const c = await request<Context>('/v1/contexts', {
           title,
           description,
-          slug,
+          slug:
+            slug ||
+            title
+              .normalize('NFKD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '')
+              .slice(0, 64) ||
+            'konteks-' + crypto.randomUUID().slice(0, 8),
           kind,
           language,
           aliases: [],
@@ -956,28 +965,27 @@
               </option>{/if}
             <option value="hidden-private">Anggota · disembunyikan</option>
           </NativeSelect.Root>{/if}
-        {#if modal === 'context'}<Label for="context-slug">
-            Alamat singkat
-          </Label><Input
-            id="context-slug"
-            bind:value={slug}
-            pattern={'[a-z0-9][a-z0-9-]{1,63}'}
-            placeholder="papua"
-            required
-          /><Label for="context-kind">Jenis konteks</Label><NativeSelect.Root
-            id="context-kind"
-            bind:value={kind}
-          >
+        {#if modal === 'context'}<Label for="context-kind">
+            Jenis konteks
+          </Label><NativeSelect.Root id="context-kind" bind:value={kind}>
             <option value="region">Wilayah</option>
             <option value="place">Tempat</option>
             <option value="topic">Topik</option>
             <option value="language">Bahasa</option>
-          </NativeSelect.Root><Label for="context-language">Bahasa</Label><Input
-            id="context-language"
-            bind:value={language}
-            maxlength={40}
-            required
-          />{/if}
+          </NativeSelect.Root>
+          <details class="form-details">
+            <summary>Alamat dan bahasa</summary>
+            <Label for="context-slug">Alamat singkat</Label><Input
+              id="context-slug"
+              bind:value={slug}
+              pattern={'[a-z0-9][a-z0-9-]{1,63}'}
+              placeholder="Dibuat dari nama"
+            /><Label for="context-language">Bahasa</Label><Input
+              id="context-language"
+              bind:value={language}
+              maxlength={40}
+            />
+          </details>{/if}
         {#if modal === 'work' && contexts.length}<Label for="work-context">
             Konteks publik (opsional)
           </Label><NativeSelect.Root id="work-context" bind:value={contextId}>

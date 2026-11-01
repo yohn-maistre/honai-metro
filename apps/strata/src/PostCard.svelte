@@ -10,8 +10,7 @@
     Globe,
     LoaderCircle,
   } from '@lucide/svelte'
-  import PostMedia from './PostMedia.svelte'
-  import PostText from './PostText.svelte'
+  import RichPost from './RichPost.svelte'
   import * as Card from '$lib/components/ui/card/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
@@ -19,6 +18,7 @@
   import { Button } from '$lib/components/ui/button/index.js'
   import { Badge } from '$lib/components/ui/badge/index.js'
   import { Textarea } from '$lib/components/ui/textarea/index.js'
+  import { Input } from '$lib/components/ui/input/index.js'
   import { Label } from '$lib/components/ui/label/index.js'
   import { Ellipsis } from '@lucide/svelte'
   import {
@@ -53,7 +53,40 @@
   } = $props()
   let busy = $state(false),
     reporting = $state(false),
+    editing = $state(false),
+    removing = $state(false),
+    editText = $state(''),
+    editTitle = $state(''),
+    editUrl = $state(''),
+    editWarning = $state(''),
+    modAction = $state(''),
+    modReason = $state(''),
     reason = $state('')
+  function edit() {
+    editText = post.text
+    editTitle = post.content?.title ?? ''
+    editUrl = post.content?.url ?? ''
+    editWarning = post.content?.warning ?? ''
+    editing = true
+  }
+  async function mutate(route: string, body: unknown) {
+    if (busy) return
+    busy = true
+    try {
+      const saved = await request<Post>(`/v1/posts/${post.id}/${route}`, body)
+      if (route === 'moderate') {
+        location.reload()
+        return
+      }
+      Object.assign(post, saved)
+      editing = false
+      removing = false
+    } catch (e) {
+      onError(e instanceof Error ? e.message : 'Belum tersimpan.')
+    } finally {
+      busy = false
+    }
+  }
   async function vote(value: number) {
     if (!canVote) {
       onError(
@@ -154,13 +187,33 @@
         href={'/square/' + post.id}
         title={new Date(post.created).toLocaleString()}
       >
-        {relativeDate(post.created)}
+        {relativeDate(post.created)}{#if post.updated}
+          · diedit{/if}
       </a>
+      {#if post.pinned}<span class="post-state">Disematkan</span>{/if}
       {#if authorBadge}<span class="reply-author-badge">Penulis</span>{/if}
       <Dropdown.Root>
         <Dropdown.Trigger class="cx-post-more" aria-label="Opsi posting">
           <Ellipsis size={18} />
         </Dropdown.Trigger><Dropdown.Content align="end">
+          {#if post.permissions?.edit}<Dropdown.Item onSelect={edit}>
+              Edit posting
+            </Dropdown.Item><Dropdown.Item onSelect={() => (removing = true)}>
+              Hapus posting
+            </Dropdown.Item><Dropdown.Separator />{/if}
+          {#if post.permissions?.moderate && !post.deleted}<Dropdown.Item
+              onSelect={() => (modAction = 'hide')}
+            >
+              Sembunyikan posting
+            </Dropdown.Item>{#if !post.parent_id}<Dropdown.Item
+                onSelect={() => (modAction = post.locked ? 'unlock' : 'lock')}
+              >
+                {post.locked ? 'Buka percakapan' : 'Kunci percakapan'}
+              </Dropdown.Item><Dropdown.Item
+                onSelect={() => (modAction = post.pinned ? 'unpin' : 'pin')}
+              >
+                {post.pinned ? 'Lepas sematan' : 'Sematkan'}
+              </Dropdown.Item>{/if}<Dropdown.Separator />{/if}
           <Dropdown.Item onSelect={share}>
             <Share2 size={15} />Bagikan tautan
           </Dropdown.Item>{#if loggedIn}<Dropdown.Item onSelect={save}>
@@ -184,13 +237,7 @@
           />{/if}{community?.title ?? 'Komunitas'}
       </a>
     {/if}
-    <div class="cx-post-body strata-body">
-      <PostText
-        text={post.text}
-        permalink={!detail && !reply ? '/square/' + post.id : undefined}
-      />
-    </div>
-    {#if post.media?.length}<PostMedia images={post.media} />{/if}
+    <RichPost {post} {detail} {canVote} {onError} />
     {#if post.contexts?.length}<div class="context-links mt-3">
         {#each post.contexts as context}<Badge
             href={'/contexts/' + context.slug}
@@ -291,6 +338,112 @@
       /><Button type="submit" disabled={busy || !reason.trim()}>
         {#if busy}<LoaderCircle size={15} class="animate-spin" />{/if}Kirim
         laporan
+      </Button>
+    </form>
+  </Dialog.Content>
+</Dialog.Root>
+
+<Dialog.Root bind:open={editing}>
+  <Dialog.Content class="platform-dialog">
+    <Dialog.Header>
+      <Dialog.Title>Edit posting</Dialog.Title><Dialog.Description
+        class="sr-only"
+      >
+        Perbarui posting Anda.
+      </Dialog.Description>
+    </Dialog.Header>
+    <form
+      class="cx-form"
+      onsubmit={(e) => {
+        e.preventDefault()
+        void mutate('edit', {
+          revision: post.revision,
+          text: editText,
+          content: {
+            title: editTitle,
+            url: editUrl,
+            warning: editWarning,
+            format: post.content?.format ?? 'plain',
+          },
+        })
+      }}
+    >
+      <Label for={'edit-title-' + post.id}>Judul</Label>
+      <Input
+        id={'edit-title-' + post.id}
+        bind:value={editTitle}
+        maxlength={180}
+      />
+      <Label for={'edit-text-' + post.id}>Posting</Label><Textarea
+        id={'edit-text-' + post.id}
+        bind:value={editText}
+        maxlength={20000}
+      /><Label for={'edit-link-' + post.id}>Tautan</Label>
+      <input id={'edit-link-' + post.id} bind:value={editUrl} type="url" />
+      <Label for={'edit-cw-' + post.id}>Peringatan konten</Label>
+      <Input
+        id={'edit-cw-' + post.id}
+        bind:value={editWarning}
+        maxlength={160}
+      />
+      <Button type="submit" disabled={busy}>Simpan</Button>
+    </form>
+  </Dialog.Content>
+</Dialog.Root>
+<Dialog.Root bind:open={removing}>
+  <Dialog.Content class="platform-dialog">
+    <Dialog.Header>
+      <Dialog.Title>Hapus posting?</Dialog.Title><Dialog.Description>
+        Teks dan media akan dihapus. Balasan tetap ada.
+      </Dialog.Description>
+    </Dialog.Header><Button
+      variant="destructive"
+      disabled={busy}
+      onclick={() => mutate('delete', { revision: post.revision })}
+    >
+      Hapus posting
+    </Button>
+  </Dialog.Content>
+</Dialog.Root>
+<Dialog.Root
+  open={!!modAction}
+  onOpenChange={(open) => {
+    if (!open) {
+      modAction = ''
+      modReason = ''
+    }
+  }}
+>
+  <Dialog.Content class="platform-dialog">
+    <Dialog.Header>
+      <Dialog.Title>Moderasi posting</Dialog.Title><Dialog.Description>
+        {(
+          {
+            hide: 'Sembunyikan posting',
+            lock: 'Kunci percakapan',
+            unlock: 'Buka percakapan',
+            pin: 'Sematkan',
+            unpin: 'Lepas sematan',
+          } as Record<string, string>
+        )[modAction]}
+      </Dialog.Description>
+    </Dialog.Header>
+    <form
+      class="cx-form"
+      onsubmit={(e) => {
+        e.preventDefault()
+        void mutate('moderate', { action: modAction, reason: modReason })
+      }}
+    >
+      <Label for={'mod-reason-' + post.id}>
+        Alasan untuk catatan moderator
+      </Label><Textarea
+        id={'mod-reason-' + post.id}
+        bind:value={modReason}
+        maxlength={500}
+        required
+      /><Button type="submit" disabled={busy || !modReason.trim()}>
+        Terapkan
       </Button>
     </form>
   </Dialog.Content>

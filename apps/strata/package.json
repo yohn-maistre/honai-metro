@@ -10,7 +10,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "preview": "vite preview --host 0.0.0.0",
     "test:crypto": "node --test tests/crypto.test.ts",
-    "test:browser": "node tests/browser/forum.mjs && node tests/browser/governance.mjs && node tests/browser/messaging.mjs",
+    "test:browser": "node tests/browser/forum.mjs && node tests/browser/governance.mjs && node tests/browser/messaging.mjs && node tests/browser/rich-forum.mjs",
     "prebuild": "node scripts/notices.mjs",
     "test": "node --test tests/*.test.ts"
   },
@@ -26,6 +26,8 @@
     "@noble/post-quantum": "0.5.2",
     "bits-ui": "2.20.2",
     "clsx": "2.1.1",
+    "dompurify": "3.4.17",
+    "marked": "18.1.2",
     "svelte": "5.49.1",
     "tailwind-merge": "3.7.0",
     "ts-mls": "1.6.4",

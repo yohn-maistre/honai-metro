@@ -27,6 +27,7 @@
   import PostComposer from './PostComposer.svelte'
   import PostCard from './PostCard.svelte'
   import PlatformShell from './PlatformShell.svelte'
+  import SpacesLab from './SpacesLab.svelte'
   import ActivityPage from './ActivityPage.svelte'
   import AppearancePanel from './AppearancePanel.svelte'
   import LoginForm from '$lib/components/login-form.svelte'
@@ -101,6 +102,21 @@
     reports = $state<
       { id: string; post_id: string; reason: string; state: string }[]
     >([])
+  let moderation = $state<{
+    posts: {
+      id: string
+      text: string
+      hidden: number
+      locked: number
+      pinned: number
+    }[]
+    events: {
+      post_id: string
+      action: string
+      reason: string
+      created: number
+    }[]
+  }>({ posts: [], events: [] })
   let unread = $state(0)
   let generation = 0,
     notificationTimer: ReturnType<typeof setTimeout> | undefined
@@ -218,7 +234,7 @@
         filters.set('q', new SvelteURLSearchParams(search).get('q') ?? '')
       const [cs, feed, pages, roles, features] = await Promise.all([
         request<Community[]>('/v1/communities'),
-        request<{ items: Post[]; nextCursor: string | null }>(
+        request<{ items: Post[]; pinned?: Post[]; nextCursor: string | null }>(
           '/v1/feed/page?' + filters,
         ),
         request<WikiPage[]>('/v1/wiki'),
@@ -229,7 +245,12 @@
       ])
       if (mine !== generation) return
       communities = cs
-      posts = feed.items
+      posts = [
+        ...(feed.pinned ?? []),
+        ...feed.items.filter(
+          (p) => !feed.pinned?.some((pin) => pin.id === p.id),
+        ),
+      ]
       wiki = pages
       memberships = roles
       cap = features
@@ -329,9 +350,10 @@
   }
   async function manage(id: string) {
     try {
-      ;[joinRequests, reports] = await Promise.all([
+      ;[joinRequests, reports, moderation] = await Promise.all([
         request<typeof joinRequests>(`/v1/communities/${id}/requests`),
         request<typeof reports>(`/v1/communities/${id}/reports`),
+        request<typeof moderation>(`/v1/communities/${id}/moderation`),
       ])
     } catch (e) {
       modalError =
@@ -431,7 +453,12 @@
       const page = await request<{ items: Post[]; nextCursor: string | null }>(
         '/v1/feed/page?' + q,
       )
-      posts = [...posts, ...page.items]
+      posts = [
+        ...posts,
+        ...page.items.filter(
+          (p) => !posts.some((existing) => existing.id === p.id),
+        ),
+      ]
       nextCursor = page.nextCursor
     })
   }
@@ -472,11 +499,11 @@
   onCompose={() => open('compose')}
   onSearch={(q) => navigate('/find?q=' + encodeURIComponent(q))}
 >
-  {#if loading}<div
+  {#if loading && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore'].includes(parts[0])}<div
       class="strata-card strata-inline strata-pending"
       role="status"
     >
-      <LoaderCircle size={18} />Memuat…
+      <LoaderCircle size={18} class="animate-spin" />Memuat…
     </div>{/if}
   {#if error}<div class="strata-card">
       <p class="strata-alert" role="alert">{error}</p>
@@ -490,6 +517,7 @@
         <RefreshCw size={14} />Coba lagi
       </Button>
     </div>
+  {:else if path === '/labs/spaces'}<SpacesLab />
   {:else if path === '/login'}
     <h1 class="sr-only">Masuk</h1>
     <section class="strata-narrow">
@@ -506,6 +534,9 @@
     <div class="cx-page-head"><h1>Pengaturan</h1></div>
     <Card.Root class="strata-card strata-preferences">
       <AppearancePanel />
+      <a class="cx-list-row" href="/labs/spaces">
+        AT Spaces · uji protokol alpha <ChevronRight size={16} />
+      </a>
       {#if auth.actor}<div>
           <strong>{auth.actor.name}</strong>
           <p class="cx-hint" style="overflow-wrap:anywhere">
@@ -1195,6 +1226,43 @@
             Tidak ada laporan yang menunggu.
           </p>{/if}
       </div>
+      <details class="form-details">
+        <summary>Posting dan catatan moderator</summary>
+        {#each moderation.posts as item}<div class="strata-review">
+            <a href={'/square/' + item.id}>
+              {item.text.slice(0, 120) || 'Posting'}
+            </a>
+            <small>
+              {item.hidden ? 'Disembunyikan' : ''}
+              {item.locked ? 'Dikunci' : ''}
+              {item.pinned ? 'Disematkan' : ''}
+            </small>
+            {#if item.hidden}<Button
+                variant="outline"
+                size="sm"
+                onclick={async () => {
+                  try {
+                    await request(`/v1/posts/${item.id}/moderate`, {
+                      action: 'restore',
+                      reason: 'Ditinjau melalui antrean moderator',
+                    })
+                    await manage(communityId)
+                  } catch (e) {
+                    modalError =
+                      e instanceof Error ? e.message : 'Belum tersimpan.'
+                  }
+                }}
+              >
+                Pulihkan
+              </Button>{/if}
+          </div>{/each}{#each moderation.events.slice(0, 20) as event}<p
+            class="cx-hint"
+          >
+            {event.action} · {event.reason}
+          </p>{/each}{#if !moderation.events.length}<p class="cx-hint">
+            Belum ada tindakan moderator.
+          </p>{/if}
+      </details>
     {:else if modal === 'compose' && auth.actor}<PostComposer
         actor={auth.actor}
         communities={communities.filter((c) => isMember(c.id))}

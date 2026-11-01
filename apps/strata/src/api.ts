@@ -20,7 +20,37 @@ export type MediaAttachment = {
   width: number
   height: number
 }
+export type PostContent = {
+  title?: string
+  url?: string
+  format?: 'plain' | 'markdown'
+  warning?: string
+  poll?: { options: string[]; closesAt: number }
+  event?: { startsAt: number; endsAt?: number; location: string }
+}
 export type Post = {
+  content?: PostContent
+  revision?: number
+  updated?: number | null
+  deleted?: boolean
+  locked?: boolean
+  pinned?: boolean
+  permissions?: { edit: boolean; moderate: boolean }
+  poll?: {
+    options: { label: string; votes: number }[]
+    total: number
+    myVote: number | null
+    closesAt: number
+    closed: boolean
+  } | null
+  event?: {
+    startsAt: number
+    endsAt?: number
+    location: string
+    going: number
+    interested: number
+    myResponse: string | null
+  } | null
   media?: MediaAttachment[]
   directReplies?: number
   id: string

@@ -1,0 +1,58 @@
+{
+  "snapshot": "0.0.0-spaces-alpha-20261029171913",
+  "syntheticOnly": true,
+  "checks": [
+    {
+      "name": "create-private-space",
+      "detail": "Official PDS alpha; two independent PDS services"
+    },
+    {
+      "name": "member-write-on-second-pds",
+      "detail": "Author retains a separate repository inside the shared space"
+    },
+    {
+      "name": "admitted-member-can-mint-credential"
+    },
+    {
+      "name": "cross-pds-authorized-read",
+      "detail": "Official key-bound credential and HTTP signature helpers"
+    },
+    {
+      "name": "outsider-credential-denied"
+    },
+    {
+      "name": "anonymous-space-read-denied"
+    },
+    {
+      "name": "wrong-credential-key-denied"
+    },
+    {
+      "name": "absent-from-public-repository-records"
+    },
+    {
+      "name": "absent-from-public-collection-list"
+    },
+    {
+      "name": "authorized-private-blob-read"
+    },
+    {
+      "name": "anonymous-private-blob-denied"
+    },
+    {
+      "name": "private-blob-absent-from-public-sync"
+    },
+    {
+      "name": "removed-member-cannot-mint-new-credential"
+    },
+    {
+      "name": "issued-credential-still-readable-immediately-after-removal",
+      "detail": "New credentials denied; old bearer remains usable until revocation/expiry reaches the repo host"
+    }
+  ],
+  "limits": [
+    "Credential lifetime: 600 seconds. Existing issued credentials need explicit revocation qualification; no instant-revocation claim.",
+    "Spaces access control is not end-to-end encryption.",
+    "This trial uses development account sessions, not the production OAuth/consent integration.",
+    "Public full-repo/firehose inspection, OAuth scopes and backup/restore remain separate qualification gates."
+  ]
+}

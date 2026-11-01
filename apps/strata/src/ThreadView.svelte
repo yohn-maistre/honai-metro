@@ -103,7 +103,9 @@
       </p>{/if}
   </section>
   <div class="thread-reply-dock">
-    {#if actor && member && community}{#key post.id}<PostComposer
+    {#if post.locked}<p class="thread-empty">
+        Percakapan dikunci oleh moderator.
+      </p>{:else if actor && member && community}{#key post.id}<PostComposer
           bind:this={composer}
           {actor}
           communities={[community]}

@@ -7,6 +7,12 @@
     X,
     LoaderCircle,
     ChevronDown,
+    Link,
+    Heading,
+    ShieldAlert,
+    Vote,
+    CalendarDays,
+    Code,
   } from '@lucide/svelte'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import * as NativeSelect from '$lib/components/ui/native-select/index.js'
@@ -15,11 +21,16 @@
   import { Input } from '$lib/components/ui/input/index.js'
   import {
     request,
+    ApiError,
     initials,
     type Actor,
     type Community,
     type Post,
+    type PostContent,
   } from './api'
+  import PostText from './PostText.svelte'
+  import { markdown } from './markdown'
+  import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
   import { prepareImage, uploadImages, type ImageDraft } from './media'
   let {
     actor,
@@ -42,6 +53,22 @@
   } = $props()
   let communityId = $state(untrack(() => initialCommunity)),
     text = $state(''),
+    title = $state(''),
+    url = $state(''),
+    warning = $state(''),
+    showTitle = $state(false),
+    showUrl = $state(false),
+    showWarning = $state(false),
+    format = $state(false),
+    preview = $state(false),
+    kind = $state(''),
+    pollOptions = $state(['', '']),
+    pollDays = $state('3'),
+    eventTime = $state(''),
+    eventLocation = $state(''),
+    pending = $state<{ key: string; payload: Record<string, unknown> } | null>(
+      null,
+    ),
     images = $state<ImageDraft[]>([]),
     busy = $state(false),
     processing = $state(false),
@@ -49,6 +76,9 @@
     altKey = $state(''),
     field = $state<HTMLTextAreaElement | null>(null),
     picker = $state<HTMLInputElement | null>(null)
+  const hasContent = $derived(
+    !!(text.trim() || title.trim() || url.trim() || images.length || kind),
+  )
   const destination = $derived(communities.find((c) => c.id === communityId))
   onDestroy(() => images.forEach((image) => URL.revokeObjectURL(image.preview)))
   function remove(key: string) {
@@ -57,7 +87,7 @@
     images = images.filter((i) => i.key !== key)
   }
   async function add(files: FileList | null) {
-    if (!files || processing || busy) return
+    if (!files || processing || busy || pending) return
     processing = true
     error = ''
     try {
@@ -82,23 +112,61 @@
     field?.focus()
   }
   async function submit() {
-    if (busy || processing || !text.trim() || !destination) return
+    if (busy || processing || !hasContent || !destination) return
     busy = true
     error = ''
     try {
-      const mediaIds = await uploadImages(communityId, images)
+      const content: PostContent = {
+        ...(title.trim() ? { title } : {}),
+        ...(url.trim() ? { url } : {}),
+        ...(warning.trim() ? { warning } : {}),
+        ...(format ? { format: 'markdown' } : {}),
+      }
+      if (kind === 'poll')
+        content.poll = {
+          options: pollOptions,
+          closesAt: Date.now() + Number(pollDays) * 86400000,
+        }
+      if (kind === 'event') {
+        if (!eventTime) throw Error('Pilih waktu acara.')
+        content.event = {
+          startsAt: new Date(eventTime).getTime(),
+          location: eventLocation,
+        }
+      }
+      if (!pending) {
+        const mediaIds = await uploadImages(communityId, images)
+        pending = {
+          key: crypto.randomUUID(),
+          payload: {
+            communityId,
+            text,
+            ...(parentId ? { parentId } : {}),
+            mediaIds,
+            content,
+          },
+        }
+      }
       const post = await request<Post>('/v1/posts', {
-        communityId,
-        text,
-        ...(parentId ? { parentId } : {}),
-        mediaIds,
+        ...pending.payload,
+        requestKey: pending.key,
       })
+      pending = null
+      title = ''
+      url = ''
+      warning = ''
+      kind = ''
+      pollOptions = ['', '']
+      format = false
+      preview = false
       text = ''
       images.forEach((image) => URL.revokeObjectURL(image.preview))
       images = []
       resize()
       await onPosted(post)
     } catch (e) {
+      if (e instanceof ApiError && e.status >= 400 && e.status < 500)
+        pending = null
       error =
         e instanceof Error
           ? e.message
@@ -139,7 +207,7 @@
             <ChevronDown size={12} /><NativeSelect.Root
               aria-label="Komunitas"
               bind:value={communityId}
-              disabled={busy || images.length > 0}
+              disabled={busy || !!pending || images.length > 0}
             >
               {#each communities as community}<option value={community.id}>
                   {community.title}{community.visibility === 'public'
@@ -149,23 +217,101 @@
             </NativeSelect.Root>
           </span>
         </div>{/if}
-      <Textarea
-        bind:ref={field}
-        bind:value={text}
-        class="composer-text"
-        aria-label={compact ? 'Tulis balasan' : 'Posting'}
-        placeholder={compact ? 'Tulis balasan…' : 'Apa yang terjadi?'}
-        rows={compact ? 1 : 4}
-        maxlength={6000}
-        required
-        oninput={resize}
-        onkeydown={(e) => {
-          if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-            e.preventDefault()
-            void submit()
-          }
-        }}
-      />
+      {#if showTitle}<Input
+          aria-label="Judul posting"
+          placeholder="Judul (opsional)"
+          bind:value={title}
+          maxlength={180}
+          disabled={busy || !!pending}
+        />{/if}
+      {#if !preview}<Textarea
+          bind:ref={field}
+          bind:value={text}
+          class="composer-text"
+          aria-label={compact ? 'Tulis balasan' : 'Posting'}
+          placeholder={compact ? 'Tulis balasan…' : 'Apa yang terjadi?'}
+          rows={compact ? 1 : 4}
+          maxlength={destination?.publication === 'atproto' ? 6000 : 20000}
+          disabled={!!pending}
+          oninput={resize}
+          onkeydown={(e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+              e.preventDefault()
+              void submit()
+            }
+          }}
+        />{:else}<div class="composer-preview post-markdown">
+          {#if format}{@html markdown(text)}{:else}<PostText {text} />{/if}
+        </div>{/if}
+      {#if showUrl}<Input
+          aria-label="Tautan posting"
+          type="url"
+          placeholder="https://…"
+          bind:value={url}
+          disabled={busy || !!pending}
+        />{/if}
+      {#if showWarning}<Input
+          aria-label="Peringatan konten"
+          placeholder="Peringatan konten"
+          bind:value={warning}
+          maxlength={160}
+          disabled={busy || !!pending}
+        />{/if}
+      {#if kind === 'poll'}<fieldset
+          class="composer-extras"
+          disabled={busy || !!pending}
+        >
+          <legend>Jajak pendapat</legend>
+          {#each pollOptions.keys() as i}<Input
+              aria-label={'Pilihan ' + (i + 1)}
+              placeholder={'Pilihan ' + (i + 1)}
+              bind:value={pollOptions[i]}
+              maxlength={100}
+              required
+            />{/each}
+          <div>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={pollOptions.length >= 6}
+              onclick={() => (pollOptions = [...pollOptions, ''])}
+            >
+              Tambah pilihan
+            </Button><NativeSelect.Root
+              aria-label="Durasi jajak pendapat"
+              bind:value={pollDays}
+            >
+              <option value="1">1 hari</option>
+              <option value="3">3 hari</option>
+              <option value="7">7 hari</option>
+            </NativeSelect.Root><Button
+              variant="ghost"
+              size="sm"
+              onclick={() => (kind = '')}
+            >
+              Hapus
+            </Button>
+          </div>
+        </fieldset>{/if}
+      {#if kind === 'event'}<fieldset
+          class="composer-extras"
+          disabled={busy || !!pending}
+        >
+          <legend>Acara</legend>
+          <Input
+            aria-label="Waktu acara"
+            type="datetime-local"
+            bind:value={eventTime}
+            required
+          /><Input
+            aria-label="Lokasi acara"
+            placeholder="Lokasi (opsional)"
+            bind:value={eventLocation}
+            maxlength={200}
+          /><Button variant="ghost" size="sm" onclick={() => (kind = '')}>
+            Hapus acara
+          </Button>
+        </fieldset>{/if}
       {#if images.length}<div class="composer-images">
           {#each images as image (image.key)}<div class="composer-image-draft">
               <img
@@ -179,7 +325,7 @@
                 variant="secondary"
                 size="icon"
                 aria-label="Hapus gambar"
-                disabled={busy}
+                disabled={busy || !!pending}
                 onclick={() => remove(image.key)}
               >
                 <X size={16} />
@@ -204,7 +350,7 @@
         class="composer-send"
         type="submit"
         size="sm"
-        disabled={busy || processing || !text.trim()}
+        disabled={busy || processing || !hasContent}
       >
         {#if busy}<LoaderCircle
             size={16}
@@ -229,6 +375,7 @@
         size="icon"
         aria-label="Tambahkan gambar"
         disabled={busy ||
+          !!pending ||
           processing ||
           images.length >= 4 ||
           destination?.publication !== 'local'}
@@ -238,8 +385,51 @@
             size={20}
             class="animate-spin"
           />{:else}<ImagePlus size={20} />{/if}
-      </Button>{#if text.length > 5500}<span class="composer-count">
-          {6000 - text.length}
+      </Button>
+      {#if destination?.publication === 'local'}<Dropdown.Root>
+          <Dropdown.Trigger
+            class="composer-tool"
+            aria-label="Opsi konten"
+            disabled={busy || !!pending}
+          >
+            <Heading size={20} />
+          </Dropdown.Trigger><Dropdown.Content>
+            <Dropdown.Item onSelect={() => (showTitle = !showTitle)}>
+              <Heading size={16} />Judul
+            </Dropdown.Item><Dropdown.Item
+              onSelect={() => (showUrl = !showUrl)}
+            >
+              <Link size={16} />Tautan / video
+            </Dropdown.Item><Dropdown.Item
+              onSelect={() => (showWarning = !showWarning)}
+            >
+              <ShieldAlert size={16} />Peringatan konten
+            </Dropdown.Item>{#if !parentId}<Dropdown.Item
+                onSelect={() => (kind = kind === 'poll' ? '' : 'poll')}
+              >
+                <Vote size={16} />Jajak pendapat
+              </Dropdown.Item><Dropdown.Item
+                onSelect={() => (kind = kind === 'event' ? '' : 'event')}
+              >
+                <CalendarDays size={16} />Acara
+              </Dropdown.Item>{/if}<Dropdown.Separator /><Dropdown.CheckboxItem
+              checked={format}
+              onCheckedChange={(v) => (format = v)}
+            >
+              <Code size={16} />Markdown
+            </Dropdown.CheckboxItem>
+          </Dropdown.Content>
+        </Dropdown.Root>{/if}
+      {#if text.trim()}<Button
+          variant="ghost"
+          size="sm"
+          onclick={() => (preview = !preview)}
+        >
+          {preview ? 'Tulis' : 'Pratinjau'}
+        </Button>{/if}
+      {#if text.length > 19500}<span class="composer-count">
+          {(destination?.publication === 'atproto' ? 6000 : 20000) -
+            text.length}
         </span>{/if}
     </div>
     {#if !compact}<span class="composer-audience">
@@ -251,10 +441,14 @@
       </span>
       <Button
         type="submit"
-        disabled={busy || processing || !text.trim() || !destination}
+        disabled={busy || processing || !hasContent || !destination}
       >
         {#if busy}<LoaderCircle size={16} class="animate-spin" />{/if}Posting
       </Button>{/if}
   </div>
+  {#if pending && !busy}<p class="composer-retry-note">
+      Pengiriman belum terkonfirmasi. Coba lagi untuk memeriksa posting yang
+      sama.
+    </p>{/if}
   {#if error}<p class="cx-form-error" role="alert">{error}</p>{/if}
 </form>

@@ -1,6 +1,6 @@
 /** Presentation only. No identity, membership or institution preferences live here. */
 export const palettes = [
-  { id: 'abstraksi', name: 'Abstraksi', color: '#c5b0e2' },
+  { id: 'abstraksi', name: 'Abstraksi', color: '#b8b2c1' },
   { id: 'aksara', name: 'Aksara', color: '#aa8bd5' },
   { id: 'clay', name: 'Tanah', color: '#b7775c' },
   { id: 'sage', name: 'Daun', color: '#7b9287' },
@@ -8,11 +8,11 @@ export const palettes = [
 ] as const
 export const appearance = $state({
   theme: 'dark' as 'dark' | 'light',
-  accent: '#c5b0e2',
+  accent: '#b8b2c1',
 })
 import { accentRoles } from './appearance-color'
 export function applyAppearance() {
-  if (!/^#[0-9a-f]{6}$/i.test(appearance.accent)) appearance.accent = '#c5b0e2'
+  if (!/^#[0-9a-f]{6}$/i.test(appearance.accent)) appearance.accent = '#b8b2c1'
   const root = document.documentElement,
     dark = appearance.theme === 'dark'
   root.classList.toggle('dark', dark)

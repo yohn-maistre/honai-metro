@@ -5,6 +5,7 @@
   import { Label } from '$lib/components/ui/label/index.js'
   import { Check, Moon, Sun } from '@lucide/svelte'
   import { appearance, palettes } from './appearance.svelte'
+  import { bases } from './appearance-bases'
   let custom = $state(appearance.accent),
     invalid = $state(false)
 </script>
@@ -26,6 +27,44 @@
       >
         <Moon size={16} />Gelap
       </Button>
+    </div>
+    <div>
+      <Label>Warna dasar</Label>
+      <div class="base-options" role="group" aria-label="Warna dasar">
+        {#each bases as base}<button
+            class="base-choice"
+            aria-pressed={appearance.base === base.id}
+            onclick={() => (appearance.base = base.id)}
+          >
+            <span
+              class="base-preview"
+              style:background={appearance.theme === 'dark'
+                ? base.dark[0]
+                : base.light[0]}
+            >
+              <i
+                style:background={appearance.theme === 'dark'
+                  ? base.dark[1]
+                  : base.light[1]}
+              ></i>
+              <i style:background={appearance.accent}></i>
+            </span>
+            <span>{base.name}</span>
+            {#if appearance.base === base.id}<Check size={14} />{/if}
+          </button>{/each}
+      </div>
+    </div>
+    <div>
+      <Label>Tekstur</Label>
+      <div class="texture-options" role="group" aria-label="Tekstur">
+        {#each [['none', 'Polos'], ['grain', 'Serat'], ['dither', 'Dither']] as [id, name]}<Button
+            variant="outline"
+            aria-pressed={appearance.texture === id}
+            onclick={() => (appearance.texture = id)}
+          >
+            {name}
+          </Button>{/each}
+      </div>
     </div>
     <div>
       <Label>Warna aksen</Label>

@@ -130,11 +130,16 @@ let csrf: string | null = null
 export function setCsrf(value: string | null) {
   csrf = value
 }
-export async function request<T>(path: string, body?: unknown): Promise<T> {
+export async function request<T>(
+  path: string,
+  body?: unknown,
+  signal?: AbortSignal,
+): Promise<T> {
   const response = await fetch(path, {
     method: body === undefined ? 'GET' : 'POST',
     credentials: 'same-origin',
     cache: 'no-store',
+    signal,
     headers: {
       accept: 'application/json',
       ...(body === undefined

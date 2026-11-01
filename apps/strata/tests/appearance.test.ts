@@ -27,3 +27,25 @@ test('palette presets and custom seeds retain readable accent text and button la
       assert.ok(contrast(roles.ink, roles.foreground) >= 4.5, seed)
     }
 })
+
+import { bases, baseRoles } from '../src/appearance-bases.ts'
+test('every base ramp has readable body and secondary text in both themes', () => {
+  for (const base of bases)
+    for (const dark of [false, true]) {
+      const roles = baseRoles(base.id, dark)
+      for (const surface of [
+        '--reading-surface',
+        '--page-ground',
+        '--secondary',
+      ] as const) {
+        assert.ok(
+          contrast(roles['--foreground'], roles[surface]) >= 4.5,
+          base.id + ' primary',
+        )
+        assert.ok(
+          contrast(roles['--muted-foreground'], roles[surface]) >= 4.5,
+          base.id + ' muted ' + surface,
+        )
+      }
+    }
+})

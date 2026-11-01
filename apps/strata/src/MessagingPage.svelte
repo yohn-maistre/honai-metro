@@ -717,7 +717,7 @@
   <Dialog.Content class="platform-dialog">
     <Dialog.Header>
       <Dialog.Title>Pesan baru</Dialog.Title><Dialog.Description>
-        Cari pengguna yang sudah mengaktifkan pesan.
+        Cari peserta lain yang sudah mengaktifkan pesan.
       </Dialog.Description>
     </Dialog.Header>
     <form
@@ -749,7 +749,9 @@
       </Button>{/each}{#if contactSearched && !contacts.length}<p
         class="cx-hint"
       >
-        Tidak ada pengguna yang tersedia.
+        Tidak ada peserta lain yang cocok. Peserta harus mengaktifkan pesan dan
+        memiliki percakapan yang dapat kamu lihat. Akun sendiri tidak muncul di
+        sini.
       </p>{/if}{#if error}<p role="alert" class="cx-form-error">{error}</p>{/if}
   </Dialog.Content>
 </Dialog.Root>

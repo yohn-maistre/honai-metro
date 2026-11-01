@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { tick, type Snippet } from 'svelte'
+  import { type Snippet } from 'svelte'
   import * as Sidebar from '$lib/components/ui/sidebar/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
@@ -51,13 +51,10 @@
     onCompose: () => void
     onSearch: (q: string) => void
     onRefresh: () => void
-    feedMode: 'new' | 'mine'
-    onFeedChange: (mode: 'new' | 'mine') => void
+    feedMode: 'new' | 'mine' | 'following'
+    onFeedChange: (mode: 'new' | 'mine' | 'following') => void
   } = $props()
   const sidebar = Sidebar.useSidebar()
-  let searchOpen = $state(false)
-  let query = $state(''),
-    searchField = $state<HTMLInputElement | null>(null)
   const nav = [
     { href: '/', label: 'Beranda', icon: Home },
     { href: '/explore', label: 'Jelajah', icon: Compass },
@@ -221,9 +218,11 @@
     <div class="surface-heading">
       {#if path === '/'}<Dropdown.Root>
           <Dropdown.Trigger class="surface-switch" aria-label="Pilih linimasa">
-            {feedMode === 'mine' ? 'Komunitasku' : 'Terbaru'}<ChevronDown
-              size={14}
-            />
+            {feedMode === 'mine'
+              ? 'Komunitasku'
+              : feedMode === 'following'
+                ? 'Mengikuti'
+                : 'Terbaru'}<ChevronDown size={14} />
           </Dropdown.Trigger><Dropdown.Content align="center">
             <Dropdown.Item onSelect={() => onFeedChange('new')}>
               Terbaru
@@ -231,6 +230,10 @@
               onSelect={() => onFeedChange('mine')}
             >
               Komunitasku
+            </Dropdown.Item><Dropdown.Item
+              onSelect={() => onFeedChange('following')}
+            >
+              Mengikuti
             </Dropdown.Item>
           </Dropdown.Content>
         </Dropdown.Root>{:else}<span>{heading}</span>{/if}
@@ -239,42 +242,16 @@
       etnos
       <span>.</span>
     </a>
-    <form
-      class="cx-global-search"
-      class:search-open={searchOpen}
-      onfocusout={(e) => {
-        if (
-          !(e.relatedTarget instanceof Node) ||
-          !e.currentTarget.contains(e.relatedTarget)
-        )
-          searchOpen = false
-      }}
-      onsubmit={(e) => {
-        e.preventDefault()
-        onSearch(query)
-      }}
+    <Button
+      variant="ghost"
+      class="cx-global-search search-launcher"
+      aria-label="Buka pencarian"
+      onclick={() => onSearch('')}
     >
-      <Search size={17} class="desktop-search-icon" /><Button
-        variant="ghost"
-        size="icon"
-        class="mobile-search-button"
-        aria-label="Buka pencarian"
-        onclick={async () => {
-          searchOpen = true
-          await tick()
-          searchField?.focus()
-        }}
-      >
-        <Search size={18} />
-      </Button><Input
-        bind:ref={searchField}
-        onfocus={() => (searchOpen = true)}
-        bind:value={query}
-        placeholder="Cari percakapan"
-        aria-label="Cari percakapan"
-        class="border-0 shadow-none focus-visible:ring-0 bg-transparent"
-      />
-    </form>
+      <Search size={18} />
+      <span>Cari ETNOS</span>
+      <kbd>⌘ K</kbd>
+    </Button>
     {#if path === '/'}<Button
         variant="ghost"
         size="icon"

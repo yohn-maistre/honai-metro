@@ -25,8 +25,8 @@
     onCompose: () => void
     onSearch: (q: string) => void
     onRefresh: () => void
-    feedMode: 'new' | 'mine'
-    onFeedChange: (mode: 'new' | 'mine') => void
+    feedMode: 'new' | 'mine' | 'following'
+    onFeedChange: (mode: 'new' | 'mine' | 'following') => void
   } = $props()
 </script>
 

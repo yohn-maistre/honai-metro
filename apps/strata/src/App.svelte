@@ -23,6 +23,9 @@
     GitPullRequest,
     History,
   } from '@lucide/svelte'
+  import DiscoveryPage from './DiscoveryPage.svelte'
+  import SearchDialog from './SearchDialog.svelte'
+  import SearchPage from './SearchPage.svelte'
   import ThreadView from './ThreadView.svelte'
   import PostComposer from './PostComposer.svelte'
   import PostCard from './PostCard.svelte'
@@ -49,6 +52,7 @@
     ApiError,
     relativeDate,
     initials,
+    type Actor,
     type Community,
     type Post,
     type Membership,
@@ -58,6 +62,8 @@
     type Capabilities,
     type ActivityInbox,
   } from './api'
+  let searchDialogOpen = $state(false),
+    profile = $state<Actor | null>(null)
   let path = $state(location.pathname),
     search = $state(location.search),
     loading = $state(true),
@@ -72,6 +78,7 @@
     wiki = $state<WikiPage[]>([]),
     saved = $state<Post[]>([]),
     nextCursor = $state<string | null>(null)
+  let following = $state<Actor[]>([])
   let selectedPost = $state<Post | null>(null),
     replies = $state<Post[]>([]),
     repliesCursor = $state<string | null>(null),
@@ -81,7 +88,7 @@
       { id: string; created: number; perspective: string; language: string }[]
     >([])
   let tab = $state('discussion'),
-    feedTab = $state<'new' | 'mine'>('new'),
+    feedTab = $state<'new' | 'mine' | 'following'>('new'),
     handle = $state(''),
     publishingConsent = $state(false),
     inviteHandle = $state('')
@@ -240,12 +247,16 @@
       if (mine !== generation) return
       auth = identity
       setCsrf(identity.csrf)
+      profile = null
       const filters = new SvelteURLSearchParams({ roots: 'true', limit: '30' })
       if (parts[0] === 'communities' && parts[1])
         filters.set('community', parts[1])
+      if (path === '/' && feedTab === 'following' && identity.actor)
+        filters.set('following', 'true')
+      if (parts[0] === 'people' && parts[1]) filters.set('author', parts[1])
       if (parts[0] === 'find')
         filters.set('q', new SvelteURLSearchParams(search).get('q') ?? '')
-      const [cs, feed, pages, roles, features] = await Promise.all([
+      const [cs, feed, pages, roles, features, followed] = await Promise.all([
         request<Community[]>('/v1/communities'),
         request<{ items: Post[]; pinned?: Post[]; nextCursor: string | null }>(
           '/v1/feed/page?' + filters,
@@ -255,6 +266,9 @@
           ? request<Membership[]>('/v1/memberships')
           : Promise.resolve([]),
         request<Capabilities>('/v1/capabilities'),
+        identity.actor
+          ? request<Actor[]>('/v1/following')
+          : Promise.resolve([]),
       ])
       if (mine !== generation) return
       communities = cs
@@ -267,6 +281,7 @@
       wiki = pages
       memberships = roles
       cap = features
+      following = followed
       nextCursor = feed.nextCursor
       unread = identity.actor
         ? (await request<ActivityInbox>('/v1/notifications')).unread
@@ -277,6 +292,10 @@
       selectedPage = null
       proposals = []
       history = []
+      if (parts[0] === 'people' && parts[1]) {
+        const actor = await request<Actor>('/v1/actors/' + parts[1])
+        if (mine === generation) profile = actor
+      }
       if (path === '/saved' && identity.actor) {
         const rows = await request<Post[]>('/v1/bookmarks')
         if (mine === generation) saved = rows
@@ -464,6 +483,8 @@
         cursor: nextCursor!,
       })
       if (community) q.set('community', community.id)
+      if (parts[0] === 'people' && parts[1]) q.set('author', parts[1])
+      if (path === '/' && feedTab === 'following') q.set('following', 'true')
       const page = await request<{ items: Post[]; nextCursor: string | null }>(
         '/v1/feed/page?' + q,
       )
@@ -498,6 +519,12 @@
 
 <svelte:head><title>{heading} · ETNOS</title></svelte:head>
 <svelte:window
+  onkeydown={(e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault()
+      searchDialogOpen = !searchDialogOpen
+    }
+  }}
   onclick={intercept}
   onpopstate={() => {
     path = location.pathname
@@ -513,8 +540,15 @@
   onCompose={() => open('compose')}
   onRefresh={() => load()}
   feedMode={feedTab}
-  onFeedChange={(mode) => (feedTab = mode)}
-  onSearch={(q) => navigate('/find?q=' + encodeURIComponent(q))}
+  onFeedChange={(mode) => {
+    if (mode === 'following' && !auth.actor) {
+      navigate('/login')
+      return
+    }
+    feedTab = mode
+    void load()
+  }}
+  onSearch={() => (searchDialogOpen = true)}
 >
   {#if loading && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore'].includes(parts[0])}<div
       class="strata-card strata-inline strata-pending"
@@ -616,6 +650,13 @@
         {search}
         {navigate}
       />{/await}
+  {:else if path === '/explore'}
+    <DiscoveryPage {auth} {navigate} />
+  {:else if path === '/find'}
+    <SearchPage
+      query={new SvelteURLSearchParams(search).get('q') ?? ''}
+      {navigate}
+    />
   {:else if path === '/notifications'}
     <ActivityPage
       {auth}
@@ -936,15 +977,31 @@
         <h2>Posting tidak tersedia</h2>
       </div>{/if}
   {:else if parts[0] === 'people'}
-    {@const actor =
-      auth.actor?.id === parts[1]
-        ? auth.actor
-        : posts.find((p) => p.author.id === parts[1])?.author}{#if actor}<div
-        class="cx-detail-head"
-      >
+    {@const actor = profile}{#if actor}<div class="cx-detail-head profile-head">
         <span class="cx-avatar sage">{initials(actor.name)}</span>
         <h1>{actor.name}</h1>
-        <p class="cx-hint" style="overflow-wrap:anywhere">{actor.did}</p>
+        <details class="profile-identity">
+          <summary>Identitas AT</summary>
+          <p class="cx-hint">{actor.did}</p>
+        </details>
+        {#if auth.actor && auth.actor.id !== actor.id}<Button
+            variant={following.some((a) => a.id === actor.id)
+              ? 'outline'
+              : 'default'}
+            disabled={busy}
+            onclick={() =>
+              mutate(async () => {
+                const follow = !following.some((a) => a.id === actor.id)
+                await request('/v1/actors/' + actor.id + '/follow', {
+                  following: follow,
+                })
+                following = follow
+                  ? [...following, actor]
+                  : following.filter((a) => a.id !== actor.id)
+              })}
+          >
+            {following.some((a) => a.id === actor.id) ? 'Mengikuti' : 'Ikuti'}
+          </Button>{/if}
         {#if auth.actor && auth.actor.id !== actor.id && actor.kind === 'human'}<Button
             href={'/messages?to=' + actor.id}
             variant="outline"
@@ -959,7 +1016,16 @@
           loggedIn={!!auth.actor}
           canVote={isMember(p.community_id)}
           onError={notify}
-        />{/each}{:else if !loading}<div class="strata-nodata">
+        />{/each}
+      {#if nextCursor}<div class="profile-more">
+          <Button variant="outline" disabled={busy} onclick={more}>
+            Muat posting lain
+          </Button>
+        </div>{/if}
+      {#if !posts.length && !loading}<p class="search-state">
+          Belum ada posting yang dapat kamu lihat.
+        </p>{/if}
+    {:else if !loading}<div class="strata-nodata">
         <h2>Profil tidak tersedia</h2>
         <p>
           Identitas anggota privat tidak ditampilkan dalam direktori publik.
@@ -1009,12 +1075,16 @@
             ? 'Simpan untuk nanti'
             : path === '/find'
               ? 'Belum ada hasil'
-              : 'Belum ada percakapan'}
+              : feedTab === 'following'
+                ? 'Ikuti percakapan mereka'
+                : 'Belum ada percakapan'}
         </h2>
         <p>
           {path === '/saved'
             ? 'Posting yang kamu simpan tersedia selama kamu memiliki akses.'
-            : 'Jelajahi komunitas atau mulai percakapan.'}
+            : feedTab === 'following'
+              ? 'Cari peserta dan pilih Ikuti di profil mereka.'
+              : 'Jelajahi komunitas atau mulai percakapan.'}
         </p>
         <Button
           href={path === '/saved' && !auth.actor ? '/login' : '/communities'}
@@ -1403,3 +1473,5 @@
     </AlertDialog.Footer>
   </AlertDialog.Content>
 </AlertDialog.Root>
+
+<SearchDialog bind:open={searchDialogOpen} {navigate} />

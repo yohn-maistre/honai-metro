@@ -223,11 +223,14 @@ try {
   )
   await p.getByRole('link', { name: 'Kembali ke beranda', exact: true }).click()
   await p.getByRole('button', { name: 'Buka pencarian', exact: true }).click()
-  await p.getByLabel('Cari percakapan', { exact: true }).fill('Synthetic')
-  await p.getByLabel('Cari percakapan', { exact: true }).press('Enter')
   await p
-    .getByRole('heading', { name: 'Hasil pencarian', exact: true })
-    .waitFor()
+    .getByRole('dialog', { name: 'Cari ETNOS', exact: true })
+    .getByLabel('Cari ETNOS', { exact: true })
+    .fill('Synthetic')
+  await p
+    .getByRole('button', { name: 'Lihat semua hasil', exact: false })
+    .click()
+  await p.getByRole('heading', { name: 'Cari', exact: true }).waitFor()
   assert.deepEqual(errors, [])
   console.log(
     JSON.stringify({

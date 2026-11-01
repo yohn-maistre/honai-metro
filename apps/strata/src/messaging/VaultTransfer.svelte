@@ -52,6 +52,7 @@
       if (file.size > 8 * 1024 * 1024) throw Error('Berkas terlalu besar.')
       const v = await import('./vault')
       await v.importVault(actorId, await file.text(), passphrase)
+      ids = await v.localVaultIds()
       status = 'Kunci dipulihkan. Buka Pesan untuk melanjutkan.'
       passphrase = ''
       file = null

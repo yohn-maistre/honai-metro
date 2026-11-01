@@ -6,7 +6,6 @@
     LockKeyhole,
     X,
     LoaderCircle,
-    ChevronDown,
     Link,
     Heading,
     ShieldAlert,

@@ -44,7 +44,7 @@
     pending = true
     request<SearchResult>('/v1/search', undefined, controller.signal)
       .then((result) => {
-        if (!controller.signal.aborted) data = result
+        if (!controller.signal.aborted && auth.actor?.id === actor) data = result
       })
       .catch((e) => {
         if (!controller.signal.aborted) error = e.message

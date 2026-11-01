@@ -25,7 +25,7 @@ const s = new Strata(':memory:', origin),
   ),
   g = new Groups(s, { stewardDid: owner.actor.did })
 s.setMember(owner.actor.id, c.id, peer.actor.id, true)
-const old = s.createPost(peer.actor.id, c.id, 'An older conversation by Martha')
+s.createPost(peer.actor.id, c.id, 'An older conversation by Martha')
 for (let i = 0; i < 34; i++)
   s.createPost(owner.actor.id, c.id, 'Synthetic public post ' + i)
 s.createPost(privatePeer.actor.id, h.id, 'Not discoverable')

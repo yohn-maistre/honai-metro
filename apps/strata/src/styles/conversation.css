@@ -2492,7 +2492,7 @@ body {
 .explore-featured .places-tile {
   min-height: 150px;
 }
-@media (min-width: 761px) {
+@media (min-width: 768px) {
   .cx-main:is(
       [data-route='/explore'],
       [data-route='/wiki'],
@@ -2541,7 +2541,7 @@ body {
     border: 0;
   }
 }
-@media (max-width: 760px) {
+@media (max-width: 767px) {
   .news-section {
     padding: 16px;
   }

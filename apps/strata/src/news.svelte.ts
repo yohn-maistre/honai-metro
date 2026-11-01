@@ -24,7 +24,7 @@ export function loadNews() {
     try {
       const res = await fetch('/v1/news', {
         credentials: 'omit',
-        signal: AbortSignal.timeout(6000),
+        signal: AbortSignal.timeout(10000),
       })
       if (!res.ok) throw Error('unavailable')
       const feed = (await res.json()) as Feed

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 
-import { Strata, api, chromium, origin } from './environment.mjs'
+import { Strata, api, chromium, origin, artifactDir } from './environment.mjs'
 
 const s = new Strata(':memory:', origin)
 const owner = s.provision(
@@ -47,7 +47,7 @@ try {
     await r.fulfill({
       status: response.status,
       headers: Object.fromEntries(response.headers),
-      body: await response.text(),
+      body: Buffer.from(await response.arrayBuffer()),
     })
   })
   await page.goto(origin, { waitUntil: 'networkidle' })
@@ -59,6 +59,30 @@ try {
     .getByRole('dialog', { name: 'Posting baru' })
     .getByLabel('Posting', { exact: true })
     .fill('Synthetic browser contribution')
+  const png = await page.evaluate(() => {
+    const c = document.createElement('canvas')
+    c.width = 600
+    c.height = 360
+    const x = c.getContext('2d')
+    x.fillStyle = '#376e65'
+    x.fillRect(0, 0, 600, 360)
+    x.fillStyle = '#e3cba9'
+    x.font = '24px sans-serif'
+    x.fillText('Synthetic image fixture', 32, 64)
+    return c.toDataURL('image/png').split(',')[1]
+  })
+  await page
+    .getByLabel('Pilih gambar', { exact: true })
+    .setInputFiles({
+      name: 'fixture.png',
+      mimeType: 'image/png',
+      buffer: Buffer.from(png, 'base64'),
+    })
+  await page.getByRole('button', { name: 'ALT', exact: true }).click()
+  await page
+    .getByLabel('Teks alternatif gambar')
+    .fill('Synthetic image for browser contract')
+  await page.screenshot({ path: artifactDir + '/forum-desktop-composer.png' })
   await page
     .getByRole('dialog', { name: 'Posting baru' })
     .getByRole('button', { name: 'Posting', exact: true })
@@ -68,12 +92,64 @@ try {
     .waitFor()
   const root = s.feed()[0]
   assert.equal(root.text, 'Synthetic browser contribution')
+  assert.equal(root.media.length, 1)
+  await page
+    .getByRole('button', {
+      name: 'Buka gambar 1: Synthetic image for browser contract',
+    })
+    .click()
+  await page
+    .getByRole('dialog')
+    .getByRole('button', { name: 'Teks alternatif', exact: true })
+    .click()
+  await page
+    .getByRole('dialog')
+    .getByText('Synthetic image for browser contract')
+    .waitFor()
+  await page.getByRole('button', { name: 'Tutup gambar', exact: true }).click()
   await page
     .getByPlaceholder('Tulis balasan…')
     .fill('Synthetic nested discussion')
   await page.getByRole('button', { name: 'Balas', exact: true }).click()
   await page.getByText('Synthetic nested discussion', { exact: true }).waitFor()
   assert.equal(s.getPost(owner.actor.id, root.id).replies, 1)
+  const child = s.feed().find((p) => p.parent_id === root.id)
+  await page
+    .locator('[data-post="' + child.id + '"]')
+    .getByRole('button', { name: 'Balas Synthetic steward', exact: true })
+    .click()
+  await page.getByPlaceholder('Tulis balasan…').fill('Synthetic child reply')
+  await page.getByRole('button', { name: 'Balas', exact: true }).click()
+  await page.getByText('Synthetic child reply', { exact: true }).waitFor()
+  assert.equal(
+    s.feed().find((p) => p.text === 'Synthetic child reply').parent_id,
+    child.id,
+  )
+  await page
+    .getByRole('button', { name: 'Sembunyikan 1 balasan', exact: true })
+    .click()
+  assert.equal(
+    await page.getByText('Synthetic child reply', { exact: true }).count(),
+    0,
+  )
+  await page
+    .getByRole('button', { name: 'Tampilkan 1 balasan', exact: true })
+    .click()
+  await page.getByText('Synthetic child reply', { exact: true }).waitFor()
+  await page.getByLabel('Urutkan balasan', { exact: true }).selectOption('top')
+  await page.screenshot({ path: artifactDir + '/forum-desktop-thread.png' })
+  await page.setViewportSize({ width: 390, height: 844 })
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+    false,
+  )
+  await page.screenshot({
+    path: artifactDir + '/forum-mobile-thread.png',
+    fullPage: true,
+  })
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page
     .getByRole('button', { name: 'Dukung posting', exact: true })
     .first()

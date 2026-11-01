@@ -10,6 +10,8 @@
     Globe,
     LoaderCircle,
   } from '@lucide/svelte'
+  import PostMedia from './PostMedia.svelte'
+  import PostText from './PostText.svelte'
   import * as Card from '$lib/components/ui/card/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
@@ -34,6 +36,9 @@
     canVote = false,
     detail = false,
     onSaved,
+    onReply,
+    reply = false,
+    authorBadge = false,
   }: {
     post: Post
     community?: Community
@@ -42,6 +47,9 @@
     canVote?: boolean
     detail?: boolean
     onSaved?: () => void
+    onReply?: (post: Post) => void
+    reply?: boolean
+    authorBadge?: boolean
   } = $props()
   let busy = $state(false),
     reporting = $state(false),
@@ -100,7 +108,7 @@
     }
   }
   async function share() {
-    const url = new URL('/square/' + post.rootId, location.origin).href
+    const url = new URL('/square/' + post.id, location.origin).href
     try {
       if (navigator.share) await navigator.share({ title: 'ETNOS', url })
       else {
@@ -116,7 +124,8 @@
 
 <Card.Root
   role="article"
-  class={'cx-post' + (detail ? ' detail' : '')}
+  class={'cx-post' + (detail ? ' detail' : '') + (reply ? ' reply' : '')}
+  id={'post-' + post.id}
   data-post={post.id}
 >
   <a
@@ -130,13 +139,24 @@
   </a>
   <div class="cx-post-content">
     <div class="cx-post-meta">
-      <a href={'/people/' + post.author.id} class="cx-author">
+      <a
+        href={'/people/' + post.author.id}
+        class="cx-author"
+        title={post.author.name}
+      >
         {post.author.name}
       </a>
       {#if post.author.kind === 'agent'}<Badge variant="secondary">
           AI
         </Badge>{/if}
-      <span class="cx-meta-secondary">{relativeDate(post.created)}</span>
+      <a
+        class="cx-meta-secondary post-permalink"
+        href={'/square/' + post.id}
+        title={new Date(post.created).toLocaleString()}
+      >
+        {relativeDate(post.created)}
+      </a>
+      {#if authorBadge}<span class="reply-author-badge">Penulis</span>{/if}
       <Dropdown.Root>
         <Dropdown.Trigger class="cx-post-more" aria-label="Opsi posting">
           <Ellipsis size={18} />
@@ -155,17 +175,22 @@
         </Dropdown.Content>
       </Dropdown.Root>
     </div>
-    <a class="cx-post-community" href={'/communities/' + post.community_id}>
-      {#if community?.visibility !== 'public'}<LockKeyhole
-          size={12}
-        />{/if}{community?.title ?? 'Komunitas'}
-    </a>
-    {#if detail}<p class="cx-post-body strata-body">{post.text}</p>{:else}<a
-        href={'/square/' + post.rootId}
-        class="cx-post-body strata-body"
+    {#if !reply}<a
+        class="cx-post-community"
+        href={'/communities/' + post.community_id}
       >
-        {post.text}
-      </a>{/if}
+        {#if community?.visibility !== 'public'}<LockKeyhole
+            size={12}
+          />{/if}{community?.title ?? 'Komunitas'}
+      </a>
+    {/if}
+    <div class="cx-post-body strata-body">
+      <PostText
+        text={post.text}
+        permalink={!detail && !reply ? '/square/' + post.id : undefined}
+      />
+    </div>
+    {#if post.media?.length}<PostMedia images={post.media} />{/if}
     {#if post.contexts?.length}<div class="context-links mt-3">
         {#each post.contexts as context}<Badge
             href={'/contexts/' + context.slug}
@@ -195,7 +220,7 @@
           onclick={() => vote(1)}
           disabled={busy}
         >
-          <ArrowUp size={17} />
+          <ArrowUp size={19} />
         </Button>
         <span>{post.score}</span>
         <Button
@@ -206,16 +231,21 @@
           onclick={() => vote(-1)}
           disabled={busy}
         >
-          <ArrowDown size={17} />
+          <ArrowDown size={19} />
         </Button>
       </span>
       <Button
         variant="ghost"
         class="cx-action"
-        href={'/square/' + post.rootId + '#replies'}
-        aria-label={post.replies + ' balasan'}
+        href={onReply ? undefined : '/square/' + post.id + '#replies'}
+        onclick={onReply ? () => onReply(post) : undefined}
+        aria-label={reply
+          ? 'Balas ' + post.author.name
+          : post.replies + ' balasan'}
       >
-        <MessageCircle size={17} />{post.replies || 'Balas'}
+        <MessageCircle size={19} />{(reply
+          ? post.directReplies
+          : post.replies) || ''}
       </Button><Button
         variant="ghost"
         size="icon"
@@ -225,7 +255,7 @@
         onclick={save}
         disabled={busy}
       >
-        <Bookmark size={17} fill={post.bookmarked ? 'currentColor' : 'none'} />
+        <Bookmark size={19} fill={post.bookmarked ? 'currentColor' : 'none'} />
       </Button><Button
         variant="ghost"
         size="icon"
@@ -233,7 +263,7 @@
         aria-label="Bagikan tautan"
         onclick={share}
       >
-        <Share2 size={17} />
+        <Share2 size={19} />
       </Button>
     </div>
   </div>

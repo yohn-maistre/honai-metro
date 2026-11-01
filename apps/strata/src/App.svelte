@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
+  import { onMount, tick } from 'svelte'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
   import {
     Users,
@@ -23,6 +23,8 @@
     GitPullRequest,
     History,
   } from '@lucide/svelte'
+  import ThreadView from './ThreadView.svelte'
+  import PostComposer from './PostComposer.svelte'
   import PostCard from './PostCard.svelte'
   import PlatformShell from './PlatformShell.svelte'
   import ActivityPage from './ActivityPage.svelte'
@@ -70,6 +72,7 @@
     nextCursor = $state<string | null>(null)
   let selectedPost = $state<Post | null>(null),
     replies = $state<Post[]>([]),
+    repliesCursor = $state<string | null>(null),
     selectedPage = $state<WikiPage | null>(null),
     proposals = $state<Proposal[]>([]),
     history = $state<
@@ -79,8 +82,6 @@
     feedTab = $state('new'),
     handle = $state(''),
     publishingConsent = $state(false),
-    replyText = $state(''),
-    replyParent = $state<string | null>(null),
     inviteHandle = $state('')
   let modal = $state<
     null | 'compose' | 'community' | 'wiki' | 'proposal' | 'manage' | 'join'
@@ -248,12 +249,24 @@
       } else saved = []
       if (parts[0] === 'square' && parts[1]) {
         const p = await request<Post>('/v1/posts/' + parts[1])
-        const thread = await request<{ items: Post[] }>(
-          '/v1/posts/' + p.id + '/replies',
-        )
+        const root =
+          p.rootId === p.id ? p : await request<Post>('/v1/posts/' + p.rootId)
+        const thread = await request<{
+          items: Post[]
+          nextCursor: string | null
+        }>('/v1/posts/' + root.id + '/replies')
         if (mine !== generation) return
-        selectedPost = p
-        replies = thread.items.reverse()
+        selectedPost = root
+        replies = thread.items
+        repliesCursor = thread.nextCursor
+        if (p.id !== root.id && !replies.some((r) => r.id === p.id))
+          replies = [...replies, p]
+        if (p.id !== root.id) {
+          await tick()
+          document
+            .getElementById('post-' + p.id)
+            ?.scrollIntoView({ block: 'center' })
+        }
       }
       if (parts[0] === 'wiki' && parts[1]) {
         const p = await request<WikiPage>('/v1/wiki/' + parts[1])
@@ -420,19 +433,6 @@
       )
       posts = [...posts, ...page.items]
       nextCursor = page.nextCursor
-    })
-  }
-  async function reply() {
-    if (!selectedPost || !replyText.trim()) return
-    await mutate(async () => {
-      await request('/v1/posts', {
-        communityId: selectedPost!.community_id,
-        text: replyText,
-        parentId: replyParent ?? selectedPost!.id,
-      })
-      replyText = ''
-      replyParent = null
-      await load()
     })
   }
   async function decide(p: Proposal, accept: boolean) {
@@ -875,88 +875,16 @@
           </Button>{/if}
       </div>{/if}
   {:else if parts[0] === 'square'}
-    <a href="/" class="cx-back"><ArrowLeft size={14} />Beranda</a>
-    {#if selectedPost}<PostCard
+    {#if selectedPost}<ThreadView
         post={selectedPost}
+        {replies}
+        cursor={repliesCursor}
         community={communities.find((c) => c.id === selectedPost!.community_id)}
-        loggedIn={!!auth.actor}
-        canVote={isMember(selectedPost.community_id)}
-        detail
+        actor={auth.actor}
+        member={isMember(selectedPost.community_id)}
         onError={notify}
-      />
-      <section id="replies" class="strata-card">
-        <h2 style="font-size:16px;margin-bottom:18px">
-          Diskusi <span class="cx-muted">{selectedPost.replies}</span>
-        </h2>
-        {#if auth.actor && isMember(selectedPost.community_id)}<form
-            class="cx-form"
-            onsubmit={(e) => {
-              e.preventDefault()
-              reply()
-            }}
-          >
-            {#if replyParent}<Button
-                class="cx-text-link"
-                type="button"
-                onclick={() => (replyParent = null)}
-                variant="outline"
-              >
-                Membalas · batal
-              </Button>{/if}
-            <Textarea
-              bind:value={replyText}
-              required
-              maxlength={6000}
-              placeholder="Tulis balasan…"
-              aria-label="Tulis balasan"
-            ></Textarea>
-            <div class="cx-actions">
-              <Button
-                class="cx-button primary small"
-                disabled={busy || !replyText.trim()}
-                type="submit"
-                variant="default"
-              >
-                Balas<Send size={13} />
-              </Button>
-            </div>
-          </form>{:else}<a
-            href={auth.actor
-              ? '/communities/' + selectedPost.community_id
-              : '/login'}
-            class="cx-text-link"
-          >
-            {auth.actor
-              ? 'Gabung komunitas untuk membalas'
-              : 'Masuk untuk membalas'}
-          </a>{/if}
-        <div class="strata-replies">
-          {#each replies as r}<article class="strata-reply">
-              <div class="cx-post-meta">
-                <a class="cx-author" href={'/people/' + r.author.id}>
-                  {r.author.name}
-                </a>
-                <span class="cx-meta-secondary">
-                  {relativeDate(r.created)}
-                </span>
-              </div>
-              <p class="strata-body">{r.text}</p>
-              {#if auth.actor && isMember(r.community_id)}<Button
-                  class="cx-text-link"
-                  onclick={() => {
-                    replyParent = r.id
-                    document
-                      .querySelector<HTMLTextAreaElement>('#replies textarea')
-                      ?.focus()
-                  }}
-                  type="button"
-                  variant="outline"
-                >
-                  Balas
-                </Button>{/if}
-            </article>{/each}
-        </div>
-      </section>{:else if !loading}<div class="strata-nodata">
+        onRefresh={load}
+      />{:else if !loading}<div class="strata-nodata">
         <h2>Posting tidak tersedia</h2>
       </div>{/if}
   {:else if parts[0] === 'people'}
@@ -1167,7 +1095,10 @@
     if (!value) modal = null
   }}
 >
-  <Dialog.Content class="platform-dialog" showCloseButton={true}>
+  <Dialog.Content
+    class={'platform-dialog' + (modal === 'compose' ? ' compose-dialog' : '')}
+    showCloseButton={true}
+  >
     <Dialog.Header>
       <Dialog.Title>
         {modal === 'compose'
@@ -1264,7 +1195,15 @@
             Tidak ada laporan yang menunggu.
           </p>{/if}
       </div>
-    {:else}<form
+    {:else if modal === 'compose' && auth.actor}<PostComposer
+        actor={auth.actor}
+        communities={communities.filter((c) => isMember(c.id))}
+        initialCommunity={communityId}
+        onPosted={(post) => {
+          modal = null
+          navigate('/square/' + post.id)
+        }}
+      />{:else}<form
         class="cx-form"
         style="margin-top:22px"
         onsubmit={(e) => {
@@ -1272,7 +1211,7 @@
           submit()
         }}
       >
-        {#if modal === 'compose' || modal === 'wiki'}<Label>
+        {#if modal === 'wiki'}<Label>
             Komunitas
             <NativeSelect.Root bind:value={communityId} required>
               {#each communities.filter( (c) => (modal === 'wiki' ? isSteward(c.id) && c.visibility === 'public' : isMember(c.id)) ) as c}<option
@@ -1307,8 +1246,7 @@
               </option>
             </NativeSelect.Root>
           </Label>{/if}
-        {#if modal === 'compose' || modal === 'join' || modal === 'proposal'}<Label
-          >
+        {#if modal === 'join' || modal === 'proposal'}<Label>
             {modal === 'join'
               ? 'Pesan untuk pengelola'
               : modal === 'proposal'
@@ -1323,7 +1261,7 @@
                   : 6000}
               required
               rows={modal === 'proposal' ? 10 : 5}
-              placeholder={modal === 'compose' ? 'Apa yang terjadi?' : ''}
+              placeholder=""
             ></Textarea>
           </Label>{/if}
         {#if modal === 'proposal'}<Label>
@@ -1346,34 +1284,20 @@
             Usulan hanya terlihat oleh penulis dan pengelola. Revisi diterbitkan
             setelah tinjauan manusia.
           </p>{/if}
-        {#if modal === 'compose'}{@const destination = communities.find(
-            (c) => c.id === communityId,
-          )}
-          <p class="strata-caption">
-            {#if destination?.visibility === 'public'}<Globe
-                size={13}
-              />Publik{#if destination.publication === 'atproto'}
-                · Akan masuk antrean AT{:else}
-                · Di Strata{/if}{:else}<LockKeyhole size={13} />Hanya anggota
-              komunitas{/if}
-          </p>{/if}
         {#if modalError}<p class="cx-form-error" role="alert">
             {modalError}
           </p>{/if}
         <Button
           class="cx-button primary"
-          disabled={busy ||
-            ((modal === 'compose' || modal === 'wiki') && !communityId)}
+          disabled={busy || (modal === 'wiki' && !communityId)}
           type="submit"
           variant="default"
         >
-          {#if busy}<LoaderCircle size={15} />{/if}{modal === 'compose'
-            ? 'Posting'
-            : modal === 'join'
-              ? 'Kirim permintaan'
-              : modal === 'proposal'
-                ? 'Ajukan untuk tinjauan'
-                : 'Buat'}<Send size={14} />
+          {#if busy}<LoaderCircle size={15} />{/if}{modal === 'join'
+            ? 'Kirim permintaan'
+            : modal === 'proposal'
+              ? 'Ajukan untuk tinjauan'
+              : 'Buat'}<Send size={14} />
         </Button>
       </form>{/if}
   </Dialog.Content>

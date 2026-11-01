@@ -24,6 +24,7 @@
     ChevronsUpDown,
     Building2,
     ListTodo,
+    ArrowLeft,
   } from '@lucide/svelte'
   import { appearance } from './appearance.svelte'
   import { initials, type Auth } from './api'
@@ -167,7 +168,17 @@
   </Sidebar.Footer>
 </Sidebar.Root>
 <Sidebar.Inset class="platform-inset">
-  <header class="cx-topbar">
+  <header class="cx-topbar" class:thread-topbar={path.startsWith('/square/')}>
+    {#if path.startsWith('/square/')}<Button
+        href="/"
+        variant="ghost"
+        size="icon"
+        class="thread-back"
+        aria-label="Kembali ke beranda"
+      >
+        <ArrowLeft size={22} />
+      </Button>
+      <span class="thread-heading">Percakapan</span>{/if}
     <Button
       variant="ghost"
       size="icon"
@@ -256,7 +267,11 @@
     </aside>
   </div>
 </Sidebar.Inset>
-<nav class="cx-mobile-dock" aria-label="Navigasi seluler">
+<nav
+  class="cx-mobile-dock"
+  class:thread-dock={path.startsWith('/square/')}
+  aria-label="Navigasi seluler"
+>
   <Button
     href="/"
     variant="ghost"

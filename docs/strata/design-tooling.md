@@ -28,3 +28,13 @@ Skill reference: https://github.com/Leonxlnx/taste-skill/tree/v2.1.5/skills/tast
 Libraries: https://www.cult-ui.com · https://www.shadcn-svelte.com/docs · https://bits-ui.com/docs/introduction
 
 All installation, builds, screenshots and audits run in the cloud. The owner's phone has no build/install requirement. Tool output alone is not visual approval or a security audit; inspect screenshots and test real interaction/accessibility states.
+
+## Threads-style conversation pass
+
+Installed the full [heydamir/unslop](https://github.com/heydamir/unslop) skill in `/workspace/.agents/skills/unslop`, pinned to `1d13095e4bef6ad6c74f1dd828d84c4ba309a4dc`. Created by Damir Sokolovsky (@heydamir), licensed CC BY 4.0; creator credit and source link are retained in this adaptation. Skill files/references/LICENSE are installed together. No external skill scripts or packages were executed for installation.
+
+The owner explicitly authorized implementation using supplied Threads/Bluesky screenshots, so Unslop's “skip the wait only when the user already said to just do it” applies. Direction: a public square for people and institutions; conversational, warm, grounded; quiet ink and paper surfaces; richness in posted images and people; an avatar connector as the consistent thread detail. Existing Instrument Sans and customizable Abstraksi/Aksara colors remain. This task is a forum, so its 640–680px reading column takes precedence over the skill's generic dashboard-width example.
+
+Audit: feed padding and line height inflated each row; reply cards lacked avatars, hierarchy and actions; the outline reply button looked like a form control; the shared creation modal imposed an oversized settings-form layout; reply links lost their specific target; cursor replies were not exposed in UI. Implementation follows spacing, palette, icon, copy/type, layout, details and purposeful motion passes. New controls use existing shadcn primitives and Lucide. No decorative animation, hero visual or synthetic deployed content was added.
+
+Taste's app inspector reports no FAIL findings with the explicit palette allowances; the real empty fixture retains a desktop empty-space warning. Populated fixture screenshots cover thread, nested branch and composer on phone/desktop. Browser contracts exercise actual Strata API/SQLite, gallery upload/alt text/viewer, reply nesting/collapse/actions and the existing governance/MLS flows. Physical phone keyboard behavior is still an operational check.

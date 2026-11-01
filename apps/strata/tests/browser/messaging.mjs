@@ -49,7 +49,7 @@ async function client(actor, width = 1280) {
     await r.fulfill({
       status: response.status,
       headers: Object.fromEntries(response.headers),
-      body: await response.text(),
+      body: Buffer.from(await response.arrayBuffer()),
     })
   })
   return p

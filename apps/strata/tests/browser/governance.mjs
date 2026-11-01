@@ -39,7 +39,7 @@ try {
     await r.fulfill({
       status: response.status,
       headers: Object.fromEntries(response.headers),
-      body: await response.text(),
+      body: Buffer.from(await response.arrayBuffer()),
     })
   })
   await p.goto(origin + '/groups', { waitUntil: 'networkidle' })
@@ -221,6 +221,7 @@ try {
     await p.evaluate(() => document.documentElement.scrollWidth > innerWidth),
     false,
   )
+  await p.getByRole('link', { name: 'Kembali ke beranda', exact: true }).click()
   await p.getByRole('button', { name: 'Buka pencarian', exact: true }).click()
   await p.getByLabel('Cari percakapan', { exact: true }).fill('Synthetic')
   await p.getByLabel('Cari percakapan', { exact: true }).press('Enter')

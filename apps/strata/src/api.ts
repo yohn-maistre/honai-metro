@@ -13,7 +13,16 @@ export type Community = {
   publication: 'local' | 'atproto'
   automation: number
 }
+export type MediaAttachment = {
+  id: string
+  url: string
+  alt: string
+  width: number
+  height: number
+}
 export type Post = {
+  media?: MediaAttachment[]
+  directReplies?: number
   id: string
   author_id: string
   author: Actor

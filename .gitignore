@@ -25,3 +25,6 @@ pnpm-lock.yaml
 
 # Independently built Strata surface
 /apps/strata/dist/
+
+# Local design audit captures and generated direction sheets
+.taste-skill/

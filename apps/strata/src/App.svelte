@@ -2,18 +2,11 @@
   import { onMount } from 'svelte'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
   import {
-    Home,
-    Compass,
     Users,
     Bookmark,
     BookOpen,
-    Search,
-    Settings2,
-    Menu,
     X,
     Plus,
-    Sun,
-    Moon,
     ArrowUpRight,
     ArrowLeft,
     Send,
@@ -23,6 +16,7 @@
     RefreshCw,
     LoaderCircle,
     MessageCircle,
+    MessageSquare,
     ChevronRight,
     LogOut,
     FileText,
@@ -30,6 +24,21 @@
     History,
   } from '@lucide/svelte'
   import PostCard from './PostCard.svelte'
+  import PlatformShell from './PlatformShell.svelte'
+  import ActivityPage from './ActivityPage.svelte'
+  import AppearancePanel from './AppearancePanel.svelte'
+  import LoginForm from '$lib/components/login-form.svelte'
+  import FeaturePages from './FeaturePages.svelte'
+  import { applyAppearance, restoreAppearance } from './appearance.svelte'
+  import { Button } from '$lib/components/ui/button/index.js'
+  import { Input } from '$lib/components/ui/input/index.js'
+  import { Textarea } from '$lib/components/ui/textarea/index.js'
+  import { Label } from '$lib/components/ui/label/index.js'
+  import * as NativeSelect from '$lib/components/ui/native-select/index.js'
+  import * as Card from '$lib/components/ui/card/index.js'
+  import * as Dialog from '$lib/components/ui/dialog/index.js'
+  import * as Tabs from '$lib/components/ui/tabs/index.js'
+  import { Badge } from '$lib/components/ui/badge/index.js'
   import {
     request,
     setCsrf,
@@ -43,16 +52,15 @@
     type Proposal,
     type Auth,
     type Capabilities,
+    type ActivityInbox,
   } from './api'
   let path = $state(location.pathname),
     search = $state(location.search),
     loading = $state(true),
     busy = $state(false),
     message = $state(''),
-    error = $state(''),
-    menu = $state(false)
-  let theme = $state<'light' | 'dark'>('dark'),
-    auth = $state<Auth>({ actor: null, csrf: null, steward: false }),
+    error = $state('')
+  let auth = $state<Auth>({ actor: null, csrf: null, steward: false }),
     cap = $state<Capabilities | null>(null)
   let communities = $state<Community[]>([]),
     posts = $state<Post[]>([]),
@@ -69,17 +77,14 @@
     >([])
   let tab = $state('discussion'),
     feedTab = $state('new'),
-    query = $state(''),
     handle = $state(''),
     publishingConsent = $state(false),
     replyText = $state(''),
     replyParent = $state<string | null>(null),
     inviteHandle = $state('')
   let modal = $state<
-      null | 'compose' | 'community' | 'wiki' | 'proposal' | 'manage' | 'join'
-    >(null),
-    dialog: HTMLDialogElement,
-    menuDialog: HTMLDialogElement
+    null | 'compose' | 'community' | 'wiki' | 'proposal' | 'manage' | 'join'
+  >(null)
   let text = $state(''),
     title = $state(''),
     description = $state(''),
@@ -95,6 +100,7 @@
     reports = $state<
       { id: string; post_id: string; reason: string; state: string }[]
     >([])
+  let unread = $state(0)
   let generation = 0,
     notificationTimer: ReturnType<typeof setTimeout> | undefined
   const parts = $derived(path.split('/').filter(Boolean)),
@@ -137,15 +143,18 @@
                       ? 'Percakapan'
                       : parts[0] === 'people'
                         ? 'Profil'
-                        : 'Strata',
+                        : parts[0] === 'messages'
+                          ? 'Pesan'
+                          : parts[0] === 'notifications'
+                            ? 'Aktivitas'
+                            : parts[0] === 'groups'
+                              ? 'Organisasi & kelompok'
+                              : parts[0] === 'work'
+                                ? 'Kerja publik'
+                                : parts[0] === 'contexts'
+                                  ? 'Konteks'
+                                  : 'ETNOS',
   )
-  const nav = [
-    { href: '/', label: 'Beranda', icon: Home },
-    { href: '/explore', label: 'Jelajah', icon: Compass },
-    { href: '/communities', label: 'Komunitas', icon: Users },
-    { href: '/wiki', label: 'Wiki', icon: BookOpen },
-    { href: '/saved', label: 'Tersimpan', icon: Bookmark },
-  ]
   function notify(value: string) {
     message = value
     clearTimeout(notificationTimer)
@@ -169,7 +178,6 @@
     window.history.pushState({}, '', u)
     path = u.pathname
     search = u.search
-    menu = false
     tab = 'discussion'
   }
   function intercept(e: MouseEvent) {
@@ -225,6 +233,10 @@
       memberships = roles
       cap = features
       nextCursor = feed.nextCursor
+      unread = identity.actor
+        ? (await request<ActivityInbox>('/v1/notifications')).unread
+        : 0
+      if (mine !== generation) return
       selectedPost = null
       replies = []
       selectedPage = null
@@ -434,31 +446,10 @@
     })
   }
   $effect(() => {
-    document.documentElement.dataset.commonsTheme = theme
-    document.documentElement.style.colorScheme = theme
-    try {
-      localStorage.setItem('strata.ui.theme', theme)
-    } catch {
-      /* Presentation preferences are optional. */
-    }
-  })
-  $effect(() => {
-    if (!menuDialog) return
-    if (menu && !menuDialog.open) menuDialog.showModal()
-    else if (!menu && menuDialog.open) menuDialog.close()
-  })
-  $effect(() => {
-    if (!dialog) return
-    if (modal && !dialog.open) dialog.showModal()
-    else if (!modal && dialog.open) dialog.close()
+    applyAppearance()
   })
   onMount(() => {
-    try {
-      const value = localStorage.getItem('strata.ui.theme')
-      if (value === 'light' || value === 'dark') theme = value
-    } catch {
-      /* Presentation preferences are optional. */
-    }
+    restoreAppearance()
     void load()
     return () => clearTimeout(notificationTimer)
   })
@@ -473,1076 +464,911 @@
     void load()
   }}
 />
-<div class="cx-root">
-  <a class="cx-skip" href="#commons-main">Lewati navigasi</a>
-  {#snippet navigation()}
-    <a href="/" class="cx-brand">
-      etnos
-      <span>.</span>
-    </a>
-    <nav class="cx-nav" aria-label="Navigasi utama">
-      {#each nav as item}<a
-          href={item.href}
-          class:active={item.href === '/'
-            ? path === '/'
-            : path.startsWith(item.href)}
-          aria-current={(
-            item.href === '/' ? path === '/' : path.startsWith(item.href)
-          )
-            ? 'page'
-            : undefined}
-        >
-          <item.icon size={20} strokeWidth={1.7} />
-          <span>{item.label}</span>
-        </a>{/each}
-    </nav>
-    <button class="cx-nav-create" onclick={() => open('compose')}>
-      <Plus size={19} />Posting
-    </button>
-    <div class="cx-sidebar-bottom">
-      <a href="/preferences" class="cx-nav-more">
-        <Settings2 size={19} />Pengaturan
-      </a>
-      {#if auth.actor}<a
-          href={'/people/' + auth.actor.id}
-          class="cx-current-user"
-        >
-          <span class="cx-avatar sage small">{initials(auth.actor.name)}</span>
-          <span>
-            <strong>{auth.actor.name}</strong>
-            <small>Akun AT terhubung</small>
-          </span>
-        </a>{:else}<a href="/login" class="cx-button primary">Masuk</a>{/if}
-      <span class="cx-workspace-label">
-        <span></span>
-        Papua · pratinjau
-      </span>
-    </div>
-  {/snippet}
-  <aside class="cx-sidebar">{@render navigation()}</aside>
-  <div class="cx-workspace">
-    <header class="cx-topbar">
-      <a href="/" class="cx-mobile-brand">
-        etnos
-        <span>.</span>
-      </a>
-      <div class="cx-location">
-        <span>Papua</span>
-        <span>/</span>
-        <strong>{heading}</strong>
-      </div>
-      <form
-        class="cx-global-search"
-        onsubmit={(e) => {
-          e.preventDefault()
-          navigate('/find?q=' + encodeURIComponent(query))
-        }}
+<PlatformShell
+  {path}
+  {heading}
+  {auth}
+  {unread}
+  onCompose={() => open('compose')}
+  onSearch={(q) => navigate('/find?q=' + encodeURIComponent(q))}
+>
+  {#if loading}<div
+      class="strata-card strata-inline strata-pending"
+      role="status"
+    >
+      <LoaderCircle size={18} />Memuat…
+    </div>{/if}
+  {#if error}<div class="strata-card">
+      <p class="strata-alert" role="alert">{error}</p>
+      <Button
+        class="cx-button small"
+        style="margin-top:14px"
+        onclick={() => load()}
+        type="button"
+        variant="outline"
       >
-        <Search size={17} />
-        <input
-          bind:value={query}
-          placeholder="Cari percakapan"
-          aria-label="Cari percakapan"
-          style="background:none;border:0;outline:none;min-width:0;width:100%;color:inherit"
-        />
-      </form>
-      <div class="cx-topbar-actions">
-        <button
-          class="cx-icon-button"
-          aria-label={theme === 'dark' ? 'Tema terang' : 'Tema gelap'}
-          onclick={() => (theme = theme === 'dark' ? 'light' : 'dark')}
+        <RefreshCw size={14} />Coba lagi
+      </Button>
+    </div>
+  {:else if path === '/login'}
+    <h1 class="sr-only">Masuk</h1>
+    <section class="strata-narrow">
+      <LoginForm
+        bind:handle
+        bind:publishing={publishingConsent}
+        livePublishing={!!cap?.publication.liveAT}
+        {busy}
+        failed={new SvelteURLSearchParams(search).has('error')}
+        onsubmit={login}
+      />
+    </section>
+  {:else if path === '/preferences'}
+    <div class="cx-page-head"><h1>Pengaturan</h1></div>
+    <Card.Root class="strata-card strata-preferences">
+      <AppearancePanel />
+      {#if auth.actor}<div>
+          <strong>{auth.actor.name}</strong>
+          <p class="cx-hint" style="overflow-wrap:anywhere">
+            {auth.actor.did}
+          </p>
+        </div>
+        <p class="cx-hint">
+          Akun tetap berada di PDS asal. Tidak ada migrasi akun.
+        </p>
+        <Button
+          class="cx-button"
+          disabled={busy}
+          onclick={logout}
+          type="button"
+          variant="outline"
         >
-          {#if theme === 'dark'}<Sun size={18} />{:else}<Moon size={18} />{/if}
-        </button>
-        <button
-          class="cx-icon-button cx-mobile-menu"
-          aria-label="Menu"
-          onclick={() => (menu = true)}
-        >
-          <Menu size={20} />
-        </button>
-      </div>
-    </header>
-    <div class="cx-content-grid">
-      <main id="commons-main" class="cx-main" tabindex="-1">
-        {#if loading}<div
-            class="strata-card strata-inline strata-pending"
-            role="status"
+          <LogOut size={16} />Keluar dari perangkat ini
+        </Button>
+        {#if auth.steward}<form
+            class="cx-form"
+            onsubmit={(e) => {
+              e.preventDefault()
+              mutate(async () => {
+                await request('/auth/invite', { handle: inviteHandle })
+                inviteHandle = ''
+                notify(
+                  'Akun dapat masuk. Keanggotaan komunitas tetap terpisah.',
+                )
+              })
+            }}
           >
-            <LoaderCircle size={18} />Memuat…
-          </div>{/if}
-        {#if error}<div class="strata-card">
-            <p class="strata-alert" role="alert">{error}</p>
-            <button
+            <Label>
+              Undang akun ke Strata
+              <Input
+                bind:value={inviteHandle}
+                placeholder="nama.domain"
+                required
+              />
+            </Label>
+            <Button
               class="cx-button small"
-              style="margin-top:14px"
-              onclick={() => load()}
+              disabled={busy}
+              type="submit"
+              variant="outline"
             >
-              <RefreshCw size={14} />Coba lagi
-            </button>
+              Undang akun
+            </Button>
+          </form>{/if}{:else}<Button
+          href="/login"
+          class="cx-button primary"
+          variant="default"
+        >
+          Masuk
+        </Button>{/if}
+    </Card.Root>
+  {:else if parts[0] === 'messages'}
+    {#await import('./MessagingPage.svelte') then module}<module.default
+        {auth}
+        {path}
+        {search}
+        {navigate}
+      />{/await}
+  {:else if path === '/notifications'}
+    <ActivityPage
+      {auth}
+      {navigate}
+      onError={notify}
+      onUnread={(n) => (unread = n)}
+    />
+  {:else if ['groups', 'work', 'contexts', 'explore'].includes(parts[0])}
+    <FeaturePages {path} {auth} onError={notify} {navigate} />
+  {:else if parts[0] === 'wiki'}
+    <div class="cx-page-head">
+      <h1>{selectedPage?.title ?? 'Wiki'}</h1>
+      {#if !selectedPage && memberships.some((m) => m.role !== 'member')}<Button
+          class="cx-button small"
+          onclick={() => open('wiki')}
+          type="button"
+          variant="outline"
+        >
+          <Plus size={14} />Halaman
+        </Button>{/if}
+    </div>
+    {#if selectedPage}<Card.Root class="strata-card">
+        <a href="/wiki" class="cx-back"><ArrowLeft size={14} />Wiki</a>
+        {#if selectedPage.revision}<p class="strata-caption">
+            <FileText size={14} />{selectedPage.revision.language} · {selectedPage
+              .revision.perspective}
+          </p>
+          <div class="cx-document strata-body" style="margin:20px 0">
+            {selectedPage.revision.text}
           </div>
-        {:else if path === '/login'}
-          <div class="cx-page-head">
-            <h1>Masuk</h1>
-            <span class="strata-pill">AT Protocol</span>
-          </div>
-          <section class="strata-narrow">
-            <form
-              class="cx-form"
-              onsubmit={(e) => {
-                e.preventDefault()
-                login()
-              }}
+          {#each selectedPage.revision.citations as url}<a
+              class="strata-source"
+              href={url}
+              target="_blank"
+              rel="noreferrer"
             >
-              <label>
-                Handle akun
-                <input
-                  bind:value={handle}
-                  placeholder="giyaibo.bsky.social"
-                  autocomplete="username"
-                  autocapitalize="none"
-                  spellcheck="false"
-                  required
-                />
-              </label>
-              <p class="cx-hint">
-                Kata sandi tetap di penyedia akunmu. Keanggotaan komunitas
-                memerlukan persetujuan tersendiri.
+              {url}<ArrowUpRight size={12} />
+            </a>{/each}{:else}<p class="cx-muted">
+            Belum ada revisi yang diterima.
+          </p>{/if}{#if isMember(selectedPage.community_id)}<Button
+            class="cx-button small"
+            style="margin-top:18px"
+            onclick={() => {
+              open('proposal')
+              text = selectedPage?.revision?.text ?? ''
+              language = selectedPage?.revision?.language ?? 'id'
+              perspective = selectedPage?.revision?.perspective ?? ''
+              citations = selectedPage?.revision?.citations.join('\n') ?? ''
+            }}
+            type="button"
+            variant="outline"
+          >
+            <GitPullRequest size={14} />Usulkan perubahan
+          </Button>{/if}
+      </Card.Root>
+      {#if proposals.length}<Card.Root class="strata-card">
+          <h2 style="font-size:16px">Usulan</h2>
+          {#each proposals as p}<article class="strata-review">
+              <Badge variant="secondary">
+                {p.state === 'pending'
+                  ? 'Menunggu tinjauan'
+                  : p.state === 'accepted'
+                    ? 'Diterima'
+                    : 'Ditolak'}
+              </Badge>
+              <p class="strata-caption" style="margin-top:12px">
+                {p.language} · {p.perspective}
               </p>
-              {#if cap?.publication.liveAT}<label class="strata-inline">
-                  <input type="checkbox" bind:checked={publishingConsent} />
-                  Hubungkan penerbitan Strata ke AT
-                </label>{/if}{#if new SvelteURLSearchParams(search).has('error')}<p
-                  class="cx-form-error"
-                  role="alert"
+              <p class="strata-body">{p.text}</p>
+              {#each p.citations as url}<a
+                  class="strata-source"
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
                 >
-                  Sesi masuk belum selesai atau sudah berakhir. Coba lagi dari
-                  halaman ini.
-                </p>{/if}
-              <button class="cx-button primary" disabled={busy}>
-                {#if busy}<LoaderCircle size={16} />{/if}Lanjutkan<ArrowUpRight
-                  size={15}
-                />
-              </button>
-            </form>
-            <p class="cx-hint" style="margin-top:25px">
-              Pratinjau ini menerima akun yang diundang. Belum punya akun AT? <a
-                class="cx-text-link"
-                href="https://bsky.app"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Buat akun di penyedia AT ↗
-              </a>
-            </p>
-          </section>
-        {:else if path === '/preferences'}
-          <div class="cx-page-head"><h1>Pengaturan</h1></div>
-          <section class="strata-card strata-preferences">
-            <label class="cx-form">
-              Tampilan
-              <select bind:value={theme}>
-                <option value="dark">Gelap</option>
-                <option value="light">Terang</option>
-              </select>
-            </label>
-            {#if auth.actor}<div>
-                <strong>{auth.actor.name}</strong>
-                <p class="cx-hint" style="overflow-wrap:anywhere">
-                  {auth.actor.did}
-                </p>
-              </div>
-              <p class="cx-hint">
-                Akun tetap berada di PDS asal. Tidak ada migrasi akun.
-              </p>
-              <button class="cx-button" disabled={busy} onclick={logout}>
-                <LogOut size={16} />Keluar dari perangkat ini
-              </button>
-              {#if auth.steward}<form
-                  class="cx-form"
-                  onsubmit={(e) => {
-                    e.preventDefault()
-                    mutate(async () => {
-                      await request('/auth/invite', { handle: inviteHandle })
-                      inviteHandle = ''
-                      notify(
-                        'Akun dapat masuk. Keanggotaan komunitas tetap terpisah.',
-                      )
-                    })
-                  }}
+                  {url}
+                </a>{/each}{#if p.state === 'pending' && isSteward(selectedPage.community_id)}<div
+                  class="cx-actions"
+                  style="margin-top:16px"
                 >
-                  <label>
-                    Undang akun ke Strata
-                    <input
-                      bind:value={inviteHandle}
-                      placeholder="nama.domain"
-                      required
-                    />
-                  </label>
-                  <button class="cx-button small" disabled={busy}>
-                    Undang akun
-                  </button>
-                </form>{/if}{:else}<a href="/login" class="cx-button primary">
-                Masuk
-              </a>{/if}
-          </section>
-        {:else if parts[0] === 'wiki'}
-          <div class="cx-page-head">
-            <h1>{selectedPage?.title ?? 'Wiki'}</h1>
-            {#if !selectedPage && memberships.some((m) => m.role !== 'member')}<button
-                class="cx-button small"
-                onclick={() => open('wiki')}
-              >
-                <Plus size={14} />Halaman
-              </button>{/if}
-          </div>
-          {#if selectedPage}<section class="strata-card">
-              <a href="/wiki" class="cx-back"><ArrowLeft size={14} />Wiki</a>
-              {#if selectedPage.revision}<p class="strata-caption">
-                  <FileText size={14} />{selectedPage.revision.language} · {selectedPage
-                    .revision.perspective}
-                </p>
-                <div class="cx-document strata-body" style="margin:20px 0">
-                  {selectedPage.revision.text}
-                </div>
-                {#each selectedPage.revision.citations as url}<a
-                    class="strata-source"
-                    href={url}
-                    target="_blank"
-                    rel="noreferrer"
+                  <Button
+                    class="cx-button primary small"
+                    disabled={busy}
+                    onclick={() => decide(p, true)}
+                    type="button"
+                    variant="default"
                   >
-                    {url}<ArrowUpRight size={12} />
-                  </a>{/each}{:else}<p class="cx-muted">
-                  Belum ada revisi yang diterima.
-                </p>{/if}{#if isMember(selectedPage.community_id)}<button
-                  class="cx-button small"
-                  style="margin-top:18px"
-                  onclick={() => {
-                    open('proposal')
-                    text = selectedPage?.revision?.text ?? ''
-                    language = selectedPage?.revision?.language ?? 'id'
-                    perspective = selectedPage?.revision?.perspective ?? ''
-                    citations =
-                      selectedPage?.revision?.citations.join('\n') ?? ''
-                  }}
-                >
-                  <GitPullRequest size={14} />Usulkan perubahan
-                </button>{/if}
-            </section>
-            {#if proposals.length}<section class="strata-card">
-                <h2 style="font-size:16px">Usulan</h2>
-                {#each proposals as p}<article class="strata-review">
-                    <span class="strata-pill">
-                      {p.state === 'pending'
-                        ? 'Menunggu tinjauan'
-                        : p.state === 'accepted'
-                          ? 'Diterima'
-                          : 'Ditolak'}
-                    </span>
-                    <p class="strata-caption" style="margin-top:12px">
-                      {p.language} · {p.perspective}
-                    </p>
-                    <p class="strata-body">{p.text}</p>
-                    {#each p.citations as url}<a
-                        class="strata-source"
-                        href={url}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        {url}
-                      </a>{/each}{#if p.state === 'pending' && isSteward(selectedPage.community_id)}<div
-                        class="cx-actions"
-                        style="margin-top:16px"
-                      >
-                        <button
-                          class="cx-button primary small"
-                          disabled={busy}
-                          onclick={() => decide(p, true)}
-                        >
-                          Terima revisi
-                        </button>
-                        <button
-                          class="cx-button small"
-                          disabled={busy}
-                          onclick={() => decide(p, false)}
-                        >
-                          Tolak
-                        </button>
-                      </div>{/if}
-                  </article>{/each}
-              </section>{/if}
-            {#if history.length}<section class="strata-card">
-                <h2 class="strata-inline" style="font-size:16px">
-                  <History size={16} />Riwayat
-                </h2>
-                {#each history as rev}<div class="cx-list-row">
-                    <FileText size={16} />
-                    <div>
-                      <strong>{rev.perspective}</strong>
-                      <small>
-                        {rev.language} · {relativeDate(rev.created)}
-                      </small>
-                    </div>
-                  </div>{/each}
-              </section>{/if}
-          {:else if wiki.length}<section>
-              {#each wiki as p}<a
-                  href={'/wiki/' + p.id}
-                  class="cx-list-row strata-card"
-                >
-                  <span class="cx-object-icon"><BookOpen size={20} /></span>
-                  <div>
-                    <h3>{p.title}</h3>
-                    <small>
-                      {communities.find((c) => c.id === p.community_id)?.title} ·
-                      {p.revision_id
-                        ? 'Ada revisi diterima'
-                        : 'Belum ada revisi'}
-                    </small>
-                  </div>
-                  <ChevronRight size={16} />
-                </a>{/each}
-            </section>{:else}<div class="strata-nodata">
-              <div class="strata-empty-graphic"><BookOpen size={27} /></div>
-              <h2>Pengetahuan yang bisa ditinjau bersama</h2>
-              <p>
-                Halaman, sumber dan revisi yang diterima akan muncul di sini.
-              </p>
-              <a class="cx-button" href="/communities">Lihat komunitas</a>
-            </div>{/if}
-        {:else if parts[0] === 'communities' && parts[1]}
-          {#if community}<div class="cx-detail-head">
-              <div class="cx-between">
-                <span class="cx-avatar sage">{initials(community.title)}</span>
-                {#if currentMembership}<span class="strata-pill">
-                    {currentMembership.role === 'member'
-                      ? 'Anggota'
-                      : currentMembership.role === 'owner'
-                        ? 'Pemilik'
-                        : 'Moderator'}
-                  </span>{:else if community.admission === 'open'}<button
+                    Terima revisi
+                  </Button>
+                  <Button
                     class="cx-button small"
                     disabled={busy}
-                    onclick={() =>
-                      mutate(async () => {
-                        await request(
-                          `/v1/communities/${community.id}/join`,
-                          {},
-                        )
-                        await load()
-                      })}
+                    onclick={() => decide(p, false)}
+                    type="button"
+                    variant="outline"
                   >
-                    Gabung
-                  </button>{:else if community.admission === 'approval'}<button
-                    class="cx-button small"
-                    onclick={() => open('join', community.id)}
-                  >
-                    Minta bergabung
-                  </button>{:else}<span class="strata-pill">
-                    Dengan undangan
-                  </span>{/if}
-              </div>
-              <h1>{community.title}</h1>
-              <p>{community.description}</p>
-              <div class="strata-caption">
-                {#if community.visibility === 'public'}<Globe
-                    size={13}
-                  />Publik{:else}<LockKeyhole size={13} />Khusus anggota{/if}
-                <span>·</span>
-                {community.publication === 'atproto'
-                  ? 'Penerbitan AT tersedia'
-                  : 'Percakapan di Strata'}
-              </div>
-              <div class="cx-actions" style="margin-top:18px">
-                {#if currentMembership}<button
-                    class="cx-button primary small"
-                    onclick={() => open('compose', community.id)}
-                  >
-                    <Plus size={14} />Posting
-                  </button>{/if}{#if isSteward(community.id)}<button
-                    class="cx-button small"
-                    onclick={() => open('manage', community.id)}
-                  >
-                    <ShieldCheck size={14} />Kelola
-                  </button>{/if}
-              </div>
-            </div>
-            <div class="strata-tabs">
-              <button
-                class:active={tab === 'discussion'}
-                onclick={() => (tab = 'discussion')}
-              >
-                Diskusi
-              </button>
-              <button
-                class:active={tab === 'wiki'}
-                onclick={() => (tab = 'wiki')}
-              >
-                Wiki
-              </button>
-              <button
-                class:active={tab === 'about'}
-                onclick={() => (tab = 'about')}
-              >
-                Tentang
-              </button>
-            </div>
-            {#if tab === 'about'}<section class="strata-card">
-                <p class="strata-body">{community.description}</p>
-                <p class="cx-hint">
-                  {community.visibility === 'public'
-                    ? 'Isi dapat dibaca publik.'
-                    : 'Isi hanya tersedia bagi anggota saat ini.'}
-                  {community.admission === 'approval'
-                    ? 'Permintaan bergabung ditinjau pengelola.'
-                    : community.admission === 'invite'
-                      ? 'Keanggotaan melalui undangan.'
-                      : 'Keanggotaan terbuka.'}
-                </p>
-              </section>{:else if tab === 'wiki'}<section class="strata-card">
-                {#each wiki.filter((p) => p.community_id === community.id) as p}<a
-                    href={'/wiki/' + p.id}
-                    class="cx-list-row"
-                  >
-                    <BookOpen size={18} />{p.title}<ChevronRight size={15} />
-                  </a>{/each}{#if isSteward(community.id) && community.visibility === 'public'}<button
-                    class="cx-button small"
-                    onclick={() => open('wiki', community.id)}
-                  >
-                    <Plus size={14} />Halaman baru
-                  </button>{/if}
-              </section>{:else}{#each posts as p}<PostCard
-                  post={p}
-                  {community}
-                  loggedIn={!!auth.actor}
-                  canVote={!!currentMembership}
-                  onError={notify}
-                />{/each}{#if !posts.length && !loading}<div
-                  class="strata-nodata"
-                >
-                  <MessageCircle size={26} />
-                  <h2>Belum ada percakapan</h2>
-                  <p>
-                    {currentMembership
-                      ? 'Mulai percakapan pertama.'
-                      : 'Gabung komunitas untuk ikut berbicara.'}
-                  </p>
-                </div>{/if}{/if}
-          {:else if !loading}<div class="strata-nodata">
-              <LockKeyhole size={26} />
-              <h2>Komunitas tidak tersedia</h2>
-              <p>Komunitas mungkin tidak ada atau memerlukan akses.</p>
-              <a href="/communities" class="cx-button">Komunitas</a>
-            </div>{/if}
-        {:else if path === '/communities' || path === '/explore'}
-          <div class="cx-page-head">
-            <h1>{path === '/explore' ? 'Jelajah' : 'Komunitas'}</h1>
-            {#if auth.actor}<button
-                class="cx-button small"
-                onclick={() => open('community')}
-              >
-                <Plus size={14} />Komunitas
-              </button>{/if}
-          </div>
-          <div class="strata-mosaic">
-            {#each communities as c}<a
-                href={'/communities/' + c.id}
-                class="strata-tile"
-              >
-                <div class="cx-between">
-                  <span class="cx-avatar sage small">{initials(c.title)}</span>
-                  <ArrowUpRight size={18} />
-                </div>
-                <div>
-                  <h2>{c.title}</h2>
-                  <p>{c.description}</p>
-                  <span class="strata-small">
-                    {c.visibility === 'public'
-                      ? 'Publik'
-                      : 'Khusus anggota'}{isMember(c.id) ? ' · Bergabung' : ''}
-                  </span>
-                </div>
-              </a>{/each}
-          </div>
-          {#if !communities.length && !loading}<div class="strata-nodata">
-              <div class="strata-empty-graphic"><Users size={27} /></div>
-              <h2>Ruang untuk komunitasmu</h2>
-              <p>
-                Komunitas pertama dibuat setelah steward menyelesaikan proses
-                masuk.
-              </p>
-              {#if !auth.actor}<a href="/login" class="cx-button primary">
-                  Masuk
-                </a>{/if}
-            </div>{/if}
-        {:else if parts[0] === 'square'}
-          <a href="/" class="cx-back"><ArrowLeft size={14} />Beranda</a>
-          {#if selectedPost}<PostCard
-              post={selectedPost}
-              community={communities.find(
-                (c) => c.id === selectedPost!.community_id,
-              )}
-              loggedIn={!!auth.actor}
-              canVote={isMember(selectedPost.community_id)}
-              detail
-              onError={notify}
-            />
-            <section id="replies" class="strata-card">
-              <h2 style="font-size:16px;margin-bottom:18px">
-                Diskusi <span class="cx-muted">{selectedPost.replies}</span>
-              </h2>
-              {#if auth.actor && isMember(selectedPost.community_id)}<form
-                  class="cx-form"
-                  onsubmit={(e) => {
-                    e.preventDefault()
-                    reply()
-                  }}
-                >
-                  {#if replyParent}<button
-                      class="cx-text-link"
-                      type="button"
-                      onclick={() => (replyParent = null)}
-                    >
-                      Membalas · batal
-                    </button>{/if}
-                  <textarea
-                    bind:value={replyText}
-                    required
-                    maxlength="6000"
-                    placeholder="Tulis balasan…"
-                    aria-label="Tulis balasan"
-                  ></textarea>
-                  <div class="cx-actions">
-                    <button
-                      class="cx-button primary small"
-                      disabled={busy || !replyText.trim()}
-                    >
-                      Balas<Send size={13} />
-                    </button>
-                  </div>
-                </form>{:else}<a
-                  href={auth.actor
-                    ? '/communities/' + selectedPost.community_id
-                    : '/login'}
-                  class="cx-text-link"
-                >
-                  {auth.actor
-                    ? 'Gabung komunitas untuk membalas'
-                    : 'Masuk untuk membalas'}
-                </a>{/if}
-              <div class="strata-replies">
-                {#each replies as r}<article class="strata-reply">
-                    <div class="cx-post-meta">
-                      <a class="cx-author" href={'/people/' + r.author.id}>
-                        {r.author.name}
-                      </a>
-                      <span class="cx-meta-secondary">
-                        {relativeDate(r.created)}
-                      </span>
-                    </div>
-                    <p class="strata-body">{r.text}</p>
-                    {#if auth.actor && isMember(r.community_id)}<button
-                        class="cx-text-link"
-                        onclick={() => {
-                          replyParent = r.id
-                          document
-                            .querySelector<HTMLTextAreaElement>(
-                              '#replies textarea',
-                            )
-                            ?.focus()
-                        }}
-                      >
-                        Balas
-                      </button>{/if}
-                  </article>{/each}
-              </div>
-            </section>{:else if !loading}<div class="strata-nodata">
-              <h2>Posting tidak tersedia</h2>
-            </div>{/if}
-        {:else if parts[0] === 'people'}
-          {@const actor =
-            auth.actor?.id === parts[1]
-              ? auth.actor
-              : posts.find((p) => p.author.id === parts[1])
-                  ?.author}{#if actor}<div class="cx-detail-head">
-              <span class="cx-avatar sage">{initials(actor.name)}</span>
-              <h1>{actor.name}</h1>
-              <p class="cx-hint" style="overflow-wrap:anywhere">{actor.did}</p>
-              {#if actor.kind === 'agent'}<span class="strata-pill">
-                  AI
-                </span>{/if}
-            </div>
-            {#each posts.filter((p) => p.author.id === actor.id) as p}<PostCard
-                post={p}
-                community={communities.find((c) => c.id === p.community_id)}
-                loggedIn={!!auth.actor}
-                canVote={isMember(p.community_id)}
-                onError={notify}
-              />{/each}{:else if !loading}<div class="strata-nodata">
-              <h2>Profil tidak tersedia</h2>
-              <p>
-                Identitas anggota privat tidak ditampilkan dalam direktori
-                publik.
-              </p>
-            </div>{/if}
-        {:else if path === '/' || path === '/saved' || path === '/find'}
-          {#if path === '/saved'}<div class="cx-page-head">
-              <h1>Tersimpan</h1>
-              <Bookmark size={18} />
-            </div>{:else if path === '/find'}<div class="cx-page-head">
-              <h1>Hasil pencarian</h1>
-            </div>{:else}<div class="strata-tabs">
-              <button
-                class:active={feedTab === 'new'}
-                onclick={() => (feedTab = 'new')}
-              >
-                Terbaru
-              </button>
-              <button
-                class:active={feedTab === 'mine'}
-                onclick={() => (feedTab = 'mine')}
-              >
-                Komunitasku
-              </button>
-              <button
-                class="cx-icon-button"
-                aria-label="Muat ulang"
-                style="margin-left:auto"
-                onclick={() => load()}
-              >
-                <RefreshCw size={15} />
-              </button>
-            </div>
-            <div class="cx-composer-bar">
-              <span class="cx-avatar sage">
-                {auth.actor ? initials(auth.actor.name) : '+'}
-              </span>
-              <button onclick={() => open('compose')}>Apa yang terjadi?</button>
-              <button class="cx-button primary" onclick={() => open('compose')}>
-                Posting
-              </button>
-            </div>{/if}
-          {#each displayPosts as p}<PostCard
-              post={p}
-              community={communities.find((c) => c.id === p.community_id)}
-              loggedIn={!!auth.actor}
-              canVote={isMember(p.community_id)}
-              onError={notify}
-              onSaved={() => {
-                if (path === '/saved') saved = saved.filter((x) => x.bookmarked)
-              }}
-            />{/each}
-          {#if !displayPosts.length && !loading}<div class="strata-nodata">
-              <div class="strata-empty-graphic">
-                {#if path === '/saved'}<Bookmark
-                    size={27}
-                  />{:else}<MessageCircle size={27} />{/if}
-              </div>
-              <h2>
-                {path === '/saved'
-                  ? 'Simpan untuk nanti'
-                  : path === '/find'
-                    ? 'Belum ada hasil'
-                    : 'Percakapan dimulai di sini'}
-              </h2>
-              <p>
-                {path === '/saved'
-                  ? 'Posting yang kamu simpan tersedia selama kamu memiliki akses.'
-                  : 'Temukan komunitas, ajukan pertanyaan dan bagikan sesuatu yang berguna.'}
-              </p>
-              <a
-                href={path === '/saved' && !auth.actor
-                  ? '/login'
-                  : '/communities'}
-                class="cx-button"
-              >
-                {path === '/saved' && !auth.actor ? 'Masuk' : 'Lihat komunitas'}
-              </a>
-            </div>{/if}
-          {#if nextCursor && path === '/'}<div class="strata-card">
-              <button class="cx-button" disabled={busy} onclick={more}>
-                Muat posting lain
-              </button>
-            </div>{/if}
-        {:else}<div class="strata-nodata">
-            <h2>Halaman tidak tersedia</h2>
-            <a href="/" class="cx-button">Beranda</a>
-          </div>{/if}
-      </main>
-      <aside class="cx-context" aria-label="Konteks terkait">
-        <div class="cx-context-block">
-          <div class="cx-section-head">
-            <h2>Komunitas</h2>
-            <a href="/communities" aria-label="Semua komunitas">
-              <ArrowUpRight size={16} />
-            </a>
-          </div>
-          {#each communities.slice(0, 4) as c}<a
-              href={'/communities/' + c.id}
-              class="cx-community-mini"
-            >
-              <span class="cx-avatar sage small">{initials(c.title)}</span>
-              <span>
-                <strong>{c.title}</strong>
+                    Tolak
+                  </Button>
+                </div>{/if}
+            </article>{/each}
+        </Card.Root>{/if}
+      {#if history.length}<Card.Root class="strata-card">
+          <h2 class="strata-inline" style="font-size:16px">
+            <History size={16} />Riwayat
+          </h2>
+          {#each history as rev}<div class="cx-list-row">
+              <FileText size={16} />
+              <div>
+                <strong>{rev.perspective}</strong>
                 <small>
-                  {c.visibility === 'public' ? 'Publik' : 'Khusus anggota'}
+                  {rev.language} · {relativeDate(rev.created)}
                 </small>
-              </span>
-            </a>{/each}{#if !communities.length}<p class="cx-hint">
-              Ruang komunitas akan muncul di sini.
-            </p>{/if}
-        </div>
-        <a
-          href="/wiki"
-          class="cx-context-spotlight"
-          style="background:linear-gradient(135deg,#27382e,#171725);padding:22px;min-height:180px;display:flex;align-items:end"
-        >
-          <div>
-            <BookOpen size={26} />
-            <h3 style="margin-top:22px">Pengetahuan bersama</h3>
-            <span>Wiki & revisi<ArrowUpRight size={14} /></span>
-          </div>
-        </a>
-        <div class="cx-context-block">
-          <h2 style="font-size:15px">Satu akun, banyak ruang</h2>
-          <p class="cx-hint" style="margin-top:12px">
-            Keanggotaan dan izin tetap mengikuti setiap komunitas.
-          </p>
-          <a class="cx-text-link" href="/preferences">
-            Akun & pengaturan<ChevronRight size={13} />
-          </a>
-        </div>
-        <div class="cx-rail-footer">
-          <a
-            href="https://github.com/yohn-maistre/honai-metro"
-            target="_blank"
-            rel="noreferrer"
+              </div>
+            </div>{/each}
+        </Card.Root>{/if}
+    {:else if wiki.length}<section>
+        {#each wiki as p}<a
+            href={'/wiki/' + p.id}
+            class="cx-list-row strata-card"
           >
-            Honai
-          </a>
-          <a
-            href="https://github.com/yohn-maistre/strata"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Strata
-          </a>
-          <span>Papua · pratinjau terhubung</span>
-        </div>
-      </aside>
-    </div>
-  </div>
-  <nav class="cx-mobile-dock" aria-label="Navigasi seluler">
-    <a href="/" class:active={path === '/'} aria-label="Beranda">
-      <Home size={22} />
-    </a>
-    <a
-      href="/communities"
-      class:active={path.startsWith('/communities')}
-      aria-label="Komunitas"
-    >
-      <Users size={22} />
-    </a>
-    <button
-      class="cx-dock-compose"
-      aria-label="Posting baru"
-      onclick={() => open('compose')}
-    >
-      <Plus size={23} />
-    </button>
-    <a href="/wiki" class:active={path.startsWith('/wiki')} aria-label="Wiki">
-      <BookOpen size={22} />
-    </a>
-    <button aria-label="Semua ruang" onclick={() => (menu = true)}>
-      <Menu size={22} />
-    </button>
-  </nav>
-  <dialog
-    bind:this={menuDialog}
-    class="strata-menu-dialog"
-    onclose={() => (menu = false)}
-    oncancel={() => (menu = false)}
-    aria-label="Navigasi"
-  >
-    <aside class="strata-menu" aria-label="Menu">
-      <button
-        class="cx-icon-button"
-        style="margin-left:auto;display:block"
-        aria-label="Tutup menu"
-        onclick={() => (menu = false)}
-      >
-        <X size={20} />
-      </button>
-      {@render navigation()}
-    </aside>
-  </dialog>
-  {#if message}<div class="cx-toast" role="status">
-      <span>{message}</span>
-      <button
-        class="cx-icon-button"
-        aria-label="Tutup notifikasi"
-        onclick={() => (message = '')}
-      >
-        <X size={16} />
-      </button>
-    </div>{/if}
-</div>
-
-<dialog
-  bind:this={dialog}
-  class="cx-dialog"
-  onclose={() => (modal = null)}
-  oncancel={() => (modal = null)}
-  aria-labelledby="dialog-title"
->
-  <div class="cx-between">
-    <h2 id="dialog-title">
-      {modal === 'compose'
-        ? 'Posting baru'
-        : modal === 'community'
-          ? 'Komunitas baru'
-          : modal === 'wiki'
-            ? 'Halaman Wiki'
-            : modal === 'proposal'
-              ? 'Usulkan perubahan'
-              : modal === 'join'
-                ? 'Minta bergabung'
-                : 'Kelola komunitas'}
-    </h2>
-    <button
-      class="cx-icon-button"
-      aria-label="Tutup"
-      onclick={() => (modal = null)}
-    >
-      <X size={19} />
-    </button>
-  </div>
-  {#if modal === 'manage'}<div class="strata-stack" style="margin-top:20px">
-      <h3 style="font-size:15px">Permintaan bergabung</h3>
-      {#each joinRequests.filter((r) => r.state === 'pending') as r}<article
-          class="strata-review"
-        >
-          <p>{r.message}</p>
-          <div class="cx-actions">
-            <button
+            <span class="cx-object-icon"><BookOpen size={20} /></span>
+            <div>
+              <h3>{p.title}</h3>
+              <small>
+                {communities.find((c) => c.id === p.community_id)?.title} ·
+                {p.revision_id ? 'Ada revisi diterima' : 'Belum ada revisi'}
+              </small>
+            </div>
+            <ChevronRight size={16} />
+          </a>{/each}
+      </section>{:else}<div class="strata-nodata">
+        <div class="strata-empty-graphic"><BookOpen size={27} /></div>
+        <h2>Belum ada halaman</h2>
+        <p>Halaman, sumber dan revisi yang diterima akan muncul di sini.</p>
+        <Button class="cx-button" href="/communities" variant="outline">
+          Lihat komunitas
+        </Button>
+      </div>{/if}
+  {:else if parts[0] === 'communities' && parts[1]}
+    {#if community}<div class="cx-detail-head">
+        <div class="cx-between">
+          <span class="cx-avatar sage">{initials(community.title)}</span>
+          {#if currentMembership}<Badge variant="secondary">
+              {currentMembership.role === 'member'
+                ? 'Anggota'
+                : currentMembership.role === 'owner'
+                  ? 'Pemilik'
+                  : 'Moderator'}
+            </Badge>{:else if community.admission === 'open'}<Button
               class="cx-button small"
               disabled={busy}
               onclick={() =>
                 mutate(async () => {
-                  await request(`/v1/communities/${communityId}/decide`, {
-                    actorId: r.actor_id,
-                    approve: true,
-                  })
-                  await manage(communityId)
+                  await request(`/v1/communities/${community.id}/join`, {})
+                  await load()
                 })}
+              type="button"
+              variant="outline"
             >
-              Terima
-            </button>
-            <button
+              Gabung
+            </Button>{:else if community.admission === 'approval'}<Button
               class="cx-button small"
-              disabled={busy}
-              onclick={() =>
-                mutate(async () => {
-                  await request(`/v1/communities/${communityId}/decide`, {
-                    actorId: r.actor_id,
-                    approve: false,
-                  })
-                  await manage(communityId)
-                })}
+              onclick={() => open('join', community.id)}
+              type="button"
+              variant="outline"
             >
-              Tolak
-            </button>
-          </div>
-        </article>{/each}{#if !joinRequests.some((r) => r.state === 'pending')}<p
-          class="cx-hint"
-        >
-          Tidak ada permintaan yang menunggu.
-        </p>{/if}
-      <h3 style="font-size:15px">Laporan</h3>
-      {#each reports.filter((r) => r.state === 'open') as r}<article
-          class="strata-review"
-        >
-          <a
-            href={'/square/' + r.post_id}
-            class="cx-text-link"
-            onclick={() => (modal = null)}
-          >
-            Lihat posting<ArrowUpRight size={13} />
-          </a>
-          <p>{r.reason}</p>
-          <button
-            class="cx-button small"
-            disabled={busy}
-            onclick={() =>
-              mutate(async () => {
-                await request(`/v1/reports/${r.id}/decide`, {
-                  state: 'resolved',
-                  decision: 'Ditinjau pengelola melalui Strata',
-                })
-                await manage(communityId)
-              })}
-          >
-            Tandai ditinjau
-          </button>
-        </article>{/each}{#if !reports.some((r) => r.state === 'open')}<p
-          class="cx-hint"
-        >
-          Tidak ada laporan yang menunggu.
-        </p>{/if}
-    </div>
-  {:else}<form
-      class="cx-form"
-      style="margin-top:22px"
-      onsubmit={(e) => {
-        e.preventDefault()
-        submit()
-      }}
-    >
-      {#if modal === 'compose' || modal === 'wiki'}<label>
-          Komunitas
-          <select bind:value={communityId} required>
-            {#each communities.filter( (c) => (modal === 'wiki' ? isSteward(c.id) && c.visibility === 'public' : isMember(c.id)) ) as c}<option
-                value={c.id}
-              >
-                {c.title}{c.visibility === 'public'
-                  ? ' · Publik'
-                  : ' · Anggota'}
-              </option>{/each}
-          </select>
-        </label>{/if}
-      {#if modal === 'community' || modal === 'wiki'}<label>
-          Nama
-          <input bind:value={title} maxlength="160" required />
-        </label>{/if}
-      {#if modal === 'community'}<label>
-          Tentang komunitas
-          <textarea
-            bind:value={description}
-            maxlength="2000"
-            required
-          ></textarea>
-        </label>
-        <label>
-          Siapa yang dapat membaca?
-          <select bind:value={visibility}>
-            <option value="public">
-              Publik · bergabung dengan persetujuan
-            </option>
-            <option value="listed-private">
-              Anggota · nama komunitas terlihat publik
-            </option>
-            <option value="hidden-private">
-              Anggota · komunitas disembunyikan
-            </option>
-          </select>
-        </label>{/if}
-      {#if modal === 'compose' || modal === 'join' || modal === 'proposal'}<label
-        >
-          {modal === 'join'
-            ? 'Pesan untuk pengelola'
-            : modal === 'proposal'
-              ? 'Isi revisi'
-              : 'Posting'}
-          <textarea
-            bind:value={text}
-            maxlength={modal === 'proposal'
-              ? 50000
-              : modal === 'join'
-                ? 500
-                : 6000}
-            required
-            rows={modal === 'proposal' ? 10 : 5}
-            placeholder={modal === 'compose' ? 'Apa yang terjadi?' : ''}
-          ></textarea>
-        </label>{/if}
-      {#if modal === 'proposal'}<label>
-          Sumber publik
-          <textarea
-            bind:value={citations}
-            placeholder="Satu URL https per baris"
-            rows="3"
-          ></textarea>
-        </label>
-        <label>
-          Bahasa
-          <input bind:value={language} maxlength="40" required />
-        </label>
-        <label>
-          Perspektif / atribusi
-          <input bind:value={perspective} maxlength="300" required />
-        </label>
-        <p class="cx-hint">
-          Usulan hanya terlihat oleh penulis dan pengelola. Revisi diterbitkan
-          setelah tinjauan manusia.
-        </p>{/if}
-      {#if modal === 'compose'}{@const destination = communities.find(
-          (c) => c.id === communityId,
-        )}
-        <p class="strata-caption">
-          {#if destination?.visibility === 'public'}<Globe
+              Minta bergabung
+            </Button>{:else}<Badge variant="secondary">
+              Dengan undangan
+            </Badge>{/if}
+        </div>
+        <h1>{community.title}</h1>
+        <p>{community.description}</p>
+        <div class="strata-caption">
+          {#if community.visibility === 'public'}<Globe
               size={13}
-            />Publik{#if destination.publication === 'atproto'}
-              · Akan masuk antrean AT{:else}
-              · Di Strata{/if}{:else}<LockKeyhole size={13} />Hanya anggota
-            komunitas{/if}
-        </p>{/if}
-      {#if modalError}<p class="cx-form-error" role="alert">
-          {modalError}
-        </p>{/if}
-      <button
-        class="cx-button primary"
-        disabled={busy ||
-          ((modal === 'compose' || modal === 'wiki') && !communityId)}
+            />Publik{:else}<LockKeyhole size={13} />Khusus anggota{/if}
+          <span>·</span>
+          {community.publication === 'atproto'
+            ? 'Penerbitan AT tersedia'
+            : 'Percakapan di Strata'}
+        </div>
+        <div class="cx-actions" style="margin-top:18px">
+          {#if currentMembership}<Button
+              class="cx-button primary small"
+              onclick={() => open('compose', community.id)}
+              type="button"
+              variant="default"
+            >
+              <Plus size={14} />Posting
+            </Button>{/if}{#if isSteward(community.id)}<Button
+              class="cx-button small"
+              onclick={() => open('manage', community.id)}
+              type="button"
+              variant="outline"
+            >
+              <ShieldCheck size={14} />Kelola
+            </Button>{/if}
+        </div>
+      </div>
+      <Tabs.Root bind:value={tab}>
+        <Tabs.List variant="line" class="page-tabs" aria-label="Isi komunitas">
+          <Tabs.Trigger value="discussion">Diskusi</Tabs.Trigger><Tabs.Trigger
+            value="wiki"
+          >
+            Wiki
+          </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
+        </Tabs.List>
+      </Tabs.Root>
+      {#if tab === 'about'}<Card.Root class="strata-card">
+          <p class="strata-body">{community.description}</p>
+          <p class="cx-hint">
+            {community.visibility === 'public'
+              ? 'Isi dapat dibaca publik.'
+              : 'Isi hanya tersedia bagi anggota saat ini.'}
+            {community.admission === 'approval'
+              ? 'Permintaan bergabung ditinjau pengelola.'
+              : community.admission === 'invite'
+                ? 'Keanggotaan melalui undangan.'
+                : 'Keanggotaan terbuka.'}
+          </p>
+        </Card.Root>{:else if tab === 'wiki'}<Card.Root class="strata-card">
+          {#each wiki.filter((p) => p.community_id === community.id) as p}<a
+              href={'/wiki/' + p.id}
+              class="cx-list-row"
+            >
+              <BookOpen size={18} />{p.title}<ChevronRight size={15} />
+            </a>{/each}{#if isSteward(community.id) && community.visibility === 'public'}<Button
+              class="cx-button small"
+              onclick={() => open('wiki', community.id)}
+              type="button"
+              variant="outline"
+            >
+              <Plus size={14} />Halaman baru
+            </Button>{/if}
+        </Card.Root>{:else}{#each posts as p}<PostCard
+            post={p}
+            {community}
+            loggedIn={!!auth.actor}
+            canVote={!!currentMembership}
+            onError={notify}
+          />{/each}{#if !posts.length && !loading}<div class="strata-nodata">
+            <MessageCircle size={26} />
+            <h2>Belum ada percakapan</h2>
+            <p>
+              {currentMembership
+                ? 'Mulai percakapan pertama.'
+                : 'Gabung komunitas untuk ikut berbicara.'}
+            </p>
+          </div>{/if}{/if}
+    {:else if !loading}<div class="strata-nodata">
+        <LockKeyhole size={26} />
+        <h2>Komunitas tidak tersedia</h2>
+        <p>Komunitas mungkin tidak ada atau memerlukan akses.</p>
+        <Button href="/communities" class="cx-button" variant="outline">
+          Komunitas
+        </Button>
+      </div>{/if}
+  {:else if path === '/communities'}
+    <div class="cx-page-head">
+      <h1>Komunitas</h1>
+      {#if auth.actor}<Button
+          class="cx-button small"
+          onclick={() => open('community')}
+          type="button"
+          variant="outline"
+        >
+          <Plus size={14} />Komunitas
+        </Button>{/if}
+    </div>
+    <div class="strata-mosaic">
+      {#each communities as c}<a
+          href={'/communities/' + c.id}
+          class="strata-tile"
+        >
+          <div class="cx-between">
+            <span class="cx-avatar sage small">{initials(c.title)}</span>
+            <ArrowUpRight size={18} />
+          </div>
+          <div>
+            <h2>{c.title}</h2>
+            <p>{c.description}</p>
+            <span class="strata-small">
+              {c.visibility === 'public'
+                ? 'Publik'
+                : 'Khusus anggota'}{isMember(c.id) ? ' · Bergabung' : ''}
+            </span>
+          </div>
+        </a>{/each}
+    </div>
+    {#if !communities.length && !loading}<div class="strata-nodata">
+        <div class="strata-empty-graphic"><Users size={27} /></div>
+        <h2>Ruang untuk komunitasmu</h2>
+        <p>Komunitas akan muncul di sini.</p>
+        {#if !auth.actor}<Button
+            href="/login"
+            class="cx-button primary"
+            variant="default"
+          >
+            Masuk
+          </Button>{/if}
+      </div>{/if}
+  {:else if parts[0] === 'square'}
+    <a href="/" class="cx-back"><ArrowLeft size={14} />Beranda</a>
+    {#if selectedPost}<PostCard
+        post={selectedPost}
+        community={communities.find((c) => c.id === selectedPost!.community_id)}
+        loggedIn={!!auth.actor}
+        canVote={isMember(selectedPost.community_id)}
+        detail
+        onError={notify}
+      />
+      <section id="replies" class="strata-card">
+        <h2 style="font-size:16px;margin-bottom:18px">
+          Diskusi <span class="cx-muted">{selectedPost.replies}</span>
+        </h2>
+        {#if auth.actor && isMember(selectedPost.community_id)}<form
+            class="cx-form"
+            onsubmit={(e) => {
+              e.preventDefault()
+              reply()
+            }}
+          >
+            {#if replyParent}<Button
+                class="cx-text-link"
+                type="button"
+                onclick={() => (replyParent = null)}
+                variant="outline"
+              >
+                Membalas · batal
+              </Button>{/if}
+            <Textarea
+              bind:value={replyText}
+              required
+              maxlength={6000}
+              placeholder="Tulis balasan…"
+              aria-label="Tulis balasan"
+            ></Textarea>
+            <div class="cx-actions">
+              <Button
+                class="cx-button primary small"
+                disabled={busy || !replyText.trim()}
+                type="submit"
+                variant="default"
+              >
+                Balas<Send size={13} />
+              </Button>
+            </div>
+          </form>{:else}<a
+            href={auth.actor
+              ? '/communities/' + selectedPost.community_id
+              : '/login'}
+            class="cx-text-link"
+          >
+            {auth.actor
+              ? 'Gabung komunitas untuk membalas'
+              : 'Masuk untuk membalas'}
+          </a>{/if}
+        <div class="strata-replies">
+          {#each replies as r}<article class="strata-reply">
+              <div class="cx-post-meta">
+                <a class="cx-author" href={'/people/' + r.author.id}>
+                  {r.author.name}
+                </a>
+                <span class="cx-meta-secondary">
+                  {relativeDate(r.created)}
+                </span>
+              </div>
+              <p class="strata-body">{r.text}</p>
+              {#if auth.actor && isMember(r.community_id)}<Button
+                  class="cx-text-link"
+                  onclick={() => {
+                    replyParent = r.id
+                    document
+                      .querySelector<HTMLTextAreaElement>('#replies textarea')
+                      ?.focus()
+                  }}
+                  type="button"
+                  variant="outline"
+                >
+                  Balas
+                </Button>{/if}
+            </article>{/each}
+        </div>
+      </section>{:else if !loading}<div class="strata-nodata">
+        <h2>Posting tidak tersedia</h2>
+      </div>{/if}
+  {:else if parts[0] === 'people'}
+    {@const actor =
+      auth.actor?.id === parts[1]
+        ? auth.actor
+        : posts.find((p) => p.author.id === parts[1])?.author}{#if actor}<div
+        class="cx-detail-head"
       >
-        {#if busy}<LoaderCircle size={15} />{/if}{modal === 'compose'
-          ? 'Posting'
-          : modal === 'join'
-            ? 'Kirim permintaan'
-            : modal === 'proposal'
-              ? 'Ajukan untuk tinjauan'
-              : 'Buat'}<Send size={14} />
-      </button>
-    </form>{/if}
-</dialog>
-
-<style>
-  .strata-menu-dialog {
-    position: fixed;
-    inset: 0 auto 0 0;
-    width: min(300px, 85vw);
-    max-width: none;
-    max-height: none;
-    height: 100dvh;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    background: var(--cx-panel);
-    color: var(--cx-ink);
-  }
-  .strata-menu-dialog::backdrop {
-    background: rgb(0 0 0/0.6);
-  }
-  .strata-menu {
-    width: min(300px, 85vw);
-    height: 100dvh;
-    overflow: auto;
-    background: var(--cx-panel);
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 1;
-  }
-  .strata-menu :global(.cx-sidebar-bottom) {
-    position: static;
-    margin-top: 28px;
-  }
-  .strata-menu :global(.cx-brand) {
-    margin-top: 0;
-  }
-  @media (min-width: 1000px) {
-    .strata-menu-dialog {
-      display: none;
-    }
-  }
-</style>
+        <span class="cx-avatar sage">{initials(actor.name)}</span>
+        <h1>{actor.name}</h1>
+        <p class="cx-hint" style="overflow-wrap:anywhere">{actor.did}</p>
+        {#if auth.actor && auth.actor.id !== actor.id && actor.kind === 'human'}<Button
+            href={'/messages?to=' + actor.id}
+            variant="outline"
+          >
+            <MessageSquare size={16} />Pesan
+          </Button>{/if}
+        {#if actor.kind === 'agent'}<Badge variant="secondary">AI</Badge>{/if}
+      </div>
+      {#each posts.filter((p) => p.author.id === actor.id) as p}<PostCard
+          post={p}
+          community={communities.find((c) => c.id === p.community_id)}
+          loggedIn={!!auth.actor}
+          canVote={isMember(p.community_id)}
+          onError={notify}
+        />{/each}{:else if !loading}<div class="strata-nodata">
+        <h2>Profil tidak tersedia</h2>
+        <p>
+          Identitas anggota privat tidak ditampilkan dalam direktori publik.
+        </p>
+      </div>{/if}
+  {:else if path === '/' || path === '/saved' || path === '/find'}
+    {#if path === '/saved'}<div class="cx-page-head">
+        <h1>Tersimpan</h1>
+        <Bookmark size={18} />
+      </div>{:else if path === '/find'}<div class="cx-page-head">
+        <h1>Hasil pencarian</h1>
+      </div>{:else}<div class="cx-page-head">
+        <h1>Beranda</h1>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Muat ulang"
+          onclick={() => load()}
+        >
+          <RefreshCw size={16} />
+        </Button>
+      </div>
+      <Tabs.Root bind:value={feedTab}>
+        <Tabs.List
+          variant="line"
+          class="page-tabs"
+          aria-label="Urutan percakapan"
+        >
+          <Tabs.Trigger value="new">Terbaru</Tabs.Trigger><Tabs.Trigger
+            value="mine"
+          >
+            Komunitasku
+          </Tabs.Trigger>
+        </Tabs.List>
+      </Tabs.Root>
+      <div class="cx-composer-bar">
+        <span class="cx-avatar sage">
+          {auth.actor ? initials(auth.actor.name) : '+'}
+        </span>
+        <Button onclick={() => open('compose')} type="button" variant="outline">
+          Apa yang terjadi?
+        </Button>
+        <Button
+          class="cx-button primary"
+          onclick={() => open('compose')}
+          type="button"
+          variant="default"
+        >
+          Posting
+        </Button>
+      </div>{/if}
+    {#each displayPosts as p}<PostCard
+        post={p}
+        community={communities.find((c) => c.id === p.community_id)}
+        loggedIn={!!auth.actor}
+        canVote={isMember(p.community_id)}
+        onError={notify}
+        onSaved={() => {
+          if (path === '/saved') saved = saved.filter((x) => x.bookmarked)
+        }}
+      />{/each}
+    {#if !displayPosts.length && !loading}<div class="strata-nodata">
+        <div class="strata-empty-graphic">
+          {#if path === '/saved'}<Bookmark size={27} />{:else}<MessageCircle
+              size={27}
+            />{/if}
+        </div>
+        <h2>
+          {path === '/saved'
+            ? 'Simpan untuk nanti'
+            : path === '/find'
+              ? 'Belum ada hasil'
+              : 'Belum ada percakapan'}
+        </h2>
+        <p>
+          {path === '/saved'
+            ? 'Posting yang kamu simpan tersedia selama kamu memiliki akses.'
+            : 'Jelajahi komunitas atau mulai percakapan.'}
+        </p>
+        <Button
+          href={path === '/saved' && !auth.actor ? '/login' : '/communities'}
+          class="cx-button"
+          variant="outline"
+        >
+          {path === '/saved' && !auth.actor ? 'Masuk' : 'Lihat komunitas'}
+        </Button>
+      </div>{/if}
+    {#if nextCursor && path === '/'}<div class="strata-card">
+        <Button
+          class="cx-button"
+          disabled={busy}
+          onclick={more}
+          type="button"
+          variant="outline"
+        >
+          Muat posting lain
+        </Button>
+      </div>{/if}
+  {:else}<div class="strata-nodata">
+      <h2>Halaman tidak tersedia</h2>
+      <Button href="/" class="cx-button" variant="outline">Beranda</Button>
+    </div>{/if}
+  {#snippet rail()}
+    <div class="cx-context-block">
+      <div class="cx-section-head">
+        <h2>Komunitas</h2>
+        <a href="/communities" aria-label="Semua komunitas">
+          <ArrowUpRight size={16} />
+        </a>
+      </div>
+      {#each communities.slice(0, 4) as c}<a
+          href={'/communities/' + c.id}
+          class="cx-community-mini"
+        >
+          <span class="cx-avatar sage small">{initials(c.title)}</span>
+          <span>
+            <strong>{c.title}</strong>
+            <small>
+              {c.visibility === 'public' ? 'Publik' : 'Khusus anggota'}
+            </small>
+          </span>
+        </a>{/each}{#if !communities.length}<p class="cx-hint">
+          Ruang komunitas akan muncul di sini.
+        </p>{/if}
+    </div>
+    <a href="/wiki" class="cx-context-spotlight">
+      <div>
+        <BookOpen size={26} />
+        <h3 style="margin-top:22px">Wiki bersama</h3>
+        <span>Wiki & revisi<ArrowUpRight size={14} /></span>
+      </div>
+    </a>
+    <div class="cx-context-block">
+      <h2 style="font-size:15px">Akun & akses</h2>
+      <p class="cx-hint" style="margin-top:12px">
+        Keanggotaan dan izin tetap mengikuti setiap komunitas.
+      </p>
+      <a class="cx-text-link" href="/preferences">
+        Akun & pengaturan<ChevronRight size={13} />
+      </a>
+    </div>
+    <div class="cx-rail-footer">
+      <a
+        href="https://github.com/yohn-maistre/honai-metro"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Honai
+      </a>
+      <a
+        href="https://github.com/yohn-maistre/strata"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Strata
+      </a>
+      <a href="/third-party-notices.txt" target="_blank" rel="noreferrer">
+        Lisensi
+      </a>
+      <span>ETNOS · pratinjau</span>
+    </div>
+  {/snippet}
+</PlatformShell>
+{#if message}<div class="cx-toast" role="status">
+    <span>{message}</span>
+    <Button
+      class="cx-icon-button"
+      aria-label="Tutup notifikasi"
+      onclick={() => (message = '')}
+      type="button"
+      variant="outline"
+    >
+      <X size={16} />
+    </Button>
+  </div>{/if}
+<Dialog.Root
+  open={modal !== null}
+  onOpenChange={(value) => {
+    if (!value) modal = null
+  }}
+>
+  <Dialog.Content class="platform-dialog" showCloseButton={true}>
+    <Dialog.Header>
+      <Dialog.Title>
+        {modal === 'compose'
+          ? 'Posting baru'
+          : modal === 'community'
+            ? 'Komunitas baru'
+            : modal === 'wiki'
+              ? 'Halaman Wiki'
+              : modal === 'proposal'
+                ? 'Usulkan perubahan'
+                : modal === 'join'
+                  ? 'Minta bergabung'
+                  : 'Kelola komunitas'}
+      </Dialog.Title><Dialog.Description class="sr-only">
+        Isi formulir dan tinjau sebelum mengirim.
+      </Dialog.Description>
+    </Dialog.Header>
+    {#if modal === 'manage'}<div class="strata-stack" style="margin-top:20px">
+        <h3 style="font-size:15px">Permintaan bergabung</h3>
+        {#each joinRequests.filter((r) => r.state === 'pending') as r}<article
+            class="strata-review"
+          >
+            <p>{r.message}</p>
+            <div class="cx-actions">
+              <Button
+                class="cx-button small"
+                disabled={busy}
+                onclick={() =>
+                  mutate(async () => {
+                    await request(`/v1/communities/${communityId}/decide`, {
+                      actorId: r.actor_id,
+                      approve: true,
+                    })
+                    await manage(communityId)
+                  })}
+                type="button"
+                variant="outline"
+              >
+                Terima
+              </Button>
+              <Button
+                class="cx-button small"
+                disabled={busy}
+                onclick={() =>
+                  mutate(async () => {
+                    await request(`/v1/communities/${communityId}/decide`, {
+                      actorId: r.actor_id,
+                      approve: false,
+                    })
+                    await manage(communityId)
+                  })}
+                type="button"
+                variant="outline"
+              >
+                Tolak
+              </Button>
+            </div>
+          </article>{/each}{#if !joinRequests.some((r) => r.state === 'pending')}<p
+            class="cx-hint"
+          >
+            Tidak ada permintaan yang menunggu.
+          </p>{/if}
+        <h3 style="font-size:15px">Laporan</h3>
+        {#each reports.filter((r) => r.state === 'open') as r}<article
+            class="strata-review"
+          >
+            <a
+              href={'/square/' + r.post_id}
+              class="cx-text-link"
+              onclick={() => (modal = null)}
+            >
+              Lihat posting<ArrowUpRight size={13} />
+            </a>
+            <p>{r.reason}</p>
+            <Button
+              class="cx-button small"
+              disabled={busy}
+              onclick={() =>
+                mutate(async () => {
+                  await request(`/v1/reports/${r.id}/decide`, {
+                    state: 'resolved',
+                    decision: 'Ditinjau pengelola melalui Strata',
+                  })
+                  await manage(communityId)
+                })}
+              type="button"
+              variant="outline"
+            >
+              Tandai ditinjau
+            </Button>
+          </article>{/each}{#if !reports.some((r) => r.state === 'open')}<p
+            class="cx-hint"
+          >
+            Tidak ada laporan yang menunggu.
+          </p>{/if}
+      </div>
+    {:else}<form
+        class="cx-form"
+        style="margin-top:22px"
+        onsubmit={(e) => {
+          e.preventDefault()
+          submit()
+        }}
+      >
+        {#if modal === 'compose' || modal === 'wiki'}<Label>
+            Komunitas
+            <NativeSelect.Root bind:value={communityId} required>
+              {#each communities.filter( (c) => (modal === 'wiki' ? isSteward(c.id) && c.visibility === 'public' : isMember(c.id)) ) as c}<option
+                  value={c.id}
+                >
+                  {c.title}{c.visibility === 'public'
+                    ? ' · Publik'
+                    : ' · Anggota'}
+                </option>{/each}
+            </NativeSelect.Root>
+          </Label>{/if}
+        {#if modal === 'community' || modal === 'wiki'}<Label>
+            Nama
+            <Input bind:value={title} maxlength={160} required />
+          </Label>{/if}
+        {#if modal === 'community'}<Label>
+            Tentang komunitas
+            <Textarea bind:value={description} maxlength={2000} required
+            ></Textarea>
+          </Label>
+          <Label>
+            Siapa yang dapat membaca?
+            <NativeSelect.Root bind:value={visibility}>
+              <option value="public">
+                Publik · bergabung dengan persetujuan
+              </option>
+              <option value="listed-private">
+                Anggota · nama komunitas terlihat publik
+              </option>
+              <option value="hidden-private">
+                Anggota · komunitas disembunyikan
+              </option>
+            </NativeSelect.Root>
+          </Label>{/if}
+        {#if modal === 'compose' || modal === 'join' || modal === 'proposal'}<Label
+          >
+            {modal === 'join'
+              ? 'Pesan untuk pengelola'
+              : modal === 'proposal'
+                ? 'Isi revisi'
+                : 'Posting'}
+            <Textarea
+              bind:value={text}
+              maxlength={modal === 'proposal'
+                ? 50000
+                : modal === 'join'
+                  ? 500
+                  : 6000}
+              required
+              rows={modal === 'proposal' ? 10 : 5}
+              placeholder={modal === 'compose' ? 'Apa yang terjadi?' : ''}
+            ></Textarea>
+          </Label>{/if}
+        {#if modal === 'proposal'}<Label>
+            Sumber publik
+            <Textarea
+              bind:value={citations}
+              placeholder="Satu URL https per baris"
+              rows={3}
+            ></Textarea>
+          </Label>
+          <Label>
+            Bahasa
+            <Input bind:value={language} maxlength={40} required />
+          </Label>
+          <Label>
+            Perspektif / atribusi
+            <Input bind:value={perspective} maxlength={300} required />
+          </Label>
+          <p class="cx-hint">
+            Usulan hanya terlihat oleh penulis dan pengelola. Revisi diterbitkan
+            setelah tinjauan manusia.
+          </p>{/if}
+        {#if modal === 'compose'}{@const destination = communities.find(
+            (c) => c.id === communityId,
+          )}
+          <p class="strata-caption">
+            {#if destination?.visibility === 'public'}<Globe
+                size={13}
+              />Publik{#if destination.publication === 'atproto'}
+                · Akan masuk antrean AT{:else}
+                · Di Strata{/if}{:else}<LockKeyhole size={13} />Hanya anggota
+              komunitas{/if}
+          </p>{/if}
+        {#if modalError}<p class="cx-form-error" role="alert">
+            {modalError}
+          </p>{/if}
+        <Button
+          class="cx-button primary"
+          disabled={busy ||
+            ((modal === 'compose' || modal === 'wiki') && !communityId)}
+          type="submit"
+          variant="default"
+        >
+          {#if busy}<LoaderCircle size={15} />{/if}{modal === 'compose'
+            ? 'Posting'
+            : modal === 'join'
+              ? 'Kirim permintaan'
+              : modal === 'proposal'
+                ? 'Ajukan untuk tinjauan'
+                : 'Buat'}<Send size={14} />
+        </Button>
+      </form>{/if}
+  </Dialog.Content>
+</Dialog.Root>

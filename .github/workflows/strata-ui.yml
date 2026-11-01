@@ -18,4 +18,5 @@ jobs:
           cache-dependency-path: apps/strata/package-lock.json
       - run: npm ci --prefix apps/strata --ignore-scripts
       - run: npm run check --prefix apps/strata
+      - run: npm test --prefix apps/strata
       - run: npm run build --prefix apps/strata

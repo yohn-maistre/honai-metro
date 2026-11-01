@@ -27,6 +27,7 @@ export type Post = {
   score: number
   myVote: number
   bookmarked: boolean
+  contexts?: { id: string; slug: string; title: string; kind: string }[]
   replies: number
 }
 export type Membership = {
@@ -134,3 +135,18 @@ export const initials = (name: string) =>
     .map((x) => x[0])
     .join('')
     .toUpperCase()
+export type ActivityItem = {
+  id: string
+  kind:
+    'reply' | 'wiki-review' | 'wiki-decision' | 'join-review' | 'join-decision'
+  title: string
+  detail: string
+  created: number
+  read: boolean
+  href: string
+}
+export type ActivityInbox = {
+  items: ActivityItem[]
+  unread: number
+  window: number
+}

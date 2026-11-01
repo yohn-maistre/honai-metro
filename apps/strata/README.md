@@ -13,3 +13,9 @@ Live preview: https://strata-preview.giyaibo.workers.dev
 See UPSTREAM.md for source provenance.
 
 The future interface model is documented in [contexts and identities](../../docs/strata/context-and-identity-ui.md). It keeps the general ETNOS deployment, regional lenses, governed Groups/Spaces, institutional PublicWork, AI editorial proposals and a later hotline distinct from current delivered controls.
+
+## UI and messaging checkpoint
+
+The connected app now uses shadcn-svelte/Lucide, shared appearance tokens, Groups/Spaces, sponsor work and an activity inbox. Forum-only 1:1 DMs are experimental: client-side ts-mls 1.6.4, requests/acceptance, single device, passphrase-encrypted local state, comparison codes and blocking. The library/application are unaudited; no sensitive-use or multi-device/recovery/interop claim is made. See Strata's docs/commons-implementation.md for the full boundary. Clearing browser storage or losing the phrase loses access; a new origin requires a qualified key-transfer plan.
+
+Cloud checks: npm run check; npm run test:crypto; npm run build. Optional browser contracts require an existing local Strata checkout, Chromium/Playwright and the built app served on loopback port 5175. Set STRATA_REPO, PLAYWRIGHT_MODULE if needed, and STRATA_UI_URL, then run npm run test:browser. Those scripts intercept every auth/API call into isolated synthetic databases and reject remote UI URLs. They never provision a deployed node. All checks run in cloud development/CI, not on the owner's phone.

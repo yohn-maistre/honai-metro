@@ -10,6 +10,15 @@
     Globe,
     LoaderCircle,
   } from '@lucide/svelte'
+  import * as Card from '$lib/components/ui/card/index.js'
+  import * as Avatar from '$lib/components/ui/avatar/index.js'
+  import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
+  import * as Dialog from '$lib/components/ui/dialog/index.js'
+  import { Button } from '$lib/components/ui/button/index.js'
+  import { Badge } from '$lib/components/ui/badge/index.js'
+  import { Textarea } from '$lib/components/ui/textarea/index.js'
+  import { Label } from '$lib/components/ui/label/index.js'
+  import { Ellipsis } from '@lucide/svelte'
   import {
     request,
     relativeDate,
@@ -93,7 +102,7 @@
   async function share() {
     const url = new URL('/square/' + post.rootId, location.origin).href
     try {
-      if (navigator.share) await navigator.share({ title: 'Strata', url })
+      if (navigator.share) await navigator.share({ title: 'ETNOS', url })
       else {
         await navigator.clipboard.writeText(url)
         onError('Tautan disalin.')
@@ -105,130 +114,154 @@
   }
 </script>
 
-<article class="cx-post" class:detail data-post={post.id}>
+<Card.Root
+  role="article"
+  class={'cx-post' + (detail ? ' detail' : '')}
+  data-post={post.id}
+>
   <a
     class="cx-post-avatar"
-    href="/people/{post.author.id}"
+    href={'/people/' + post.author.id}
     aria-label={post.author.name}
   >
-    <span class="cx-avatar sage">{initials(post.author.name)}</span>
+    <Avatar.Root class="size-10">
+      <Avatar.Fallback>{initials(post.author.name)}</Avatar.Fallback>
+    </Avatar.Root>
   </a>
   <div class="cx-post-content">
     <div class="cx-post-meta">
-      <a href="/people/{post.author.id}" class="cx-author">
+      <a href={'/people/' + post.author.id} class="cx-author">
         {post.author.name}
       </a>
-      {#if post.author.kind === 'agent'}<span class="strata-pill">AI</span>{/if}
+      {#if post.author.kind === 'agent'}<Badge variant="secondary">
+          AI
+        </Badge>{/if}
       <span class="cx-meta-secondary">{relativeDate(post.created)}</span>
-      {#if loggedIn}<button
-          class="cx-icon-button cx-post-more"
-          aria-label="Laporkan posting"
-          onclick={() => (reporting = !reporting)}
-        >
-          <Flag size={15} />
-        </button>{/if}
+      <Dropdown.Root>
+        <Dropdown.Trigger class="cx-post-more" aria-label="Opsi posting">
+          <Ellipsis size={18} />
+        </Dropdown.Trigger><Dropdown.Content align="end">
+          <Dropdown.Item onSelect={share}>
+            <Share2 size={15} />Bagikan tautan
+          </Dropdown.Item>{#if loggedIn}<Dropdown.Item onSelect={save}>
+              <Bookmark size={15} />{post.bookmarked
+                ? 'Hapus dari tersimpan'
+                : 'Simpan posting'}
+            </Dropdown.Item><Dropdown.Separator /><Dropdown.Item
+              onSelect={() => (reporting = true)}
+            >
+              <Flag size={15} />Laporkan posting
+            </Dropdown.Item>{/if}
+        </Dropdown.Content>
+      </Dropdown.Root>
     </div>
-    <a class="cx-post-community" href="/communities/{post.community_id}">
+    <a class="cx-post-community" href={'/communities/' + post.community_id}>
       {#if community?.visibility !== 'public'}<LockKeyhole
-          size={11}
+          size={12}
         />{/if}{community?.title ?? 'Komunitas'}
     </a>
     {#if detail}<p class="cx-post-body strata-body">{post.text}</p>{:else}<a
-        href="/square/{post.rootId}"
+        href={'/square/' + post.rootId}
         class="cx-post-body strata-body"
       >
         {post.text}
       </a>{/if}
-    {#if post.uri}<div class="strata-publication">
+    {#if post.contexts?.length}<div class="context-links mt-3">
+        {#each post.contexts as context}<Badge
+            href={'/contexts/' + context.slug}
+            variant="secondary"
+          >
+            {context.title}
+          </Badge>{/each}
+      </div>{/if}
+    {#if post.uri}<div class="strata-publication mt-3">
         <Globe size={12} />{#if post.publicationState === 'delivered'}<a
             href={'https://atproto-browser.vercel.app/at/' + post.uri.slice(5)}
             target="_blank"
             rel="noreferrer"
           >
             Terbit di AT ↗
-          </a>{:else if post.publicationState === 'uncertain'}Hasil penerbitan
-          perlu diperiksa{:else if post.publicationState === 'pending'}Menunggu
+          </a>{:else if post.publicationState === 'uncertain'}Penerbitan perlu
+          diperiksa{:else if post.publicationState === 'pending'}Menunggu
           penerbitan AT{:else}{post.publicationState}{/if}
       </div>{/if}
     <div class="cx-post-actions">
       <span class="cx-vote">
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           aria-label="Dukung posting"
           aria-pressed={post.myVote === 1}
-          class:active={post.myVote === 1}
           onclick={() => vote(1)}
           disabled={busy}
         >
-          <ArrowUp size={16} />
-        </button>
+          <ArrowUp size={17} />
+        </Button>
         <span>{post.score}</span>
-        <button
+        <Button
+          variant="ghost"
+          size="icon"
           aria-label="Turunkan posting"
           aria-pressed={post.myVote === -1}
-          class:active={post.myVote === -1}
           onclick={() => vote(-1)}
           disabled={busy}
         >
-          <ArrowDown size={16} />
-        </button>
+          <ArrowDown size={17} />
+        </Button>
       </span>
-      <a
+      <Button
+        variant="ghost"
         class="cx-action"
-        href="/square/{post.rootId}#replies"
-        aria-label="{post.replies} balasan"
+        href={'/square/' + post.rootId + '#replies'}
+        aria-label={post.replies + ' balasan'}
       >
-        <MessageCircle size={17} />
-        <span>{post.replies || 'Balas'}</span>
-      </a>
-      <button
+        <MessageCircle size={17} />{post.replies || 'Balas'}
+      </Button><Button
+        variant="ghost"
+        size="icon"
         class="cx-action"
         aria-label="Simpan posting"
         aria-pressed={post.bookmarked}
-        class:active={post.bookmarked}
         onclick={save}
         disabled={busy}
       >
         <Bookmark size={17} fill={post.bookmarked ? 'currentColor' : 'none'} />
-      </button>
-      <button
+      </Button><Button
+        variant="ghost"
+        size="icon"
         class="cx-action cx-share"
         aria-label="Bagikan tautan"
         onclick={share}
       >
-        <Share2 size={16} />
-      </button>
+        <Share2 size={17} />
+      </Button>
     </div>
-    {#if reporting}<form
-        class="cx-inline-form"
-        onsubmit={(e) => {
-          e.preventDefault()
-          report()
-        }}
-      >
-        <label>
-          Alasan laporan
-          <textarea
-            bind:value={reason}
-            maxlength="2000"
-            required
-            placeholder="Apa yang perlu ditinjau?"
-          ></textarea>
-        </label>
-        <div class="cx-actions">
-          <button
-            class="cx-button primary small"
-            disabled={busy || !reason.trim()}
-          >
-            {#if busy}<LoaderCircle size={14} />{/if}Kirim laporan
-          </button>
-          <button
-            type="button"
-            class="cx-button small"
-            onclick={() => (reporting = false)}
-          >
-            Batal
-          </button>
-        </div>
-      </form>{/if}
   </div>
-</article>
+</Card.Root>
+<Dialog.Root bind:open={reporting}>
+  <Dialog.Content class="platform-dialog">
+    <Dialog.Header>
+      <Dialog.Title>Laporkan posting</Dialog.Title><Dialog.Description>
+        Laporan hanya terlihat oleh moderator komunitas.
+      </Dialog.Description>
+    </Dialog.Header>
+    <form
+      class="cx-form"
+      onsubmit={(e) => {
+        e.preventDefault()
+        report()
+      }}
+    >
+      <Label for={'reason-' + post.id}>Alasan laporan</Label><Textarea
+        id={'reason-' + post.id}
+        bind:value={reason}
+        maxlength={2000}
+        required
+        placeholder="Apa yang perlu ditinjau?"
+      /><Button type="submit" disabled={busy || !reason.trim()}>
+        {#if busy}<LoaderCircle size={15} class="animate-spin" />{/if}Kirim
+        laporan
+      </Button>
+    </form>
+  </Dialog.Content>
+</Dialog.Root>

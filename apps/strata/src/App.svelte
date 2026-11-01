@@ -560,7 +560,6 @@
 >
   {#if loading && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore'].includes(parts[0])}<div
       class="route-progress"
-      role="status"
     >
       <PixelLoader />
     </div>{/if}
@@ -800,7 +799,7 @@
             </div>
             <ChevronRight size={16} />
           </a>{/each}
-      </section>{:else}<div class="strata-nodata">
+      </section>{:else if !loading}<div class="strata-nodata">
         <div class="strata-empty-graphic"><BookOpen size={27} /></div>
         <h2>Belum ada halaman</h2>
         <p>Halaman, sumber dan revisi yang diterima akan muncul di sini.</p>

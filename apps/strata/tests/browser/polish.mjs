@@ -25,7 +25,8 @@ try {
     errors = []
   page.setDefaultTimeout(15000)
   page.on('pageerror', (e) => errors.push(e.message))
-  let feedRequests = 0
+  let feedRequests = 0,
+    delayWiki = false
   await page.route('**/auth/me', (r) =>
     r.fulfill({ json: { actor: owner.actor, csrf: 'fixture', steward: true } }),
   )
@@ -50,6 +51,8 @@ try {
         },
       })
     if (url.pathname === '/v1/feed/page') feedRequests++
+    if (delayWiki && url.pathname === '/v1/wiki')
+      await new Promise((resolve) => setTimeout(resolve, 500))
     const res = await handler(
       new Request(req.url(), {
         method: req.method(),
@@ -115,8 +118,7 @@ try {
   await page.goto(origin, { waitUntil: 'networkidle' })
   const before = feedRequests
   await page
-    .locator('main [data-post]')
-    .first()
+    .getByText('Synthetic conversation for layout', { exact: true })
     .dispatchEvent('touchstart', {
       touches: [{ identifier: 1, clientX: 200, clientY: 100 }],
       bubbles: true,
@@ -145,6 +147,22 @@ try {
   await page.waitForTimeout(300)
   assert.equal(feedRequests, before + 1)
   await page.emulateMedia({ reducedMotion: 'reduce' })
+  delayWiki = true
+  await page.goto(origin + '/wiki', { waitUntil: 'domcontentloaded' })
+  await page.locator('.route-progress').waitFor()
+  assert.equal(
+    await page.getByText('Belum ada halaman', { exact: true }).count(),
+    0,
+  )
+  assert.equal(
+    await page
+      .locator('.route-progress .pixel-ring i')
+      .first()
+      .evaluate((el) => getComputedStyle(el).animationName),
+    'none',
+  )
+  await page.getByText('Belum ada halaman', { exact: true }).waitFor()
+  delayWiki = false
   await page.goto(origin + '/explore', { waitUntil: 'networkidle' })
   // Origin transfer uses a separate, intercepted legacy page. No requests reach a live deployment.
   const legacy = await context.newPage()

@@ -29,8 +29,9 @@
       busy ||
       window.scrollY > 0 ||
       e.touches.length !== 1 ||
+      !target.closest('#commons-main') ||
       target.closest(
-        'input,textarea,button,a,[contenteditable="true"],[role="dialog"]',
+        'input,textarea,[contenteditable="true"],[role="dialog"],[role="listbox"]',
       )
     )
       return

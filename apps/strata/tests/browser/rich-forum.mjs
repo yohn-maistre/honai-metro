@@ -116,7 +116,9 @@ try {
   await page
     .getByRole('menuitem', { name: 'Edit posting', exact: true })
     .click()
-  await page.getByLabel('Judul', { exact: true }).fill('Catatan diperbarui')
+  await page
+    .getByLabel('Judul (opsional)', { exact: true })
+    .fill('Catatan diperbarui')
   await page
     .getByRole('dialog')
     .getByRole('button', { name: 'Simpan', exact: true })

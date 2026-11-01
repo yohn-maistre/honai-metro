@@ -20,6 +20,18 @@
   const contexts = $derived(
     data?.contexts.filter((c) => facet === 'all' || c.kind === facet) ?? [],
   )
+  const featured = $derived(
+    data?.posts
+      .filter(
+        (post) =>
+          !post.content?.warning &&
+          (post.media?.length || post.content?.event) &&
+          data?.communities.some(
+            (c) => c.id === post.community_id && c.visibility === 'public',
+          ),
+      )
+      .slice(0, 3) ?? [],
+  )
   const kinds: Record<string, string> = {
     region: 'Wilayah',
     place: 'Tempat',
@@ -68,6 +80,71 @@
   </div>{:else if error}<div class="search-state" role="alert">
     {error}
   </div>{:else if data}
+  <section class="explore-featured" aria-label="Pilihan jelajah">
+    {#if featured.length}{#each featured as post, i}<a
+          class="explore-feature-tile"
+          class:lead={i === 0}
+          class:with-image={!!post.media?.length}
+          href={'/square/' + post.id}
+        >
+          {#if post.media?.[0]}<img
+              src={post.media[0].url}
+              alt={post.media[0].alt}
+              loading="lazy"
+            />{/if}
+          <div>
+            <small>
+              {data.communities.find((c) => c.id === post.community_id)?.title}
+            </small>
+            <strong>{post.content?.title ?? post.text.slice(0, 100)}</strong>
+            {#if post.content?.event}<span>
+                {post.content.event.location}
+              </span>{/if}
+          </div>
+          <ArrowUpRight size={18} />
+        </a>{/each}{:else}
+      <a
+        class="explore-feature-tile lead"
+        href={data.communities[0]
+          ? '/communities/' + data.communities[0].id
+          : '/communities'}
+      >
+        <Users size={24} />
+        <div>
+          <small>Ruang percakapan</small>
+          <strong>{data.communities[0]?.title ?? 'Temukan komunitasmu'}</strong>
+          <span>
+            {data.communities[0]?.description ??
+              'Percakapan, cerita, dan kabar bersama'}
+          </span>
+        </div>
+        <ArrowUpRight size={18} />
+      </a>
+    {/if}
+    <a
+      class="explore-feature-tile knowledge-tile"
+      href={data.wiki[0] ? '/wiki/' + data.wiki[0].id : '/wiki'}
+    >
+      <BookOpen size={24} />
+      <div>
+        <small>Wiki bersama</small>
+        <strong>
+          {data.wiki[0]?.title ?? 'Pengetahuan yang terus tumbuh'}
+        </strong>
+        <span>Catatan, sumber, dan revisi</span>
+      </div>
+      <ArrowUpRight size={18} />
+    </a>
+    <a class="explore-feature-tile places-tile" href="/contexts">
+      <MapPin size={24} />
+      <div>
+        <small>Tempat & bahasa</small>
+        <strong>Jelajahi yang dekat</strong>
+        <span>Wilayah, bahasa, dan topik</span>
+      </div>
+      <ArrowUpRight size={18} />
+    </a>
+  </section>
   {#if data.contexts.length}<section class="discovery-section">
       <div class="discovery-section-head">
         <h2>Tempat & bahasa</h2>

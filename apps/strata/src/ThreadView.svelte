@@ -3,7 +3,7 @@
   import PostCard from './PostCard.svelte'
   import ThreadBranch from './ThreadBranch.svelte'
   import PostComposer from './PostComposer.svelte'
-  import * as NativeSelect from '$lib/components/ui/native-select/index.js'
+  import Choice from './Choice.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { LoaderCircle } from '@lucide/svelte'
   import { replyTree } from './thread'
@@ -77,11 +77,15 @@
       <h2>
         Balasan <span>{post.replies}</span>
       </h2>
-      <NativeSelect.Root aria-label="Urutkan balasan" bind:value={sort}>
-        <option value="old">Terlama</option>
-        <option value="new">Terbaru</option>
-        <option value="top">Teratas</option>
-      </NativeSelect.Root>
+      <Choice
+        aria-label="Urutkan balasan"
+        bind:value={sort}
+        items={[
+          { value: 'old', label: 'Terlama' },
+          { value: 'new', label: 'Terbaru' },
+          { value: 'top', label: 'Teratas' },
+        ]}
+      />
     </div>
     {#each nodes as node (node.post.id)}<ThreadBranch
         {node}

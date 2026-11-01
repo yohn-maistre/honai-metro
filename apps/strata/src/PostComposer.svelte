@@ -16,7 +16,7 @@
     Plus,
   } from '@lucide/svelte'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
-  import * as NativeSelect from '$lib/components/ui/native-select/index.js'
+  import Choice from './Choice.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { Textarea } from '$lib/components/ui/textarea/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
@@ -210,17 +210,15 @@
       {#if !compact}<div class="composer-identity">
           <strong>{actor.name}</strong>
           <span class="composer-destination">
-            <ChevronDown size={12} /><NativeSelect.Root
+            <Choice
               aria-label="Komunitas"
               bind:value={communityId}
               disabled={busy || !!pending || images.length > 0}
-            >
-              {#each communities as community}<option value={community.id}>
-                  {community.title}{community.visibility === 'public'
-                    ? ''
-                    : ' · Privat'}
-                </option>{/each}
-            </NativeSelect.Root>
+              items={communities.map((c) => ({
+                value: c.id,
+                label: c.title + (c.visibility === 'public' ? '' : ' · Privat'),
+              }))}
+            />
           </span>
         </div>{/if}
       {#if showTitle}<Input
@@ -283,18 +281,15 @@
               onclick={() => (pollOptions = [...pollOptions, ''])}
             >
               Tambah pilihan
-            </Button><NativeSelect.Root
+            </Button><Choice
               aria-label="Durasi jajak pendapat"
               bind:value={pollDays}
-            >
-              <option value="1">1 hari</option>
-              <option value="3">3 hari</option>
-              <option value="7">7 hari</option>
-            </NativeSelect.Root><Button
-              variant="ghost"
-              size="sm"
-              onclick={() => (kind = '')}
-            >
+              items={[
+                { value: '1', label: '1 hari' },
+                { value: '3', label: '3 hari' },
+                { value: '7', label: '7 hari' },
+              ]}
+            /><Button variant="ghost" size="sm" onclick={() => (kind = '')}>
               Hapus
             </Button>
           </div>

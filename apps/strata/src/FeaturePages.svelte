@@ -19,7 +19,7 @@
   import * as Dialog from '$lib/components/ui/dialog/index.js'
   import * as Tabs from '$lib/components/ui/tabs/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
-  import * as NativeSelect from '$lib/components/ui/native-select/index.js'
+  import Choice from './Choice.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
   import { Textarea } from '$lib/components/ui/textarea/index.js'
@@ -511,22 +511,15 @@
               })
             }}
           >
-            <Label for="group-context">
-              Tambahkan konteks publik
-            </Label><NativeSelect.Root
+            <Label for="group-context">Tambahkan konteks publik</Label><Choice
               id="group-context"
               bind:value={contextId}
               required
-            >
-              <option value="">Pilih konteks</option>
-              {#each contexts as c}<option value={c.id}>
-                  {c.title}
-                </option>{/each}
-            </NativeSelect.Root><Button
-              type="submit"
-              variant="outline"
-              disabled={busy}
-            >
+              items={[
+                { value: '', label: 'Pilih konteks' },
+                ...contexts.map((c) => ({ value: c.id, label: c.title })),
+              ]}
+            /><Button type="submit" variant="outline" disabled={busy}>
               Tambahkan
             </Button>
           </form>
@@ -816,43 +809,43 @@
         submit()
       }}
     >
-      {#if modal === 'group'}<Label for="group-kind">
-          Jenis
-        </Label><NativeSelect.Root id="group-kind" bind:value={kind}>
-          <option value="institution">Institusi</option>
-          <option value="collective">Kelompok / komunitas</option>
-        </NativeSelect.Root>{/if}
+      {#if modal === 'group'}<Label for="group-kind">Jenis</Label><Choice
+          id="group-kind"
+          bind:value={kind}
+          items={[
+            { value: 'institution', label: 'Institusi' },
+            { value: 'collective', label: 'Kelompok / komunitas' },
+          ]}
+        />{/if}
       {#if modal === 'space'}<Label for="existing-space">
           Ruang yang kamu miliki
-        </Label><NativeSelect.Root id="existing-space" bind:value={bindId}>
-          <option value="">Buat ruang baru</option>
-          {#each communities.filter( (c) => memberships.some((m) => m.community_id === c.id && m.role === 'owner') ) as c}<option
-              value={c.id}
-            >
-              {c.title}
-            </option>{/each}
-        </NativeSelect.Root>{/if}
-      {#if modal === 'work'}<Label for="work-sponsor">
-          Sponsor
-        </Label><NativeSelect.Root
+        </Label><Choice
+          id="existing-space"
+          bind:value={bindId}
+          items={[
+            { value: '', label: 'Buat ruang baru' },
+            ...communities
+              .filter((c) =>
+                memberships.some(
+                  (m) => m.community_id === c.id && m.role === 'owner',
+                ),
+              )
+              .map((c) => ({ value: c.id, label: c.title })),
+          ]}
+        />{/if}
+      {#if modal === 'work'}<Label for="work-sponsor">Sponsor</Label><Choice
           id="work-sponsor"
           bind:value={groupId}
           required
-        >
-          {#each eligible as g}<option value={g.id}>{g.title}</option>{/each}
-        </NativeSelect.Root><Label for="work-forum">
-          Ruang diskusi publik
-        </Label><NativeSelect.Root
+          items={eligible.map((g) => ({ value: g.id, label: g.title }))}
+        /><Label for="work-forum">Ruang diskusi publik</Label><Choice
           id="work-forum"
           bind:value={communityId}
           required
-        >
-          {#each communities.filter((c) => c.visibility === 'public' && isMember(c.id)) as c}<option
-              value={c.id}
-            >
-              {c.title}
-            </option>{/each}
-        </NativeSelect.Root>{/if}
+          items={communities
+            .filter((c) => c.visibility === 'public' && isMember(c.id))
+            .map((c) => ({ value: c.id, label: c.title }))}
+        />{/if}
       {#if modal === 'members'}
         <p class="cx-hint">
           Daftar ini hanya tersedia bagi pengelola. Akses ruang diberikan
@@ -918,17 +911,18 @@
                 AI
               </Badge>{/if}{#if memberId === person.id}<Check size={15} />{/if}
           </Button>{/each}
-        <Label for="member-role">Peran</Label><NativeSelect.Root
+        <Label for="member-role">Peran</Label><Choice
           id="member-role"
           bind:value={memberRole}
-        >
-          <option value="member">Anggota</option>
-          {#if roles.some((r) => r.group_id === group?.id && r.role === 'owner')}<option
-              value="steward"
-            >
-              Pengelola
-            </option>{/if}
-        </NativeSelect.Root>
+          items={[
+            { value: 'member', label: 'Anggota' },
+            ...(roles.some(
+              (r) => r.group_id === group?.id && r.role === 'owner',
+            )
+              ? [{ value: 'steward', label: 'Pengelola' }]
+              : []),
+          ]}
+        />
       {:else}
         {#if modal !== 'result' && !bindId}<Label for="object-title">
             Nama
@@ -955,24 +949,34 @@
             for="object-visibility"
           >
             Siapa yang dapat melihat?
-          </Label><NativeSelect.Root
+          </Label><Choice
             id="object-visibility"
             bind:value={visibility}
-          >
-            <option value="public">Publik</option>
-            {#if modal === 'space'}<option value="listed-private">
-                Anggota · nama ruang terlihat
-              </option>{/if}
-            <option value="hidden-private">Anggota · disembunyikan</option>
-          </NativeSelect.Root>{/if}
+            items={[
+              { value: 'public', label: 'Publik' },
+              ...(modal === 'space'
+                ? [
+                    {
+                      value: 'listed-private',
+                      label: 'Anggota · nama ruang terlihat',
+                    },
+                  ]
+                : []),
+              { value: 'hidden-private', label: 'Anggota · disembunyikan' },
+            ]}
+          />{/if}
         {#if modal === 'context'}<Label for="context-kind">
             Jenis konteks
-          </Label><NativeSelect.Root id="context-kind" bind:value={kind}>
-            <option value="region">Wilayah</option>
-            <option value="place">Tempat</option>
-            <option value="topic">Topik</option>
-            <option value="language">Bahasa</option>
-          </NativeSelect.Root>
+          </Label><Choice
+            id="context-kind"
+            bind:value={kind}
+            items={[
+              { value: 'region', label: 'Wilayah' },
+              { value: 'place', label: 'Tempat' },
+              { value: 'topic', label: 'Topik' },
+              { value: 'language', label: 'Bahasa' },
+            ]}
+          />
           <details class="form-details">
             <summary>Alamat dan bahasa</summary>
             <Label for="context-slug">Alamat singkat</Label><Input
@@ -988,10 +992,14 @@
           </details>{/if}
         {#if modal === 'work' && contexts.length}<Label for="work-context">
             Konteks publik (opsional)
-          </Label><NativeSelect.Root id="work-context" bind:value={contextId}>
-            <option value="">Tanpa konteks</option>
-            {#each contexts as c}<option value={c.id}>{c.title}</option>{/each}
-          </NativeSelect.Root>{/if}
+          </Label><Choice
+            id="work-context"
+            bind:value={contextId}
+            items={[
+              { value: '', label: 'Tanpa konteks' },
+              ...contexts.map((c) => ({ value: c.id, label: c.title })),
+            ]}
+          />{/if}
         {#if modal === 'result'}<Label for="result-citations">
             Sumber publik
           </Label><Textarea

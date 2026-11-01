@@ -150,7 +150,8 @@ try {
     .getByRole('button', { name: 'Tampilkan 1 balasan', exact: true })
     .click()
   await page.getByText('Synthetic child reply', { exact: true }).waitFor()
-  await page.getByLabel('Urutkan balasan', { exact: true }).selectOption('top')
+  await page.getByLabel('Urutkan balasan', { exact: true }).click()
+  await page.getByRole('option', { name: 'Teratas', exact: true }).click()
   await page.screenshot({ path: artifactDir + '/forum-desktop-thread.png' })
   await page.setViewportSize({ width: 390, height: 844 })
   assert.equal(

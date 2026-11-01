@@ -10,6 +10,7 @@
     Globe,
     LoaderCircle,
   } from '@lucide/svelte'
+  import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js'
   import RichPost from './RichPost.svelte'
   import * as Card from '$lib/components/ui/card/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
@@ -51,6 +52,14 @@
     reply?: boolean
     authorBadge?: boolean
   } = $props()
+  let menuOpen = $state(false),
+    discardEdit = $state(false),
+    extraEdit = $state(false)
+  function closeEdit() {
+    if (busy) return
+    if (editDirty) discardEdit = true
+    else editing = false
+  }
   let busy = $state(false),
     reporting = $state(false),
     editing = $state(false),
@@ -62,11 +71,18 @@
     modAction = $state(''),
     modReason = $state(''),
     reason = $state('')
+  const editDirty = $derived(
+    editText !== post.text ||
+      editTitle !== (post.content?.title ?? '') ||
+      editUrl !== (post.content?.url ?? '') ||
+      editWarning !== (post.content?.warning ?? ''),
+  )
   function edit() {
     editText = post.text
     editTitle = post.content?.title ?? ''
     editUrl = post.content?.url ?? ''
     editWarning = post.content?.warning ?? ''
+    extraEdit = !!(editTitle || editUrl || editWarning)
     editing = true
   }
   async function mutate(route: string, body: unknown) {
@@ -160,6 +176,16 @@
   class={'cx-post' + (detail ? ' detail' : '') + (reply ? ' reply' : '')}
   id={'post-' + post.id}
   data-post={post.id}
+  oncontextmenu={(event) => {
+    if (
+      event.target instanceof Element &&
+      !event.target.closest('input,textarea,a,button') &&
+      !window.getSelection()?.toString()
+    ) {
+      event.preventDefault()
+      menuOpen = true
+    }
+  }}
 >
   <a
     class="cx-post-avatar"
@@ -192,7 +218,7 @@
       </a>
       {#if post.pinned}<span class="post-state">Disematkan</span>{/if}
       {#if authorBadge}<span class="reply-author-badge">Penulis</span>{/if}
-      <Dropdown.Root>
+      <Dropdown.Root bind:open={menuOpen}>
         <Dropdown.Trigger class="cx-post-more" aria-label="Opsi posting">
           <Ellipsis size={18} />
         </Dropdown.Trigger><Dropdown.Content align="end">
@@ -343,19 +369,43 @@
   </Dialog.Content>
 </Dialog.Root>
 
-<Dialog.Root bind:open={editing}>
-  <Dialog.Content class="platform-dialog">
-    <Dialog.Header>
-      <Dialog.Title>Edit posting</Dialog.Title><Dialog.Description
-        class="sr-only"
+<Dialog.Root
+  open={editing}
+  onOpenChange={(v) => {
+    if (!v) closeEdit()
+  }}
+>
+  <Dialog.Content
+    class="platform-dialog edit-dialog"
+    showCloseButton={false}
+    onEscapeKeydown={(event) => {
+      event.preventDefault()
+      closeEdit()
+    }}
+    onInteractOutside={(event) => {
+      event.preventDefault()
+      if (!discardEdit) closeEdit()
+    }}
+  >
+    <Dialog.Header class="edit-dialog-header">
+      <Button variant="ghost" onclick={closeEdit} disabled={busy}>Batal</Button>
+      <Dialog.Title>Edit posting</Dialog.Title>
+      <Button
+        type="submit"
+        form={'edit-form-' + post.id}
+        disabled={busy || !editDirty}
       >
-        Perbarui posting Anda.
+        {#if busy}<LoaderCircle size={15} class="animate-spin" />{/if}Simpan
+      </Button>
+      <Dialog.Description class="sr-only">
+        Perbarui tulisan dan rincian posting.
       </Dialog.Description>
     </Dialog.Header>
     <form
-      class="cx-form"
-      onsubmit={(e) => {
-        e.preventDefault()
+      id={'edit-form-' + post.id}
+      class="edit-form"
+      onsubmit={(event) => {
+        event.preventDefault()
         void mutate('edit', {
           revision: post.revision,
           text: editText,
@@ -368,28 +418,79 @@
         })
       }}
     >
-      <Label for={'edit-title-' + post.id}>Judul</Label>
-      <Input
-        id={'edit-title-' + post.id}
-        bind:value={editTitle}
-        maxlength={180}
-      />
-      <Label for={'edit-text-' + post.id}>Posting</Label><Textarea
+      <div class="edit-author">
+        <Avatar.Root>
+          <Avatar.Fallback>{initials(post.author.name)}</Avatar.Fallback>
+        </Avatar.Root>
+        <span>
+          <strong>{post.author.name}</strong>
+          <small>{community?.title ?? 'Percakapan'}</small>
+        </span>
+      </div>
+      <Label class="sr-only" for={'edit-text-' + post.id}>
+        Posting
+      </Label><Textarea
         id={'edit-text-' + post.id}
         bind:value={editText}
         maxlength={20000}
-      /><Label for={'edit-link-' + post.id}>Tautan</Label>
-      <input id={'edit-link-' + post.id} bind:value={editUrl} type="url" />
-      <Label for={'edit-cw-' + post.id}>Peringatan konten</Label>
-      <Input
-        id={'edit-cw-' + post.id}
-        bind:value={editWarning}
-        maxlength={160}
+        class="edit-writing"
+        placeholder="Apa yang terjadi?"
       />
-      <Button type="submit" disabled={busy}>Simpan</Button>
+      <div class="edit-tools">
+        <Button
+          variant="ghost"
+          type="button"
+          aria-expanded={extraEdit}
+          onclick={() => (extraEdit = !extraEdit)}
+        >
+          Rincian posting
+        </Button>
+        <small>{editText.length.toLocaleString('id')} / 20.000</small>
+      </div>
+      {#if extraEdit}<div class="edit-details">
+          <Label for={'edit-title-' + post.id}>Judul (opsional)</Label><Input
+            id={'edit-title-' + post.id}
+            bind:value={editTitle}
+            maxlength={180}
+          />
+          <Label for={'edit-link-' + post.id}>Tautan</Label><Input
+            id={'edit-link-' + post.id}
+            bind:value={editUrl}
+            type="url"
+            maxlength={2048}
+            placeholder="https://"
+          />
+          <Label for={'edit-cw-' + post.id}>Peringatan konten</Label><Input
+            id={'edit-cw-' + post.id}
+            bind:value={editWarning}
+            maxlength={160}
+          />
+        </div>{/if}
     </form>
   </Dialog.Content>
 </Dialog.Root>
+<AlertDialog.Root bind:open={discardEdit}>
+  <AlertDialog.Content>
+    <AlertDialog.Header>
+      <AlertDialog.Title>
+        Buang perubahan?
+      </AlertDialog.Title><AlertDialog.Description>
+        Perubahan ini belum disimpan.
+      </AlertDialog.Description>
+    </AlertDialog.Header><AlertDialog.Footer>
+      <AlertDialog.Cancel>
+        Lanjut mengedit
+      </AlertDialog.Cancel><AlertDialog.Action
+        onclick={() => {
+          editing = false
+          discardEdit = false
+        }}
+      >
+        Buang perubahan
+      </AlertDialog.Action>
+    </AlertDialog.Footer>
+  </AlertDialog.Content>
+</AlertDialog.Root>
 <Dialog.Root bind:open={removing}>
   <Dialog.Content class="platform-dialog">
     <Dialog.Header>

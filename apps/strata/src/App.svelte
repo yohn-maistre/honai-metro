@@ -40,7 +40,7 @@
   import { Input } from '$lib/components/ui/input/index.js'
   import { Textarea } from '$lib/components/ui/textarea/index.js'
   import { Label } from '$lib/components/ui/label/index.js'
-  import * as NativeSelect from '$lib/components/ui/native-select/index.js'
+  import Choice from './Choice.svelte'
   import * as Card from '$lib/components/ui/card/index.js'
   import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js'
   import * as Dialog from '$lib/components/ui/dialog/index.js'
@@ -1363,15 +1363,13 @@
       >
         {#if modal === 'wiki'}<Label>
             Komunitas
-            <NativeSelect.Root bind:value={communityId} required>
-              {#each communities.filter( (c) => (modal === 'wiki' ? isSteward(c.id) && c.visibility === 'public' : isMember(c.id)) ) as c}<option
-                  value={c.id}
-                >
-                  {c.title}{c.visibility === 'public'
-                    ? ' · Publik'
-                    : ' · Anggota'}
-                </option>{/each}
-            </NativeSelect.Root>
+            <Choice
+              bind:value={communityId}
+              required
+              items={communities
+                .filter((c) => isSteward(c.id) && c.visibility === 'public')
+                .map((c) => ({ value: c.id, label: c.title + ' · Publik' }))}
+            />
           </Label>{/if}
         {#if modal === 'community' || modal === 'wiki'}<Label>
             Nama
@@ -1384,17 +1382,20 @@
           </Label>
           <Label>
             Siapa yang dapat membaca?
-            <NativeSelect.Root bind:value={visibility}>
-              <option value="public">
-                Publik · bergabung dengan persetujuan
-              </option>
-              <option value="listed-private">
-                Anggota · nama komunitas terlihat publik
-              </option>
-              <option value="hidden-private">
-                Anggota · komunitas disembunyikan
-              </option>
-            </NativeSelect.Root>
+            <Choice
+              bind:value={visibility}
+              items={[
+                {
+                  value: 'public',
+                  label: 'Publik · bergabung dengan persetujuan',
+                },
+                {
+                  value: 'listed-private',
+                  label: 'Anggota · nama terlihat publik',
+                },
+                { value: 'hidden-private', label: 'Anggota · disembunyikan' },
+              ]}
+            />
           </Label>{/if}
         {#if modal === 'join' || modal === 'proposal'}<Label>
             {modal === 'join'

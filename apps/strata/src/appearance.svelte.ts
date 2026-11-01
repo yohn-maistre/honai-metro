@@ -5,6 +5,7 @@ export const palettes = [
   { id: 'clay', name: 'Tanah', color: '#b7775c' },
   { id: 'sage', name: 'Daun', color: '#7b9287' },
   { id: 'neutral', name: 'Netral', color: '#8b8b95' },
+  { id: 'sky', name: 'Langit', color: '#1680fa' },
   { id: 'sea', name: 'Laut', color: '#6c9bab' },
   { id: 'ochre', name: 'Oker', color: '#bc945e' },
   { id: 'rose', name: 'Ros', color: '#b9848a' },

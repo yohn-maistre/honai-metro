@@ -2214,3 +2214,35 @@
   max-height: min(56dvh, 420px);
   overflow-y: auto;
 }
+/* In a conversation, the opening post gets the full reading width. */
+.cx-post.detail {
+  display: grid !important;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 0 12px !important;
+}
+.cx-post.detail .cx-post-content {
+  display: contents;
+}
+.cx-post.detail .cx-post-avatar {
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+.cx-post.detail .cx-post-meta,
+.cx-post.detail .cx-post-community {
+  grid-column: 2;
+}
+.cx-post.detail .cx-post-body,
+.cx-post.detail .post-gallery,
+.cx-post.detail .cx-post-actions,
+.cx-post.detail .context-links,
+.cx-post.detail .strata-publication {
+  grid-column: 1 / -1;
+}
+.cx-post.detail .cx-post-body {
+  margin-top: 12px;
+}
+@media (max-width: 767px) {
+  .cx-post.detail {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+}

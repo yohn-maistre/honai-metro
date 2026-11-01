@@ -13,6 +13,7 @@
     Vote,
     CalendarDays,
     Code,
+    Plus,
   } from '@lucide/svelte'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import * as NativeSelect from '$lib/components/ui/native-select/index.js'
@@ -40,6 +41,7 @@
     replyingTo,
     onCancelReply,
     onPosted,
+    onStateChange,
     compact = false,
   }: {
     actor: Actor
@@ -49,6 +51,7 @@
     replyingTo?: string
     onCancelReply?: () => void
     onPosted: (post: Post) => void | Promise<void>
+    onStateChange?: (state: { dirty: boolean; busy: boolean }) => void
     compact?: boolean
   } = $props()
   let communityId = $state(untrack(() => initialCommunity)),
@@ -79,6 +82,9 @@
   const hasContent = $derived(
     !!(text.trim() || title.trim() || url.trim() || images.length || kind),
   )
+  $effect(() => {
+    onStateChange?.({ dirty: hasContent, busy: busy || processing })
+  })
   const destination = $derived(communities.find((c) => c.id === communityId))
   onDestroy(() => images.forEach((image) => URL.revokeObjectURL(image.preview)))
   function remove(key: string) {
@@ -345,6 +351,101 @@
                 />{/if}
             </div>{/each}
         </div>{/if}
+      <div class="composer-tools">
+        <input
+          bind:this={picker}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+          class="sr-only"
+          tabindex="-1"
+          aria-label="Pilih gambar"
+          onchange={(e) => void add(e.currentTarget.files)}
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Tambahkan gambar"
+          disabled={busy ||
+            !!pending ||
+            processing ||
+            images.length >= 4 ||
+            destination?.publication !== 'local'}
+          onclick={() => picker?.click()}
+        >
+          {#if processing}<LoaderCircle
+              size={20}
+              class="animate-spin"
+            />{:else}<ImagePlus size={20} />{/if}
+        </Button>
+        {#if !compact && destination?.publication === 'local'}<Button
+            variant="ghost"
+            size="icon"
+            aria-label="Tambahkan tautan"
+            title="Tautan"
+            aria-pressed={showUrl}
+            disabled={busy || !!pending}
+            onclick={() => (showUrl = !showUrl)}
+          >
+            <Link size={20} />
+          </Button>{#if !parentId}<Button
+              variant="ghost"
+              size="icon"
+              aria-label="Tambahkan jajak pendapat"
+              title="Jajak pendapat"
+              aria-pressed={kind === 'poll'}
+              disabled={busy || !!pending}
+              onclick={() => (kind = kind === 'poll' ? '' : 'poll')}
+            >
+              <Vote size={20} />
+            </Button>{/if}{/if}
+        {#if destination?.publication === 'local'}<Dropdown.Root>
+            <Dropdown.Trigger
+              class="composer-tool"
+              aria-label="Opsi konten"
+              disabled={busy || !!pending}
+            >
+              <Plus size={20} />
+            </Dropdown.Trigger><Dropdown.Content>
+              <Dropdown.Item onSelect={() => (showTitle = !showTitle)}>
+                <Heading size={16} />Judul
+              </Dropdown.Item><Dropdown.Item
+                onSelect={() => (showUrl = !showUrl)}
+              >
+                <Link size={16} />Tautan / video
+              </Dropdown.Item><Dropdown.Item
+                onSelect={() => (showWarning = !showWarning)}
+              >
+                <ShieldAlert size={16} />Peringatan konten
+              </Dropdown.Item>{#if !parentId}<Dropdown.Item
+                  onSelect={() => (kind = kind === 'poll' ? '' : 'poll')}
+                >
+                  <Vote size={16} />Jajak pendapat
+                </Dropdown.Item><Dropdown.Item
+                  onSelect={() => (kind = kind === 'event' ? '' : 'event')}
+                >
+                  <CalendarDays size={16} />Acara
+                </Dropdown.Item>{/if}<Dropdown.Separator
+              /><Dropdown.CheckboxItem
+                checked={format}
+                onCheckedChange={(v) => (format = v)}
+              >
+                <Code size={16} />Markdown
+              </Dropdown.CheckboxItem>
+            </Dropdown.Content>
+          </Dropdown.Root>{/if}
+        {#if text.trim()}<Button
+            variant="ghost"
+            size="sm"
+            onclick={() => (preview = !preview)}
+          >
+            {preview ? 'Tulis' : 'Pratinjau'}
+          </Button>{/if}
+        {#if text.length > 19500}<span class="composer-count">
+            {(destination?.publication === 'atproto' ? 6000 : 20000) -
+              text.length}
+          </span>{/if}
+      </div>
     </div>
     {#if compact}<Button
         class="composer-send"
@@ -359,79 +460,6 @@
       </Button>{/if}
   </div>
   <div class="composer-footer" class:reply-footer={compact}>
-    <div class="composer-tools">
-      <input
-        bind:this={picker}
-        type="file"
-        accept="image/jpeg,image/png,image/webp"
-        multiple
-        class="sr-only"
-        tabindex="-1"
-        aria-label="Pilih gambar"
-        onchange={(e) => void add(e.currentTarget.files)}
-      />
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label="Tambahkan gambar"
-        disabled={busy ||
-          !!pending ||
-          processing ||
-          images.length >= 4 ||
-          destination?.publication !== 'local'}
-        onclick={() => picker?.click()}
-      >
-        {#if processing}<LoaderCircle
-            size={20}
-            class="animate-spin"
-          />{:else}<ImagePlus size={20} />{/if}
-      </Button>
-      {#if destination?.publication === 'local'}<Dropdown.Root>
-          <Dropdown.Trigger
-            class="composer-tool"
-            aria-label="Opsi konten"
-            disabled={busy || !!pending}
-          >
-            <Heading size={20} />
-          </Dropdown.Trigger><Dropdown.Content>
-            <Dropdown.Item onSelect={() => (showTitle = !showTitle)}>
-              <Heading size={16} />Judul
-            </Dropdown.Item><Dropdown.Item
-              onSelect={() => (showUrl = !showUrl)}
-            >
-              <Link size={16} />Tautan / video
-            </Dropdown.Item><Dropdown.Item
-              onSelect={() => (showWarning = !showWarning)}
-            >
-              <ShieldAlert size={16} />Peringatan konten
-            </Dropdown.Item>{#if !parentId}<Dropdown.Item
-                onSelect={() => (kind = kind === 'poll' ? '' : 'poll')}
-              >
-                <Vote size={16} />Jajak pendapat
-              </Dropdown.Item><Dropdown.Item
-                onSelect={() => (kind = kind === 'event' ? '' : 'event')}
-              >
-                <CalendarDays size={16} />Acara
-              </Dropdown.Item>{/if}<Dropdown.Separator /><Dropdown.CheckboxItem
-              checked={format}
-              onCheckedChange={(v) => (format = v)}
-            >
-              <Code size={16} />Markdown
-            </Dropdown.CheckboxItem>
-          </Dropdown.Content>
-        </Dropdown.Root>{/if}
-      {#if text.trim()}<Button
-          variant="ghost"
-          size="sm"
-          onclick={() => (preview = !preview)}
-        >
-          {preview ? 'Tulis' : 'Pratinjau'}
-        </Button>{/if}
-      {#if text.length > 19500}<span class="composer-count">
-          {(destination?.publication === 'atproto' ? 6000 : 20000) -
-            text.length}
-        </span>{/if}
-    </div>
     {#if !compact}<span class="composer-audience">
         {#if destination?.visibility === 'public'}<Globe
             size={13}

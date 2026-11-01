@@ -39,6 +39,7 @@
   import { Label } from '$lib/components/ui/label/index.js'
   import * as NativeSelect from '$lib/components/ui/native-select/index.js'
   import * as Card from '$lib/components/ui/card/index.js'
+  import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js'
   import * as Dialog from '$lib/components/ui/dialog/index.js'
   import * as Tabs from '$lib/components/ui/tabs/index.js'
   import { Badge } from '$lib/components/ui/badge/index.js'
@@ -80,13 +81,25 @@
       { id: string; created: number; perspective: string; language: string }[]
     >([])
   let tab = $state('discussion'),
-    feedTab = $state('new'),
+    feedTab = $state<'new' | 'mine'>('new'),
     handle = $state(''),
     publishingConsent = $state(false),
     inviteHandle = $state('')
   let modal = $state<
     null | 'compose' | 'community' | 'wiki' | 'proposal' | 'manage' | 'join'
   >(null)
+  let composeState = $state({ dirty: false, busy: false }),
+    discardDraft = $state(false)
+  function closeModal() {
+    if (modal === 'compose') {
+      if (composeState.busy) return
+      if (composeState.dirty) {
+        discardDraft = true
+        return
+      }
+    }
+    modal = null
+  }
   let text = $state(''),
     title = $state(''),
     description = $state(''),
@@ -337,6 +350,7 @@
       navigate('/login')
       return
     }
+    composeState = { dirty: false, busy: false }
     modal = kind
     communityId = id || memberships[0]?.community_id || communities[0]?.id || ''
     text = ''
@@ -497,6 +511,9 @@
   {auth}
   {unread}
   onCompose={() => open('compose')}
+  onRefresh={() => load()}
+  feedMode={feedTab}
+  onFeedChange={(mode) => (feedTab = mode)}
   onSearch={(q) => navigate('/find?q=' + encodeURIComponent(q))}
 >
   {#if loading && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore'].includes(parts[0])}<div
@@ -954,32 +971,7 @@
         <Bookmark size={18} />
       </div>{:else if path === '/find'}<div class="cx-page-head">
         <h1>Hasil pencarian</h1>
-      </div>{:else}<div class="cx-page-head">
-        <h1>Beranda</h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Muat ulang"
-          onclick={() => load()}
-        >
-          <RefreshCw size={16} />
-        </Button>
-      </div>
-      <div class="filter-tabs" role="group" aria-label="Urutan percakapan">
-        <Button
-          variant="ghost"
-          aria-pressed={feedTab === 'new'}
-          onclick={() => (feedTab = 'new')}
-        >
-          Terbaru
-        </Button><Button
-          variant="ghost"
-          aria-pressed={feedTab === 'mine'}
-          onclick={() => (feedTab = 'mine')}
-        >
-          Komunitasku
-        </Button>
-      </div>
+      </div>{:else}<h1 class="sr-only">Beranda</h1>
       <div class="cx-composer-bar">
         <span class="cx-avatar sage">
           {auth.actor ? initials(auth.actor.name) : '+'}
@@ -1070,22 +1062,11 @@
           Ruang komunitas akan muncul di sini.
         </p>{/if}
     </div>
-    <a href="/wiki" class="cx-context-spotlight">
-      <div>
-        <BookOpen size={26} />
-        <h3 style="margin-top:22px">Wiki bersama</h3>
-        <span>Wiki & revisi<ArrowUpRight size={14} /></span>
-      </div>
+    <a href="/wiki" class="rail-knowledge-link">
+      <BookOpen size={18} />
+      <span>Wiki bersama</span>
+      <ArrowUpRight size={14} />
     </a>
-    <div class="cx-context-block">
-      <h2 style="font-size:15px">Akun & akses</h2>
-      <p class="cx-hint" style="margin-top:12px">
-        Keanggotaan dan izin tetap mengikuti setiap komunitas.
-      </p>
-      <a class="cx-text-link" href="/preferences">
-        Akun & pengaturan<ChevronRight size={13} />
-      </a>
-    </div>
     <div class="cx-rail-footer">
       <a
         href="https://github.com/yohn-maistre/honai-metro"
@@ -1123,14 +1104,43 @@
 <Dialog.Root
   open={modal !== null}
   onOpenChange={(value) => {
-    if (!value) modal = null
+    if (!value) closeModal()
   }}
 >
   <Dialog.Content
     class={'platform-dialog' + (modal === 'compose' ? ' compose-dialog' : '')}
-    showCloseButton={true}
+    showCloseButton={modal !== 'compose'}
+    onEscapeKeydown={(event) => {
+      if (modal === 'compose') {
+        event.preventDefault()
+        closeModal()
+      }
+    }}
+    onInteractOutside={(event) => {
+      if (modal === 'compose') {
+        event.preventDefault()
+        if (!discardDraft) closeModal()
+      }
+    }}
   >
     <Dialog.Header>
+      {#if modal === 'compose'}<Button
+          class="compose-cancel"
+          variant="ghost"
+          disabled={composeState.busy}
+          onclick={closeModal}
+        >
+          Batal
+        </Button><Button
+          class="compose-close"
+          variant="ghost"
+          size="icon"
+          aria-label="Tutup"
+          disabled={composeState.busy}
+          onclick={closeModal}
+        >
+          <X size={18} />
+        </Button>{/if}
       <Dialog.Title>
         {modal === 'compose'
           ? 'Posting baru'
@@ -1264,10 +1274,12 @@
           </p>{/if}
       </details>
     {:else if modal === 'compose' && auth.actor}<PostComposer
+        onStateChange={(state) => (composeState = state)}
         actor={auth.actor}
         communities={communities.filter((c) => isMember(c.id))}
         initialCommunity={communityId}
         onPosted={(post) => {
+          composeState = { dirty: false, busy: false }
           modal = null
           navigate('/square/' + post.id)
         }}
@@ -1370,3 +1382,24 @@
       </form>{/if}
   </Dialog.Content>
 </Dialog.Root>
+
+<AlertDialog.Root bind:open={discardDraft}>
+  <AlertDialog.Content class="draft-confirm">
+    <AlertDialog.Header>
+      <AlertDialog.Title>Buang draf?</AlertDialog.Title><AlertDialog.Description
+      >
+        Tulisan dan lampiran yang belum dikirim akan dilepas.
+      </AlertDialog.Description>
+    </AlertDialog.Header><AlertDialog.Footer>
+      <AlertDialog.Cancel>Lanjut menulis</AlertDialog.Cancel><AlertDialog.Action
+        onclick={() => {
+          composeState = { dirty: false, busy: false }
+          modal = null
+          discardDraft = false
+        }}
+      >
+        Buang draf
+      </AlertDialog.Action>
+    </AlertDialog.Footer>
+  </AlertDialog.Content>
+</AlertDialog.Root>

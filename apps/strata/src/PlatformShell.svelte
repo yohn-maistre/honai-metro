@@ -12,6 +12,9 @@
     unread = 0,
     onCompose,
     onSearch,
+    onRefresh,
+    feedMode,
+    onFeedChange,
   }: {
     children: Snippet
     rail: Snippet
@@ -21,11 +24,25 @@
     unread?: number
     onCompose: () => void
     onSearch: (q: string) => void
+    onRefresh: () => void
+    feedMode: 'new' | 'mine'
+    onFeedChange: (mode: 'new' | 'mine') => void
   } = $props()
 </script>
 
 <Sidebar.Provider style="--sidebar-width: 15rem;">
-  <ShellContent {path} {heading} {auth} {unread} {onCompose} {onSearch} {rail}>
+  <ShellContent
+    {path}
+    {heading}
+    {auth}
+    {unread}
+    {onCompose}
+    {onSearch}
+    {onRefresh}
+    {feedMode}
+    {onFeedChange}
+    {rail}
+  >
     {@render children()}
   </ShellContent>
 </Sidebar.Provider>

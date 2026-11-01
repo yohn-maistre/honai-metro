@@ -3,7 +3,6 @@
   import * as Sidebar from '$lib/components/ui/sidebar/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
-  import * as Breadcrumb from '$lib/components/ui/breadcrumb/index.js'
   import { Button } from '$lib/components/ui/button/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
   import {
@@ -25,6 +24,8 @@
     Building2,
     ListTodo,
     ArrowLeft,
+    ChevronDown,
+    RefreshCw,
   } from '@lucide/svelte'
   import { appearance } from './appearance.svelte'
   import { initials, type Auth } from './api'
@@ -37,6 +38,9 @@
     unread = 0,
     onCompose,
     onSearch,
+    onRefresh,
+    feedMode,
+    onFeedChange,
   }: {
     children: Snippet
     rail: Snippet
@@ -46,6 +50,9 @@
     unread?: number
     onCompose: () => void
     onSearch: (q: string) => void
+    onRefresh: () => void
+    feedMode: 'new' | 'mine'
+    onFeedChange: (mode: 'new' | 'mine') => void
   } = $props()
   const sidebar = Sidebar.useSidebar()
   let searchOpen = $state(false)
@@ -68,12 +75,13 @@
 </script>
 
 <a class="cx-skip" href="#commons-main">Lewati navigasi</a>
-<Sidebar.Root>
+<Sidebar.Root class="etnos-sidebar">
   <Sidebar.Header class="p-5 pb-3">
     <div class="cx-between">
       <a href="/" class="cx-brand">
-        etnos
-        <span>.</span>
+        <span class="brand-full">etnos</span>
+        <span class="brand-compact" aria-hidden="true">e</span>
+        <span class="brand-dot">.</span>
       </a>
       <Button
         variant="ghost"
@@ -86,7 +94,11 @@
       </Button>
     </div>
     <Dropdown.Root>
-      <Dropdown.Trigger class="workspace-picker">
+      <Dropdown.Trigger
+        class="workspace-picker"
+        aria-label="Jelajahi wilayah"
+        title="Jelajahi wilayah"
+      >
         <span class="workspace-mark"><Compass size={16} /></span>
         <span>Semua wilayah</span>
         <ChevronsUpDown size={14} />
@@ -123,6 +135,8 @@
               {#snippet child({ props })}<a
                   {...props}
                   href={item.href}
+                  aria-label={item.label}
+                  title={item.label}
                   aria-current={active(item.href) ? 'page' : undefined}
                 >
                   <item.icon size={20} strokeWidth={1.7} />
@@ -133,18 +147,33 @@
       </Sidebar.Menu>
     </Sidebar.Group>
     <div class="px-4 pt-2">
-      <Button class="w-full" onclick={onCompose}>
-        <Plus size={18} />Posting
+      <Button
+        class="w-full sidebar-compose"
+        aria-label="Posting"
+        title="Posting"
+        onclick={onCompose}
+      >
+        <Plus size={18} />
+        <span>Posting</span>
       </Button>
     </div>
   </Sidebar.Content>
   <Sidebar.Footer class="p-4 gap-3">
-    <Button href="/preferences" variant="ghost" class="justify-start">
-      <Settings2 size={18} />Pengaturan
+    <Button
+      href="/preferences"
+      variant="ghost"
+      class="justify-start sidebar-settings"
+      aria-label="Pengaturan"
+      title="Pengaturan"
+    >
+      <Settings2 size={18} />
+      <span>Pengaturan</span>
     </Button>
     {#if auth.actor}<a
         href={'/people/' + auth.actor.id}
         class="account-link"
+        aria-label={'Profil ' + auth.actor.name}
+        title={'Profil ' + auth.actor.name}
         onclick={() => sidebar.setOpenMobile(false)}
       >
         <Avatar.Root>
@@ -161,14 +190,16 @@
       >
         Masuk
       </Button>{/if}
-    <span class="preview-label">
-      <span></span>
-      Pratinjau terhubung
-    </span>
+    <span class="preview-label">ETNOS · Alpha</span>
   </Sidebar.Footer>
 </Sidebar.Root>
 <Sidebar.Inset class="platform-inset">
-  <header class="cx-topbar" class:thread-topbar={path.startsWith('/square/')}>
+  <header
+    class="cx-topbar"
+    class:home-topbar={path === '/'}
+    class:sidebar-collapsed={sidebar.state === 'collapsed'}
+    class:thread-topbar={path.startsWith('/square/')}
+  >
     {#if path.startsWith('/square/')}<Button
         href="/"
         variant="ghost"
@@ -178,7 +209,7 @@
       >
         <ArrowLeft size={22} />
       </Button>
-      <span class="thread-heading">Percakapan</span>{/if}
+    {/if}
     <Button
       variant="ghost"
       size="icon"
@@ -187,15 +218,23 @@
     >
       <PanelLeft size={19} />
     </Button>
-    <Breadcrumb.Root class="top-breadcrumb">
-      <Breadcrumb.List>
-        <Breadcrumb.Item>
-          <Breadcrumb.Link href="/">ETNOS</Breadcrumb.Link>
-        </Breadcrumb.Item><Breadcrumb.Separator /><Breadcrumb.Item>
-          <Breadcrumb.Page>{heading}</Breadcrumb.Page>
-        </Breadcrumb.Item>
-      </Breadcrumb.List>
-    </Breadcrumb.Root>
+    <div class="surface-heading">
+      {#if path === '/'}<Dropdown.Root>
+          <Dropdown.Trigger class="surface-switch" aria-label="Pilih linimasa">
+            {feedMode === 'mine' ? 'Komunitasku' : 'Terbaru'}<ChevronDown
+              size={14}
+            />
+          </Dropdown.Trigger><Dropdown.Content align="center">
+            <Dropdown.Item onSelect={() => onFeedChange('new')}>
+              Terbaru
+            </Dropdown.Item><Dropdown.Item
+              onSelect={() => onFeedChange('mine')}
+            >
+              Komunitasku
+            </Dropdown.Item>
+          </Dropdown.Content>
+        </Dropdown.Root>{:else}<span>{heading}</span>{/if}
+    </div>
     <a href="/" class="cx-mobile-brand">
       etnos
       <span>.</span>
@@ -236,6 +275,15 @@
         class="border-0 shadow-none focus-visible:ring-0 bg-transparent"
       />
     </form>
+    {#if path === '/'}<Button
+        variant="ghost"
+        size="icon"
+        class="header-refresh"
+        aria-label="Muat ulang"
+        onclick={onRefresh}
+      >
+        <RefreshCw size={18} />
+      </Button>{/if}
     <Button
       href="/notifications"
       variant="ghost"
@@ -258,7 +306,14 @@
         />{/if}
     </Button>
   </header>
-  <div class="cx-content-grid">
+  <div
+    class="cx-content-grid"
+    data-surface={path.startsWith('/square/')
+      ? 'thread'
+      : path === '/'
+        ? 'feed'
+        : 'page'}
+  >
     <main id="commons-main" class="cx-main" tabindex="-1">
       {@render children()}
     </main>
@@ -287,8 +342,15 @@
   <Button size="icon" aria-label="Posting baru" onclick={onCompose}>
     <Plus size={23} />
   </Button>
-  <Button href="/wiki" variant="ghost" size="icon" aria-label="Wiki">
-    <BookOpen size={21} />
+  <Button
+    href="/notifications"
+    variant="ghost"
+    size="icon"
+    aria-label={unread ? `Aktivitas, ${unread} belum dibaca` : 'Aktivitas'}
+    aria-current={active('/notifications') ? 'page' : undefined}
+    class="mobile-activity"
+  >
+    <Bell size={21} />{#if unread}<span class="bell-dot"></span>{/if}
   </Button>
   <Button
     variant="ghost"

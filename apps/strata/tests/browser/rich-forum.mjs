@@ -197,10 +197,80 @@ try {
     path: artifactDir + '/strata-rich-compose-result-1440.png',
     fullPage: true,
   })
+  await page.goto(origin, { waitUntil: 'networkidle' })
+  await page
+    .getByRole('button', { name: 'Pilih linimasa', exact: true })
+    .click()
+  await page.getByRole('menuitem', { name: 'Komunitasku', exact: true }).click()
+  assert.match(
+    await page
+      .getByRole('button', { name: 'Pilih linimasa', exact: true })
+      .innerText(),
+    /Komunitasku/,
+  )
+  await page
+    .getByRole('button', { name: 'Posting', exact: true })
+    .first()
+    .click()
+  await page
+    .getByRole('dialog', { name: 'Posting baru' })
+    .getByLabel('Posting', { exact: true })
+    .fill('Keep this draft while reviewing')
+  await page.getByRole('button', { name: 'Batal', exact: true }).click()
+  await page.getByRole('alertdialog', { name: 'Buang draf?' }).waitFor()
+  await page
+    .getByRole('button', { name: 'Lanjut menulis', exact: true })
+    .click()
+  assert.equal(
+    await page
+      .getByRole('dialog', { name: 'Posting baru' })
+      .getByLabel('Posting', { exact: true })
+      .inputValue(),
+    'Keep this draft while reviewing',
+  )
+  await page.keyboard.press('Escape')
+  await page.getByRole('alertdialog', { name: 'Buang draf?' }).waitFor()
+  await page
+    .getByRole('button', { name: 'Lanjut menulis', exact: true })
+    .click()
+  await page
+    .getByRole('dialog', { name: 'Posting baru' })
+    .getByRole('button', { name: 'Tutup', exact: true })
+    .click()
+  await page.getByRole('alertdialog', { name: 'Buang draf?' }).waitFor()
+  await page.getByRole('button', { name: 'Buang draf', exact: true }).click()
+  await page
+    .getByRole('dialog', { name: 'Posting baru' })
+    .waitFor({ state: 'hidden' })
+  await page.keyboard.press('Control+b')
+  await page
+    .getByRole('button', { name: 'Semua ruang', exact: true })
+    .first()
+    .click()
+  await page
+    .getByRole('link', { name: 'Beranda', exact: true })
+    .first()
+    .waitFor()
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page
+    .getByRole('button', { name: 'Pilih linimasa', exact: true })
+    .click()
+  await page.getByRole('menuitem', { name: 'Terbaru', exact: true }).click()
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+    false,
+  )
+  assert.equal(await page.getByRole('main').count(), 1)
   assert.deepEqual(errors, [])
   console.log(
     JSON.stringify({
       fixtureOnly: true,
+      draftDiscardAndResume: true,
+      escapeAndClosePreserveDraft: true,
+      mobileTimelineSwitch: true,
+      sidebarRestore: true,
       markdownSanitized: true,
       noAutomaticVideoRequests: true,
       pollVoted: true,

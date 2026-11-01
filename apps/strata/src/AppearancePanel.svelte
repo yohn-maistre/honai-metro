@@ -3,7 +3,6 @@
   import { Button } from '$lib/components/ui/button/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
   import { Label } from '$lib/components/ui/label/index.js'
-  import * as Tabs from '$lib/components/ui/tabs/index.js'
   import { Check, Moon, Sun } from '@lucide/svelte'
   import { appearance, palettes } from './appearance.svelte'
   let custom = $state(appearance.accent),
@@ -13,16 +12,21 @@
 <Card.Root class="appearance-card">
   <Card.Header><Card.Title>Tampilan</Card.Title></Card.Header>
   <Card.Content class="strata-stack">
-    <Tabs.Root bind:value={appearance.theme}>
-      <Tabs.List aria-label="Tema" class="w-full">
-        <Tabs.Trigger value="light" class="flex-1">
-          <Sun size={16} />Terang
-        </Tabs.Trigger>
-        <Tabs.Trigger value="dark" class="flex-1">
-          <Moon size={16} />Gelap
-        </Tabs.Trigger>
-      </Tabs.List>
-    </Tabs.Root>
+    <div role="group" aria-label="Tema" class="appearance-theme">
+      <Button
+        variant="ghost"
+        aria-pressed={appearance.theme === 'light'}
+        onclick={() => (appearance.theme = 'light')}
+      >
+        <Sun size={16} />Terang
+      </Button><Button
+        variant="ghost"
+        aria-pressed={appearance.theme === 'dark'}
+        onclick={() => (appearance.theme = 'dark')}
+      >
+        <Moon size={16} />Gelap
+      </Button>
+    </div>
     <div>
       <Label>Warna aksen</Label>
       <div class="accent-options">

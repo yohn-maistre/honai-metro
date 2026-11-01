@@ -776,48 +776,52 @@
             Wiki
           </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
         </Tabs.List>
+        <Tabs.Content value={tab}>
+          {#if tab === 'about'}<Card.Root class="strata-card">
+              <p class="strata-body">{community.description}</p>
+              <p class="cx-hint">
+                {community.visibility === 'public'
+                  ? 'Isi dapat dibaca publik.'
+                  : 'Isi hanya tersedia bagi anggota saat ini.'}
+                {community.admission === 'approval'
+                  ? 'Permintaan bergabung ditinjau pengelola.'
+                  : community.admission === 'invite'
+                    ? 'Keanggotaan melalui undangan.'
+                    : 'Keanggotaan terbuka.'}
+              </p>
+            </Card.Root>{:else if tab === 'wiki'}<Card.Root class="strata-card">
+              {#each wiki.filter((p) => p.community_id === community.id) as p}<a
+                  href={'/wiki/' + p.id}
+                  class="cx-list-row"
+                >
+                  <BookOpen size={18} />{p.title}<ChevronRight size={15} />
+                </a>{/each}{#if isSteward(community.id) && community.visibility === 'public'}<Button
+                  class="cx-button small"
+                  onclick={() => open('wiki', community.id)}
+                  type="button"
+                  variant="outline"
+                >
+                  <Plus size={14} />Halaman baru
+                </Button>{/if}
+            </Card.Root>{:else}{#each posts as p}<PostCard
+                post={p}
+                {community}
+                loggedIn={!!auth.actor}
+                canVote={!!currentMembership}
+                onError={notify}
+              />{/each}{#if !posts.length && !loading}<div
+                class="strata-nodata"
+              >
+                <MessageCircle size={26} />
+                <h2>Belum ada percakapan</h2>
+                <p>
+                  {currentMembership
+                    ? 'Mulai percakapan pertama.'
+                    : 'Gabung komunitas untuk ikut berbicara.'}
+                </p>
+              </div>{/if}{/if}
+        </Tabs.Content>
       </Tabs.Root>
-      {#if tab === 'about'}<Card.Root class="strata-card">
-          <p class="strata-body">{community.description}</p>
-          <p class="cx-hint">
-            {community.visibility === 'public'
-              ? 'Isi dapat dibaca publik.'
-              : 'Isi hanya tersedia bagi anggota saat ini.'}
-            {community.admission === 'approval'
-              ? 'Permintaan bergabung ditinjau pengelola.'
-              : community.admission === 'invite'
-                ? 'Keanggotaan melalui undangan.'
-                : 'Keanggotaan terbuka.'}
-          </p>
-        </Card.Root>{:else if tab === 'wiki'}<Card.Root class="strata-card">
-          {#each wiki.filter((p) => p.community_id === community.id) as p}<a
-              href={'/wiki/' + p.id}
-              class="cx-list-row"
-            >
-              <BookOpen size={18} />{p.title}<ChevronRight size={15} />
-            </a>{/each}{#if isSteward(community.id) && community.visibility === 'public'}<Button
-              class="cx-button small"
-              onclick={() => open('wiki', community.id)}
-              type="button"
-              variant="outline"
-            >
-              <Plus size={14} />Halaman baru
-            </Button>{/if}
-        </Card.Root>{:else}{#each posts as p}<PostCard
-            post={p}
-            {community}
-            loggedIn={!!auth.actor}
-            canVote={!!currentMembership}
-            onError={notify}
-          />{/each}{#if !posts.length && !loading}<div class="strata-nodata">
-            <MessageCircle size={26} />
-            <h2>Belum ada percakapan</h2>
-            <p>
-              {currentMembership
-                ? 'Mulai percakapan pertama.'
-                : 'Gabung komunitas untuk ikut berbicara.'}
-            </p>
-          </div>{/if}{/if}
     {:else if !loading}<div class="strata-nodata">
         <LockKeyhole size={26} />
         <h2>Komunitas tidak tersedia</h2>
@@ -1002,19 +1006,21 @@
           <RefreshCw size={16} />
         </Button>
       </div>
-      <Tabs.Root bind:value={feedTab}>
-        <Tabs.List
-          variant="line"
-          class="page-tabs"
-          aria-label="Urutan percakapan"
+      <div class="filter-tabs" role="group" aria-label="Urutan percakapan">
+        <Button
+          variant="ghost"
+          aria-pressed={feedTab === 'new'}
+          onclick={() => (feedTab = 'new')}
         >
-          <Tabs.Trigger value="new">Terbaru</Tabs.Trigger><Tabs.Trigger
-            value="mine"
-          >
-            Komunitasku
-          </Tabs.Trigger>
-        </Tabs.List>
-      </Tabs.Root>
+          Terbaru
+        </Button><Button
+          variant="ghost"
+          aria-pressed={feedTab === 'mine'}
+          onclick={() => (feedTab = 'mine')}
+        >
+          Komunitasku
+        </Button>
+      </div>
       <div class="cx-composer-bar">
         <span class="cx-avatar sage">
           {auth.actor ? initials(auth.actor.name) : '+'}

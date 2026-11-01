@@ -11,7 +11,6 @@
     Check,
     LoaderCircle,
   } from '@lucide/svelte'
-  import * as Tabs from '$lib/components/ui/tabs/index.js'
   import * as Card from '$lib/components/ui/card/index.js'
   import { Button } from '$lib/components/ui/button/index.js'
   import {
@@ -120,17 +119,23 @@
     <Button href="/login">Masuk</Button>
   </div>
 {:else}
-  <Tabs.Root bind:value={tab}>
-    <Tabs.List variant="line" class="page-tabs" aria-label="Filter aktivitas">
-      <Tabs.Trigger value="all">Semua</Tabs.Trigger><Tabs.Trigger
-        value="unread"
-      >
-        Belum dibaca{#if inbox.unread}<span class="activity-count">
-            {inbox.unread}
-          </span>{/if}
-      </Tabs.Trigger>
-    </Tabs.List>
-  </Tabs.Root>
+  <div class="filter-tabs" role="group" aria-label="Filter aktivitas">
+    <Button
+      variant="ghost"
+      aria-pressed={tab === 'all'}
+      onclick={() => (tab = 'all')}
+    >
+      Semua
+    </Button><Button
+      variant="ghost"
+      aria-pressed={tab === 'unread'}
+      onclick={() => (tab = 'unread')}
+    >
+      Belum dibaca{#if inbox.unread}<span class="activity-count">
+          {inbox.unread}
+        </span>{/if}
+    </Button>
+  </div>
   {#if loading}<div class="strata-card strata-inline" role="status">
       <LoaderCircle class="animate-spin" size={18} />Memuat aktivitas…
     </div>{:else if error}<div class="strata-card">

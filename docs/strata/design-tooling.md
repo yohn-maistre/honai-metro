@@ -14,7 +14,7 @@ The owner selected **shadcn-svelte throughout**, with Lucide as the single icon 
 | Desktop/mobile shell | Sidebar/Inset and Sheet, Breadcrumb, Avatar and DropdownMenu |
 | Feed and object surfaces | Flat Card rows for discussion; Card tiles for communities, contexts and organizations |
 | Forms | Input, Textarea, Label/Field, Checkbox; NativeSelect preserves familiar mobile pickers |
-| Navigation within a screen | Tabs with line variant; keyboard behavior supplied by Bits UI |
+| Navigation within a screen | Tabs with connected panels for community/group sections; pressed Button groups for feed/activity filters and theme controls |
 | Editors and review | Dialog, Button/Badge, readable document and review Cards |
 | Private messages | Inbox Card rows, local unlock/setup fields, Dialog comparison code, DropdownMenu actions and AlertDialog for block/close |
 | Feedback | Native accessible status/alert regions, real loading/error/empty states and restrained component transitions |

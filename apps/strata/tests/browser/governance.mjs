@@ -174,7 +174,7 @@ try {
     ),
     '#7b9287',
   )
-  await p.getByRole('tab', { name: 'Terang', exact: true }).click()
+  await p.getByRole('button', { name: 'Terang', exact: true }).click()
   assert.equal(
     await p.evaluate(() => document.documentElement.classList.contains('dark')),
     false,

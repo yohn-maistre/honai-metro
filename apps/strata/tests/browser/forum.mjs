@@ -122,6 +122,28 @@ try {
   await page.getByRole('button', { name: 'Terima revisi', exact: true }).click()
   await page.waitForTimeout(200)
   assert.equal(s.get('SELECT count(*) AS n FROM wiki_revisions').n, 1)
+  await page.goto(
+    origin + '/communities/' + s.get('SELECT id FROM communities LIMIT 1').id,
+    { waitUntil: 'networkidle' },
+  )
+  await page.getByRole('tab', { name: 'Tentang', exact: true }).click()
+  await page.getByRole('tabpanel').waitFor()
+  assert.equal(
+    await page
+      .getByRole('tab', { name: 'Tentang', exact: true })
+      .getAttribute('aria-selected'),
+    'true',
+  )
+  await page
+    .getByRole('tab', { name: 'Tentang', exact: true })
+    .press('ArrowLeft')
+  assert.equal(
+    await page
+      .getByRole('tab', { name: 'Wiki', exact: true })
+      .getAttribute('aria-selected'),
+    'true',
+  )
+  assert.equal(await page.getByRole('tabpanel').count(), 1)
   assert.deepEqual(errors, [])
   console.log(
     JSON.stringify({

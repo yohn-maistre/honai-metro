@@ -81,6 +81,22 @@ try {
     .getByLabel('Teks alternatif gambar')
     .fill('Synthetic image for browser contract')
   await page.screenshot({ path: artifactDir + '/forum-desktop-composer.png' })
+  await page.setViewportSize({ width: 390, height: 844 })
+  assert.equal(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > innerWidth,
+    ),
+    false,
+  )
+  const dialogBounds = await page
+    .getByRole('dialog', { name: 'Posting baru' })
+    .boundingBox()
+  assert.equal(dialogBounds.x, 0)
+  assert.equal(dialogBounds.width, 390)
+  assert.equal(dialogBounds.y, 0)
+  assert.equal(dialogBounds.height, 844)
+  await page.screenshot({ path: artifactDir + '/forum-mobile-composer.png' })
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page
     .getByRole('dialog', { name: 'Posting baru' })
     .getByRole('button', { name: 'Posting', exact: true })

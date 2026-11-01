@@ -5,4 +5,8 @@ import './styles/conversation.css'
 import App from './App.svelte'
 import { restoreAppearance } from './appearance.svelte'
 restoreAppearance()
-mount(App, { target: document.getElementById('app')! })
+if (location.pathname === '/recover-messages') {
+  void import('./RecoveryPage.svelte').then(({ default: Recovery }) =>
+    mount(Recovery, { target: document.getElementById('app')! }),
+  )
+} else mount(App, { target: document.getElementById('app')! })

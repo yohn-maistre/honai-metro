@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Search, ArrowUpRight, LoaderCircle } from '@lucide/svelte'
-  import { Input } from '$lib/components/ui/input/index.js'
+  import { Search, ArrowUpRight } from '@lucide/svelte'
+  import PixelLoader from './PixelLoader.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { request } from './api'
   import {
@@ -11,16 +11,14 @@
   } from './search'
   let {
     query = '',
-    navigate,
-  }: { query?: string; navigate: (href: string) => void } = $props()
-  let value = $state(''),
-    category = $state<SearchCategory>('all'),
+    onSearch,
+  }: { query?: string; onSearch: (query: string) => void } = $props()
+  let category = $state<SearchCategory>('all'),
     data = $state<SearchResult | null>(null),
     pending = $state(false),
     error = $state('')
   const groups = $derived(resultGroups(data, category))
   $effect(() => {
-    value = query
     const controller = new AbortController()
     pending = true
     error = ''
@@ -44,20 +42,12 @@
 </script>
 
 <div class="cx-page-head"><h1>Cari</h1></div>
-<form
-  class="discovery-search"
-  onsubmit={(e) => {
-    e.preventDefault()
-    navigate('/find?q=' + encodeURIComponent(value.trim()))
-  }}
->
-  <Search size={18} /><Input
-    bind:value
-    aria-label="Kata pencarian"
-    placeholder="Orang, topik, komunitas…"
-    maxlength={100}
-  /><Button type="submit" variant="ghost">Cari</Button>
-</form>
+<div class="search-query-summary">
+  <span>{query ? `Hasil untuk “${query}”` : 'Di ETNOS'}</span>
+  <Button variant="ghost" onclick={() => onSearch(query)}>
+    <Search size={16} />Ubah pencarian
+  </Button>
+</div>
 <div class="search-filters" role="group" aria-label="Jenis hasil">
   {#each categories as [key, label]}<button
       aria-pressed={category === key}
@@ -67,7 +57,7 @@
     </button>{/each}
 </div>
 {#if pending}<div class="search-state" role="status">
-    <LoaderCircle size={18} class="animate-spin" />Mencari…
+    <PixelLoader label="Mencari…" />
   </div>{:else if error}<div class="search-state" role="alert">
     {error}
   </div>{:else}

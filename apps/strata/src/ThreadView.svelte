@@ -79,6 +79,7 @@
       </h2>
       <Choice
         aria-label="Urutkan balasan"
+        compact
         bind:value={sort}
         items={[
           { value: 'old', label: 'Terlama' },

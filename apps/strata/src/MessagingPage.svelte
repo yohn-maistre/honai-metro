@@ -487,9 +487,12 @@
         </Card.Description>
       </Card.Header><Card.Content>
         {#if device?.device && !localExists}<p class="cx-hint">
-            Kunci pesan ada di browser yang digunakan saat aktivasi. Masuk di
-            sana untuk membaca pesan. Penggantian perangkat belum tersedia.
-          </p>{:else}<form
+            Kunci pesan ada di browser yang digunakan saat aktivasi. Untuk
+            perpindahan domain, pulihkan cadangan terenkripsi di Pengaturan.
+          </p>
+          <Button href="/preferences" variant="outline">
+            Pulihkan kunci pesan
+          </Button>{:else}<form
             class="cx-form"
             onsubmit={(e) => {
               e.preventDefault()

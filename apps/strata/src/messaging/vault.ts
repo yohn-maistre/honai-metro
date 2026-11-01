@@ -197,3 +197,98 @@ export async function save() {
     throw e
   }
 }
+
+// Origin moves are explicit, passphrase-encrypted file transfers. Never send this
+// envelope to the forum server or accept it as an authentication credential.
+export async function localVaultIds(): Promise<string[]> {
+  const d = await db()
+  try {
+    return await new Promise((resolve, reject) => {
+      const r = d.transaction('vaults').objectStore('vaults').getAllKeys()
+      r.onsuccess = () =>
+        resolve(r.result.filter((id): id is string => typeof id === 'string'))
+      r.onerror = () => reject(r.error)
+    })
+  } finally {
+    d.close()
+  }
+}
+export async function exportVault(id: string): Promise<string> {
+  lock()
+  await acquire(id)
+  try {
+    const sealed = await read(id)
+    if (!sealed) throw Error('Tidak ada kunci di browser ini.')
+    return JSON.stringify({
+      format: 'etnos-encrypted-vault',
+      version: 1,
+      origin: location.origin,
+      actorId: id,
+      sealed,
+    })
+  } finally {
+    lock()
+  }
+}
+export async function importVault(
+  id: string,
+  text: string,
+  passphrase: string,
+) {
+  if (text.length > 8 * 1024 * 1024) throw Error('Berkas terlalu besar.')
+  const value = JSON.parse(text)
+  if (
+    value?.format !== 'etnos-encrypted-vault' ||
+    value.version !== 1 ||
+    value.actorId !== id ||
+    ![location.origin, 'https://strata-preview.giyaibo.workers.dev'].includes(
+      value.origin,
+    )
+  )
+    throw Error('Cadangan bukan milik akun atau asal ini.')
+  const sealed = value.sealed as Sealed
+  const valid = (s: unknown, length?: number): s is string =>
+    typeof s === 'string' &&
+    /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(
+      s,
+    ) &&
+    (!length || bytes(s).length === length)
+  if (
+    sealed?.version !== 1 ||
+    !valid(sealed.salt, 16) ||
+    !valid(sealed.iv, 12) ||
+    !valid(sealed.ciphertext)
+  )
+    throw Error('Format cadangan tidak cocok.')
+  const derived = await derive(passphrase, sealed.salt)
+  let clear: ArrayBuffer
+  try {
+    clear = await crypto.subtle.decrypt(
+      {
+        name: 'AES-GCM',
+        iv: bytes(sealed.iv),
+        additionalData: encoder.encode(
+          'strata.dm.vault.v1:' + value.origin + ':' + id,
+        ),
+      },
+      derived,
+      bytes(sealed.ciphertext),
+    )
+  } catch {
+    throw Error('Frasa sandi tidak cocok atau cadangan rusak.')
+  }
+  const recovered = JSON.parse(decoder.decode(clear)) as VaultData
+  if (
+    recovered.actorId !== id ||
+    typeof recovered.deviceId !== 'string' ||
+    typeof recovered.pair?.privateKey !== 'string' ||
+    typeof recovered.pair?.publicKey !== 'string' ||
+    !recovered.threads ||
+    !recovered.packages
+  )
+    throw Error('Kunci akun tidak cocok.')
+  // create() takes the actor lock, rejects overwrites and seals afresh to this
+  // origin. Imported ratchet state must not be used on two active devices.
+  await create(id, passphrase, recovered)
+  lock()
+}

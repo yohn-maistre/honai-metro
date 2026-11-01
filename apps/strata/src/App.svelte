@@ -24,6 +24,10 @@
     History,
   } from '@lucide/svelte'
   import DiscoveryPage from './DiscoveryPage.svelte'
+  import PixelLoader from './PixelLoader.svelte'
+  import FeedRefresh from './FeedRefresh.svelte'
+  import NewsSection from './NewsSection.svelte'
+  import VaultTransfer from './messaging/VaultTransfer.svelte'
   import SearchDialog from './SearchDialog.svelte'
   import SearchPage from './SearchPage.svelte'
   import ThreadView from './ThreadView.svelte'
@@ -62,7 +66,8 @@
     type Capabilities,
     type ActivityInbox,
   } from './api'
-  let searchDialogOpen = $state(false),
+  let searchQuery = $state(''),
+    searchDialogOpen = $state(false),
     profile = $state<Actor | null>(null)
   let path = $state(location.pathname),
     search = $state(location.search),
@@ -548,15 +553,19 @@
     feedTab = mode
     void load()
   }}
-  onSearch={() => (searchDialogOpen = true)}
+  onSearch={(q) => {
+    searchQuery = q
+    searchDialogOpen = true
+  }}
 >
   {#if loading && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore'].includes(parts[0])}<div
-      class="strata-card strata-inline strata-pending"
+      class="route-progress"
       role="status"
     >
-      <LoaderCircle size={18} class="animate-spin" />Memuat…
+      <PixelLoader />
     </div>{/if}
-  {#if error}<div class="strata-card">
+  {#if path === '/recover-messages'}<VaultTransfer recovery />
+  {:else if error}<div class="strata-card">
       <p class="strata-alert" role="alert">{error}</p>
       <Button
         class="cx-button small"
@@ -585,6 +594,7 @@
     <div class="cx-page-head"><h1>Pengaturan</h1></div>
     <Card.Root class="strata-card strata-preferences">
       <AppearancePanel />
+      <VaultTransfer actorId={auth.actor?.id} />
       <a class="cx-list-row" href="/labs/spaces">
         AT Spaces · uji protokol alpha <ChevronRight size={16} />
       </a>
@@ -651,11 +661,14 @@
         {navigate}
       />{/await}
   {:else if path === '/explore'}
-    <DiscoveryPage {auth} {navigate} />
+    <DiscoveryPage {auth} />
   {:else if path === '/find'}
     <SearchPage
+      onSearch={(q) => {
+        searchQuery = q
+        searchDialogOpen = true
+      }}
       query={new SvelteURLSearchParams(search).get('q') ?? ''}
-      {navigate}
     />
   {:else if path === '/notifications'}
     <ActivityPage
@@ -1032,84 +1045,95 @@
         </p>
       </div>{/if}
   {:else if path === '/' || path === '/saved' || path === '/find'}
-    {#if path === '/saved'}<div class="cx-page-head">
-        <h1>Tersimpan</h1>
-        <Bookmark size={18} />
-      </div>{:else if path === '/find'}<div class="cx-page-head">
-        <h1>Hasil pencarian</h1>
-      </div>{:else}<h1 class="sr-only">Beranda</h1>
-      <div class="cx-composer-bar">
-        <span class="cx-avatar sage">
-          {auth.actor ? initials(auth.actor.name) : '+'}
-        </span>
-        <Button onclick={() => open('compose')} type="button" variant="outline">
-          Apa yang terjadi?
-        </Button>
-        <Button
-          class="cx-button primary"
-          onclick={() => open('compose')}
-          type="button"
-          variant="default"
-        >
-          Posting
-        </Button>
-      </div>{/if}
-    {#each displayPosts as p}<PostCard
-        post={p}
-        community={communities.find((c) => c.id === p.community_id)}
-        loggedIn={!!auth.actor}
-        canVote={isMember(p.community_id)}
-        onError={notify}
-        onSaved={() => {
-          if (path === '/saved') saved = saved.filter((x) => x.bookmarked)
-        }}
-      />{/each}
-    {#if !displayPosts.length && !loading}<div class="strata-nodata">
-        <div class="strata-empty-graphic">
-          {#if path === '/saved'}<Bookmark size={27} />{:else}<MessageCircle
-              size={27}
-            />{/if}
-        </div>
-        <h2>
-          {path === '/saved'
-            ? 'Simpan untuk nanti'
-            : path === '/find'
-              ? 'Belum ada hasil'
+    <FeedRefresh
+      enabled={path === '/' && modal === null && !searchDialogOpen}
+      busy={loading}
+      onRefresh={load}
+    >
+      {#if path === '/saved'}<div class="cx-page-head">
+          <h1>Tersimpan</h1>
+          <Bookmark size={18} />
+        </div>{:else if path === '/find'}<div class="cx-page-head">
+          <h1>Hasil pencarian</h1>
+        </div>{:else}<h1 class="sr-only">Beranda</h1>
+        <div class="cx-composer-bar">
+          <span class="cx-avatar sage">
+            {auth.actor ? initials(auth.actor.name) : '+'}
+          </span>
+          <Button
+            onclick={() => open('compose')}
+            type="button"
+            variant="outline"
+          >
+            Apa yang terjadi?
+          </Button>
+          <Button
+            class="cx-button primary"
+            onclick={() => open('compose')}
+            type="button"
+            variant="default"
+          >
+            Posting
+          </Button>
+        </div>{/if}
+      {#each displayPosts as p}<PostCard
+          post={p}
+          community={communities.find((c) => c.id === p.community_id)}
+          loggedIn={!!auth.actor}
+          canVote={isMember(p.community_id)}
+          onError={notify}
+          onSaved={() => {
+            if (path === '/saved') saved = saved.filter((x) => x.bookmarked)
+          }}
+        />{/each}
+      {#if !displayPosts.length && !loading}<div class="strata-nodata">
+          <div class="strata-empty-graphic">
+            {#if path === '/saved'}<Bookmark size={27} />{:else}<MessageCircle
+                size={27}
+              />{/if}
+          </div>
+          <h2>
+            {path === '/saved'
+              ? 'Simpan untuk nanti'
+              : path === '/find'
+                ? 'Belum ada hasil'
+                : feedTab === 'following'
+                  ? 'Ikuti percakapan mereka'
+                  : 'Belum ada percakapan'}
+          </h2>
+          <p>
+            {path === '/saved'
+              ? 'Posting yang kamu simpan tersedia selama kamu memiliki akses.'
               : feedTab === 'following'
-                ? 'Ikuti percakapan mereka'
-                : 'Belum ada percakapan'}
-        </h2>
-        <p>
-          {path === '/saved'
-            ? 'Posting yang kamu simpan tersedia selama kamu memiliki akses.'
-            : feedTab === 'following'
-              ? 'Cari peserta dan pilih Ikuti di profil mereka.'
-              : 'Jelajahi komunitas atau mulai percakapan.'}
-        </p>
-        <Button
-          href={path === '/saved' && !auth.actor ? '/login' : '/communities'}
-          class="cx-button"
-          variant="outline"
-        >
-          {path === '/saved' && !auth.actor ? 'Masuk' : 'Lihat komunitas'}
-        </Button>
-      </div>{/if}
-    {#if nextCursor && path === '/'}<div class="strata-card">
-        <Button
-          class="cx-button"
-          disabled={busy}
-          onclick={more}
-          type="button"
-          variant="outline"
-        >
-          Muat posting lain
-        </Button>
-      </div>{/if}
+                ? 'Cari peserta dan pilih Ikuti di profil mereka.'
+                : 'Jelajahi komunitas atau mulai percakapan.'}
+          </p>
+          <Button
+            href={path === '/saved' && !auth.actor ? '/login' : '/communities'}
+            class="cx-button"
+            variant="outline"
+          >
+            {path === '/saved' && !auth.actor ? 'Masuk' : 'Lihat komunitas'}
+          </Button>
+        </div>{/if}
+      {#if nextCursor && path === '/'}<div class="strata-card">
+          <Button
+            class="cx-button"
+            disabled={busy}
+            onclick={more}
+            type="button"
+            variant="outline"
+          >
+            Muat posting lain
+          </Button>
+        </div>{/if}
+    </FeedRefresh>
   {:else}<div class="strata-nodata">
       <h2>Halaman tidak tersedia</h2>
       <Button href="/" class="cx-button" variant="outline">Beranda</Button>
     </div>{/if}
   {#snippet rail()}
+    <NewsSection compact />
     <div class="cx-context-block">
       <div class="cx-section-head">
         <h2>Komunitas</h2>
@@ -1475,4 +1499,8 @@
   </AlertDialog.Content>
 </AlertDialog.Root>
 
-<SearchDialog bind:open={searchDialogOpen} {navigate} />
+<SearchDialog
+  bind:open={searchDialogOpen}
+  bind:query={searchQuery}
+  {navigate}
+/>

@@ -7,6 +7,7 @@
     name,
     required = false,
     disabled = false,
+    compact = false,
     'aria-label': label,
     class: className = '',
   }: {
@@ -16,6 +17,7 @@
     name?: string
     required?: boolean
     disabled?: boolean
+    compact?: boolean
     'aria-label'?: string
     class?: string
   } = $props()
@@ -35,10 +37,18 @@
   onValueChange={(next) => (value = next === '__strata_empty__' ? '' : next)}
   allowDeselect={false}
 >
-  <Select.Trigger {id} aria-label={label} class={'app-choice ' + className}>
+  <Select.Trigger
+    {id}
+    aria-label={label}
+    class={'app-choice ' + (compact ? 'app-choice-compact ' : '') + className}
+  >
     <span>{items.find((item) => item.value === value)?.label ?? 'Pilih'}</span>
   </Select.Trigger>
-  <Select.Content class="app-choice-menu">
+  <Select.Content
+    class={compact
+      ? 'app-choice-menu app-choice-menu-compact'
+      : 'app-choice-menu'}
+  >
     {#each choices as item}<Select.Item
         value={item.value}
         label={item.label}

@@ -1,18 +1,17 @@
 <script lang="ts">
   import {
-    Search,
     ArrowUpRight,
     Users,
     BookOpen,
     MapPin,
     Building2,
-    LoaderCircle,
   } from '@lucide/svelte'
+  import PixelLoader from './PixelLoader.svelte'
+  import NewsSection from './NewsSection.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { request, initials, type Auth } from './api'
   import type { SearchResult } from './search'
-  let { auth, navigate }: { auth: Auth; navigate: (href: string) => void } =
-    $props()
+  let { auth }: { auth: Auth } = $props()
   let data = $state<SearchResult | null>(null),
     pending = $state(true),
     error = $state(''),
@@ -44,7 +43,8 @@
     pending = true
     request<SearchResult>('/v1/search', undefined, controller.signal)
       .then((result) => {
-        if (!controller.signal.aborted && auth.actor?.id === actor) data = result
+        if (!controller.signal.aborted && auth.actor?.id === actor)
+          data = result
       })
       .catch((e) => {
         if (!controller.signal.aborted) error = e.message
@@ -62,24 +62,17 @@
     <Building2 size={18} />
   </Button>
 </div>
-<button
-  class="discovery-search discovery-launcher"
-  onclick={() => navigate('/find')}
->
-  <Search size={18} />
-  <span>Orang, tempat, bahasa, percakapan</span>
-  <ArrowUpRight size={16} />
-</button>
 <nav class="discovery-nav" aria-label="Jelajah ETNOS">
   <a href="/communities"><Users size={17} />Komunitas</a>
   <a href="/wiki"><BookOpen size={17} />Wiki</a>
   <a href="/groups"><Building2 size={17} />Kelompok</a>
 </nav>
 {#if pending}<div class="search-state" role="status">
-    <LoaderCircle size={18} class="animate-spin" />Memuat…
+    <PixelLoader />
   </div>{:else if error}<div class="search-state" role="alert">
     {error}
   </div>{:else if data}
+  <NewsSection />
   <section class="explore-featured" aria-label="Pilihan jelajah">
     {#if featured.length}{#each featured as post, i}<a
           class="explore-feature-tile"
@@ -127,9 +120,9 @@
     >
       <BookOpen size={24} />
       <div>
-        <small>Wiki bersama</small>
+        {#if data.wiki[0]}<small>Wiki bersama</small>{/if}
         <strong>
-          {data.wiki[0]?.title ?? 'Pengetahuan yang terus tumbuh'}
+          {data.wiki[0]?.title ?? 'Wiki bersama'}
         </strong>
         <span>Catatan, sumber, dan revisi</span>
       </div>
@@ -138,8 +131,7 @@
     <a class="explore-feature-tile places-tile" href="/contexts">
       <MapPin size={24} />
       <div>
-        <small>Tempat & bahasa</small>
-        <strong>Jelajahi yang dekat</strong>
+        <strong>Tempat & bahasa</strong>
         <span>Wilayah, bahasa, dan topik</span>
       </div>
       <ArrowUpRight size={18} />

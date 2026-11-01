@@ -21,10 +21,14 @@
   } from './search'
   let {
     open = $bindable(false),
+    query = $bindable(''),
     navigate,
-  }: { open?: boolean; navigate: (href: string) => void } = $props()
-  let query = $state(''),
-    category = $state<SearchCategory>('all'),
+  }: {
+    open?: boolean
+    query?: string
+    navigate: (href: string) => void
+  } = $props()
+  let category = $state<SearchCategory>('all'),
     data = $state<SearchResult | null>(null),
     pending = $state(false),
     error = $state('')

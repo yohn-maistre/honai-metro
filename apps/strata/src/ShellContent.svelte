@@ -290,7 +290,7 @@
         ? 'feed'
         : 'page'}
   >
-    <main id="commons-main" class="cx-main" tabindex="-1">
+    <main id="commons-main" class="cx-main" data-route={path} tabindex="-1">
       {@render children()}
     </main>
     <aside class="cx-context" aria-label="Konteks terkait">

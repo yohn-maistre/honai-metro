@@ -2246,3 +2246,16 @@
     grid-template-columns: 36px minmax(0, 1fr);
   }
 }
+@media (max-width: 767px) {
+  .cx-vote [data-slot='button'],
+  .cx-post-actions > .cx-action {
+    width: 44px;
+    min-width: 44px;
+  }
+}
+@media (max-width: 359px) {
+  /* Saving remains in the post menu on the narrowest screens. */
+  .cx-post-actions > [aria-label='Simpan posting'] {
+    display: none;
+  }
+}

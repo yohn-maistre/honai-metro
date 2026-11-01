@@ -71,13 +71,11 @@ try {
     x.fillText('Synthetic image fixture', 32, 64)
     return c.toDataURL('image/png').split(',')[1]
   })
-  await page
-    .getByLabel('Pilih gambar', { exact: true })
-    .setInputFiles({
-      name: 'fixture.png',
-      mimeType: 'image/png',
-      buffer: Buffer.from(png, 'base64'),
-    })
+  await page.getByLabel('Pilih gambar', { exact: true }).setInputFiles({
+    name: 'fixture.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(png, 'base64'),
+  })
   await page.getByRole('button', { name: 'ALT', exact: true }).click()
   await page
     .getByLabel('Teks alternatif gambar')
@@ -149,6 +147,16 @@ try {
     path: artifactDir + '/forum-mobile-thread.png',
     fullPage: true,
   })
+  for (const width of [320, 360, 768]) {
+    await page.setViewportSize({ width, height: 844 })
+    assert.equal(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > innerWidth,
+      ),
+      false,
+      'thread overflow at ' + width,
+    )
+  }
   await page.setViewportSize({ width: 1280, height: 900 })
   await page
     .getByRole('button', { name: 'Dukung posting', exact: true })

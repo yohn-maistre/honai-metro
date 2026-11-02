@@ -61,8 +61,6 @@
   <a href="/communities"><Users size={17} />Komunitas</a>
   <a href="/wiki"><BookOpen size={17} />Wiki</a>
   <a href="/groups"><Building2 size={17} />Organisasi</a>
-  <a href="/work">Kerja publik <ArrowUpRight size={14} /></a>
-  <a href="/voices">Suara komunitas <ArrowUpRight size={14} /></a>
 </nav>
 {#if pending}<ContentSkeleton />{:else if error}<div
     class="search-state"

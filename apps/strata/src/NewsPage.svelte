@@ -144,7 +144,7 @@
           src={story.image}
           alt=""
           onerror={(e) => {
-            e.currentTarget.setAttribute('hidden', '')
+            e.currentTarget.closest('figure')?.setAttribute('hidden', '')
           }}
         />
         <figcaption>{story.imageCredit}</figcaption>

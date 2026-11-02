@@ -1,7 +1,12 @@
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
+import type { MediaAttachment } from './api'
 /** Only text formatting. Raw media, scripts, SVG and remote images are excluded. */
-export function markdown(text: string) {
+export function markdown(
+  text: string,
+  images: MediaAttachment[] = [],
+  headingPrefix?: string,
+) {
   const html = marked.parse(text, { async: false, gfm: true, breaks: true })
   const safe = DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
@@ -30,13 +35,49 @@ export function markdown(text: string) {
       'td',
       'details',
       'summary',
+      ...(images.length ? ['img'] : []),
     ],
-    ALLOWED_ATTR: ['href', 'title', 'start'],
+    ALLOWED_ATTR: [
+      'href',
+      'title',
+      'start',
+      ...(images.length ? ['src', 'alt'] : []),
+    ],
     ALLOW_DATA_ATTR: false,
     ALLOW_ARIA_ATTR: false,
   })
   const template = document.createElement('template')
   template.innerHTML = safe
+  if (headingPrefix)
+    for (const [i, heading] of Array.from(
+      template.content.querySelectorAll('h1,h2,h3,h4'),
+    ).entries())
+      heading.id = headingPrefix + '-' + i
+  for (const image of template.content.querySelectorAll('img')) {
+    const attachment = images.find(
+      (m) =>
+        m.url === image.getAttribute('src') &&
+        /^\/v1\/media\/[-a-f0-9]{36}$/.test(m.url),
+    )
+    if (!attachment) {
+      image.remove()
+      continue
+    }
+    image.setAttribute('alt', attachment.alt)
+    image.setAttribute('loading', 'lazy')
+    image.setAttribute('width', String(attachment.width))
+    image.setAttribute('height', String(attachment.height))
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.className = 'inline-image'
+    button.dataset.imageId = attachment.id
+    button.setAttribute(
+      'aria-label',
+      'Buka gambar' + (attachment.alt ? ': ' + attachment.alt : ''),
+    )
+    image.replaceWith(button)
+    button.append(image)
+  }
   for (const a of template.content.querySelectorAll('a')) {
     const href = a.getAttribute('href') ?? ''
     if (!/^(https?:\/\/|mailto:)/i.test(href)) {

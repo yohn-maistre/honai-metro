@@ -13,6 +13,7 @@
     CalendarDays,
     Code,
     Plus,
+    ArrowUp,
   } from '@lucide/svelte'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import Choice from './Choice.svelte'
@@ -31,8 +32,22 @@
   import PostText from './PostText.svelte'
   import { markdown, videoEmbed, directVideo } from './markdown'
   import VideoPreview from './VideoPreview.svelte'
+  import LinkPreview from './LinkPreview.svelte'
   import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
   import { prepareImage, uploadImages, type ImageDraft } from './media'
+  import type DocumentEditor from './DocumentEditor.svelte'
+  let documentEditor = $state<DocumentEditor | null>(null)
+  async function insertImage(image: ImageDraft) {
+    processing = true
+    try {
+      await uploadImages(communityId, [image])
+      documentEditor?.insertImage(image.uploaded!.url, image.alt)
+    } catch (e) {
+      error = e instanceof Error ? e.message : 'Gambar belum dapat disisipkan.'
+    } finally {
+      processing = false
+    }
+  }
   let {
     actor,
     communities,
@@ -44,6 +59,7 @@
     onStateChange,
     compact = false,
     initialUrl = '',
+    initialKind = '',
   }: {
     actor: Actor
     communities: Community[]
@@ -54,6 +70,7 @@
     onPosted: (post: Post) => void | Promise<void>
     onStateChange?: (state: { dirty: boolean; busy: boolean }) => void
     initialUrl?: string
+    initialKind?: string
     compact?: boolean
   } = $props()
   let communityId = $state(untrack(() => initialCommunity)),
@@ -66,7 +83,7 @@
     showWarning = $state(false),
     format = $state(false),
     preview = $state(false),
-    kind = $state(''),
+    kind = $state(untrack(() => initialKind)),
     pollOptions = $state(['', '']),
     pollDays = $state('3'),
     eventTime = $state(''),
@@ -96,6 +113,7 @@
   onDestroy(() => images.forEach((image) => URL.revokeObjectURL(image.preview)))
   function remove(key: string) {
     const image = images.find((i) => i.key === key)
+    if (image?.uploaded) documentEditor?.removeImage(image.uploaded.url)
     if (image) URL.revokeObjectURL(image.preview)
     images = images.filter((i) => i.key !== key)
   }
@@ -149,6 +167,11 @@
       }
       if (!pending) {
         const mediaIds = await uploadImages(communityId, images)
+        const inlineIds = mediaIds.filter((id) =>
+          text.includes('/v1/media/' + id),
+        )
+        if (format && inlineIds.length)
+          content.inlineMedia = { version: 1, ids: inlineIds }
         pending = {
           key: crypto.randomUUID(),
           payload: {
@@ -235,7 +258,14 @@
           maxlength={180}
           disabled={busy || !!pending}
         />{/if}
-      {#if !preview}<Textarea
+      {#if !preview && format && !compact}{#await import('./DocumentEditor.svelte') then module}<module.default
+            bind:this={documentEditor}
+            bind:value={text}
+            label="Posting"
+            max={destination?.publication === 'atproto' ? 6000 : 20000}
+            disabled={busy || !!pending}
+          />{/await}
+      {:else if !preview}<Textarea
           bind:ref={field}
           bind:value={text}
           class="composer-text"
@@ -263,7 +293,11 @@
         />{/if}
       {#if !warning && (videoEmbed(detectedUrl) || directVideo(detectedUrl))}<VideoPreview
           url={detectedUrl}
-        />{/if}
+        />{:else if !warning && detectedUrl && destination?.visibility === 'public'}<div
+          class="post-link-card"
+        >
+          <LinkPreview url={detectedUrl} />
+        </div>{/if}
       {#if showWarning}<Input
           aria-label="Peringatan konten"
           placeholder="Peringatan konten"
@@ -361,7 +395,15 @@
                 onclick={() => (altKey = altKey === image.key ? '' : image.key)}
               >
                 ALT{image.alt ? ' ✓' : ''}
-              </Button>{#if altKey === image.key}<Input
+              </Button>{#if format && !compact}<Button
+                  class="draft-insert"
+                  variant="secondary"
+                  size="sm"
+                  disabled={busy || processing || !!pending}
+                  onclick={() => insertImage(image)}
+                >
+                  Sisipkan
+                </Button>{/if}{#if altKey === image.key}<Input
                   aria-label="Teks alternatif gambar"
                   placeholder="Deskripsikan gambar"
                   maxlength={1000}
@@ -449,7 +491,7 @@
                 checked={format}
                 onCheckedChange={(v) => (format = v)}
               >
-                <Code size={16} />Markdown
+                <Code size={16} />Editor tulisan
               </Dropdown.CheckboxItem>
             </Dropdown.Content>
           </Dropdown.Root>{/if}
@@ -468,14 +510,14 @@
     </div>
     {#if compact}<Button
         class="composer-send"
+        aria-label="Kirim balasan"
         type="submit"
         size="sm"
         disabled={busy || processing || !hasContent}
       >
-        {#if busy}<LoaderCircle
-            size={16}
-            class="animate-spin"
-          />{:else}Balas{/if}
+        {#if busy}<LoaderCircle size={16} class="animate-spin" />{:else}<ArrowUp
+            size={20}
+          />{/if}
       </Button>{/if}
   </div>
   <div class="composer-footer" class:reply-footer={compact}>

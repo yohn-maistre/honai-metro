@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { NewsPlace } from './news.svelte'
   import land from './news-land.json'
+  const uid = $props.id()
   let { places }: { places: NewsPlace[] } = $props()
   const points = $derived(
     places.filter(
@@ -23,7 +24,7 @@
     >
       <defs>
         <pattern
-          id="news-map-grid"
+          id={uid + '-grid'}
           width="2"
           height="2"
           patternUnits="userSpaceOnUse"
@@ -41,7 +42,7 @@
         y="-2"
         width="30"
         height="14"
-        fill="url(#news-map-grid)"
+        fill={'url(#' + uid + '-grid)'}
         opacity=".2"
       />
       <g class="map-land">
@@ -56,4 +57,7 @@
         </circle>{/each}
     </svg>
     <small>Wilayah dalam liputan · Natural Earth</small>
+    <div class="map-place-list">
+      {#each points as point}<span>{point.name}</span>{/each}
+    </div>
   </div>{/if}

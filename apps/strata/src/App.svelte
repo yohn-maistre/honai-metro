@@ -2,13 +2,11 @@
   import { onMount, tick } from 'svelte'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
   import {
-    Users,
     Bookmark,
     BookOpen,
     X,
     Plus,
     ArrowUpRight,
-    ArrowLeft,
     Send,
     Globe,
     LockKeyhole,
@@ -19,11 +17,11 @@
     MessageSquare,
     ChevronRight,
     LogOut,
-    FileText,
-    GitPullRequest,
-    History,
+    MapPin,
+    Link,
   } from '@lucide/svelte'
   import DiscoveryPage from './DiscoveryPage.svelte'
+  import CommunityDirectory from './CommunityDirectory.svelte'
   import RouteProgress from './RouteProgress.svelte'
   import ContentSkeleton from './ContentSkeleton.svelte'
   import FeedRefresh from './FeedRefresh.svelte'
@@ -56,7 +54,6 @@
     request,
     setCsrf,
     ApiError,
-    relativeDate,
     initials,
     type Actor,
     type Community,
@@ -72,6 +69,7 @@
     searchDialogOpen = $state(false),
     profileTab = $state('posts'),
     composeUrl = $state(''),
+    composeKind = $state(''),
     profile = $state<Actor | null>(null)
   let path = $state(location.pathname),
     search = $state(location.search),
@@ -88,6 +86,16 @@
     saved = $state<Post[]>([]),
     nextCursor = $state<string | null>(null)
   let following = $state<Actor[]>([])
+  let homeLayout = $state('single')
+  function setLayout(value: string) {
+    homeLayout = value
+    try {
+      localStorage.setItem('etnos-home-layout', value)
+    } catch {
+      /* A blocked preference store does not prevent navigation. */
+    }
+    if (path === '/board') navigate('/')
+  }
   let selectedPost = $state<Post | null>(null),
     replies = $state<Post[]>([]),
     repliesCursor = $state<string | null>(null),
@@ -104,6 +112,7 @@
   let modal = $state<
     null | 'compose' | 'community' | 'wiki' | 'proposal' | 'manage' | 'join'
   >(null)
+  let wikiRequestKey = $state('')
   let composeState = $state({ dirty: false, busy: false }),
     discardDraft = $state(false)
   function closeModal() {
@@ -169,41 +178,43 @@
         : posts,
   )
   const heading = $derived(
-    parts[0] === 'news'
-      ? 'Kabar'
-      : path === '/board'
-        ? 'Lajur'
-        : path === '/'
+    parts[0] === 'voices'
+      ? 'Suara komunitas'
+      : parts[0] === 'news'
+        ? 'Kabar'
+        : path === '/board'
           ? 'Beranda'
-          : parts[0] === 'explore'
-            ? 'Jelajah'
-            : parts[0] === 'communities'
-              ? (community?.title ?? 'Komunitas')
-              : parts[0] === 'wiki'
-                ? 'Wiki'
-                : parts[0] === 'saved'
-                  ? 'Tersimpan'
-                  : parts[0] === 'preferences'
-                    ? 'Pengaturan'
-                    : parts[0] === 'login'
-                      ? 'Masuk'
-                      : parts[0] === 'find'
-                        ? 'Cari'
-                        : parts[0] === 'square'
-                          ? 'Percakapan'
-                          : parts[0] === 'people'
-                            ? 'Profil'
-                            : parts[0] === 'messages'
-                              ? 'Pesan'
-                              : parts[0] === 'notifications'
-                                ? 'Aktivitas'
-                                : parts[0] === 'groups'
-                                  ? 'Organisasi & kelompok'
-                                  : parts[0] === 'work'
-                                    ? 'Kerja publik'
-                                    : parts[0] === 'contexts'
-                                      ? 'Konteks'
-                                      : 'ETNOS',
+          : path === '/'
+            ? 'Beranda'
+            : parts[0] === 'explore'
+              ? 'Jelajah'
+              : parts[0] === 'communities'
+                ? (community?.title ?? 'Komunitas')
+                : parts[0] === 'wiki'
+                  ? 'Wiki'
+                  : parts[0] === 'saved'
+                    ? 'Tersimpan'
+                    : parts[0] === 'preferences'
+                      ? 'Pengaturan'
+                      : parts[0] === 'login'
+                        ? 'Masuk'
+                        : parts[0] === 'find'
+                          ? 'Cari'
+                          : parts[0] === 'square'
+                            ? 'Percakapan'
+                            : parts[0] === 'people'
+                              ? 'Profil'
+                              : parts[0] === 'messages'
+                                ? 'Pesan'
+                                : parts[0] === 'notifications'
+                                  ? 'Aktivitas'
+                                  : parts[0] === 'groups'
+                                    ? 'Organisasi & kelompok'
+                                    : parts[0] === 'work'
+                                      ? 'Kerja publik'
+                                      : parts[0] === 'contexts'
+                                        ? 'Konteks'
+                                        : 'ETNOS',
   )
   function notify(value: string) {
     message = value
@@ -374,24 +385,14 @@
       } else saved = []
       if (parts[0] === 'square' && parts[1]) {
         const p = await request<Post>('/v1/posts/' + parts[1])
-        const root =
-          p.rootId === p.id ? p : await request<Post>('/v1/posts/' + p.rootId)
         const thread = await request<{
           items: Post[]
           nextCursor: string | null
-        }>('/v1/posts/' + root.id + '/replies')
+        }>('/v1/posts/' + p.id + '/replies')
         if (mine !== generation) return
-        selectedPost = root
+        selectedPost = p
         replies = thread.items
         repliesCursor = thread.nextCursor
-        if (p.id !== root.id && !replies.some((r) => r.id === p.id))
-          replies = [...replies, p]
-        if (p.id !== root.id) {
-          await tick()
-          document
-            .getElementById('post-' + p.id)
-            ?.scrollIntoView({ block: 'center' })
-        }
       }
       if (parts[0] === 'wiki' && parts[1]) {
         const p = await request<WikiPage>('/v1/wiki/' + parts[1])
@@ -443,13 +444,15 @@
     }
     composeState = { dirty: false, busy: false }
     composeUrl = ''
+    composeKind = ''
     modal = kind
+    wikiRequestKey = crypto.randomUUID()
     communityId = id || memberships[0]?.community_id || communities[0]?.id || ''
     text = ''
     title = ''
     description = ''
     citations = ''
-    perspective = ''
+    perspective = auth.actor?.name ?? ''
     modalError = ''
     visibility = 'public'
     if (kind === 'manage') void manage(id)
@@ -493,7 +496,20 @@
       } else if (modal === 'wiki') {
         const p = await request<WikiPage>(
           `/v1/communities/${communityId}/wiki`,
-          { title },
+          {
+            title,
+            requestKey: wikiRequestKey,
+            draft: {
+              text,
+              citations: citations
+                .split('\n')
+                .map((x) => x.trim())
+                .filter(Boolean),
+              language,
+              perspective:
+                perspective || auth.actor?.name || 'Kontribusi komunitas',
+            },
+          },
         )
         modal = null
         navigate('/wiki/' + p.id)
@@ -587,6 +603,13 @@
     applyAppearance()
   })
   onMount(() => {
+    try {
+      const saved = localStorage.getItem('etnos-home-layout')
+      if (['single', 'split', 'columns'].includes(saved ?? ''))
+        homeLayout = saved!
+    } catch {
+      /* Default to the single feed when local storage is unavailable. */
+    }
     restoreAppearance()
     window.history.scrollRestoration = 'manual'
     window.history.replaceState({ etnosDepth: 0, ...window.history.state }, '')
@@ -611,6 +634,8 @@
   {heading}
   {auth}
   {unread}
+  layout={homeLayout}
+  onLayoutChange={setLayout}
   onBack={goBack}
   onCompose={() => open('compose')}
   onRefresh={() => load()}
@@ -629,7 +654,7 @@
   }}
 >
   <RouteProgress />
-  {#if loading && !posts.length && !selectedPost && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore', 'news', 'board', 'login'].includes(parts[0])}<ContentSkeleton
+  {#if loading && !posts.length && !selectedPost && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore', 'news', 'board', 'login', 'wiki'].includes(parts[0])}<ContentSkeleton
     />{/if}
   {#if path === '/recover-messages'}<VaultTransfer recovery />
   {:else if error}<div class="strata-card">
@@ -656,13 +681,25 @@
           composeUrl = url
         }}
       />{/await}
-  {:else if path === '/board'}{#await import('./FeedBoard.svelte')}<ContentSkeleton
-      />{:then { default: FeedBoard }}<FeedBoard
+  {:else if path === '/voices'}{#await import('./EngagementPage.svelte') then module}<module.default
         {auth}
-        {communities}
-        {memberships}
-        onError={notify}
+        onAsk={() => {
+          open('compose')
+          composeKind = 'poll'
+        }}
       />{/await}
+  {:else if path === '/news'}{#await import('./NewsIndex.svelte') then module}<module.default
+        {search}
+        {navigate}
+      />{/await}
+  {:else if path === '/board' || (path === '/' && homeLayout !== 'single')}{#key homeLayout}{#await import('./FeedBoard.svelte')}<ContentSkeleton
+        />{:then { default: FeedBoard }}<FeedBoard
+          initialColumns={homeLayout === 'columns' ? 3 : 2}
+          {auth}
+          {communities}
+          {memberships}
+          onError={notify}
+        />{/await}{/key}
   {:else if path === '/labs/spaces'}<SpacesLab />
   {:else if path === '/login'}
     <h1 class="sr-only">Masuk</h1>
@@ -763,137 +800,39 @@
       onError={notify}
       onUnread={(n) => (unread = n)}
     />
+  {:else if path === '/groups' && !search.includes('create=true')}
+    <CommunityDirectory
+      {auth}
+      {communities}
+      {memberships}
+      organizations
+      onCreate={() => open('community')}
+      {navigate}
+    />
   {:else if ['groups', 'work', 'contexts', 'explore'].includes(parts[0])}
     <FeaturePages {path} {auth} onError={notify} {navigate} />
   {:else if parts[0] === 'wiki'}
-    <div class="cx-page-head">
-      <h1>{selectedPage?.title ?? 'Wiki'}</h1>
-      {#if !selectedPage && memberships.some((m) => m.role !== 'member')}<Button
-          class="cx-button small"
-          onclick={() => open('wiki')}
-          type="button"
-          variant="outline"
-        >
-          <Plus size={14} />Halaman
-        </Button>{/if}
-    </div>
-    {#if selectedPage}<Card.Root class="strata-card">
-        <a href="/wiki" class="cx-back"><ArrowLeft size={14} />Wiki</a>
-        {#if selectedPage.revision}<p class="strata-caption">
-            <FileText size={14} />{selectedPage.revision.language} · {selectedPage
-              .revision.perspective}
-          </p>
-          <div class="cx-document strata-body" style="margin:20px 0">
-            {selectedPage.revision.text}
-          </div>
-          {#each selectedPage.revision.citations as url}<a
-              class="strata-source"
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {url}<ArrowUpRight size={12} />
-            </a>{/each}{:else}<p class="cx-muted">
-            Belum ada revisi yang diterima.
-          </p>{/if}{#if isMember(selectedPage.community_id)}<Button
-            class="cx-button small"
-            style="margin-top:18px"
-            onclick={() => {
-              open('proposal')
-              text = selectedPage?.revision?.text ?? ''
-              language = selectedPage?.revision?.language ?? 'id'
-              perspective = selectedPage?.revision?.perspective ?? ''
-              citations = selectedPage?.revision?.citations.join('\n') ?? ''
-            }}
-            type="button"
-            variant="outline"
-          >
-            <GitPullRequest size={14} />Usulkan perubahan
-          </Button>{/if}
-      </Card.Root>
-      {#if proposals.length}<Card.Root class="strata-card">
-          <h2 style="font-size:16px">Usulan</h2>
-          {#each proposals as p}<article class="strata-review">
-              <Badge variant="secondary">
-                {p.state === 'pending'
-                  ? 'Menunggu tinjauan'
-                  : p.state === 'accepted'
-                    ? 'Diterima'
-                    : 'Ditolak'}
-              </Badge>
-              <p class="strata-caption" style="margin-top:12px">
-                {p.language} · {p.perspective}
-              </p>
-              <p class="strata-body">{p.text}</p>
-              {#each p.citations as url}<a
-                  class="strata-source"
-                  href={url}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {url}
-                </a>{/each}{#if p.state === 'pending' && isSteward(selectedPage.community_id)}<div
-                  class="cx-actions"
-                  style="margin-top:16px"
-                >
-                  <Button
-                    class="cx-button primary small"
-                    disabled={busy}
-                    onclick={() => decide(p, true)}
-                    type="button"
-                    variant="default"
-                  >
-                    Terima revisi
-                  </Button>
-                  <Button
-                    class="cx-button small"
-                    disabled={busy}
-                    onclick={() => decide(p, false)}
-                    type="button"
-                    variant="outline"
-                  >
-                    Tolak
-                  </Button>
-                </div>{/if}
-            </article>{/each}
-        </Card.Root>{/if}
-      {#if history.length}<Card.Root class="strata-card">
-          <h2 class="strata-inline" style="font-size:16px">
-            <History size={16} />Riwayat
-          </h2>
-          {#each history as rev}<div class="cx-list-row">
-              <FileText size={16} />
-              <div>
-                <strong>{rev.perspective}</strong>
-                <small>
-                  {rev.language} · {relativeDate(rev.created)}
-                </small>
-              </div>
-            </div>{/each}
-        </Card.Root>{/if}
-    {:else if wiki.length}<section>
-        {#each wiki as p}<a
-            href={'/wiki/' + p.id}
-            class="cx-list-row strata-card"
-          >
-            <span class="cx-object-icon"><BookOpen size={20} /></span>
-            <div>
-              <h3>{p.title}</h3>
-              <small>
-                {communities.find((c) => c.id === p.community_id)?.title} ·
-                {p.revision_id ? 'Ada revisi diterima' : 'Belum ada revisi'}
-              </small>
-            </div>
-            <ChevronRight size={16} />
-          </a>{/each}
-      </section>{:else if !loading}<div class="strata-nodata">
-        <div class="strata-empty-graphic"><BookOpen size={27} /></div>
-        <h2>Belum ada halaman</h2>
-        <p>Halaman, sumber dan revisi yang diterima akan muncul di sini.</p>
-        <Button class="cx-button" href="/communities" variant="outline">
-          Lihat komunitas
-        </Button>
-      </div>{/if}
+    {#if loading}<ContentSkeleton
+      />{:else}{#await import('./WikiExperience.svelte') then module}<module.default
+          page={selectedPage}
+          pages={wiki}
+          {proposals}
+          {history}
+          {communities}
+          {memberships}
+          {auth}
+          {busy}
+          onCreate={() => open('wiki')}
+          onPropose={() => {
+            open('proposal')
+            text = selectedPage?.revision?.text ?? ''
+            language = selectedPage?.revision?.language ?? 'id'
+            perspective =
+              selectedPage?.revision?.perspective ?? auth.actor?.name ?? ''
+            citations = selectedPage?.revision?.citations.join('\n') ?? ''
+          }}
+          onDecide={decide}
+        />{/await}{/if}
   {:else if parts[0] === 'communities' && parts[1]}
     {#if community}<div class="cx-detail-head community-profile">
         <div class="cx-between">
@@ -964,10 +903,21 @@
             Wiki
           </Tabs.Trigger><Tabs.Trigger value="media">
             Media
+          </Tabs.Trigger><Tabs.Trigger value="voices">
+            Suara
           </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content value={tab}>
-          {#if tab === 'about'}<Card.Root class="strata-card">
+          {#if tab === 'voices'}{#await import('./EngagementPage.svelte') then module}<module.default
+                {auth}
+                communityId={community.id}
+                onAsk={() => {
+                  open('compose', community.id)
+                  composeKind = 'poll'
+                }}
+              />{/await}{:else if tab === 'about'}<Card.Root
+              class="strata-card"
+            >
               <p class="strata-body">{community.description}</p>
               <p class="cx-hint">
                 {community.visibility === 'public'
@@ -1031,49 +981,13 @@
         </Button>
       </div>{/if}
   {:else if path === '/communities'}
-    <div class="cx-page-head">
-      <h1>Komunitas</h1>
-      {#if auth.actor}<Button
-          class="cx-button small"
-          onclick={() => open('community')}
-          type="button"
-          variant="outline"
-        >
-          <Plus size={14} />Komunitas
-        </Button>{/if}
-    </div>
-    <div class="strata-mosaic">
-      {#each communities as c}<a
-          href={'/communities/' + c.id}
-          class="strata-tile"
-        >
-          <div class="cx-between">
-            <span class="cx-avatar sage small">{initials(c.title)}</span>
-            <ArrowUpRight size={18} />
-          </div>
-          <div>
-            <h2>{c.title}</h2>
-            <p>{c.description}</p>
-            <span class="strata-small">
-              {c.visibility === 'public'
-                ? 'Publik'
-                : 'Khusus anggota'}{isMember(c.id) ? ' · Bergabung' : ''}
-            </span>
-          </div>
-        </a>{/each}
-    </div>
-    {#if !communities.length && !loading}<div class="strata-nodata">
-        <div class="strata-empty-graphic"><Users size={27} /></div>
-        <h2>Ruang untuk komunitasmu</h2>
-        <p>Komunitas akan muncul di sini.</p>
-        {#if !auth.actor}<Button
-            href="/login"
-            class="cx-button primary"
-            variant="default"
-          >
-            Masuk
-          </Button>{/if}
-      </div>{/if}
+    <CommunityDirectory
+      {auth}
+      {communities}
+      {memberships}
+      onCreate={() => open('community')}
+      {navigate}
+    />
   {:else if parts[0] === 'square'}
     {#if selectedPost}<ThreadView
         post={selectedPost}
@@ -1084,6 +998,20 @@
         member={isMember(selectedPost.community_id)}
         onError={notify}
         onRefresh={load}
+        onWikiDraft={selectedPost &&
+        isSteward(selectedPost.community_id) &&
+        communities.some(
+          (c) =>
+            c.id === selectedPost!.community_id && c.visibility === 'public',
+        )
+          ? () => {
+              open('wiki', selectedPost!.community_id)
+              title =
+                selectedPost!.content?.title || selectedPost!.text.slice(0, 80)
+              text = selectedPost!.text
+              citations = location.origin + '/square/' + selectedPost!.id
+            }
+          : undefined}
       />{:else if !loading}<div class="strata-nodata">
         <h2>Posting tidak tersedia</h2>
       </div>{/if}
@@ -1117,6 +1045,24 @@
                 : 'Anggota ETNOS'}
           </p>
         </div>
+        {#if actor.bio}<p class="profile-bio">{actor.bio}</p>{/if}
+        {#if actor.website || actor.location}<div class="profile-public-fields">
+            {#if actor.location}<span>
+                <MapPin size={14} />{actor.location}
+              </span>{/if}{#if actor.website}<a
+                href={actor.website}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Link size={14} />{new URL(actor.website).hostname}
+              </a>{/if}
+          </div>{/if}
+        {#if auth.actor?.id === actor.id && actor.kind === 'human'}{#await import('./ProfileEdit.svelte') then module}<module.default
+              {actor}
+              onSaved={(fields) => {
+                if (profile) profile = { ...profile, ...fields }
+              }}
+            />{/await}{/if}
         <details class="profile-identity">
           <summary>Identitas AT</summary>
           <p class="cx-hint">{actor.did}</p>
@@ -1539,6 +1485,7 @@
         communities={communities.filter((c) => isMember(c.id))}
         initialCommunity={communityId}
         initialUrl={composeUrl}
+        initialKind={composeKind}
         onPosted={(post) => {
           composeState = { dirty: false, busy: false }
           modal = null
@@ -1593,56 +1540,63 @@
               ]}
             />
           </Label>{/if}
-        {#if modal === 'join' || modal === 'proposal'}<Label>
-            {modal === 'join'
-              ? 'Pesan untuk pengelola'
-              : modal === 'proposal'
-                ? 'Isi revisi'
-                : 'Posting'}
-            <Textarea
+        {#if modal === 'join'}<Label>
+            Pesan untuk pengelola<Textarea
               bind:value={text}
-              maxlength={modal === 'proposal'
-                ? 50000
-                : modal === 'join'
-                  ? 500
-                  : 6000}
+              maxlength={500}
               required
-              rows={modal === 'proposal' ? 10 : 5}
-              placeholder=""
-            ></Textarea>
+              rows={5}
+            />
           </Label>{/if}
-        {#if modal === 'proposal'}<Label>
-            Sumber publik
-            <Textarea
-              bind:value={citations}
-              placeholder="Satu URL https per baris"
-              rows={3}
-            ></Textarea>
-          </Label>
-          <Label>
-            Bahasa
-            <Input bind:value={language} maxlength={40} required />
-          </Label>
-          <Label>
-            Perspektif / atribusi
-            <Input bind:value={perspective} maxlength={300} required />
-          </Label>
+        {#if modal === 'wiki' || modal === 'proposal'}
+          <div class="wiki-editor-field">
+            <Label>
+              Isi tulisan
+            </Label>{#await import('./DocumentEditor.svelte') then module}<module.default
+                bind:value={text}
+                label="Isi revisi"
+                max={50000}
+                disabled={busy}
+              />{/await}
+          </div>
+          <details class="wiki-draft-details">
+            <summary>Sumber, bahasa & atribusi</summary>
+            <Label>
+              Sumber publik<Textarea
+                bind:value={citations}
+                placeholder="Satu URL https per baris"
+                rows={3}
+              />
+            </Label><Label>
+              Bahasa<Input bind:value={language} maxlength={40} required />
+            </Label><Label>
+              Atribusi<Input
+                bind:value={perspective}
+                maxlength={300}
+                required
+              />
+            </Label>
+          </details>
           <p class="cx-hint">
-            Usulan hanya terlihat oleh penulis dan pengelola. Revisi diterbitkan
-            setelah tinjauan manusia.
-          </p>{/if}
+            Draf hanya terlihat oleh penulis dan peninjau yang berwenang.
+            Halaman terbit setelah tinjauan manusia.
+          </p>
+        {/if}
         {#if modalError}<p class="cx-form-error" role="alert">
             {modalError}
           </p>{/if}
         <Button
           class="cx-button primary"
-          disabled={busy || (modal === 'wiki' && !communityId)}
+          disabled={busy ||
+            ((modal === 'wiki' || modal === 'proposal') &&
+              (!text.trim() || text.length > 50000)) ||
+            (modal === 'wiki' && !communityId)}
           type="submit"
           variant="default"
         >
           {#if busy}<LoaderCircle size={15} />{/if}{modal === 'join'
             ? 'Kirim permintaan'
-            : modal === 'proposal'
+            : modal === 'proposal' || modal === 'wiki'
               ? 'Ajukan untuk tinjauan'
               : 'Buat'}<Send size={14} />
         </Button>

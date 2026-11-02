@@ -20,7 +20,6 @@
     PanelLeft,
     X,
     ChevronsUpDown,
-    Building2,
     ListTodo,
     ArrowLeft,
     ChevronDown,
@@ -42,6 +41,8 @@
     onRefresh,
     feedMode,
     onFeedChange,
+    layout = 'single',
+    onLayoutChange,
   }: {
     children: Snippet
     rail: Snippet
@@ -55,22 +56,31 @@
     onRefresh: () => void
     feedMode: 'new' | 'mine' | 'following'
     onFeedChange: (mode: 'new' | 'mine' | 'following') => void
+    layout?: string
+    onLayoutChange: (value: string) => void
   } = $props()
   const sidebar = Sidebar.useSidebar()
   const nav = [
     { href: '/', label: 'Beranda', icon: Home },
     { href: '/explore', label: 'Jelajah', icon: Compass },
-    { href: '/board', label: 'Lajur', icon: Columns3 },
     { href: '/communities', label: 'Komunitas', icon: Users },
-    { href: '/groups', label: 'Kelompok', icon: Building2 },
     { href: '/wiki', label: 'Wiki', icon: BookOpen },
-    { href: '/work', label: 'Kerja publik', icon: ListTodo },
     { href: '/messages', label: 'Pesan', icon: MessageSquare },
-    { href: '/notifications', label: 'Aktivitas', icon: Bell },
-    { href: '/saved', label: 'Tersimpan', icon: Bookmark },
   ]
   function active(href: string) {
-    return href === '/' ? path === '/' : path.startsWith(href)
+    return href === '/'
+      ? path === '/' || path === '/board'
+      : href === '/communities'
+        ? path.startsWith('/communities') || path.startsWith('/groups')
+        : path.startsWith(href)
+  }
+  $effect(() => {
+    void path
+    sidebar.setOpenMobile(false)
+  })
+  function compose() {
+    sidebar.setOpenMobile(false)
+    onCompose()
   }
 </script>
 
@@ -78,7 +88,7 @@
 <Sidebar.Root class="etnos-sidebar">
   <Sidebar.Header class="p-5 pb-3">
     <div class="cx-between">
-      <a href="/" class="cx-brand">
+      <a href="/" class="cx-brand" onclick={() => sidebar.setOpenMobile(false)}>
         <span class="brand-full">etnos</span>
         <span class="brand-compact" aria-hidden="true">e</span>
         <span class="brand-dot">.</span>
@@ -151,7 +161,7 @@
         class="w-full sidebar-compose"
         aria-label="Posting"
         title="Posting"
-        onclick={onCompose}
+        onclick={compose}
       >
         <Plus size={18} />
         <span>Posting</span>
@@ -159,12 +169,42 @@
     </div>
   </Sidebar.Content>
   <Sidebar.Footer class="p-4 gap-3">
+    <div class="sidebar-utilities">
+      <Button
+        href="/notifications"
+        variant="ghost"
+        class="justify-start"
+        aria-label="Aktivitas"
+        onclick={() => sidebar.setOpenMobile(false)}
+      >
+        <Bell size={17} />Aktivitas{#if unread}<span class="utility-unread">
+            {unread}
+          </span>{/if}
+      </Button>
+      <Button
+        href="/saved"
+        variant="ghost"
+        class="justify-start"
+        onclick={() => sidebar.setOpenMobile(false)}
+      >
+        <Bookmark size={17} />Tersimpan
+      </Button>
+      <Button
+        href="/work"
+        variant="ghost"
+        class="justify-start"
+        onclick={() => sidebar.setOpenMobile(false)}
+      >
+        <ListTodo size={17} />Kerja publik
+      </Button>
+    </div>
     <Button
       href="/preferences"
       variant="ghost"
       class="justify-start sidebar-settings"
       aria-label="Pengaturan"
       title="Pengaturan"
+      onclick={() => sidebar.setOpenMobile(false)}
     >
       <Settings2 size={18} />
       <span>Pengaturan</span>
@@ -193,7 +233,12 @@
     <span class="preview-label">ETNOS · Alpha</span>
   </Sidebar.Footer>
 </Sidebar.Root>
-<Sidebar.Inset class="platform-inset">
+<Sidebar.Inset
+  class={'platform-inset' +
+    (path === '/board' || (path === '/' && layout !== 'single')
+      ? ' workspace-view'
+      : '')}
+>
   <header
     class="cx-topbar"
     class:home-topbar={path === '/'}
@@ -220,7 +265,7 @@
     >
       <PanelLeft size={19} />
     </Button>
-    <div class="surface-heading">
+    <div class="surface-heading" class:explore-title={path === '/explore'}>
       {#if path === '/'}<Dropdown.Root>
           <Dropdown.Trigger class="surface-switch" aria-label="Pilih linimasa">
             {feedMode === 'mine'
@@ -241,9 +286,15 @@
               Mengikuti
             </Dropdown.Item>
           </Dropdown.Content>
-        </Dropdown.Root>{:else}<span>{heading}</span>{/if}
+        </Dropdown.Root>{:else if path === '/explore'}<h1>
+          {heading}
+        </h1>{:else}<span>{heading}</span>{/if}
     </div>
-    <a href="/" class="cx-mobile-brand">
+    <a
+      href="/"
+      class="cx-mobile-brand"
+      class:explore-brand={path === '/explore'}
+    >
       etnos
       <span>.</span>
     </a>
@@ -275,6 +326,24 @@
     >
       <Bell size={18} />{#if unread}<span class="bell-dot"></span>{/if}
     </Button>
+    {#if path === '/' || path === '/board'}<Dropdown.Root>
+        <Dropdown.Trigger
+          class="home-layout-switch"
+          aria-label="Tata letak beranda"
+          title="Tata letak beranda"
+        >
+          <Columns3 size={19} />
+        </Dropdown.Trigger><Dropdown.Content align="end">
+          <Dropdown.Label>
+            Tata letak
+          </Dropdown.Label>{#each [['single', 'Satu linimasa'], ['split', 'Dua lajur'], ['columns', 'Tiga lajur']] as [value, label]}<Dropdown.Item
+              onSelect={() => onLayoutChange(value)}
+            >
+              {label}{#if layout === value}
+                ·{/if}
+            </Dropdown.Item>{/each}
+        </Dropdown.Content>
+      </Dropdown.Root>{/if}
     <Button
       variant="ghost"
       size="icon"
@@ -290,7 +359,8 @@
   </header>
   <div
     class="cx-content-grid"
-    class:board-grid={path === '/board'}
+    class:board-grid={path === '/board' ||
+      (path === '/' && layout !== 'single')}
     data-surface={path.startsWith('/square/')
       ? 'thread'
       : path === '/'
@@ -303,7 +373,7 @@
     <aside
       class="cx-context"
       aria-label="Konteks terkait"
-      hidden={path === '/board'}
+      hidden={path === '/board' || (path === '/' && layout !== 'single')}
     >
       {@render rail()}
     </aside>

@@ -58,6 +58,9 @@ try {
   await page.route('**/v1/**', async (r) => {
     const q = r.request(),
       u = new URL(q.url())
+    // Public metadata is a web Worker port, separate from the core API fixture.
+    if (u.pathname === '/v1/link-preview')
+      return r.fulfill({ json: { available: false } })
     if (u.pathname.startsWith('/v1/video-preview/'))
       return r.fulfill({
         json: {
@@ -166,7 +169,7 @@ try {
     .waitFor()
   await page.waitForFunction((y) => Math.abs(scrollY - y) < 4, before)
   await page.goto(origin + '/explore', { waitUntil: 'networkidle' })
-  assert.equal(await page.locator('main .news-item').count(), 9)
+  assert.equal(await page.locator('main .news-item').count(), 3)
   assert.equal(await page.locator('aside .news-section').count(), 0)
   await page.locator('main a[href="/news/42"]').click()
   await page.getByRole('heading', { name: 'Sumber liputan' }).waitFor()

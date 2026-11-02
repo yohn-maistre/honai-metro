@@ -204,6 +204,13 @@
           if (mine === generation) results = ps
         }
       }
+      if (
+        page === 'groups' &&
+        !id &&
+        location.search.includes('create=true') &&
+        actorId
+      )
+        open('group')
       if (page === 'contexts' && id) {
         const c = await request<ContextDetail>('/v1/contexts/' + id)
         const feed = await request<{ items: Post[] }>(

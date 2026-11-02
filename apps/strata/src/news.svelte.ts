@@ -20,12 +20,20 @@ export type NewsStory = NewsItem & {
   keyPoints: string[]
   sources: { title: string; url: string; publisher: string; summary: string }[]
 }
-type Feed = {
+export type NewsFeed = {
   source: { name: string; url: string }
   items: NewsItem[]
   available: boolean
+  selection?: { desk: string; place: string; total: number | null }
+  pagination?: {
+    page: number
+    pageSize: number
+    hasMore: boolean
+    nextPage: number | null
+  }
+  placeOptions?: { slug: string; name: string }[]
 }
-export const news = $state<{ feed: Feed | null; pending: boolean }>({
+export const news = $state<{ feed: NewsFeed | null; pending: boolean }>({
   feed: null,
   pending: true,
 })
@@ -43,7 +51,7 @@ export function loadNews() {
         signal: AbortSignal.timeout(10000),
       })
       if (!res.ok) throw Error('unavailable')
-      const feed = (await res.json()) as Feed
+      const feed = (await res.json()) as NewsFeed
       if (!Array.isArray(feed.items)) throw Error('invalid feed')
       news.feed = feed
       loadedAt = Date.now()

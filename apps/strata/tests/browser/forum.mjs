@@ -130,7 +130,14 @@ try {
     .waitFor()
   await page.screenshot({ path: artifactDir + '/photo-viewer-desktop.png' })
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.waitForFunction(() => innerWidth === 390 && Math.abs(document.querySelector('.media-viewer').getBoundingClientRect().width - innerWidth) < 1)
+  await page.waitForFunction(
+    () =>
+      innerWidth === 390 &&
+      Math.abs(
+        document.querySelector('.media-viewer').getBoundingClientRect().width -
+          innerWidth,
+      ) < 1,
+  )
   assert.equal((await viewer.boundingBox()).width, 390)
   await page.screenshot({ path: artifactDir + '/photo-viewer-mobile.png' })
   await page.setViewportSize({ width: 1280, height: 900 })
@@ -138,7 +145,7 @@ try {
   await page
     .getByPlaceholder('Tulis balasan…')
     .fill('Synthetic nested discussion')
-  await page.getByRole('button', { name: 'Balas', exact: true }).click()
+  await page.getByRole('button', { name: 'Kirim balasan', exact: true }).click()
   await page.getByText('Synthetic nested discussion', { exact: true }).waitFor()
   assert.equal(s.getPost(owner.actor.id, root.id).replies, 1)
   const child = s.feed().find((p) => p.parent_id === root.id)
@@ -147,7 +154,7 @@ try {
     .getByRole('button', { name: 'Balas Synthetic steward', exact: true })
     .click()
   await page.getByPlaceholder('Tulis balasan…').fill('Synthetic child reply')
-  await page.getByRole('button', { name: 'Balas', exact: true }).click()
+  await page.getByRole('button', { name: 'Kirim balasan', exact: true }).click()
   await page.getByText('Synthetic child reply', { exact: true }).waitFor()
   assert.equal(
     s.feed().find((p) => p.text === 'Synthetic child reply').parent_id,
@@ -204,38 +211,29 @@ try {
     .getByText('Synthetic browser contribution', { exact: true })
     .waitFor()
   await page.getByRole('link', { name: 'Wiki', exact: true }).first().click()
-  await page.getByRole('button', { name: 'Halaman', exact: true }).click()
+  await page.getByRole('button', { name: 'Tulis halaman', exact: true }).click()
   await page
     .getByRole('dialog')
     .getByLabel('Nama', { exact: true })
     .fill('Synthetic reviewed knowledge')
   await page
     .getByRole('dialog')
-    .getByRole('button', { name: 'Buat', exact: true })
-    .click()
-  await page
-    .getByRole('heading', { name: 'Synthetic reviewed knowledge', exact: true })
-    .waitFor()
-  await page
-    .getByRole('button', { name: 'Usulkan perubahan', exact: true })
-    .click()
-  await page
-    .getByRole('dialog')
-    .getByLabel('Isi revisi', { exact: true })
+    .getByRole('textbox', { name: 'Isi revisi', exact: true })
     .fill('Synthetic evidence-backed result')
-  await page
-    .getByRole('dialog')
-    .getByLabel('Perspektif / atribusi', { exact: true })
-    .fill('Synthetic fixture')
   await page
     .getByRole('dialog')
     .getByRole('button', { name: 'Ajukan untuk tinjauan', exact: true })
     .click()
   await page
-    .getByRole('button', { name: 'Terima revisi', exact: true })
+    .getByRole('heading', { name: 'Synthetic reviewed knowledge', exact: true })
     .waitFor()
+  await page.getByRole('button', { name: 'Usulan 1', exact: true }).click()
   await page.getByRole('button', { name: 'Terima revisi', exact: true }).click()
-  await page.waitForTimeout(200)
+  await page.waitForFunction(() =>
+    document
+      .querySelector('.wiki-body')
+      ?.textContent.includes('Synthetic evidence-backed result'),
+  )
   assert.equal(s.get('SELECT count(*) AS n FROM wiki_revisions').n, 1)
   await page.goto(
     origin + '/communities/' + s.get('SELECT id FROM communities LIMIT 1').id,
@@ -252,6 +250,13 @@ try {
   await page
     .getByRole('tab', { name: 'Tentang', exact: true })
     .press('ArrowLeft')
+  assert.equal(
+    await page
+      .getByRole('tab', { name: 'Suara', exact: true })
+      .getAttribute('aria-selected'),
+    'true',
+  )
+  await page.getByRole('tab', { name: 'Suara', exact: true }).press('ArrowLeft')
   assert.equal(
     await page
       .getByRole('tab', { name: 'Media', exact: true })

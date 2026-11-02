@@ -78,6 +78,13 @@ try {
       .getByText('Synthetic news headline 0', { exact: true })
       .waitFor()
     assert.equal(await page.locator('main .discovery-search').count(), 0)
+    const headline = await page.locator('main .news-lead').evaluate((el) => {
+      const tile = el.getBoundingClientRect(),
+        copy = el.querySelector('.news-tile-copy').getBoundingClientRect()
+      return { height: tile.height, inset: copy.left - tile.left }
+    })
+    assert.ok(headline.height < 200, 'A text-only news tile stays compact')
+    assert.ok(headline.inset < 25, 'The headline uses the available width')
     assert.equal(
       await page.evaluate(
         () => document.documentElement.scrollWidth > innerWidth,
@@ -151,7 +158,9 @@ try {
   await page.goto(origin + '/wiki', { waitUntil: 'domcontentloaded' })
   await page.locator('.app-load-line').waitFor()
   assert.equal(
-    await page.getByText('Belum ada halaman', { exact: true }).count(),
+    await page
+      .getByText('Mulai dari cerita yang kamu kenal', { exact: true })
+      .count(),
     0,
   )
   assert.equal(
@@ -161,7 +170,9 @@ try {
       .evaluate((el) => getComputedStyle(el).animationName),
     'none',
   )
-  await page.getByText('Belum ada halaman', { exact: true }).waitFor()
+  await page
+    .getByText('Mulai dari cerita yang kamu kenal', { exact: true })
+    .waitFor()
   delayWiki = false
   await page.goto(origin + '/explore', { waitUntil: 'networkidle' })
   // Origin transfer uses a separate, intercepted legacy page. No requests reach a live deployment.

@@ -4,6 +4,9 @@ export type Actor = {
   did: string
   name: string
   kind: 'human' | 'agent'
+  bio?: string
+  website?: string
+  location?: string
 }
 export type Community = {
   id: string
@@ -26,6 +29,7 @@ export type PostContent = {
   url?: string
   format?: 'plain' | 'markdown'
   warning?: string
+  inlineMedia?: { version: 1; ids: string[] }
   poll?: { options: string[]; closesAt: number }
   event?: { startsAt: number; endsAt?: number; location: string }
 }

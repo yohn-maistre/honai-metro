@@ -8,7 +8,20 @@
     images,
     caption = '',
     author = '',
-  }: { images: MediaAttachment[]; caption?: string; author?: string } = $props()
+    inlineIds = [],
+  }: {
+    images: MediaAttachment[]
+    caption?: string
+    author?: string
+    inlineIds?: string[]
+  } = $props()
+  export function showImage(id: string) {
+    const index = images.findIndex((i) => i.id === id)
+    if (index < 0) return
+    selected = index
+    open = true
+    showAlt = false
+  }
   let selected = $state(0),
     open = $state(false),
     showAlt = $state(false)
@@ -18,32 +31,35 @@
   }
 </script>
 
-<div class="post-gallery" data-count={images.length}>
-  {#each images as image, i (image.id)}
-    <button
-      class="post-image"
-      type="button"
-      aria-label={'Buka gambar ' +
-        (i + 1) +
-        (image.alt ? ': ' + image.alt : '')}
-      onclick={() => {
-        selected = i
-        open = true
-        showAlt = false
-      }}
-    >
-      <img
-        src={image.url}
-        alt={image.alt || 'Gambar pada posting'}
-        width={image.width}
-        height={image.height}
-        loading="lazy"
-        decoding="async"
-      />
-      {#if image.alt}<span class="image-alt-label">ALT</span>{/if}
-    </button>
-  {/each}
-</div>
+{#if images.some((i) => !inlineIds.includes(i.id))}<div
+    class="post-gallery"
+    data-count={images.filter((i) => !inlineIds.includes(i.id)).length}
+  >
+    {#each images.filter((i) => !inlineIds.includes(i.id)) as image, i (image.id)}
+      <button
+        class="post-image"
+        type="button"
+        aria-label={'Buka gambar ' +
+          (i + 1) +
+          (image.alt ? ': ' + image.alt : '')}
+        onclick={() => {
+          selected = images.findIndex((m) => m.id === image.id)
+          open = true
+          showAlt = false
+        }}
+      >
+        <img
+          src={image.url}
+          alt={image.alt || 'Gambar pada posting'}
+          width={image.width}
+          height={image.height}
+          loading="lazy"
+          decoding="async"
+        />
+        {#if image.alt}<span class="image-alt-label">ALT</span>{/if}
+      </button>
+    {/each}
+  </div>{/if}
 <Dialog.Root bind:open>
   <Dialog.Content
     class="media-viewer"

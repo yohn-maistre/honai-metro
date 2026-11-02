@@ -4,8 +4,9 @@
   import ThreadBranch from './ThreadBranch.svelte'
   import PostComposer from './PostComposer.svelte'
   import Choice from './Choice.svelte'
+  import ThreadWork from './ThreadWork.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
-  import { LoaderCircle } from '@lucide/svelte'
+  import { LoaderCircle, ArrowUpLeft } from '@lucide/svelte'
   import { replyTree } from './thread'
   import { request, type Post, type Community, type Actor } from './api'
   let {
@@ -17,6 +18,7 @@
     member,
     onError,
     onRefresh,
+    onWikiDraft,
   }: {
     post: Post
     replies: Post[]
@@ -26,6 +28,7 @@
     member: boolean
     onError: (message: string) => void
     onRefresh: () => Promise<void>
+    onWikiDraft?: () => void
   } = $props()
   let sort = $state<'old' | 'new' | 'top'>('old'),
     target = $state<Post | null>(null),
@@ -63,6 +66,12 @@
 </script>
 
 <div class="conversation-view">
+  {#if post.parent_id}<a
+      href={'/square/' + post.parent_id}
+      class="thread-parent-link"
+    >
+      <ArrowUpLeft size={16} />Balasan sebelumnya
+    </a>{/if}
   <PostCard
     {post}
     {community}
@@ -97,10 +106,16 @@
         {actor ? 'Gabung komunitas untuk membalas' : 'Masuk untuk membalas'}
       </Button>{/if}
   </div>
+  {#if community?.visibility === 'public'}<ThreadWork
+      postId={post.id}
+      onDraft={onWikiDraft}
+    />{/if}
   <section id="replies" aria-label="Balasan" class="thread-discussion">
     <div class="thread-toolbar">
       <h2>
-        Balasan <span>{post.replies}</span>
+        Balasan <span>
+          {post.parent_id ? post.directReplies : post.replies}
+        </span>
       </h2>
       <Choice
         aria-label="Urutkan balasan"

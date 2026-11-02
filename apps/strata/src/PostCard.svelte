@@ -263,7 +263,13 @@
           />{/if}{community?.title ?? 'Komunitas'}
       </a>
     {/if}
-    <RichPost {post} {detail} {canVote} {onError} />
+    <RichPost
+      {post}
+      {detail}
+      {canVote}
+      {onError}
+      externalPreview={community?.visibility === 'public'}
+    />
     {#if post.contexts?.length}<div class="context-links mt-3">
         {#each post.contexts as context}<Badge
             href={'/contexts/' + context.slug}
@@ -414,6 +420,9 @@
             url: editUrl,
             warning: editWarning,
             format: post.content?.format ?? 'plain',
+            ...(post.content?.inlineMedia
+              ? { inlineMedia: post.content.inlineMedia }
+              : {}),
           },
         })
       }}

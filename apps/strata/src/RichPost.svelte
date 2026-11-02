@@ -10,6 +10,7 @@
   import PostText from './PostText.svelte'
   import PostMedia from './PostMedia.svelte'
   import VideoPreview from './VideoPreview.svelte'
+  import LinkPreview from './LinkPreview.svelte'
   import { markdown, videoEmbed, directVideo } from './markdown'
   import { request, type Post } from './api'
   let {
@@ -17,15 +18,22 @@
     detail = false,
     canVote = false,
     onError,
+    externalPreview = false,
   }: {
     post: Post
     detail?: boolean
     canVote?: boolean
     onError: (s: string) => void
+    externalPreview?: boolean
   } = $props()
   let revealed = $state(false),
     expanded = $state(false),
     busy = $state(false)
+  let mediaViewer = $state<PostMedia | undefined>()
+  const inlineIds = $derived(post.content?.inlineMedia?.ids ?? [])
+  const inlineImages = $derived(
+    post.media?.filter((m) => inlineIds.includes(m.id)) ?? [],
+  )
   const embed = $derived(
     videoEmbed(post.content?.url ?? '') || directVideo(post.content?.url ?? ''),
   )
@@ -46,7 +54,16 @@
   }
 </script>
 
-<div class="rich-post">
+<div
+  class="rich-post"
+  onclick={(event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>(
+      'button[data-image-id]',
+    )
+    if (button) mediaViewer?.showImage(button.dataset.imageId!)
+  }}
+  role="presentation"
+>
   {#if post.deleted}<p class="post-tombstone">
       Posting dihapus oleh penulis.
     </p>{:else}
@@ -61,7 +78,7 @@
         </h2>{/if}
       <div class="cx-post-body strata-body" class:post-clamped={truncated}>
         {#if post.content?.format === 'markdown'}<div class="post-markdown">
-            {@html markdown(post.text)}
+            {@html markdown(post.text, inlineImages)}
           </div>{:else}<PostText
             text={post.text}
             permalink={!detail ? '/square/' + post.id : undefined}
@@ -74,25 +91,31 @@
           Baca selengkapnya
         </button>{/if}
       {#if post.media?.length}<PostMedia
+          bind:this={mediaViewer}
           images={post.media}
+          {inlineIds}
           caption={post.text}
           author={post.author.name}
         />{/if}
       {#if post.content?.url}<div class="post-link-card">
           {#if embed}<VideoPreview url={post.content.url} />{/if}
-          <a
-            class:video-link-label={!!embed}
-            href={post.content.url}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            referrerpolicy="no-referrer"
-          >
-            <span>
-              <small>{new URL(post.content.url).hostname}</small>
-              {post.content.title || post.content.url}
-            </span>
-            <ExternalLink size={16} />
-          </a>
+          {#if !embed}<LinkPreview
+              url={post.content.url}
+              title={post.content.title}
+              enabled={externalPreview}
+            />{:else}<a
+              class:video-link-label={!!embed}
+              href={post.content.url}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              referrerpolicy="no-referrer"
+            >
+              <span>
+                <small>{new URL(post.content.url).hostname}</small>
+                {post.content.title || post.content.url}
+              </span>
+              <ExternalLink size={16} />
+            </a>{/if}
         </div>{/if}
       {#if post.poll}<div class="post-poll" aria-label="Jajak pendapat">
           {#each post.poll.options as option, i}<button

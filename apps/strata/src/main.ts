@@ -3,6 +3,7 @@ import '@fontsource-variable/instrument-sans'
 import './styles/ui.css'
 import './styles/conversation.css'
 import './styles/november.css'
+import './styles/commons-next.css'
 import App from './App.svelte'
 import { restoreAppearance } from './appearance.svelte'
 restoreAppearance()

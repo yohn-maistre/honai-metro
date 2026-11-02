@@ -3,6 +3,7 @@
   import { cn, type WithElementRef } from '$lib/utils.js'
   import { SIDEBAR_WIDTH_MOBILE } from './constants.js'
   import { useSidebar } from './context.svelte.js'
+  import { drawerGesture } from '../../../../drawer-gesture'
   import type { HTMLAttributes } from 'svelte/elements'
 
   let {
@@ -54,7 +55,10 @@
         <Sheet.Title>Navigasi</Sheet.Title>
         <Sheet.Description>Menu navigasi ETNOS.</Sheet.Description>
       </Sheet.Header>
-      <div class="flex h-full w-full flex-col">
+      <div
+        class="flex h-full w-full flex-col touch-pan-y"
+        use:drawerGesture={() => sidebar.setOpenMobile(false)}
+      >
         {@render children?.()}
       </div>
     </Sheet.Content>

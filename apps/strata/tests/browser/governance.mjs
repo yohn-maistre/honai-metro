@@ -43,7 +43,7 @@ try {
     })
   })
   await p.goto(origin + '/groups', { waitUntil: 'networkidle' })
-  await p.getByRole('button', { name: 'Buat', exact: true }).click()
+  await p.getByRole('button', { name: 'Buat organisasi', exact: true }).click()
   let dialog = p.getByRole('dialog')
   await dialog
     .getByLabel('Nama', { exact: true })

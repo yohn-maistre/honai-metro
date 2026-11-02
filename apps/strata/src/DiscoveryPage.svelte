@@ -8,6 +8,7 @@
   } from '@lucide/svelte'
   import ContentSkeleton from './ContentSkeleton.svelte'
   import NewsSection from './NewsSection.svelte'
+  import EngagementPage from './EngagementPage.svelte'
   import { news } from './news.svelte'
   import { request, initials, type Auth } from './api'
   import type { SearchResult } from './search'
@@ -56,11 +57,12 @@
   })
 </script>
 
-<div class="cx-page-head discovery-heading"><h1>Jelajah</h1></div>
 <nav class="discovery-nav" aria-label="Jelajah ETNOS">
   <a href="/communities"><Users size={17} />Komunitas</a>
   <a href="/wiki"><BookOpen size={17} />Wiki</a>
-  <a href="/groups"><Building2 size={17} />Kelompok</a>
+  <a href="/groups"><Building2 size={17} />Organisasi</a>
+  <a href="/work">Kerja publik <ArrowUpRight size={14} /></a>
+  <a href="/voices">Suara komunitas <ArrowUpRight size={14} /></a>
 </nav>
 {#if pending}<ContentSkeleton />{:else if error}<div
     class="search-state"
@@ -69,6 +71,7 @@
     {error}
   </div>{:else if data}
   <NewsSection />
+  <EngagementPage {auth} compact />
   <section class="explore-featured" aria-label="Pilihan jelajah">
     {#if featured.length}{#each featured as post, i}<a
           class="explore-feature-tile"

@@ -9,11 +9,13 @@
     communities,
     memberships,
     onError,
+    initialColumns = 2,
   }: {
     auth: Auth
     communities: Community[]
     memberships: Membership[]
     onError: (s: string) => void
+    initialColumns?: number
   } = $props()
   let columns = $state([
       { id: 1, source: 'all' },
@@ -36,6 +38,11 @@
     ...contexts.map((c) => ({ value: 'context:' + c.id, label: c.title })),
   ])
   onMount(() => {
+    if (initialColumns === 3)
+      columns = [
+        ...columns,
+        { id: nextId++, source: auth.actor ? 'following' : 'all' },
+      ]
     const media = window.matchMedia('(min-width: 1000px)'),
       update = () => (wide = media.matches)
     update()

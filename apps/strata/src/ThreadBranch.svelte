@@ -24,7 +24,11 @@
     onReply: (post: Post) => void
     onError: (message: string) => void
   } = $props()
-  let collapsed = $state(false)
+  let collapsed = $state(false),
+    expanded = $state(false)
+  const visibleChildren = $derived(
+    expanded ? node.children : node.children.slice(0, 1),
+  )
 </script>
 
 <div
@@ -62,7 +66,7 @@
         />{/if}{collapsed ? 'Tampilkan ' : 'Sembunyikan '}{node.children.length} balasan
     </Button>
     <div id={'branch-' + node.post.id} hidden={collapsed}>
-      {#if !collapsed}{#each node.children as child (child.post.id)}<ThreadBranch
+      {#if !collapsed && depth < 1}{#each visibleChildren as child (child.post.id)}<ThreadBranch
             node={child}
             depth={depth + 1}
             {community}
@@ -71,7 +75,19 @@
             {rootAuthor}
             {onReply}
             {onError}
-          />{/each}{/if}
+          />{/each}{#if !expanded && node.children.length > 1}<Button
+            class="thread-expand"
+            variant="ghost"
+            size="sm"
+            onclick={() => (expanded = true)}
+          >
+            <ChevronDown size={14} />Lihat {node.children.length - 1} balasan lain
+          </Button>{/if}{:else if !collapsed}<a
+          class="thread-open-branch"
+          href={'/square/' + node.post.id}
+        >
+          Buka percakapan <ChevronDown size={14} />
+        </a>{/if}
     </div>
   {/if}
 </div>

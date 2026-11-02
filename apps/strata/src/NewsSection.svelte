@@ -4,7 +4,7 @@
   import { news, loadNews, newsDate } from './news.svelte'
   import ContentSkeleton from './ContentSkeleton.svelte'
   let { compact = false }: { compact?: boolean } = $props()
-  const items = $derived(news.feed?.items.slice(0, compact ? 5 : 9) ?? [])
+  const items = $derived(news.feed?.items.slice(0, compact ? 4 : 3) ?? [])
   onMount(() => {
     void loadNews()
   })
@@ -17,8 +17,8 @@
 >
   <div class="news-section-head">
     <h2>Kabar</h2>
-    <a href="https://westpapua.watch/news/" target="_blank" rel="noreferrer">
-      West Papua Watch <ArrowUpRight size={13} />
+    <a href="/news">
+      Lihat semua <ArrowUpRight size={13} />
     </a>
   </div>
   {#if news.pending}<ContentSkeleton rows={2} />
@@ -36,6 +36,9 @@
               decoding="async"
               onerror={(e) => {
                 e.currentTarget.setAttribute('hidden', '')
+                e.currentTarget
+                  .closest('.news-item')
+                  ?.classList.remove('news-photo')
               }}
             />{/if}
           <div class="news-tile-copy">

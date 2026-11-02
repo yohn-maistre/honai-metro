@@ -199,7 +199,7 @@ try {
     .getByRole('button', { name: 'Opsi konten', exact: true })
     .click()
   await page
-    .getByRole('menuitemcheckbox', { name: 'Markdown', exact: true })
+    .getByRole('menuitemcheckbox', { name: 'Editor tulisan', exact: true })
     .click()
   await page
     .getByRole('menuitem', { name: 'Jajak pendapat', exact: true })

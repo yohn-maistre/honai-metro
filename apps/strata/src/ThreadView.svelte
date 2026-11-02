@@ -72,6 +72,31 @@
     onReply={replyTo}
     {onError}
   />
+  <div class="thread-reply-dock">
+    {#if post.locked}<p class="thread-empty">
+        Percakapan dikunci oleh moderator.
+      </p>{:else if actor && member && community}{#key post.id}<PostComposer
+          bind:this={composer}
+          {actor}
+          communities={[community]}
+          initialCommunity={community.id}
+          parentId={target?.id ?? post.id}
+          replyingTo={target?.author.name}
+          onCancelReply={() => (target = null)}
+          compact
+          onPosted={async () => {
+            target = null
+            await onRefresh()
+          }}
+        />{/key}
+    {:else}<Button
+        href={actor ? '/communities/' + post.community_id : '/login'}
+        variant="ghost"
+        class="reply-signin"
+      >
+        {actor ? 'Gabung komunitas untuk membalas' : 'Masuk untuk membalas'}
+      </Button>{/if}
+  </div>
   <section id="replies" aria-label="Balasan" class="thread-discussion">
     <div class="thread-toolbar">
       <h2>
@@ -107,29 +132,4 @@
         Mulai percakapan
       </p>{/if}
   </section>
-  <div class="thread-reply-dock">
-    {#if post.locked}<p class="thread-empty">
-        Percakapan dikunci oleh moderator.
-      </p>{:else if actor && member && community}{#key post.id}<PostComposer
-          bind:this={composer}
-          {actor}
-          communities={[community]}
-          initialCommunity={community.id}
-          parentId={target?.id ?? post.id}
-          replyingTo={target?.author.name}
-          onCancelReply={() => (target = null)}
-          compact
-          onPosted={async () => {
-            target = null
-            await onRefresh()
-          }}
-        />{/key}
-    {:else}<Button
-        href={actor ? '/communities/' + post.community_id : '/login'}
-        variant="ghost"
-        class="reply-signin"
-      >
-        {actor ? 'Gabung komunitas untuk membalas' : 'Masuk untuk membalas'}
-      </Button>{/if}
-  </div>
 </div>

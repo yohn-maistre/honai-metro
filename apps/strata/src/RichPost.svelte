@@ -1,7 +1,6 @@
 <script lang="ts">
   import {
     ExternalLink,
-    Play,
     CalendarDays,
     MapPin,
     Check,
@@ -10,7 +9,8 @@
   import { Button } from '$lib/components/ui/button/index.js'
   import PostText from './PostText.svelte'
   import PostMedia from './PostMedia.svelte'
-  import { markdown, videoEmbed } from './markdown'
+  import VideoPreview from './VideoPreview.svelte'
+  import { markdown, videoEmbed, directVideo } from './markdown'
   import { request, type Post } from './api'
   let {
     post,
@@ -25,9 +25,10 @@
   } = $props()
   let revealed = $state(false),
     expanded = $state(false),
-    playing = $state(false),
     busy = $state(false)
-  const embed = $derived(videoEmbed(post.content?.url ?? ''))
+  const embed = $derived(
+    videoEmbed(post.content?.url ?? '') || directVideo(post.content?.url ?? ''),
+  )
   const truncated = $derived(!detail && !expanded && post.text.length > 900)
   async function act(route: string, b: unknown) {
     if (busy) return
@@ -72,27 +73,15 @@
         >
           Baca selengkapnya
         </button>{/if}
-      {#if post.media?.length}<PostMedia images={post.media} />{/if}
+      {#if post.media?.length}<PostMedia
+          images={post.media}
+          caption={post.text}
+          author={post.author.name}
+        />{/if}
       {#if post.content?.url}<div class="post-link-card">
-          {#if embed && playing}<iframe
-              title="Video"
-              src={embed}
-              loading="lazy"
-              allow="fullscreen; picture-in-picture"
-              referrerpolicy="no-referrer"
-              sandbox="allow-scripts allow-same-origin allow-presentation"
-              allowfullscreen
-            ></iframe>
-          {:else if embed}<Button
-              variant="outline"
-              class="video-load"
-              onclick={() => (playing = true)}
-            >
-              <Play size={22} />Muat video
-              <span>YouTube / Vimeo</span>
-            </Button>
-            <small>Memuat akan menghubungkan ke layanan video.</small>{/if}
+          {#if embed}<VideoPreview url={post.content.url} />{/if}
           <a
+            class:video-link-label={!!embed}
             href={post.content.url}
             target="_blank"
             rel="noopener noreferrer nofollow"

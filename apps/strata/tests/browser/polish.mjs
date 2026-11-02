@@ -149,14 +149,14 @@ try {
   await page.emulateMedia({ reducedMotion: 'reduce' })
   delayWiki = true
   await page.goto(origin + '/wiki', { waitUntil: 'domcontentloaded' })
-  await page.locator('.route-progress').waitFor()
+  await page.locator('.app-load-line').waitFor()
   assert.equal(
     await page.getByText('Belum ada halaman', { exact: true }).count(),
     0,
   )
   assert.equal(
     await page
-      .locator('.route-progress .pixel-ring i')
+      .locator('.app-load-line i')
       .first()
       .evaluate((el) => getComputedStyle(el).animationName),
     'none',

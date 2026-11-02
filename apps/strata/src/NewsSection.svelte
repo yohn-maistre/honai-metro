@@ -1,19 +1,10 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import { ArrowUpRight, Newspaper } from '@lucide/svelte'
-  import { news, loadNews } from './news.svelte'
-  import PixelLoader from './PixelLoader.svelte'
+  import { news, loadNews, newsDate } from './news.svelte'
+  import ContentSkeleton from './ContentSkeleton.svelte'
   let { compact = false }: { compact?: boolean } = $props()
-  const items = $derived(news.feed?.items.slice(0, compact ? 3 : 5) ?? [])
-  function date(value: string | null) {
-    return value
-      ? new Intl.DateTimeFormat('id', {
-          day: 'numeric',
-          month: 'short',
-          timeZone: 'Asia/Jayapura',
-        }).format(new Date(value))
-      : ''
-  }
+  const items = $derived(news.feed?.items.slice(0, compact ? 5 : 9) ?? [])
   onMount(() => {
     void loadNews()
   })
@@ -30,30 +21,40 @@
       West Papua Watch <ArrowUpRight size={13} />
     </a>
   </div>
-  {#if news.pending}<div class="news-pending">
-      <PixelLoader label="Memuat kabar…" />
-    </div>
+  {#if news.pending}<ContentSkeleton rows={2} />
   {:else if items.length}<div class="news-grid">
       {#each items as item, i}<a
           class="news-item"
           class:news-lead={!compact && i === 0}
-          href={item.url}
-          target="_blank"
-          rel="noreferrer"
+          class:news-photo={!compact && !!item.image}
+          href={'/news/' + item.id}
         >
-          {#if !compact && i === 0}<Newspaper
-              size={20}
-              class="news-mark"
+          {#if !compact && item.image}<img
+              src={item.image}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              onerror={(e) => {
+                e.currentTarget.setAttribute('hidden', '')
+              }}
             />{/if}
-          <strong>{item.title}</strong>
-          <span>
-            {date(item.publishedAt)}{item.sourceCount
-              ? ` · ${item.sourceCount} sumber`
-              : ''}<ArrowUpRight size={13} />
-          </span>
+          <div class="news-tile-copy">
+            {#if !compact && i === 0}<Newspaper
+                size={19}
+                class="news-mark"
+              />{/if}
+            <strong>{item.title}</strong>
+            <span>
+              {newsDate(item.publishedAt)}{item.sourceCount
+                ? ` · ${item.sourceCount} sumber`
+                : ''}<ArrowUpRight size={13} />
+            </span>
+          </div>
+          {#if !compact && item.imageCredit}<small class="news-photo-credit">
+              {item.imageCredit}
+            </small>{/if}
         </a>{/each}
-    </div>
-  {:else}<p class="news-unavailable">
+    </div>{:else}<p class="news-unavailable">
       Kabar belum dapat dimuat. <a
         href="https://westpapua.watch/news/"
         target="_blank"

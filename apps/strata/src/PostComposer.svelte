@@ -29,7 +29,8 @@
     type PostContent,
   } from './api'
   import PostText from './PostText.svelte'
-  import { markdown } from './markdown'
+  import { markdown, videoEmbed, directVideo } from './markdown'
+  import VideoPreview from './VideoPreview.svelte'
   import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
   import { prepareImage, uploadImages, type ImageDraft } from './media'
   let {
@@ -42,6 +43,7 @@
     onPosted,
     onStateChange,
     compact = false,
+    initialUrl = '',
   }: {
     actor: Actor
     communities: Community[]
@@ -51,12 +53,13 @@
     onCancelReply?: () => void
     onPosted: (post: Post) => void | Promise<void>
     onStateChange?: (state: { dirty: boolean; busy: boolean }) => void
+    initialUrl?: string
     compact?: boolean
   } = $props()
   let communityId = $state(untrack(() => initialCommunity)),
     text = $state(''),
     title = $state(''),
-    url = $state(''),
+    url = $state(untrack(() => initialUrl)),
     warning = $state(''),
     showTitle = $state(false),
     showUrl = $state(false),
@@ -78,6 +81,11 @@
     altKey = $state(''),
     field = $state<HTMLTextAreaElement | null>(null),
     picker = $state<HTMLInputElement | null>(null)
+  const detectedUrl = $derived(
+    url.trim() ||
+      text.match(/https?:\/\/[^\s<>]+/)?.[0]?.replace(/[.,;!?)]*$/, '') ||
+      '',
+  )
   const hasContent = $derived(
     !!(text.trim() || title.trim() || url.trim() || images.length || kind),
   )
@@ -123,7 +131,7 @@
     try {
       const content: PostContent = {
         ...(title.trim() ? { title } : {}),
-        ...(url.trim() ? { url } : {}),
+        ...(detectedUrl ? { url: detectedUrl } : {}),
         ...(warning.trim() ? { warning } : {}),
         ...(format ? { format: 'markdown' } : {}),
       }
@@ -253,6 +261,9 @@
           bind:value={url}
           disabled={busy || !!pending}
         />{/if}
+      {#if !warning && (videoEmbed(detectedUrl) || directVideo(detectedUrl))}<VideoPreview
+          url={detectedUrl}
+        />{/if}
       {#if showWarning}<Input
           aria-label="Peringatan konten"
           placeholder="Peringatan konten"
@@ -265,13 +276,26 @@
           disabled={busy || !!pending}
         >
           <legend>Jajak pendapat</legend>
-          {#each pollOptions.keys() as i}<Input
-              aria-label={'Pilihan ' + (i + 1)}
-              placeholder={'Pilihan ' + (i + 1)}
-              bind:value={pollOptions[i]}
-              maxlength={100}
-              required
-            />{/each}
+          <div class="poll-choice-list">
+            {#each pollOptions.keys() as i}<div class="poll-choice-row">
+                <span>{i + 1}</span>
+                <Input
+                  aria-label={'Pilihan ' + (i + 1)}
+                  placeholder={'Pilihan ' + (i + 1)}
+                  bind:value={pollOptions[i]}
+                  maxlength={100}
+                  required
+                />{#if pollOptions.length > 2}<Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label={'Hapus pilihan ' + (i + 1)}
+                    onclick={() =>
+                      (pollOptions = pollOptions.filter((_, n) => n !== i))}
+                  >
+                    <X size={15} />
+                  </Button>{/if}
+              </div>{/each}
+          </div>
           <div>
             <Button
               variant="ghost"
@@ -281,6 +305,7 @@
             >
               Tambah pilihan
             </Button><Choice
+              compact
               aria-label="Durasi jajak pendapat"
               bind:value={pollDays}
               items={[

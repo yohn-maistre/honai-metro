@@ -112,6 +112,7 @@ try {
       name: 'Buka gambar 1: Synthetic image for browser contract',
     })
     .click()
+  await page.screenshot({ path: artifactDir + '/photo-viewer-before-alt.png' })
   await page
     .getByRole('dialog')
     .getByRole('button', { name: 'Teks alternatif', exact: true })
@@ -120,6 +121,19 @@ try {
     .getByRole('dialog')
     .getByText('Synthetic image for browser contract')
     .waitFor()
+  const viewer = page.getByRole('dialog')
+  const viewerBounds = await viewer.boundingBox()
+  assert.equal(viewerBounds.width, 1280)
+  assert.equal(viewerBounds.height, 900)
+  await viewer
+    .getByText('Synthetic browser contribution', { exact: true })
+    .waitFor()
+  await page.screenshot({ path: artifactDir + '/photo-viewer-desktop.png' })
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.waitForFunction(() => innerWidth === 390 && Math.abs(document.querySelector('.media-viewer').getBoundingClientRect().width - innerWidth) < 1)
+  assert.equal((await viewer.boundingBox()).width, 390)
+  await page.screenshot({ path: artifactDir + '/photo-viewer-mobile.png' })
+  await page.setViewportSize({ width: 1280, height: 900 })
   await page.getByRole('button', { name: 'Tutup gambar', exact: true }).click()
   await page
     .getByPlaceholder('Tulis balasan…')
@@ -240,7 +254,7 @@ try {
     .press('ArrowLeft')
   assert.equal(
     await page
-      .getByRole('tab', { name: 'Wiki', exact: true })
+      .getByRole('tab', { name: 'Media', exact: true })
       .getAttribute('aria-selected'),
     'true',
   )

@@ -112,6 +112,21 @@
     {#if invalid}<p role="alert" class="cx-form-error">
         Gunakan kode warna seperti #c5b0e2.
       </p>{/if}
+    <div class="media-preference">
+      <div>
+        <Label>Sampul video</Label>
+        <p class="cx-hint">
+          Sampul dan judul saja. Pemutar dimuat setelah diketuk.
+        </p>
+      </div>
+      <Button
+        variant="outline"
+        aria-pressed={appearance.externalMedia}
+        onclick={() => (appearance.externalMedia = !appearance.externalMedia)}
+      >
+        {appearance.externalMedia ? 'Otomatis' : 'Saat diketuk'}
+      </Button>
+    </div>
     <p class="cx-hint">
       Disimpan di perangkat ini. Kontras teks menyesuaikan tema.
     </p>

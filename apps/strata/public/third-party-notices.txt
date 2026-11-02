@@ -7911,6 +7911,18 @@ SOFTWARE.
 
 
 
+NATURAL-EARTH.txt
+Natural Earth — 1:110m land polygons
+Source: https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_land.geojson
+Terms: https://www.naturalearthdata.com/about/terms-of-use/
+Natural Earth raster and vector map data are in the public domain.
+
+The small news place map uses rounded coordinates from the 1:110m land dataset,
+clipped by the SVG viewport. No political borders or exact incident locations
+are inferred. Story place coordinates come from WPW's published place metadata.
+
+
+
 shadcn-svelte-MIT.txt
 MIT License
 

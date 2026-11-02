@@ -6,10 +6,9 @@
     MapPin,
     Building2,
   } from '@lucide/svelte'
-  import PixelLoader from './PixelLoader.svelte'
+  import ContentSkeleton from './ContentSkeleton.svelte'
   import NewsSection from './NewsSection.svelte'
   import { news } from './news.svelte'
-  import { Button } from '$lib/components/ui/button/index.js'
   import { request, initials, type Auth } from './api'
   import type { SearchResult } from './search'
   let { auth }: { auth: Auth } = $props()
@@ -57,20 +56,16 @@
   })
 </script>
 
-<div class="cx-page-head">
-  <h1>Jelajah</h1>
-  <Button variant="ghost" href="/groups" aria-label="Organisasi dan kelompok">
-    <Building2 size={18} />
-  </Button>
-</div>
+<div class="cx-page-head discovery-heading"><h1>Jelajah</h1></div>
 <nav class="discovery-nav" aria-label="Jelajah ETNOS">
   <a href="/communities"><Users size={17} />Komunitas</a>
   <a href="/wiki"><BookOpen size={17} />Wiki</a>
   <a href="/groups"><Building2 size={17} />Kelompok</a>
 </nav>
-{#if pending}<div class="search-state" role="status">
-    <PixelLoader />
-  </div>{:else if error}<div class="search-state" role="alert">
+{#if pending}<ContentSkeleton />{:else if error}<div
+    class="search-state"
+    role="alert"
+  >
     {error}
   </div>{:else if data}
   <NewsSection />

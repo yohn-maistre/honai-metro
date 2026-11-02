@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Search, ArrowUpRight } from '@lucide/svelte'
-  import PixelLoader from './PixelLoader.svelte'
+  import ContentSkeleton from './ContentSkeleton.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { request } from './api'
   import {
@@ -56,9 +56,10 @@
       {label}
     </button>{/each}
 </div>
-{#if pending}<div class="search-state" role="status">
-    <PixelLoader label="Mencari…" />
-  </div>{:else if error}<div class="search-state" role="alert">
+{#if pending}<ContentSkeleton />{:else if error}<div
+    class="search-state"
+    role="alert"
+  >
     {error}
   </div>{:else}
   {#each groups as group}<section class="search-page-group">

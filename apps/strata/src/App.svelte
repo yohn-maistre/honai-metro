@@ -24,7 +24,8 @@
     History,
   } from '@lucide/svelte'
   import DiscoveryPage from './DiscoveryPage.svelte'
-  import PixelLoader from './PixelLoader.svelte'
+  import RouteProgress from './RouteProgress.svelte'
+  import ContentSkeleton from './ContentSkeleton.svelte'
   import FeedRefresh from './FeedRefresh.svelte'
   import NewsSection from './NewsSection.svelte'
   import VaultTransfer from './messaging/VaultTransfer.svelte'
@@ -39,6 +40,7 @@
   import AppearancePanel from './AppearancePanel.svelte'
   import LoginForm from '$lib/components/login-form.svelte'
   import FeaturePages from './FeaturePages.svelte'
+  import { videoEmbed, directVideo } from './markdown'
   import { applyAppearance, restoreAppearance } from './appearance.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
@@ -68,6 +70,8 @@
   } from './api'
   let searchQuery = $state(''),
     searchDialogOpen = $state(false),
+    profileTab = $state('posts'),
+    composeUrl = $state(''),
     profile = $state<Actor | null>(null)
   let path = $state(location.pathname),
     search = $state(location.search),
@@ -165,37 +169,41 @@
         : posts,
   )
   const heading = $derived(
-    path === '/'
-      ? 'Beranda'
-      : parts[0] === 'explore'
-        ? 'Jelajah'
-        : parts[0] === 'communities'
-          ? (community?.title ?? 'Komunitas')
-          : parts[0] === 'wiki'
-            ? 'Wiki'
-            : parts[0] === 'saved'
-              ? 'Tersimpan'
-              : parts[0] === 'preferences'
-                ? 'Pengaturan'
-                : parts[0] === 'login'
-                  ? 'Masuk'
-                  : parts[0] === 'find'
-                    ? 'Cari'
-                    : parts[0] === 'square'
-                      ? 'Percakapan'
-                      : parts[0] === 'people'
-                        ? 'Profil'
-                        : parts[0] === 'messages'
-                          ? 'Pesan'
-                          : parts[0] === 'notifications'
-                            ? 'Aktivitas'
-                            : parts[0] === 'groups'
-                              ? 'Organisasi & kelompok'
-                              : parts[0] === 'work'
-                                ? 'Kerja publik'
-                                : parts[0] === 'contexts'
-                                  ? 'Konteks'
-                                  : 'ETNOS',
+    parts[0] === 'news'
+      ? 'Kabar'
+      : path === '/board'
+        ? 'Lajur'
+        : path === '/'
+          ? 'Beranda'
+          : parts[0] === 'explore'
+            ? 'Jelajah'
+            : parts[0] === 'communities'
+              ? (community?.title ?? 'Komunitas')
+              : parts[0] === 'wiki'
+                ? 'Wiki'
+                : parts[0] === 'saved'
+                  ? 'Tersimpan'
+                  : parts[0] === 'preferences'
+                    ? 'Pengaturan'
+                    : parts[0] === 'login'
+                      ? 'Masuk'
+                      : parts[0] === 'find'
+                        ? 'Cari'
+                        : parts[0] === 'square'
+                          ? 'Percakapan'
+                          : parts[0] === 'people'
+                            ? 'Profil'
+                            : parts[0] === 'messages'
+                              ? 'Pesan'
+                              : parts[0] === 'notifications'
+                                ? 'Aktivitas'
+                                : parts[0] === 'groups'
+                                  ? 'Organisasi & kelompok'
+                                  : parts[0] === 'work'
+                                    ? 'Kerja publik'
+                                    : parts[0] === 'contexts'
+                                      ? 'Konteks'
+                                      : 'ETNOS',
   )
   function notify(value: string) {
     message = value
@@ -209,18 +217,64 @@
         : 'Permintaan belum dapat diselesaikan.',
     )
   }
+  function saveScroll() {
+    window.history.replaceState(
+      {
+        ...window.history.state,
+        etnosScroll: window.scrollY,
+        etnosTab: tab,
+        etnosProfileTab: profileTab,
+        etnosFeed: feedTab,
+      },
+      '',
+    )
+  }
+  function goBack() {
+    saveScroll()
+    if (window.history.state?.etnosDepth > 0) window.history.back()
+    else navigate('/')
+  }
   function navigate(href: string) {
     const u = new URL(href, location.origin)
-    historyPush(u)
-    void load()
-    document.getElementById('commons-main')?.focus()
-    window.scrollTo({ top: 0, behavior: 'instant' })
-  }
-  function historyPush(u: URL) {
-    window.history.pushState({}, '', u)
+    saveScroll()
+    window.history.pushState(
+      {
+        etnosDepth: (window.history.state?.etnosDepth ?? 0) + 1,
+        etnosScroll: 0,
+      },
+      '',
+      u,
+    )
     path = u.pathname
     search = u.search
     tab = 'discussion'
+    profileTab = 'posts'
+    void load()
+    document.getElementById('commons-main')?.focus({ preventScroll: true })
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+  async function restoreEntry() {
+    const entry = location.href,
+      top = window.history.state?.etnosScroll ?? 0
+    path = location.pathname
+    search = location.search
+    tab = window.history.state?.etnosTab ?? 'discussion'
+    profileTab = window.history.state?.etnosProfileTab ?? 'posts'
+    feedTab = window.history.state?.etnosFeed ?? 'new'
+    await load()
+    await tick()
+    let pages = 0
+    while (
+      location.href === entry &&
+      nextCursor &&
+      top > document.documentElement.scrollHeight - innerHeight &&
+      pages++ < 5
+    ) {
+      await more()
+      await tick()
+    }
+    if (location.href === entry)
+      requestAnimationFrame(() => window.scrollTo({ top, behavior: 'instant' }))
   }
   function intercept(e: MouseEvent) {
     if (e.button !== 0 || e.metaKey || e.ctrlKey || e.altKey || e.shiftKey)
@@ -258,15 +312,28 @@
         filters.set('community', parts[1])
       if (path === '/' && feedTab === 'following' && identity.actor)
         filters.set('following', 'true')
-      if (parts[0] === 'people' && parts[1]) filters.set('author', parts[1])
+      if (parts[0] === 'people' && parts[1]) {
+        filters.set('author', parts[1])
+        filters.set('roots', 'false')
+      }
       if (parts[0] === 'find')
         filters.set('q', new SvelteURLSearchParams(search).get('q') ?? '')
       const [cs, feed, pages, roles, features, followed] = await Promise.all([
         request<Community[]>('/v1/communities'),
-        request<{ items: Post[]; pinned?: Post[]; nextCursor: string | null }>(
-          '/v1/feed/page?' + filters,
-        ),
-        request<WikiPage[]>('/v1/wiki'),
+        ['news', 'board'].includes(parts[0])
+          ? Promise.resolve({
+              items: [] as Post[],
+              pinned: [] as Post[],
+              nextCursor: null,
+            })
+          : request<{
+              items: Post[]
+              pinned?: Post[]
+              nextCursor: string | null
+            }>('/v1/feed/page?' + filters),
+        ['news', 'board'].includes(parts[0])
+          ? Promise.resolve([])
+          : request<WikiPage[]>('/v1/wiki'),
         identity.actor
           ? request<Membership[]>('/v1/memberships')
           : Promise.resolve([]),
@@ -375,6 +442,7 @@
       return
     }
     composeState = { dirty: false, busy: false }
+    composeUrl = ''
     modal = kind
     communityId = id || memberships[0]?.community_id || communities[0]?.id || ''
     text = ''
@@ -488,7 +556,10 @@
         cursor: nextCursor!,
       })
       if (community) q.set('community', community.id)
-      if (parts[0] === 'people' && parts[1]) q.set('author', parts[1])
+      if (parts[0] === 'people' && parts[1]) {
+        q.set('author', parts[1])
+        q.set('roots', 'false')
+      }
       if (path === '/' && feedTab === 'following') q.set('following', 'true')
       const page = await request<{ items: Post[]; nextCursor: string | null }>(
         '/v1/feed/page?' + q,
@@ -517,6 +588,8 @@
   })
   onMount(() => {
     restoreAppearance()
+    window.history.scrollRestoration = 'manual'
+    window.history.replaceState({ etnosDepth: 0, ...window.history.state }, '')
     void load()
     return () => clearTimeout(notificationTimer)
   })
@@ -531,17 +604,14 @@
     }
   }}
   onclick={intercept}
-  onpopstate={() => {
-    path = location.pathname
-    search = location.search
-    void load()
-  }}
+  onpopstate={restoreEntry}
 />
 <PlatformShell
   {path}
   {heading}
   {auth}
   {unread}
+  onBack={goBack}
   onCompose={() => open('compose')}
   onRefresh={() => load()}
   feedMode={feedTab}
@@ -558,11 +628,9 @@
     searchDialogOpen = true
   }}
 >
-  {#if loading && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore'].includes(parts[0])}<div
-      class="route-progress"
-    >
-      <PixelLoader />
-    </div>{/if}
+  <RouteProgress />
+  {#if loading && !posts.length && !selectedPost && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore', 'news', 'board', 'login'].includes(parts[0])}<ContentSkeleton
+    />{/if}
   {#if path === '/recover-messages'}<VaultTransfer recovery />
   {:else if error}<div class="strata-card">
       <p class="strata-alert" role="alert">{error}</p>
@@ -576,6 +644,25 @@
         <RefreshCw size={14} />Coba lagi
       </Button>
     </div>
+  {:else if parts[0] === 'news' && parts[1]}{#await import('./NewsPage.svelte')}<ContentSkeleton
+      />{:then { default: NewsPage }}<NewsPage
+        id={parts[1]}
+        {auth}
+        {communities}
+        {memberships}
+        onError={notify}
+        onShare={(url) => {
+          open('compose')
+          composeUrl = url
+        }}
+      />{/await}
+  {:else if path === '/board'}{#await import('./FeedBoard.svelte')}<ContentSkeleton
+      />{:then { default: FeedBoard }}<FeedBoard
+        {auth}
+        {communities}
+        {memberships}
+        onError={notify}
+      />{/await}
   {:else if path === '/labs/spaces'}<SpacesLab />
   {:else if path === '/login'}
     <h1 class="sr-only">Masuk</h1>
@@ -808,7 +895,7 @@
         </Button>
       </div>{/if}
   {:else if parts[0] === 'communities' && parts[1]}
-    {#if community}<div class="cx-detail-head">
+    {#if community}<div class="cx-detail-head community-profile">
         <div class="cx-between">
           <span class="cx-avatar sage">{initials(community.title)}</span>
           {#if currentMembership}<Badge variant="secondary">
@@ -875,6 +962,8 @@
             value="wiki"
           >
             Wiki
+          </Tabs.Trigger><Tabs.Trigger value="media">
+            Media
           </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
         </Tabs.List>
         <Tabs.Content value={tab}>
@@ -904,21 +993,31 @@
                 >
                   <Plus size={14} />Halaman baru
                 </Button>{/if}
-            </Card.Root>{:else}{#each posts as p}<PostCard
+            </Card.Root>{:else}{#each posts.filter((p) => tab !== 'media' || p.media?.length || videoEmbed(p.content?.url ?? '') || directVideo(p.content?.url ?? '')) as p}<PostCard
                 post={p}
                 {community}
                 loggedIn={!!auth.actor}
                 canVote={!!currentMembership}
                 onError={notify}
-              />{/each}{#if !posts.length && !loading}<div
+              />{/each}{#if nextCursor}<div class="profile-more">
+                <Button variant="outline" disabled={busy} onclick={more}>
+                  Muat posting lain
+                </Button>
+              </div>{/if}{#if !posts.filter((p) => tab !== 'media' || p.media?.length || videoEmbed(p.content?.url ?? '') || directVideo(p.content?.url ?? '')).length && !loading}<div
                 class="strata-nodata"
               >
                 <MessageCircle size={26} />
-                <h2>Belum ada percakapan</h2>
+                <h2>
+                  {tab === 'media'
+                    ? 'Belum ada media yang dimuat'
+                    : 'Belum ada percakapan'}
+                </h2>
                 <p>
-                  {currentMembership
-                    ? 'Mulai percakapan pertama.'
-                    : 'Gabung komunitas untuk ikut berbicara.'}
+                  {tab === 'media'
+                    ? 'Gambar dan video dari percakapan muncul di sini.'
+                    : currentMembership
+                      ? 'Mulai percakapan pertama.'
+                      : 'Gabung komunitas untuk ikut berbicara.'}
                 </p>
               </div>{/if}{/if}
         </Tabs.Content>
@@ -989,9 +1088,35 @@
         <h2>Posting tidak tersedia</h2>
       </div>{/if}
   {:else if parts[0] === 'people'}
-    {@const actor = profile}{#if actor}<div class="cx-detail-head profile-head">
+    {@const actor = profile}{#if actor}{@const profilePosts = posts.filter(
+        (p) =>
+          p.author.id === actor.id &&
+          (profileTab === 'replies'
+            ? !!p.parent_id
+            : profileTab === 'media'
+              ? !!(
+                  p.media?.length ||
+                  videoEmbed(p.content?.url ?? '') ||
+                  directVideo(p.content?.url ?? '')
+                )
+              : !p.parent_id),
+      )}
+      <div class="cx-detail-head profile-head">
         <span class="cx-avatar sage">{initials(actor.name)}</span>
-        <h1>{actor.name}</h1>
+        <div class="profile-intro">
+          <h1>
+            {actor.name.endsWith('.bsky.social')
+              ? actor.name.slice(0, -12)
+              : actor.name}
+          </h1>
+          <p class="profile-handle">
+            {actor.name.includes('.')
+              ? '@' + actor.name
+              : actor.kind === 'agent'
+                ? 'Aksara · AI'
+                : 'Anggota ETNOS'}
+          </p>
+        </div>
         <details class="profile-identity">
           <summary>Identitas AT</summary>
           <p class="cx-hint">{actor.did}</p>
@@ -1022,7 +1147,15 @@
           </Button>{/if}
         {#if actor.kind === 'agent'}<Badge variant="secondary">AI</Badge>{/if}
       </div>
-      {#each posts.filter((p) => p.author.id === actor.id) as p}<PostCard
+      <div class="profile-tabs" role="group" aria-label="Isi profil">
+        {#each [['posts', 'Posting'], ['replies', 'Balasan'], ['media', 'Media']] as [value, label]}<button
+            aria-pressed={profileTab === value}
+            onclick={() => (profileTab = value)}
+          >
+            {label}
+          </button>{/each}
+      </div>
+      {#each profilePosts as p}<PostCard
           post={p}
           community={communities.find((c) => c.id === p.community_id)}
           loggedIn={!!auth.actor}
@@ -1034,7 +1167,7 @@
             Muat posting lain
           </Button>
         </div>{/if}
-      {#if !posts.length && !loading}<p class="search-state">
+      {#if !profilePosts.length && !loading}<p class="search-state">
           Belum ada posting yang dapat kamu lihat.
         </p>{/if}
     {:else if !loading}<div class="strata-nodata">
@@ -1132,7 +1265,39 @@
       <Button href="/" class="cx-button" variant="outline">Beranda</Button>
     </div>{/if}
   {#snippet rail()}
-    <NewsSection compact />
+    {#if !['explore', 'news', 'communities', 'people', 'wiki', 'board'].includes(parts[0])}<NewsSection
+        compact
+      />
+    {:else}<div class="cx-context-block rail-context-intro">
+        <span class="rail-accent-icon"><BookOpen size={20} /></span>
+        <h2>
+          {parts[0] === 'news'
+            ? 'Dari kabar ke percakapan'
+            : parts[0] === 'people'
+              ? 'Temukan percakapan'
+              : 'Di sekitarmu'}
+        </h2>
+        <p class="cx-hint">
+          {parts[0] === 'news'
+            ? 'Baca sumbernya, lalu bagikan sudut pandangmu di komunitas.'
+            : 'Komunitas, tempat dan pengetahuan bersama.'}
+        </p>
+      </div>{/if}
+    {#if selectedPost?.contexts?.length}<div class="cx-context-block">
+        <h2>Terkait</h2>
+        {#each selectedPost.contexts as context}<a
+            class="rail-context-link"
+            href={'/contexts/' + context.slug}
+          >
+            {context.title}<ArrowUpRight size={14} />
+          </a>{/each}
+      </div>{/if}
+    {#if community?.description && parts[0] === 'communities'}<div
+        class="cx-context-block"
+      >
+        <h2>Tentang {community.title}</h2>
+        <p class="cx-hint">{community.description}</p>
+      </div>{/if}
     <div class="cx-context-block">
       <div class="cx-section-head">
         <h2>Komunitas</h2>
@@ -1140,7 +1305,9 @@
           <ArrowUpRight size={16} />
         </a>
       </div>
-      {#each communities.slice(0, 4) as c}<a
+      {#each communities
+        .filter((c) => c.id !== community?.id)
+        .slice(0, 5) as c}<a
           href={'/communities/' + c.id}
           class="cx-community-mini"
         >
@@ -1371,14 +1538,15 @@
         actor={auth.actor}
         communities={communities.filter((c) => isMember(c.id))}
         initialCommunity={communityId}
+        initialUrl={composeUrl}
         onPosted={(post) => {
           composeState = { dirty: false, busy: false }
           modal = null
           navigate('/square/' + post.id)
         }}
       />{:else}<form
-        class="cx-form"
-        style="margin-top:22px"
+        class="cx-form creation-form"
+        style="margin-top:18px"
         onsubmit={(e) => {
           e.preventDefault()
           submit()
@@ -1400,7 +1568,12 @@
           </Label>{/if}
         {#if modal === 'community'}<Label>
             Tentang komunitas
-            <Textarea bind:value={description} maxlength={2000} required
+            <Textarea
+              bind:value={description}
+              maxlength={2000}
+              rows={3}
+              placeholder="Apa yang dibicarakan di sini?"
+              required
             ></Textarea>
           </Label>
           <Label>

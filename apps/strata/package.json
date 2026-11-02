@@ -10,7 +10,7 @@
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "preview": "vite preview --host 0.0.0.0",
     "test:crypto": "node --test tests/crypto.test.ts",
-    "test:browser": "node tests/browser/forum.mjs && node tests/browser/governance.mjs && node tests/browser/messaging.mjs && node tests/browser/rich-forum.mjs && node tests/browser/discovery.mjs && node tests/browser/dialogs.mjs && node tests/browser/polish.mjs",
+    "test:browser": "node tests/browser/forum.mjs && node tests/browser/governance.mjs && node tests/browser/messaging.mjs && node tests/browser/rich-forum.mjs && node tests/browser/discovery.mjs && node tests/browser/dialogs.mjs && node tests/browser/polish.mjs && node tests/browser/november.mjs",
     "prebuild": "node scripts/notices.mjs",
     "test": "node --test tests/*.test.ts"
   },

@@ -25,6 +25,7 @@
     ArrowLeft,
     ChevronDown,
     RefreshCw,
+    Columns3,
   } from '@lucide/svelte'
   import { appearance } from './appearance.svelte'
   import { initials, type Auth } from './api'
@@ -35,6 +36,7 @@
     heading,
     auth,
     unread = 0,
+    onBack,
     onCompose,
     onSearch,
     onRefresh,
@@ -47,6 +49,7 @@
     heading: string
     auth: Auth
     unread?: number
+    onBack: () => void
     onCompose: () => void
     onSearch: (q: string) => void
     onRefresh: () => void
@@ -57,6 +60,7 @@
   const nav = [
     { href: '/', label: 'Beranda', icon: Home },
     { href: '/explore', label: 'Jelajah', icon: Compass },
+    { href: '/board', label: 'Lajur', icon: Columns3 },
     { href: '/communities', label: 'Komunitas', icon: Users },
     { href: '/groups', label: 'Kelompok', icon: Building2 },
     { href: '/wiki', label: 'Wiki', icon: BookOpen },
@@ -194,14 +198,16 @@
     class="cx-topbar"
     class:home-topbar={path === '/'}
     class:sidebar-collapsed={sidebar.state === 'collapsed'}
-    class:thread-topbar={path.startsWith('/square/')}
+    class:thread-topbar={/^\/(square|people|news|communities|wiki|contexts|groups|work)\/[^/]+/.test(
+      path,
+    )}
   >
-    {#if path.startsWith('/square/')}<Button
-        href="/"
+    {#if /^\/(square|people|news|communities|wiki|contexts|groups|work)\/[^/]+/.test(path)}<Button
+        onclick={onBack}
         variant="ghost"
         size="icon"
         class="thread-back"
-        aria-label="Kembali ke beranda"
+        aria-label="Kembali"
       >
         <ArrowLeft size={22} />
       </Button>
@@ -284,6 +290,7 @@
   </header>
   <div
     class="cx-content-grid"
+    class:board-grid={path === '/board'}
     data-surface={path.startsWith('/square/')
       ? 'thread'
       : path === '/'
@@ -293,7 +300,11 @@
     <main id="commons-main" class="cx-main" data-route={path} tabindex="-1">
       {@render children()}
     </main>
-    <aside class="cx-context" aria-label="Konteks terkait">
+    <aside
+      class="cx-context"
+      aria-label="Konteks terkait"
+      hidden={path === '/board'}
+    >
       {@render rail()}
     </aside>
   </div>
@@ -328,12 +339,7 @@
   >
     <Bell size={21} />{#if unread}<span class="bell-dot"></span>{/if}
   </Button>
-  <Button
-    variant="ghost"
-    size="icon"
-    aria-label="Semua ruang"
-    onclick={() => sidebar.setOpenMobile(true)}
-  >
-    <PanelLeft size={21} />
+  <Button href="/messages" variant="ghost" size="icon" aria-label="Pesan">
+    <MessageSquare size={21} />
   </Button>
 </nav>

@@ -10,6 +10,7 @@
     heading,
     auth,
     unread = 0,
+    onBack,
     onCompose,
     onSearch,
     onRefresh,
@@ -22,6 +23,7 @@
     heading: string
     auth: Auth
     unread?: number
+    onBack: () => void
     onCompose: () => void
     onSearch: (q: string) => void
     onRefresh: () => void
@@ -36,6 +38,7 @@
     {heading}
     {auth}
     {unread}
+    {onBack}
     {onCompose}
     {onSearch}
     {onRefresh}

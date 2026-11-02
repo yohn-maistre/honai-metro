@@ -1,3 +1,4 @@
+import { beginRequest } from './network.svelte'
 export type Actor = {
   id: string
   did: string
@@ -135,28 +136,33 @@ export async function request<T>(
   body?: unknown,
   signal?: AbortSignal,
 ): Promise<T> {
-  const response = await fetch(path, {
-    method: body === undefined ? 'GET' : 'POST',
-    credentials: 'same-origin',
-    cache: 'no-store',
-    signal,
-    headers: {
-      accept: 'application/json',
-      ...(body === undefined
-        ? {}
-        : {
-            'content-type': 'application/json',
-            ...(csrf ? { 'x-strata-csrf': csrf } : {}),
-          }),
-    },
-    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
-  })
-  const data = await response
-    .json()
-    .catch(() => ({ error: 'Layanan belum dapat dihubungi.' }))
-  if (!response.ok)
-    throw new ApiError(response.status, data.error ?? 'Permintaan gagal.')
-  return data as T
+  const done = beginRequest()
+  try {
+    const response = await fetch(path, {
+      method: body === undefined ? 'GET' : 'POST',
+      credentials: 'same-origin',
+      cache: 'no-store',
+      signal,
+      headers: {
+        accept: 'application/json',
+        ...(body === undefined
+          ? {}
+          : {
+              'content-type': 'application/json',
+              ...(csrf ? { 'x-strata-csrf': csrf } : {}),
+            }),
+      },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }),
+    })
+    const data = await response
+      .json()
+      .catch(() => ({ error: 'Layanan belum dapat dihubungi.' }))
+    if (!response.ok)
+      throw new ApiError(response.status, data.error ?? 'Permintaan gagal.')
+    return data as T
+  } finally {
+    done()
+  }
 }
 export const relativeDate = (value: number) => {
   const n = Math.max(0, Date.now() - value)

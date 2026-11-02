@@ -221,7 +221,7 @@ try {
     await p.evaluate(() => document.documentElement.scrollWidth > innerWidth),
     false,
   )
-  await p.getByRole('link', { name: 'Kembali ke beranda', exact: true }).click()
+  await p.getByRole('button', { name: 'Kembali', exact: true }).click()
   await p.getByRole('button', { name: 'Buka pencarian', exact: true }).click()
   await p
     .getByRole('dialog', { name: 'Cari ETNOS', exact: true })

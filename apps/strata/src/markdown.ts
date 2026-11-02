@@ -75,3 +75,21 @@ export function videoEmbed(raw: string) {
   }
   return null
 }
+/** Photon-style native video URL support; no server-side fetch or upload proxy. */
+export function directVideo(raw: string) {
+  try {
+    const u = new URL(raw)
+    if (
+      u.protocol !== 'https:' ||
+      u.username ||
+      u.password ||
+      u.port ||
+      !u.hostname.includes('.') ||
+      /(^\d+\.|\[|\.(local|internal)$)/i.test(u.hostname)
+    )
+      return null
+    return /\.(mp4|webm|ogv)$/i.test(u.pathname) ? u.href : null
+  } catch {
+    return null
+  }
+}

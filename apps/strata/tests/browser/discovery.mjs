@@ -143,7 +143,10 @@ try {
         box.y + box.height <= 900,
       'Search dialog must stay inside the viewport',
     )
-    assert.ok(await dialog.evaluate(el=>el.scrollWidth<=el.clientWidth+1),'Search dialog content must fit its own width')
+    assert.ok(
+      await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+      'Search dialog content must fit its own width',
+    )
     await page.screenshot({ path: artifactDir + `/alpha-search-${width}.png` })
     assert.equal(
       await page.evaluate(

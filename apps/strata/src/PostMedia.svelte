@@ -2,8 +2,13 @@
   import * as Dialog from '$lib/components/ui/dialog/index.js'
   import { Button } from '$lib/components/ui/button/index.js'
   import { ChevronLeft, ChevronRight, X } from '@lucide/svelte'
+  import PostText from './PostText.svelte'
   import type { MediaAttachment } from './api'
-  let { images }: { images: MediaAttachment[] } = $props()
+  let {
+    images,
+    caption = '',
+    author = '',
+  }: { images: MediaAttachment[]; caption?: string; author?: string } = $props()
   let selected = $state(0),
     open = $state(false),
     showAlt = $state(false)
@@ -60,12 +65,19 @@
         <X size={20} />
       </Dialog.Close>
     </div>
-    <img
-      src={images[selected].url}
-      alt={images[selected].alt}
-      width={images[selected].width}
-      height={images[selected].height}
-    />
+    <div class="viewer-image-stage">
+      <img
+        src={images[selected].url}
+        alt={images[selected].alt}
+        width={images[selected].width}
+        height={images[selected].height}
+      />
+    </div>
+    <div class="viewer-caption">
+      {#if author}<strong>{author}</strong>{/if}{#if caption}<p>
+          <PostText text={caption} />
+        </p>{/if}
+    </div>
     <div class="viewer-controls">
       {#if images.length > 1}<Button
           variant="ghost"

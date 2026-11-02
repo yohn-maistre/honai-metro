@@ -3,6 +3,7 @@
   let {
     value = $bindable(''),
     items,
+    onchange,
     id,
     name,
     required = false,
@@ -11,6 +12,7 @@
     'aria-label': label,
     class: className = '',
   }: {
+    onchange?: (value: string) => void
     value?: string
     items: { value: string; label: string; disabled?: boolean }[]
     id?: string
@@ -34,7 +36,10 @@
   name={name ?? (required ? 'choice-' + uid : undefined)}
   items={choices}
   value={value || ''}
-  onValueChange={(next) => (value = next === '__strata_empty__' ? '' : next)}
+  onValueChange={(next) => {
+    value = next === '__strata_empty__' ? '' : next
+    onchange?.(value)
+  }}
   allowDeselect={false}
 >
   <Select.Trigger

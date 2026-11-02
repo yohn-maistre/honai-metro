@@ -60,26 +60,42 @@ try {
     remote = []
   page.on('pageerror', (e) => errors.push(e.message))
   page.on('request', (r) => {
-    if (/youtube|vimeo/.test(r.url())) remote.push(r.url())
+    if (/youtube|vimeo/.test(new URL(r.url()).hostname)) remote.push(r.url())
   })
+  await page.route(
+    /https:\/\/(www\.youtube-nocookie\.com|player\.vimeo\.com)\//,
+    (r) =>
+      r.fulfill({
+        contentType: 'text/html',
+        body: '<html>Fixture video player</html>',
+      }),
+  )
   await page.route('**/auth/me', (r) =>
     r.fulfill({
       json: { actor: owner.actor, csrf: 'fixture-only', steward: true },
     }),
   )
   await page.route('**/v1/**', async (r) => {
-    const q = r.request(),
-      response = await handler(
-        new Request(q.url(), {
-          method: q.method(),
-          headers: {
-            ...q.headers(),
-            authorization: 'Bearer ' + owner.token,
-            origin,
-          },
-          ...(q.method() === 'POST' ? { body: q.postData() } : {}),
-        }),
-      )
+    const q = r.request()
+    if (new URL(q.url()).pathname.startsWith('/v1/video-preview/'))
+      return r.fulfill({
+        json: {
+          title: 'Synthetic video title',
+          provider: 'YouTube',
+          image: null,
+        },
+      })
+    const response = await handler(
+      new Request(q.url(), {
+        method: q.method(),
+        headers: {
+          ...q.headers(),
+          authorization: 'Bearer ' + owner.token,
+          origin,
+        },
+        ...(q.method() === 'POST' ? { body: q.postData() } : {}),
+      }),
+    )
     await r.fulfill({
       status: response.status,
       headers: Object.fromEntries(response.headers),
@@ -99,8 +115,16 @@ try {
     await page.locator('.post-markdown script,.post-markdown img').count(),
     0,
   )
+  await page.locator('.video-preview').scrollIntoViewIfNeeded()
+  await page.getByRole('button', { name: 'Putar video', exact: true }).waitFor()
   assert.equal(remote.length, 0)
   assert.equal(await page.locator('iframe').count(), 0)
+  await page.getByRole('button', { name: 'Putar video', exact: true }).click()
+  await page.locator('iframe').waitFor()
+  assert.equal(
+    await page.locator('iframe').getAttribute('referrerpolicy'),
+    'strict-origin-when-cross-origin',
+  )
   await page.screenshot({
     path: artifactDir + '/strata-rich-feed-390.png',
     fullPage: true,

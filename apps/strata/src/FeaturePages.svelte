@@ -20,6 +20,7 @@
   import * as Tabs from '$lib/components/ui/tabs/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import Choice from './Choice.svelte'
+  import ContentSkeleton from './ContentSkeleton.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
   import { Textarea } from '$lib/components/ui/textarea/index.js'
@@ -359,9 +360,7 @@
       </Card.Root>{/each}
   </div>
 {/snippet}
-{#if loading}<div class="strata-card strata-inline" role="status">
-    <LoaderCircle class="animate-spin" size={18} />Memuat…
-  </div>
+{#if loading}<ContentSkeleton />
 {:else if error}<div class="strata-card">
     <h1>Halaman belum tersedia</h1>
     <p role="alert" class="cx-hint">{error}</p>
@@ -803,7 +802,7 @@
       </Dialog.Description>
     </Dialog.Header>
     <form
-      class="cx-form"
+      class="cx-form creation-form"
       onsubmit={(e) => {
         e.preventDefault()
         submit()
@@ -937,7 +936,7 @@
           </Label><Textarea
             id="object-description"
             bind:value={description}
-            rows={modal === 'result' ? 8 : 4}
+            rows={modal === 'result' ? 8 : 3}
             maxlength={modal === 'result'
               ? 50000
               : modal === 'work'

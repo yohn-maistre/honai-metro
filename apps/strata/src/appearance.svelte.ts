@@ -15,6 +15,7 @@ export const appearance = $state({
   accent: '#b8b2c1',
   base: 'graphite',
   texture: 'none',
+  externalMedia: true,
 })
 import { accentRoles } from './appearance-color'
 import { bases, baseRoles } from './appearance-bases'
@@ -51,6 +52,8 @@ export function restoreAppearance() {
     if (theme === 'light' || theme === 'dark') appearance.theme = theme
     if (/^#[0-9a-f]{6}$/i.test(saved?.accent)) appearance.accent = saved.accent
     if (bases.some((b) => b.id === saved?.base)) appearance.base = saved.base
+    if (typeof saved?.externalMedia === 'boolean')
+      appearance.externalMedia = saved.externalMedia
     if (['none', 'grain', 'dither'].includes(saved?.texture))
       appearance.texture = saved.texture
   } catch {

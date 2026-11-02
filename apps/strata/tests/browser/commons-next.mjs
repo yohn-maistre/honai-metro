@@ -289,6 +289,16 @@ try {
       fullPage: true,
     })
   }
+  await page.setViewportSize({ width: 768, height: 1024 })
+  await page.goto(origin + '/explore', { waitUntil: 'networkidle' })
+  for (const name of ['Aktivitas', 'Tersimpan', 'Kerja publik']) {
+    const box = await page
+      .locator('.sidebar-utilities')
+      .getByRole('link', { name, exact: true })
+      .boundingBox()
+    assert.ok(box && box.x >= 0 && box.x + box.width <= 76, name)
+  }
+  await page.screenshot({ path: artifactDir + '/commons-explore-768.png' })
   assert.deepEqual(errors, [])
   console.log(
     JSON.stringify({

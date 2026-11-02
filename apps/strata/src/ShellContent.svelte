@@ -175,9 +175,12 @@
         variant="ghost"
         class="justify-start"
         aria-label="Aktivitas"
+        title="Aktivitas"
         onclick={() => sidebar.setOpenMobile(false)}
       >
-        <Bell size={17} />Aktivitas{#if unread}<span class="utility-unread">
+        <Bell size={17} />
+        <span>Aktivitas</span>
+        {#if unread}<span class="utility-unread">
             {unread}
           </span>{/if}
       </Button>
@@ -185,17 +188,23 @@
         href="/saved"
         variant="ghost"
         class="justify-start"
+        aria-label="Tersimpan"
+        title="Tersimpan"
         onclick={() => sidebar.setOpenMobile(false)}
       >
-        <Bookmark size={17} />Tersimpan
+        <Bookmark size={17} />
+        <span>Tersimpan</span>
       </Button>
       <Button
         href="/work"
         variant="ghost"
         class="justify-start"
+        aria-label="Kerja publik"
+        title="Kerja publik"
         onclick={() => sidebar.setOpenMobile(false)}
       >
-        <ListTodo size={17} />Kerja publik
+        <ListTodo size={17} />
+        <span>Kerja publik</span>
       </Button>
     </div>
     <Button

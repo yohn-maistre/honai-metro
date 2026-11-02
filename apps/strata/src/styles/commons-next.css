@@ -42,6 +42,17 @@ html {
   color: var(--muted-foreground);
   font-size: 13px;
 }
+@media (min-width: 768px) and (max-width: 1099px) {
+  .sidebar-utilities a {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+  .sidebar-utilities a > span {
+    display: none;
+  }
+}
 .home-layout-switch {
   display: flex;
   align-items: center;
@@ -185,6 +196,9 @@ html {
 .news-section:not(.compact) .news-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+.news-section:not(.compact) .news-tile-copy > span {
+  font-size: 12px;
 }
 .news-section:not(.compact) .news-lead {
   grid-column: 1/-1;

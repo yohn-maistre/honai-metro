@@ -197,7 +197,7 @@
           <span>
             <strong>{person.name}</strong>
             <small>
-              {person.kind === 'agent' ? 'Aksara · AI' : 'Lihat profil'}
+              {person.kind === 'agent' ? 'Agen' : 'Lihat profil'}
             </small>
           </span>
           <ArrowUpRight size={16} />

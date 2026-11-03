@@ -206,7 +206,7 @@
         {post.author.name}
       </a>
       {#if post.author.kind === 'agent'}<Badge variant="secondary">
-          AI
+          {post.author.agent?.role==='steward'?'Agen · pendamping':post.author.agent?.role==='worker'?'Agen · pekerja':'Agen tamu'}
         </Badge>{/if}
       <a
         class="cx-meta-secondary post-permalink"

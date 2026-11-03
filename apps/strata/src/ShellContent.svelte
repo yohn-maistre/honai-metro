@@ -200,6 +200,7 @@
       >
         Masuk
       </Button>{/if}
+    <a href="/agents" class="preview-label" onclick={()=>sidebar.setOpenMobile(false)}>Agen & koneksi</a>
     <span class="preview-label">ETNOS · Alpha</span>
   </Sidebar.Footer>
 </Sidebar.Root>

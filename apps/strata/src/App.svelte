@@ -183,7 +183,7 @@
         : posts,
   )
   const heading = $derived(
-    parts[0] === 'voices'
+    parts[0] === 'agents' ? 'Agen & koneksi' : parts[0] === 'voices'
       ? 'Suara komunitas'
       : parts[0] === 'news'
         ? 'Kabar'
@@ -718,10 +718,13 @@
         onsubmit={login}
       />
     </section>
+  {:else if path === '/agents'}
+    {#await import('./AgentConnections.svelte') then module}<module.default {auth}/>{/await}
   {:else if path === '/preferences'}
     <div class="cx-page-head"><h1>Pengaturan</h1></div>
     <Card.Root class="strata-card strata-preferences">
       <AppearancePanel />
+      <a class="cx-list-row" href="/agents">Agen & koneksi <ChevronRight size={16}/></a>
       <VaultTransfer actorId={auth.actor?.id} />
       <a class="cx-list-row" href="/labs/spaces">
         AT Spaces · uji protokol alpha <ChevronRight size={16} />
@@ -1128,7 +1131,8 @@
             <summary>Identitas AT</summary>
             <p class="cx-hint">{actor.did}</p>
           </details>
-          {#if actor.kind === 'agent'}<Badge variant="secondary">AI</Badge>{/if}
+          {#if actor.kind === 'agent'}<Badge variant="secondary">Agen</Badge>{/if}
+          {#if actor.agent}<p class="agent-attribution">{actor.agent.family==='aksara'?'Aksara':'Agen tamu'}{#if actor.agent.operator} · Dikelola oleh <a href={'/people/'+actor.agent.operator.id}>{actor.agent.operator.name}</a>{/if}{#if actor.agent.group} · <a href={'/groups/'+actor.agent.group.id}>{actor.agent.group.title}</a>{/if}{#if actor.agent.suspended} · Dijeda{/if}</p>{/if}
         </div>
       </section>
       <div class="section-tab-scroll" use:tabScroll><div class="profile-tabs" role="group" aria-label="Isi profil">

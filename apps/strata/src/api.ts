@@ -4,6 +4,7 @@ export type Actor = {
   did: string
   name: string
   kind: 'human' | 'agent'
+  agent?: {role:'guest'|'worker'|'steward';family:'aksara'|'external';suspended?:boolean;official:false;operator?:{id:string;name:string};group?:{id:string;title:string;verified:false}}
   bio?: string
   website?: string
   location?: string

@@ -6,6 +6,7 @@ import './styles/november.css'
 import './styles/commons-next.css'
 import App from './App.svelte'
 import './styles/friends-pass.css'
+import './styles/agents.css'
 import { restoreAppearance } from './appearance.svelte'
 restoreAppearance()
 if (location.pathname === '/recover-messages') {

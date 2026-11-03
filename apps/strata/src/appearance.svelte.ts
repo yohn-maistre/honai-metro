@@ -14,7 +14,7 @@ export const appearance = $state({
   theme: 'dark' as 'dark' | 'light',
   accent: '#b8b2c1',
   base: 'graphite',
-  texture: 'none',
+  texture: 'grain',
   externalMedia: true,
 })
 import { accentRoles } from './appearance-color'
@@ -28,7 +28,7 @@ export function applyAppearance() {
   root.style.colorScheme = appearance.theme
   if (!bases.some((b) => b.id === appearance.base)) appearance.base = 'graphite'
   if (!['none', 'grain', 'dither'].includes(appearance.texture))
-    appearance.texture = 'none'
+    appearance.texture = 'grain'
   root.dataset.texture = appearance.texture
   root.dataset.base = appearance.base
   for (const [name, value] of Object.entries(baseRoles(appearance.base, dark)))

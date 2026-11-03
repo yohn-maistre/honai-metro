@@ -18,6 +18,7 @@
     Sun,
     Moon,
     PanelLeft,
+    Menu,
     X,
     ChevronsUpDown,
     ListTodo,
@@ -66,6 +67,10 @@
     { href: '/communities', label: 'Komunitas', icon: Users },
     { href: '/wiki', label: 'Wiki', icon: BookOpen },
     { href: '/messages', label: 'Pesan', icon: MessageSquare },
+    { href: '/notifications', label: 'Aktivitas', icon: Bell },
+    { href: '/saved', label: 'Tersimpan', icon: Bookmark },
+    { href: '/work', label: 'Kerja publik', icon: ListTodo },
+    { href: '/preferences', label: 'Pengaturan', icon: Settings2 },
   ]
   function active(href: string) {
     return href === '/'
@@ -151,6 +156,11 @@
                 >
                   <item.icon size={20} strokeWidth={1.7} />
                   <span>{item.label}</span>
+                  {#if item.href === '/notifications' && unread}<span
+                      class="utility-unread"
+                    >
+                      {unread}
+                    </span>{/if}
                 </a>{/snippet}
             </Sidebar.MenuButton>
           </Sidebar.MenuItem>{/each}
@@ -169,55 +179,6 @@
     </div>
   </Sidebar.Content>
   <Sidebar.Footer class="p-4 gap-3">
-    <div class="sidebar-utilities">
-      <Button
-        href="/notifications"
-        variant="ghost"
-        class="justify-start"
-        aria-label="Aktivitas"
-        title="Aktivitas"
-        onclick={() => sidebar.setOpenMobile(false)}
-      >
-        <Bell size={17} />
-        <span>Aktivitas</span>
-        {#if unread}<span class="utility-unread">
-            {unread}
-          </span>{/if}
-      </Button>
-      <Button
-        href="/saved"
-        variant="ghost"
-        class="justify-start"
-        aria-label="Tersimpan"
-        title="Tersimpan"
-        onclick={() => sidebar.setOpenMobile(false)}
-      >
-        <Bookmark size={17} />
-        <span>Tersimpan</span>
-      </Button>
-      <Button
-        href="/work"
-        variant="ghost"
-        class="justify-start"
-        aria-label="Kerja publik"
-        title="Kerja publik"
-        onclick={() => sidebar.setOpenMobile(false)}
-      >
-        <ListTodo size={17} />
-        <span>Kerja publik</span>
-      </Button>
-    </div>
-    <Button
-      href="/preferences"
-      variant="ghost"
-      class="justify-start sidebar-settings"
-      aria-label="Pengaturan"
-      title="Pengaturan"
-      onclick={() => sidebar.setOpenMobile(false)}
-    >
-      <Settings2 size={18} />
-      <span>Pengaturan</span>
-    </Button>
     {#if auth.actor}<a
         href={'/people/' + auth.actor.id}
         class="account-link"
@@ -275,7 +236,7 @@
       <PanelLeft size={19} />
     </Button>
     <div class="surface-heading" class:explore-title={path === '/explore'}>
-      {#if path === '/'}<Dropdown.Root>
+      {#if path === '/' && layout === 'single'}<Dropdown.Root>
           <Dropdown.Trigger class="surface-switch" aria-label="Pilih linimasa">
             {feedMode === 'mine'
               ? 'Komunitasku'
@@ -295,7 +256,9 @@
               Mengikuti
             </Dropdown.Item>
           </Dropdown.Content>
-        </Dropdown.Root>{:else if path === '/explore'}<h1>
+        </Dropdown.Root>{:else if path === '/'}<span>
+          Beranda
+        </span>{:else if path === '/explore'}<h1>
           {heading}
         </h1>{:else}<span>{heading}</span>{/if}
     </div>
@@ -418,7 +381,13 @@
   >
     <Bell size={21} />{#if unread}<span class="bell-dot"></span>{/if}
   </Button>
-  <Button href="/messages" variant="ghost" size="icon" aria-label="Pesan">
-    <MessageSquare size={21} />
+  <Button
+    variant="ghost"
+    size="icon"
+    aria-label="Buka menu"
+    title="Menu"
+    onclick={() => sidebar.toggle()}
+  >
+    <Menu size={21} />
   </Button>
 </nav>

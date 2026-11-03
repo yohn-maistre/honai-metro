@@ -2,6 +2,80 @@
   --font-sans: 'Instrument Sans Variable', system-ui, sans-serif;
 }
 /* ETNOS: shared reading and work, within the existing Taste v2 direction. */
+.etnos-sidebar [data-slot='sidebar-inner'],
+.etnos-sidebar[data-mobile='true'] > .touch-pan-y {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+.etnos-sidebar [data-slot='sidebar-header'],
+.etnos-sidebar [data-slot='sidebar-footer'] {
+  flex-shrink: 0;
+}
+.etnos-sidebar [data-slot='sidebar-content'] {
+  flex: 0 0 auto;
+  min-height: auto;
+  overflow: visible;
+}
+.etnos-sidebar [data-slot='sidebar-footer'] {
+  margin-top: auto;
+}
+.discovery-nav {
+  padding-top: 20px;
+}
+.cx-topbar .thread-back[data-slot='button'] {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  border: 0;
+  background: var(--secondary);
+  color: var(--foreground);
+}
+.cx-topbar .thread-back[data-slot='button']:hover {
+  color: var(--brand);
+}
+.video-card {
+  position: relative;
+  border: 0;
+  border-radius: 16px;
+  isolation: isolate;
+}
+.video-card .video-preview {
+  min-height: 0;
+  border-radius: inherit;
+}
+.video-card .video-cover,
+.video-card .video-preview iframe,
+.video-card .video-preview video {
+  min-height: 0;
+}
+.video-card .video-card-caption {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 2;
+  padding: 24px 14px 10px;
+  color: white;
+  background: linear-gradient(transparent, #000c);
+  gap: 10px;
+}
+.video-card .video-card-caption > span {
+  display: block;
+  min-width: 0;
+}
+.video-card .video-card-caption small {
+  color: #e5e5e5;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+.video-card .video-card-caption strong {
+  font-size: 13px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.video-card .video-card-caption > svg {
+  color: white;
+}
 html {
   scrollbar-gutter: stable;
   scrollbar-width: thin;
@@ -32,26 +106,6 @@ html {
 :hover::-webkit-scrollbar-thumb,
 :focus-within::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--foreground) 32%, transparent);
-}
-.sidebar-utilities {
-  display: grid;
-  gap: 2px;
-}
-.sidebar-utilities a {
-  justify-content: start;
-  color: var(--muted-foreground);
-  font-size: 13px;
-}
-@media (min-width: 768px) and (max-width: 1099px) {
-  .sidebar-utilities a {
-    width: 44px;
-    height: 44px;
-    padding: 0;
-    justify-content: center;
-  }
-  .sidebar-utilities a > span {
-    display: none;
-  }
 }
 .home-layout-switch {
   display: flex;
@@ -1145,12 +1199,152 @@ html {
   gap: 18px;
   margin-top: 20px;
 }
+.profile-header {
+  overflow: hidden;
+}
+.profile-cover {
+  height: 116px;
+  background-color: color-mix(
+    in srgb,
+    var(--brand) 12%,
+    var(--reading-surface)
+  );
+  background-blend-mode: soft-light;
+}
+:root[data-texture='grain'] .profile-cover {
+  background-image: url('/textures/grain.png');
+}
+:root[data-texture='dither'] .profile-cover {
+  background-image: url('/textures/dither.png');
+}
+.profile-content {
+  padding: 0 24px 22px;
+}
+.profile-topline {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -42px 0 18px;
+  position: relative;
+}
+.profile-avatar.cx-avatar {
+  width: 88px;
+  height: 88px;
+  border: 5px solid var(--reading-surface);
+  border-radius: 50%;
+  font-size: 28px;
+  flex-shrink: 0;
+  background: var(--secondary);
+  color: var(--brand);
+}
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 2px;
+}
+.profile-header .profile-intro h1 {
+  margin: 0 0 5px;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+  overflow-wrap: anywhere;
+}
+.profile-header .profile-handle {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+.profile-header .profile-bio {
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 18px 0 12px;
+  white-space: pre-line;
+}
+.profile-header .profile-public-fields {
+  margin: 14px 0;
+  gap: 10px 16px;
+}
+.profile-header .profile-identity {
+  margin-top: 18px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.profile-header .profile-identity p {
+  overflow-wrap: anywhere;
+}
+.profile-tabs {
+  position: sticky;
+  top: 72px;
+  z-index: 10;
+  background: var(--reading-surface);
+}
+@media (max-width: 767px) {
+  .profile-cover {
+    height: 96px;
+  }
+  .profile-content {
+    padding: 0 16px 20px;
+  }
+  .profile-header .profile-intro h1 {
+    font-size: 27px;
+  }
+  .profile-topline {
+    margin-bottom: 14px;
+  }
+  .profile-actions {
+    gap: 4px;
+  }
+  .profile-actions [data-slot='button'] {
+    padding-inline: 12px;
+  }
+  .profile-actions [data-slot='button'][aria-label='Salin tautan profil'] {
+    width: 40px;
+    padding: 0;
+  }
+  .profile-tabs {
+    top: 56px;
+  }
+}
 .utility-unread {
   margin-left: auto;
   font-size: 11px;
   color: var(--brand);
 }
 @media (max-width: 999px) {
+  .workspace-view .board-toolbar {
+    display: none;
+  }
+  .board-mobile-tabs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 8px;
+    overflow: visible;
+  }
+  .board-feed-tabs {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    overflow-x: auto;
+    gap: 4px;
+  }
+  .board-feed-tabs button {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .board-settings {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+  }
   .workspace-view .feed-board {
     display: flex;
   }
@@ -1165,6 +1359,9 @@ html {
   }
 }
 @media (max-width: 767px) {
+  .discovery-nav {
+    padding-top: 16px;
+  }
   .engagement-page:not(.engagement-compact) > header {
     flex-direction: column;
   }
@@ -1193,17 +1390,50 @@ html {
     display: none;
   }
   .platform-inset.workspace-view {
-    height: calc(100dvh - 65px - env(safe-area-inset-bottom));
+    display: block;
+    height: auto;
+    min-height: calc(100dvh - 65px - env(safe-area-inset-bottom));
+    overflow: visible;
+  }
+  .workspace-view .cx-topbar.home-topbar .surface-heading {
+    display: none;
+  }
+  .workspace-view .cx-topbar.home-topbar .cx-mobile-brand {
+    display: inline-flex;
+    margin-right: auto;
   }
   .workspace-view .cx-topbar {
     height: 56px;
     padding-inline: 12px;
   }
   .workspace-view .cx-content-grid.board-grid {
-    padding: 0 12px 8px;
+    display: block;
+    padding: 0;
+  }
+  .workspace-view .cx-main,
+  .workspace-view .board-lane,
+  .workspace-view .feed-column {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .workspace-view .board-lane:not(.active) {
+    display: none;
+  }
+  .workspace-view .board-mobile-tabs {
+    position: sticky;
+    top: 56px;
+    z-index: 15;
+    background: var(--reading-surface);
+    padding: 8px 12px;
   }
   .workspace-view .feed-column {
-    border-radius: 16px;
+    border: 0;
+    border-radius: 0;
+  }
+  .workspace-view .feed-column-scroll {
+    height: auto;
+    overflow: visible;
   }
   .community-directory {
     padding: 20px 16px;

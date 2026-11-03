@@ -22,6 +22,8 @@
     onChange,
     onRemove,
     onError,
+    showHeader = true,
+    refreshKey = 0,
   }: {
     source: string
     choices: { value: string; label: string }[]
@@ -32,6 +34,8 @@
     onChange: (s: string) => void
     onRemove?: () => void
     onError: (s: string) => void
+    showHeader?: boolean
+    refreshKey?: number
   } = $props()
   let posts = $state<Post[]>([]),
     pending = $state(false),
@@ -49,6 +53,7 @@
   }
   $effect(() => {
     void revision
+    void refreshKey
     const mode = source,
       actor = auth.actor?.id,
       controller = new AbortController(),
@@ -110,30 +115,30 @@
   class="feed-column"
   aria-label={'Lajur ' + (choices.find((c) => c.value === source)?.label ?? '')}
 >
-  <header>
-    <Choice
-      aria-label="Isi lajur"
-      compact
-      value={source}
-      items={choices}
-      onchange={onChange}
-    /><Button
-      size="icon"
-      variant="ghost"
-      aria-label="Muat ulang lajur"
-      disabled={pending}
-      onclick={() => revision++}
-    >
-      <RefreshCw size={16} />
-    </Button>{#if onRemove}<Button
+  {#if showHeader}<header>
+      <Choice
+        aria-label="Isi lajur"
+        compact
+        value={source}
+        items={choices}
+        onchange={onChange}
+      /><Button
         size="icon"
         variant="ghost"
-        aria-label="Tutup lajur"
-        onclick={onRemove}
+        aria-label="Muat ulang lajur"
+        disabled={pending}
+        onclick={() => revision++}
       >
-        <X size={16} />
-      </Button>{/if}
-  </header>
+        <RefreshCw size={16} />
+      </Button>{#if onRemove}<Button
+          size="icon"
+          variant="ghost"
+          aria-label="Tutup lajur"
+          onclick={onRemove}
+        >
+          <X size={16} />
+        </Button>{/if}
+    </header>{/if}
   <div class="feed-column-scroll">
     {#if pending && !posts.length}<ContentSkeleton />{:else if error}<div
         class="search-state"

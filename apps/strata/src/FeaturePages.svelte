@@ -6,7 +6,6 @@
     Globe,
     LockKeyhole,
     Plus,
-    ArrowLeft,
     ArrowUpRight,
     MapPin,
     ListTodo,
@@ -375,9 +374,6 @@
   </div>
 {:else if segments[0] === 'groups' && group}
   <div class="cx-detail-head">
-    <a class="cx-back" href="/groups">
-      <ArrowLeft size={15} />Organisasi & kelompok
-    </a>
     <div class="cx-between">
       <Avatar.Root class="size-14">
         <Avatar.Fallback>{initials(group.title)}</Avatar.Fallback>
@@ -548,7 +544,6 @@
   </Tabs.Root>
 {:else if segments[0] === 'work' && work}
   <div class="cx-detail-head">
-    <a href="/work" class="cx-back"><ArrowLeft size={15} />Kerja publik</a>
     <div class="cx-between">
       <Badge variant="secondary">{states[work.state]}</Badge>
       <span class="cx-hint">Revisi {work.revision}</span>
@@ -664,7 +659,6 @@
     </Card.Root>{/if}
 {:else if segments[0] === 'contexts' && context}
   <div class="cx-detail-head">
-    <a href="/explore" class="cx-back"><ArrowLeft size={15} />Jelajah</a>
     <Badge variant="secondary">{kinds[context.kind]}</Badge>
     <h1>{context.title}</h1>
     <p>{context.description}</p>

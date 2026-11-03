@@ -7,6 +7,7 @@
     X,
     Plus,
     ArrowUpRight,
+    Share2,
     Send,
     Globe,
     LockKeyhole,
@@ -1029,70 +1030,103 @@
                 )
               : !p.parent_id),
       )}
-      <div class="cx-detail-head profile-head">
-        <span class="cx-avatar sage">{initials(actor.name)}</span>
-        <div class="profile-intro">
-          <h1>
-            {actor.name.endsWith('.bsky.social')
-              ? actor.name.slice(0, -12)
-              : actor.name}
-          </h1>
-          <p class="profile-handle">
-            {actor.name.includes('.')
-              ? '@' + actor.name
-              : actor.kind === 'agent'
-                ? 'Aksara · AI'
-                : 'Anggota ETNOS'}
-          </p>
-        </div>
-        {#if actor.bio}<p class="profile-bio">{actor.bio}</p>{/if}
-        {#if actor.website || actor.location}<div class="profile-public-fields">
-            {#if actor.location}<span>
-                <MapPin size={14} />{actor.location}
-              </span>{/if}{#if actor.website}<a
-                href={actor.website}
-                target="_blank"
-                rel="noopener noreferrer"
+      <section class="profile-header">
+        <div class="profile-cover" aria-hidden="true"></div>
+        <div class="profile-content">
+          <div class="profile-topline">
+            <span class="cx-avatar sage profile-avatar">
+              {initials(actor.name)}
+            </span>
+            <div class="profile-actions">
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label="Salin tautan profil"
+                title="Salin tautan profil"
+                onclick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(
+                      location.origin + '/people/' + actor.id,
+                    )
+                    notify('Tautan profil disalin.')
+                  } catch {
+                    notify('Tautan belum dapat disalin.')
+                  }
+                }}
               >
-                <Link size={14} />{new URL(actor.website).hostname}
-              </a>{/if}
-          </div>{/if}
-        {#if auth.actor?.id === actor.id && actor.kind === 'human'}{#await import('./ProfileEdit.svelte') then module}<module.default
-              {actor}
-              onSaved={(fields) => {
-                if (profile) profile = { ...profile, ...fields }
-              }}
-            />{/await}{/if}
-        <details class="profile-identity">
-          <summary>Identitas AT</summary>
-          <p class="cx-hint">{actor.did}</p>
-        </details>
-        {#if auth.actor && auth.actor.id !== actor.id}<Button
-            variant={following.some((a) => a.id === actor.id)
-              ? 'outline'
-              : 'default'}
-            disabled={busy}
-            onclick={() =>
-              mutate(async () => {
-                const follow = !following.some((a) => a.id === actor.id)
-                await request('/v1/actors/' + actor.id + '/follow', {
-                  following: follow,
-                })
-                following = follow
-                  ? [...following, actor]
-                  : following.filter((a) => a.id !== actor.id)
-              })}
-          >
-            {following.some((a) => a.id === actor.id) ? 'Mengikuti' : 'Ikuti'}
-          </Button>{/if}
-        {#if auth.actor && auth.actor.id !== actor.id && actor.kind === 'human'}<Button
-            href={'/messages?to=' + actor.id}
-            variant="outline"
-          >
-            <MessageSquare size={16} />Pesan
-          </Button>{/if}
-        {#if actor.kind === 'agent'}<Badge variant="secondary">AI</Badge>{/if}
-      </div>
+                <Share2 size={18} />
+              </Button>
+              {#if auth.actor?.id === actor.id && actor.kind === 'human'}{#await import('./ProfileEdit.svelte') then module}<module.default
+                    {actor}
+                    onSaved={(fields) => {
+                      if (profile) profile = { ...profile, ...fields }
+                    }}
+                  />{/await}{/if}
+              {#if auth.actor && auth.actor.id !== actor.id}<Button
+                  variant={following.some((a) => a.id === actor.id)
+                    ? 'outline'
+                    : 'default'}
+                  disabled={busy}
+                  onclick={() =>
+                    mutate(async () => {
+                      const follow = !following.some((a) => a.id === actor.id)
+                      await request('/v1/actors/' + actor.id + '/follow', {
+                        following: follow,
+                      })
+                      following = follow
+                        ? [...following, actor]
+                        : following.filter((a) => a.id !== actor.id)
+                    })}
+                >
+                  {following.some((a) => a.id === actor.id)
+                    ? 'Mengikuti'
+                    : 'Ikuti'}
+                </Button>{/if}
+              {#if auth.actor && auth.actor.id !== actor.id && actor.kind === 'human'}<Button
+                  href={'/messages?to=' + actor.id}
+                  variant="outline"
+                  aria-label="Kirim pesan"
+                >
+                  <MessageSquare size={17} />
+                </Button>{/if}
+            </div>
+          </div>
+          <div class="profile-intro">
+            <h1>
+              {actor.name.endsWith('.bsky.social')
+                ? actor.name.slice(0, -12)
+                : actor.name}
+            </h1>
+            <p class="profile-handle">
+              {actor.name.includes('.')
+                ? '@' + actor.name
+                : actor.kind === 'agent'
+                  ? 'Aksara · AI'
+                  : 'Anggota ETNOS'}
+            </p>
+          </div>
+          {#if actor.bio}<p class="profile-bio">{actor.bio}</p>{/if}
+          {#if actor.website || actor.location}<div
+              class="profile-public-fields"
+            >
+              {#if actor.location}<span>
+                  <MapPin size={15} />{actor.location}
+                </span>{/if}
+              {#if actor.website}<a
+                  href={actor.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Link size={15} />{new URL(actor.website).hostname}
+                </a>{/if}
+            </div>{/if}
+          <details class="profile-identity">
+            <summary>Identitas AT</summary>
+            <p class="cx-hint">{actor.did}</p>
+          </details>
+          {#if actor.kind === 'agent'}<Badge variant="secondary">AI</Badge>{/if}
+        </div>
+      </section>
       <div class="profile-tabs" role="group" aria-label="Isi profil">
         {#each [['posts', 'Posting'], ['replies', 'Balasan'], ['media', 'Media']] as [value, label]}<button
             aria-pressed={profileTab === value}

@@ -1,6 +1,14 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { Plus, Columns3 } from '@lucide/svelte'
+  import {
+    Plus,
+    Columns3,
+    SlidersHorizontal,
+    RefreshCw,
+    X,
+    Check,
+  } from '@lucide/svelte'
+  import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
   import { Button } from '$lib/components/ui/button/index.js'
   import FeedColumn from './FeedColumn.svelte'
   import { request, type Auth, type Community, type Membership } from './api'
@@ -18,13 +26,16 @@
     initialColumns?: number
   } = $props()
   let columns = $state([
-      { id: 1, source: 'all' },
-      { id: 2, source: 'all' },
+      { id: 1, source: 'all', revision: 0 },
+      { id: 2, source: 'all', revision: 0 },
     ]),
     active = $state(1),
     wide = $state(false),
     contexts = $state<{ id: string; title: string }[]>([]),
     nextId = 3
+  const activeColumn = $derived(
+    columns.find((c) => c.id === active) ?? columns[0],
+  )
   const choices = $derived([
     { value: 'all', label: 'Terbaru' },
     ...(auth.actor ? [{ value: 'following', label: 'Mengikuti' }] : []),
@@ -41,7 +52,7 @@
     if (initialColumns === 3)
       columns = [
         ...columns,
-        { id: nextId++, source: auth.actor ? 'following' : 'all' },
+        { id: nextId++, source: auth.actor ? 'following' : 'all', revision: 0 },
       ]
     const media = window.matchMedia('(min-width: 1000px)'),
       update = () => (wide = media.matches)
@@ -68,7 +79,7 @@
   // Choose a useful second lane once membership is loaded; no saved private identifiers.
   let initialized = false
   $effect(() => {
-    if (!initialized && communities.length) {
+    if (!initialized && communities.length && columns.length > 1) {
       columns[1].source = communities[0].id
       initialized = true
     }
@@ -76,6 +87,15 @@
   function remove(id: number) {
     columns = columns.filter((c) => c.id !== id)
     if (active === id) active = columns[0].id
+  }
+  function add() {
+    if (columns.length === 3) return
+    const id = nextId++
+    columns = [
+      ...columns,
+      { id, source: auth.actor ? 'following' : 'all', revision: 0 },
+    ]
+    active = id
   }
 </script>
 
@@ -88,22 +108,52 @@
     variant="outline"
     size="sm"
     disabled={columns.length === 3}
-    onclick={() => {
-      const id = nextId++
-      columns = [...columns, { id, source: auth.actor ? 'following' : 'all' }]
-      active = id
-    }}
+    onclick={add}
   >
     <Plus size={15} />Lajur
   </Button>
 </div>
 <div class="board-mobile-tabs" role="group" aria-label="Pilih lajur">
-  {#each columns as column}<button
-      aria-pressed={active === column.id}
-      onclick={() => (active = column.id)}
+  <div class="board-feed-tabs">
+    {#each columns as column}<button
+        aria-pressed={active === column.id}
+        onclick={() => (active = column.id)}
+      >
+        {choices.find((c) => c.value === column.source)?.label ?? 'Terbaru'}
+      </button>{/each}
+  </div>
+  <Dropdown.Root>
+    <Dropdown.Trigger
+      class="board-settings"
+      aria-label="Atur lajur"
+      title="Atur lajur"
     >
-      {choices.find((c) => c.value === column.source)?.label ?? 'Terbaru'}
-    </button>{/each}
+      <SlidersHorizontal size={18} />
+    </Dropdown.Trigger>
+    <Dropdown.Content align="end">
+      <Dropdown.Label>Isi lajur</Dropdown.Label>
+      {#each choices as choice}<Dropdown.Item
+          onSelect={() => (activeColumn.source = choice.value)}
+        >
+          {choice.label}{#if choice.value === activeColumn.source}<Check
+              size={14}
+            />{/if}
+        </Dropdown.Item>{/each}
+      <Dropdown.Separator />
+      <Dropdown.Item onSelect={() => activeColumn.revision++}>
+        <RefreshCw size={15} />Muat ulang lajur
+      </Dropdown.Item>
+      <Dropdown.Item disabled={columns.length === 3} onSelect={add}>
+        <Plus size={15} />Tambah lajur
+      </Dropdown.Item>
+      <Dropdown.Item
+        disabled={columns.length === 1}
+        onSelect={() => remove(active)}
+      >
+        <X size={15} />Tutup lajur
+      </Dropdown.Item>
+    </Dropdown.Content>
+  </Dropdown.Root>
 </div>
 <div class="feed-board" style:--columns={columns.length}>
   {#each columns as column (column.id)}<div
@@ -118,6 +168,8 @@
         {memberships}
         {onError}
         enabled={wide || active === column.id}
+        showHeader={wide}
+        refreshKey={column.revision}
         onChange={(value) => (column.source = value)}
         onRemove={columns.length > 1 ? () => remove(column.id) : undefined}
       />

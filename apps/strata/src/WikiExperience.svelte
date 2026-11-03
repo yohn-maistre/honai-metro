@@ -5,7 +5,6 @@
     ArrowUpRight,
     GitPullRequest,
     History,
-    ArrowLeft,
     FileText,
     Search,
     MapPin,
@@ -123,9 +122,6 @@
 {#if page}
   <article class="wiki-reader">
     <header class="wiki-page-header">
-      <a href="/wiki" class="wiki-breadcrumb">
-        <ArrowLeft size={14} />Wiki bersama
-      </a>
       <small>
         {communities.find((c) => c.id === page.community_id)?.title}
       </small>

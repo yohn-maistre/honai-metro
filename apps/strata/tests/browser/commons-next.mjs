@@ -293,7 +293,7 @@ try {
   await page.goto(origin + '/explore', { waitUntil: 'networkidle' })
   for (const name of ['Aktivitas', 'Tersimpan', 'Kerja publik']) {
     const box = await page
-      .locator('.sidebar-utilities')
+      .locator('[data-slot=sidebar-content]')
       .getByRole('link', { name, exact: true })
       .boundingBox()
     assert.ok(box && box.x >= 0 && box.x + box.width <= 76, name)

@@ -105,31 +105,27 @@
             {enabled ? 'Putar video' : 'Muat pratinjau video'}
           </span>
         </button>{/if}
+      {#if !playing}<a
+          class="video-card-caption"
+          title={card?.title || 'Buka video asli'}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer nofollow"
+        >
+          <span>
+            <small>
+              {card?.provider ||
+                (identity?.provider === 'youtube'
+                  ? 'YouTube'
+                  : identity?.provider === 'vimeo'
+                    ? 'Vimeo'
+                    : 'Video')}
+            </small>
+            <strong>
+              {card?.title || 'Tonton video'}
+            </strong>
+          </span>
+          <ExternalLink size={15} />
+        </a>{/if}
     </div>
-    <a
-      class="video-card-caption"
-      href={url}
-      target="_blank"
-      rel="noopener noreferrer nofollow"
-    >
-      <span>
-        <small>
-          {card?.provider ||
-            (identity?.provider === 'youtube'
-              ? 'YouTube'
-              : identity?.provider === 'vimeo'
-                ? 'Vimeo'
-                : 'Video')}
-        </small>
-        <strong>
-          {card?.title ||
-            (native
-              ? decodeURIComponent(
-                  new URL(native).pathname.split('/').at(-1) || 'Video',
-                )
-              : 'Video · ' + (identity?.id ?? ''))}
-        </strong>
-      </span>
-      <ExternalLink size={15} />
-    </a>
   </div>{/if}

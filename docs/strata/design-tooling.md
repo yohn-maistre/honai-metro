@@ -38,3 +38,8 @@ The owner explicitly authorized implementation using supplied Threads/Bluesky sc
 Audit: feed padding and line height inflated each row; reply cards lacked avatars, hierarchy and actions; the outline reply button looked like a form control; the shared creation modal imposed an oversized settings-form layout; reply links lost their specific target; cursor replies were not exposed in UI. Implementation follows spacing, palette, icon, copy/type, layout, details and purposeful motion passes. New controls use existing shadcn primitives and Lucide. No decorative animation, hero visual or synthetic deployed content was added.
 
 Taste's app inspector reports no FAIL findings with the explicit palette allowances; the real empty fixture retains a desktop empty-space warning. Populated fixture screenshots cover thread, nested branch and composer on phone/desktop. Browser contracts exercise actual Strata API/SQLite, gallery upload/alt text/viewer, reply nesting/collapse/actions and the existing governance/MLS flows. Physical phone keyboard behavior is still an operational check.
+
+
+## Impeccable review tooling, 4 November 2026
+
+Installed the official [Impeccable](https://github.com/pbakaus/impeccable) skill 4.8.0 from upstream commit `9fadc41729c38fd47d7ae622b501558653f9d2e9` at `.agents/skills/impeccable`. Apache-2.0 license retained alongside the skill. Native engine 0.1.18 is downloaded/verified against the shipped checksums and ignored by Git; the source wrappers and references are retained. No hooks, Live Apply or product runtime dependency were enabled. The first review preserves the incumbent visual system and evaluates the existing application; no replacement design world is implied by installation.

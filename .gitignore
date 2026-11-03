@@ -28,3 +28,6 @@ pnpm-lock.yaml
 
 # Local design audit captures and generated direction sheets
 .taste-skill/
+
+# Impeccable native engine is checksum-downloaded per host, not source
+/.agents/skills/impeccable/scripts/bin/

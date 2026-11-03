@@ -249,7 +249,7 @@ try {
       if (route === '/' && width < 768)
         assert.equal(
           await page
-            .getByRole('button', { name: 'Semua ruang', exact: true })
+            .getByRole('button', { name: 'Buka menu', exact: true })
             .count(),
           1,
         )

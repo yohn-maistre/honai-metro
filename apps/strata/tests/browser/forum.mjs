@@ -160,17 +160,8 @@ try {
     s.feed().find((p) => p.text === 'Synthetic child reply').parent_id,
     child.id,
   )
-  await page
-    .getByRole('button', { name: 'Sembunyikan 1 balasan', exact: true })
-    .click()
-  assert.equal(
-    await page.getByText('Synthetic child reply', { exact: true }).count(),
-    0,
-  )
-  await page
-    .getByRole('button', { name: 'Tampilkan 1 balasan', exact: true })
-    .click()
-  await page.getByText('Synthetic child reply', { exact: true }).waitFor()
+  assert.equal(await page.getByRole('button',{name:'Sembunyikan 1 balasan',exact:true}).count(),0)
+  await page.getByText('Synthetic child reply',{exact:true}).waitFor()
   await page.getByLabel('Urutkan balasan', { exact: true }).click()
   await page.getByRole('option', { name: 'Teratas', exact: true }).click()
   await page.screenshot({ path: artifactDir + '/forum-desktop-thread.png' })

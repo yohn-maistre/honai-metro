@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { MediaQuery } from "svelte/reactivity"
+  import { tabScroll } from "./tab-scroll"
   import { onMount, tick } from 'svelte'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
   import {
@@ -88,6 +90,8 @@
     nextCursor = $state<string | null>(null)
   let following = $state<Actor[]>([])
   let homeLayout = $state('single')
+  const desktopLayout = new MediaQuery('(min-width: 768px)')
+  const activeHomeLayout = $derived(desktopLayout.current ? homeLayout : 'single')
   function setLayout(value: string) {
     homeLayout = value
     try {
@@ -635,7 +639,7 @@
   {heading}
   {auth}
   {unread}
-  layout={homeLayout}
+  layout={activeHomeLayout}
   onLayoutChange={setLayout}
   onBack={goBack}
   onCompose={() => open('compose')}
@@ -693,9 +697,9 @@
         {search}
         {navigate}
       />{/await}
-  {:else if path === '/board' || (path === '/' && homeLayout !== 'single')}{#key homeLayout}{#await import('./FeedBoard.svelte')}<ContentSkeleton
+  {:else if path === '/board' || (path === '/' && activeHomeLayout !== 'single')}{#key activeHomeLayout}{#await import('./FeedBoard.svelte')}<ContentSkeleton
         />{:then { default: FeedBoard }}<FeedBoard
-          initialColumns={homeLayout === 'columns' ? 3 : 2}
+          initialColumns={activeHomeLayout === 'columns' ? 3 : 2}
           {auth}
           {communities}
           {memberships}
@@ -897,7 +901,7 @@
         </div>
       </div>
       <Tabs.Root bind:value={tab}>
-        <Tabs.List variant="line" class="page-tabs" aria-label="Isi komunitas">
+        <div class="section-tab-scroll" use:tabScroll><Tabs.List variant="line" class="page-tabs" aria-label="Isi komunitas">
           <Tabs.Trigger value="discussion">Diskusi</Tabs.Trigger><Tabs.Trigger
             value="wiki"
           >
@@ -907,7 +911,7 @@
           </Tabs.Trigger><Tabs.Trigger value="voices">
             Suara
           </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
-        </Tabs.List>
+        </Tabs.List></div>
         <Tabs.Content value={tab}>
           {#if tab === 'voices'}{#await import('./EngagementPage.svelte') then module}<module.default
                 {auth}
@@ -1127,14 +1131,14 @@
           {#if actor.kind === 'agent'}<Badge variant="secondary">AI</Badge>{/if}
         </div>
       </section>
-      <div class="profile-tabs" role="group" aria-label="Isi profil">
+      <div class="section-tab-scroll" use:tabScroll><div class="profile-tabs" role="group" aria-label="Isi profil">
         {#each [['posts', 'Posting'], ['replies', 'Balasan'], ['media', 'Media']] as [value, label]}<button
             aria-pressed={profileTab === value}
             onclick={() => (profileTab = value)}
           >
             {label}
           </button>{/each}
-      </div>
+      </div></div>
       {#each profilePosts as p}<PostCard
           post={p}
           community={communities.find((c) => c.id === p.community_id)}
@@ -1248,7 +1252,7 @@
     {#if !['explore', 'news', 'communities', 'people', 'wiki', 'board'].includes(parts[0])}<NewsSection
         compact
       />
-    {:else}<div class="cx-context-block rail-context-intro">
+    {:else if parts[0] !== 'news'}<div class="cx-context-block rail-context-intro">
         <span class="rail-accent-icon"><BookOpen size={20} /></span>
         <h2>
           {parts[0] === 'news'

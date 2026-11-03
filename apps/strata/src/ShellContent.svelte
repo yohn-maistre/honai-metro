@@ -230,6 +230,7 @@
     <Button
       variant="ghost"
       size="icon"
+      class="desktop-menu-toggle"
       aria-label="Semua ruang"
       onclick={() => sidebar.toggle()}
     >

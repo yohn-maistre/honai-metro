@@ -5,6 +5,7 @@
     ArrowUpRight,
     GitPullRequest,
   } from '@lucide/svelte'
+  import DecisionSuggestions from './DecisionSuggestions.svelte'
   import { request } from './api'
   import { Button } from '$lib/components/ui/button/index.js'
   let { postId, onDraft }: { postId: string; onDraft?: () => void } = $props()
@@ -47,6 +48,7 @@
         : 'Jadikan pengetahuan bersama'}
     </summary>
     <div>
+      {#if onDraft}<DecisionSuggestions {postId} {onDraft}/>{/if}
       {#each works as work}<a
           class="thread-work-card"
           href={'/work/' + work.id}

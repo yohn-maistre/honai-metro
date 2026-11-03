@@ -106,10 +106,6 @@
         {actor ? 'Gabung komunitas untuk membalas' : 'Masuk untuk membalas'}
       </Button>{/if}
   </div>
-  {#if community?.visibility === 'public'}<ThreadWork
-      postId={post.id}
-      onDraft={onWikiDraft}
-    />{/if}
   <section id="replies" aria-label="Balasan" class="thread-discussion">
     <div class="thread-toolbar">
       <h2>
@@ -147,4 +143,8 @@
         Mulai percakapan
       </p>{/if}
   </section>
+  {#if community?.visibility === 'public'}<ThreadWork
+      postId={post.id}
+      onDraft={onWikiDraft}
+    />{/if}
 </div>

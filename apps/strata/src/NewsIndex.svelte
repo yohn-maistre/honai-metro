@@ -3,10 +3,10 @@
     ArrowLeft,
     ArrowRight,
     ArrowUpRight,
-    Newspaper,
     RefreshCw,
   } from '@lucide/svelte'
   import Choice from './Choice.svelte'
+  import { tabScroll } from './tab-scroll'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
   import ContentSkeleton from './ContentSkeleton.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
@@ -71,106 +71,38 @@
   })
 </script>
 
-<section class="news-index">
-  <div class="news-index-intro">
-    <Newspaper size={20} />
-    <div>
-      <h1>Kabar Papua</h1>
-      <p>West Papua Watch · Liputan, sumber & percakapan</p>
-    </div>
-    <a
-      href="https://westpapua.watch/news/"
-      target="_blank"
-      rel="noreferrer"
-      aria-label="Buka West Papua Watch"
-    >
-      <ArrowUpRight size={18} />
-    </a>
+<section class="news-index" aria-busy={pending}>
+  <header class="news-desk-heading">
+    <h1>Kabar Papua</h1>
+    <a href="https://westpapua.watch/news/" target="_blank" rel="noreferrer">West Papua Watch <ArrowUpRight size={14} /></a>
+  </header>
+  <nav class="news-desk-tabs section-tab-scroll" use:tabScroll aria-label="Topik kabar">
+    {#each desks as category}<button aria-current={desk === category.value ? 'page' : undefined} onclick={() => change('desk', category.value)}>{category.label}</button>{/each}
+  </nav>
+  <div class="news-desk-tools">
+    <span class="news-desk-count" aria-live="polite">{pending ? 'Memuat liputan…' : feed?.selection?.total != null ? `${feed.selection.total.toLocaleString('id-ID')} liputan` : 'Liputan terkini'}</span>
+    <Choice aria-label="Pilih tempat" compact value={place} items={[{value:'',label:'Semua tempat'},...(feed?.placeOptions ?? []).map(p=>({value:p.slug,label:p.name}))]} onchange={value=>change('place',value)} />
   </div>
-  <div class="news-filters">
-    <Choice
-      aria-label="Pilih liputan"
-      compact
-      value={desk}
-      items={desks}
-      onchange={(value) => change('desk', value)}
-    />
-    <Choice
-      aria-label="Pilih tempat"
-      compact
-      value={place}
-      items={[
-        { value: '', label: 'Semua tempat' },
-        ...(feed?.placeOptions ?? []).map((p) => ({
-          value: p.slug,
-          label: p.name,
-        })),
-      ]}
-      onchange={(value) => change('place', value)}
-    />
-  </div>
-  {#if pending}<ContentSkeleton rows={3} />{:else if error}<div
-      class="search-state"
-      role="alert"
-    >
-      <p>{error}</p>
-      <Button variant="outline" onclick={() => retry++}>
-        <RefreshCw size={16} />Coba lagi
-      </Button>
-    </div>{:else if feed}
-    <p class="news-range">
-      {feed.selection?.total != null
-        ? `${feed.selection.total} liputan`
-        : 'Liputan tersedia'} · Halaman {page}
-    </p>
-    <div class="news-list-grid">
-      {#each feed.items as item}<a
-          class="news-list-card"
-          href={'/news/' + item.id}
-        >
-          {#if item.image}<div class="news-list-photo">
-              <img
-                src={item.image}
-                alt=""
-                loading="lazy"
-                onerror={(e) =>
-                  e.currentTarget.parentElement?.setAttribute('hidden', '')}
-              />
-              {#if item.imageCredit}<small>{item.imageCredit}</small>{/if}
-            </div>{/if}
-          <div>
-            <span>
-              {newsDate(item.publishedAt)}{item.sourceCount
-                ? ` · ${item.sourceCount} sumber`
-                : ''}
-            </span>
-            <h2>{item.title}</h2>
-            {#if item.summary}<p>{item.summary}</p>{/if}
-            <span class="news-read">
-              Baca & diskusikan <ArrowRight size={14} />
-            </span>
-          </div>
-        </a>{/each}
+  {#if error}<div class="search-state" role="alert"><p>{error}</p><Button variant="outline" onclick={() => retry++}><RefreshCw size={16} />Coba lagi</Button></div>
+  {:else if pending}<ContentSkeleton rows={3} />
+  {:else if feed}
+    <div class="news-desk-stories">
+      {#each feed.items as item, i}<a class="news-desk-story" class:news-desk-lead={i === 0 && page === 1} class:has-photo={!!item.image} href={'/news/' + item.id}>
+        {#if item.image}<div class="news-desk-photo"><img src={item.image} alt="" loading={i === 0 ? 'eager' : 'lazy'} onerror={e=>e.currentTarget.parentElement?.setAttribute('hidden','')} />{#if item.imageCredit && i === 0 && page === 1}<small>{item.imageCredit}</small>{/if}</div>{/if}
+        <div class="news-desk-copy">
+          <span class="news-desk-meta">{newsDate(item.publishedAt)}{item.sourceCount ? ` · ${item.sourceCount} sumber` : ''}</span>
+          <h2>{item.title}</h2>
+          {#if item.summary && i === 0 && page === 1}<p>{item.summary}</p>{/if}
+          {#if item.imageCredit && (i !== 0 || page !== 1)}<small class="news-desk-credit">{item.imageCredit}</small>{/if}
+        </div>
+        <ArrowUpRight class="news-desk-open" size={16} />
+      </a>{/each}
     </div>
-    {#if !feed.items.length}<div class="search-state">
-        Belum ada liputan untuk pilihan ini.
-      </div>{/if}
+    {#if !feed.items.length}<div class="search-state">Belum ada liputan untuk pilihan ini.{#if place}<Button variant="ghost" onclick={()=>change('place','')}>Semua tempat</Button>{/if}</div>{/if}
     <nav class="news-pagination" aria-label="Halaman kabar">
-      <Button
-        variant="ghost"
-        disabled={page <= 1}
-        onclick={() => change('page', String(page - 1))}
-      >
-        <ArrowLeft size={16} />Sebelumnya
-      </Button>
-      <span>{page}</span>
-      <Button
-        variant="ghost"
-        disabled={!feed.pagination?.nextPage}
-        onclick={() => change('page', String(feed?.pagination?.nextPage))}
-      >
-        Berikutnya<ArrowRight size={16} />
-      </Button>
+      <Button variant="ghost" disabled={page <= 1} onclick={() => change('page', String(page - 1))}><ArrowLeft size={16} />Sebelumnya</Button>
+      <span>Halaman {page}</span>
+      <Button variant="ghost" disabled={!feed.pagination?.nextPage} onclick={() => change('page', String(feed?.pagination?.nextPage))}>Berikutnya<ArrowRight size={16} /></Button>
     </nav>
   {/if}
 </section>

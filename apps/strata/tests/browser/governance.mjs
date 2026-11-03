@@ -202,7 +202,7 @@ try {
     fullPage: true,
   })
   await p
-    .getByRole('button', { name: 'Semua ruang', exact: true })
+    .getByRole('button', { name: 'Buka menu', exact: true })
     .last()
     .click()
   await p.getByRole('dialog', { name: 'Navigasi', exact: true }).waitFor()

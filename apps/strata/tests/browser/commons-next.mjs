@@ -189,12 +189,7 @@ try {
   await page.getByText('Deep focused reply', { exact: true }).waitFor()
   assert.equal(new URL(page.url()).pathname, '/square/' + two.id)
   await page.goto(origin + '/news', { waitUntil: 'networkidle' })
-  await page
-    .getByRole('combobox', { name: 'Pilih liputan', exact: true })
-    .click()
-  await page
-    .getByRole('option', { name: 'Tanah & lingkungan', exact: true })
-    .click()
+  await page.getByRole('button',{name:'Tanah & lingkungan',exact:true}).click()
   await page.waitForURL('**/news?desk=land')
   await page.getByRole('button', { name: 'Berikutnya', exact: true }).click()
   await page.waitForURL('**page=2')
@@ -234,7 +229,7 @@ try {
   })
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto(origin + '/explore', { waitUntil: 'networkidle' })
-  await page.getByRole('button', { name: 'Semua ruang', exact: true }).click()
+  await page.getByRole('button', { name: 'Buka menu', exact: true }).click()
   await page.getByRole('dialog', { name: 'Navigasi' }).waitFor()
   await page
     .getByRole('dialog')
@@ -244,7 +239,7 @@ try {
   await page
     .getByRole('dialog', { name: 'Navigasi' })
     .waitFor({ state: 'hidden' })
-  await page.getByRole('button', { name: 'Semua ruang', exact: true }).click()
+  await page.getByRole('button', { name: 'Buka menu', exact: true }).click()
   const panel = page
     .getByRole('dialog', { name: 'Navigasi' })
     .locator('div.touch-pan-y')

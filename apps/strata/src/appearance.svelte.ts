@@ -15,10 +15,13 @@ export const appearance = $state({
   accent: '#b8b2c1',
   base: 'graphite',
   texture: 'grain',
+  textureStrength: 'soft',
+  fontPair: 'gabarito',
   externalMedia: true,
 })
 import { accentRoles } from './appearance-color'
 import { bases, baseRoles } from './appearance-bases'
+import { fontPairs, loadFontPair } from './font-pairs'
 export function applyAppearance() {
   if (!/^#[0-9a-f]{6}$/i.test(appearance.accent)) appearance.accent = '#b8b2c1'
   const root = document.documentElement,
@@ -30,6 +33,18 @@ export function applyAppearance() {
   if (!['none', 'grain', 'dither'].includes(appearance.texture))
     appearance.texture = 'grain'
   root.dataset.texture = appearance.texture
+  if (!['soft', 'full'].includes(appearance.textureStrength))
+    appearance.textureStrength = 'soft'
+  root.dataset.textureStrength = appearance.textureStrength
+  const pair =
+    fontPairs.find((p) => p.id === appearance.fontPair) ?? fontPairs[0]
+  appearance.fontPair = pair.id
+  root.dataset.fontPair = pair.id
+  root.style.setProperty('--font-sans', `'${pair.sans}', sans-serif`)
+  root.style.setProperty('--font-editorial', `'${pair.serif}', Georgia, serif`)
+  void loadFontPair(pair.id).catch(() => {
+    /* Readable fallback on offline font loads. */
+  })
   root.dataset.base = appearance.base
   for (const [name, value] of Object.entries(baseRoles(appearance.base, dark)))
     root.style.setProperty(name, value)
@@ -54,6 +69,10 @@ export function restoreAppearance() {
     if (bases.some((b) => b.id === saved?.base)) appearance.base = saved.base
     if (typeof saved?.externalMedia === 'boolean')
       appearance.externalMedia = saved.externalMedia
+    if (fontPairs.some((p) => p.id === saved?.fontPair))
+      appearance.fontPair = saved.fontPair
+    if (['soft', 'full'].includes(saved?.textureStrength))
+      appearance.textureStrength = saved.textureStrength
     if (['none', 'grain', 'dither'].includes(saved?.texture))
       appearance.texture = saved.texture
   } catch {

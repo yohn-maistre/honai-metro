@@ -19,6 +19,7 @@ const load = (name) =>
 export const { Strata } = await load('store.ts')
 export const { api } = await load('api.ts')
 export const { Groups } = await load('groups.ts')
+export const { Wiki } = await load('wiki.ts')
 export const { Activity } = await load('activity.ts')
 export const artifactDir = resolve(
   process.env.STRATA_BROWSER_ARTIFACTS ?? '/tmp/strata-browser-evidence',

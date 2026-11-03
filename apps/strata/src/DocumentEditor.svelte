@@ -54,6 +54,7 @@
     source = $state(false)
   const advanced = $derived(/<\/?[a-z]|^\|.*\|\s*$|!\[[^\]]*\]/im.test(value))
   onMount(() => {
+    let active = true
     // Existing advanced Markdown stays in source mode, never silently round-tripped.
     source = untrack(() => advanced)
     editor = new Editor({
@@ -88,12 +89,17 @@
           return false
         },
       },
-      onTransaction: () => revision++,
+      onTransaction: () => {
+        if (active) revision++
+      },
       onUpdate: ({ editor }) => {
-        value = editor.getMarkdown()
+        if (active) value = editor.getMarkdown()
       },
     })
-    return () => editor?.destroy()
+    return () => {
+      active = false
+      editor?.destroy()
+    }
   })
   $effect(() => {
     editor?.setEditable(!disabled)

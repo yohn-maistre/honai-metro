@@ -6,6 +6,8 @@
   import { Check, Moon, Sun } from '@lucide/svelte'
   import { appearance, palettes } from './appearance.svelte'
   import { bases } from './appearance-bases'
+  import { fontPairs } from './font-pairs'
+  import Choice from './Choice.svelte'
   let custom = $state(appearance.accent),
     invalid = $state(false)
 </script>
@@ -13,6 +15,25 @@
 <Card.Root class="appearance-card">
   <Card.Header><Card.Title>Tampilan</Card.Title></Card.Header>
   <Card.Content class="strata-stack">
+    <section class="font-settings">
+      <Label for="font-pair">Pasangan huruf</Label>
+      <Choice
+        id="font-pair"
+        aria-label="Pasangan huruf"
+        bind:value={appearance.fontPair}
+        items={fontPairs.map((p) => ({ value: p.id, label: p.name }))}
+      />
+      <div class="font-specimen">
+        <h2>Tempat kita bertemu.</h2>
+        <p>
+          Cerita sehari-hari, kabar dari sekitar, dan pengetahuan yang dirawat
+          bersama.
+        </p>
+        <small>
+          {fontPairs.find((p) => p.id === appearance.fontPair)?.note}
+        </small>
+      </div>
+    </section>
     <div role="group" aria-label="Tema" class="appearance-theme">
       <Button
         variant="ghost"
@@ -65,6 +86,26 @@
             {name}
           </Button>{/each}
       </div>
+      {#if appearance.texture !== 'none'}<div
+          class="texture-options"
+          role="group"
+          aria-label="Intensitas tekstur"
+        >
+          <Button
+            variant="outline"
+            aria-pressed={appearance.textureStrength === 'soft'}
+            onclick={() => (appearance.textureStrength = 'soft')}
+          >
+            Halus
+          </Button>
+          <Button
+            variant="outline"
+            aria-pressed={appearance.textureStrength === 'full'}
+            onclick={() => (appearance.textureStrength = 'full')}
+          >
+            Penuh
+          </Button>
+        </div>{/if}
     </div>
     <div>
       <Label>Warna aksen</Label>

@@ -11,6 +11,7 @@
     ChevronDown,
   } from '@lucide/svelte'
   import { markdown } from './markdown'
+  import { wikiDiff, languageName } from './wiki-diff'
   import {
     request,
     relativeDate,
@@ -44,6 +45,8 @@
       created: number
       perspective: string
       language: string
+      author?: { id: string; name: string; kind: string }
+      reviewer?: { id: string; name: string; kind: string }
     }[]
     communities: Community[]
     memberships: Membership[]
@@ -128,9 +131,24 @@
       <h1>{page.title}</h1>
       <p>
         {page.revision
-          ? `${page.revision.language} · ${page.revision.perspective}`
+          ? `${languageName(page.revision.language)} · ${page.revision.perspective}`
           : 'Draf · Menunggu tinjauan manusia'}
       </p>
+      {#if page.revision}<div class="wiki-provenance">
+          <span>
+            Ditulis oleh <strong>
+              {page.revision.author?.name ?? 'Kontributor'}
+            </strong>
+            {#if page.revision.author?.kind === 'agent'}
+              · Agen{/if}
+          </span>
+          <span>
+            Ditinjau oleh <strong>
+              {page.revision.reviewer?.name ?? 'Pengelola'}
+            </strong>
+            · {relativeDate(page.revision.created)}
+          </span>
+        </div>{/if}
       <div class="wiki-actions">
         {#if headings.length}<details class="wiki-contents">
             <summary>Dalam halaman <ChevronDown size={14} /></summary>
@@ -148,7 +166,15 @@
           <div class="wiki-history-popover">
             {#each history as rev}<p>
                 <strong>{rev.perspective}</strong>
-                <small>{rev.language} · {relativeDate(rev.created)}</small>
+                <small>
+                  {languageName(rev.language)} · {relativeDate(rev.created)}
+                </small>
+                {#if rev.author || rev.reviewer}<small>
+                    {rev.author?.name ?? 'Kontributor'}{rev.author?.kind ===
+                    'agent'
+                      ? ' · Agen'
+                      : ''} · ditinjau {rev.reviewer?.name ?? 'pengelola'}
+                  </small>{/if}
               </p>{/each}{#if !history.length}<p>
                 Belum ada revisi diterima.
               </p>{/if}
@@ -211,7 +237,11 @@
             </a>{/each}
         </section>{/if}
     {:else}<section class="wiki-reviews">
-        {#each proposals as proposal}<article class="wiki-review-card">
+        {#each proposals as proposal}{@const comparison = wikiDiff(
+            page.revision?.text ?? '',
+            proposal.text,
+          )}
+          <article class="wiki-review-card">
             <div class="wiki-review-heading">
               <strong>
                 {proposal.state === 'pending'
@@ -222,23 +252,60 @@
               </strong>
               <small>{relativeDate(proposal.created)}</small>
             </div>
-            <p>{proposal.language} · {proposal.perspective}</p>
+            <p>
+              {proposal.author?.name ?? 'Kontributor'}{proposal.author?.kind ===
+              'agent'
+                ? ' · Agen'
+                : ''} · {languageName(proposal.language)}
+            </p>
+            <p class="cx-hint">Atribusi tulisan: {proposal.perspective}</p>
             <details open={proposal.state === 'pending'}>
               <summary>Bandingkan tulisan</summary>
-              <div class="wiki-compare">
-                {#if page.revision}<div>
-                    <h3>Revisi saat ini</h3>
+              <div class="wiki-change-legend">
+                <span>Ditambahkan</span>
+                <span>Dihapus</span>
+              </div>
+              {#if comparison.abbreviated}<p class="cx-hint">
+                  Perubahan besar ditampilkan sebagai dua blok lengkap.
+                </p>{/if}
+              <div class="wiki-change-list" aria-label="Perubahan usulan">
+                {#each comparison.changes as change}<div
+                    class={'wiki-change ' + change.kind}
+                  >
+                    <span aria-hidden="true">
+                      {change.kind === 'added'
+                        ? '+'
+                        : change.kind === 'removed'
+                          ? '−'
+                          : ' '}
+                    </span>
+                    <span class="sr-only">
+                      {change.kind === 'added'
+                        ? 'Ditambahkan: '
+                        : change.kind === 'removed'
+                          ? 'Dihapus: '
+                          : ''}
+                    </span>
+                    {change.text || ' '}
+                  </div>{/each}
+              </div>
+              <details class="wiki-full-versions">
+                <summary>Baca kedua versi lengkap</summary>
+                <div class="wiki-compare">
+                  {#if page.revision}<div>
+                      <h3>Revisi saat ini</h3>
+                      <div class="post-markdown">
+                        {@html markdown(page.revision.text)}
+                      </div>
+                    </div>{/if}
+                  <div>
+                    <h3>Usulan</h3>
                     <div class="post-markdown">
-                      {@html markdown(page.revision.text)}
+                      {@html markdown(proposal.text)}
                     </div>
-                  </div>{/if}
-                <div>
-                  <h3>Usulan</h3>
-                  <div class="post-markdown">
-                    {@html markdown(proposal.text)}
                   </div>
                 </div>
-              </div>
+              </details>
             </details>
             {#each proposal.citations as url}<a
                 class="strata-source"

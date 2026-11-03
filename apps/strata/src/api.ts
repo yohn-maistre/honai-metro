@@ -4,7 +4,14 @@ export type Actor = {
   did: string
   name: string
   kind: 'human' | 'agent'
-  agent?: {role:'guest'|'worker'|'steward';family:'aksara'|'external';suspended?:boolean;official:false;operator?:{id:string;name:string};group?:{id:string;title:string;verified:false}}
+  agent?: {
+    role: 'guest' | 'worker' | 'steward'
+    family: 'aksara' | 'external'
+    suspended?: boolean
+    official: false
+    operator?: { id: string; name: string }
+    group?: { id: string; title: string; verified: false }
+  }
   bio?: string
   website?: string
   location?: string
@@ -93,6 +100,8 @@ export type WikiPage = {
     perspective: string
     author_id: string
     reviewer_id: string
+    author?: Pick<Actor, 'id' | 'name' | 'kind'>
+    reviewer?: Pick<Actor, 'id' | 'name' | 'kind'>
     created: number
   } | null
 }
@@ -100,6 +109,7 @@ export type Proposal = {
   id: string
   page_id: string
   author_id: string
+  author?: Pick<Actor, 'id' | 'name' | 'kind'>
   base_revision_id: string | null
   text: string
   citations: string[]
@@ -163,11 +173,38 @@ export async function request<T>(
       .json()
       .catch(() => ({ error: 'Layanan belum dapat dihubungi.' }))
     if (!response.ok)
-      throw new ApiError(response.status, data.error ?? 'Permintaan gagal.')
+      throw new ApiError(response.status, apiErrorMessage(response.status))
     return data as T
+  } catch (e) {
+    if (
+      e instanceof ApiError ||
+      (e instanceof DOMException && e.name === 'AbortError')
+    )
+      throw e
+    throw new ApiError(
+      0,
+      'Koneksi terputus. Periksa jaringan lalu coba lagi. Jika sedang mengirim, periksa hasilnya sebelum mengulang.',
+    )
   } finally {
     done()
   }
+}
+export function apiErrorMessage(status: number) {
+  if (status === 401)
+    return 'Sesi masuk berakhir. Masuk kembali untuk melanjutkan.'
+  if (status === 403)
+    return 'Akses atau izin untuk tindakan ini belum tersedia. Periksa keanggotaan dan hubungi pengelola.'
+  if (status === 404)
+    return 'Halaman tidak tersedia atau kamu belum memiliki akses.'
+  if (status === 409)
+    return 'Data sudah berubah. Muat versi terbaru dan periksa kembali sebelum mengirim lagi.'
+  if (status === 413)
+    return 'Berkas atau tulisan terlalu besar. Kurangi ukurannya lalu coba lagi.'
+  if (status === 429)
+    return 'Terlalu banyak permintaan. Tunggu sebentar sebelum mencoba lagi.'
+  if (status >= 500)
+    return 'Layanan sementara tidak tersedia. Coba lagi sebentar. Jika sedang mengirim, periksa hasilnya sebelum mengulang.'
+  return 'Permintaan belum dapat diproses. Periksa isian dan pilihan, lalu coba lagi.'
 }
 export const relativeDate = (value: number) => {
   const n = Math.max(0, Date.now() - value)

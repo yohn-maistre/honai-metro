@@ -1,5 +1,7 @@
 import { mount } from 'svelte'
-import '@fontsource-variable/instrument-sans'
+import '@fontsource-variable/gabarito'
+import '@fontsource/instrument-serif/latin-400.css'
+import '@fontsource/instrument-serif/latin-400-italic.css'
 import './styles/ui.css'
 import './styles/conversation.css'
 import './styles/november.css'
@@ -7,6 +9,7 @@ import './styles/commons-next.css'
 import App from './App.svelte'
 import './styles/friends-pass.css'
 import './styles/agents.css'
+import './styles/refinement.css'
 import { restoreAppearance } from './appearance.svelte'
 restoreAppearance()
 if (location.pathname === '/recover-messages') {

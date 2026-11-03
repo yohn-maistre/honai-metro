@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { tabScroll } from "./tab-scroll"
+  import { markdown } from './markdown'
+  import { tabScroll } from './tab-scroll'
   import { untrack } from 'svelte'
   import {
     Building2,
@@ -451,13 +452,15 @@
       </Button>{/if}
   </div>
   <Tabs.Root bind:value={tab}>
-    <div class="section-tab-scroll" use:tabScroll><Tabs.List variant="line" class="page-tabs" aria-label="Profil kelompok">
-      <Tabs.Trigger value="spaces">Ruang</Tabs.Trigger><Tabs.Trigger
-        value="work"
-      >
-        Kerja publik
-      </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
-    </Tabs.List></div>
+    <div class="section-tab-scroll" use:tabScroll>
+      <Tabs.List variant="line" class="page-tabs" aria-label="Profil kelompok">
+        <Tabs.Trigger value="spaces">Ruang</Tabs.Trigger><Tabs.Trigger
+          value="work"
+        >
+          Kerja publik
+        </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
+      </Tabs.List>
+    </div>
     <Tabs.Content value="spaces">
       <div class="object-grid">
         {#each group.spaces as space}<Card.Root class="object-card">
@@ -624,7 +627,9 @@
                 ? 'Diterima'
                 : 'Ditolak'}
           </Badge>
-          <p class="strata-body">{result.text}</p>
+          <div class="strata-body post-markdown">
+            {@html markdown(result.text)}
+          </div>
           {#each result.citations as url}<a
               href={url}
               class="strata-source"
@@ -666,34 +671,52 @@
     <h1>{context.title}</h1>
     <p>{context.description}</p>
   </div>
-  <nav class="context-relations section-tab-scroll" aria-label={'Terhubung dengan ' + context.title}>
+  <nav
+    class="context-relations section-tab-scroll"
+    aria-label={'Terhubung dengan ' + context.title}
+  >
     <a href="#context-posts"><MessageCircle size={16} />Percakapan</a>
-    <a href="#context-wiki"><BookOpen size={16} />Wiki <span>{context.pages.length}</span></a>
-    <a href="#context-groups"><Building2 size={16} />Organisasi <span>{context.groups.length}</span></a>
-    <a href="#context-work"><ListTodo size={16} />Kerja publik <span>{works.length}</span></a>
+    <a href="#context-wiki">
+      <BookOpen size={16} />Wiki
+      <span>{context.pages.length}</span>
+    </a>
+    <a href="#context-groups">
+      <Building2 size={16} />Organisasi
+      <span>{context.groups.length}</span>
+    </a>
+    <a href="#context-work">
+      <ListTodo size={16} />Kerja publik
+      <span>{works.length}</span>
+    </a>
   </nav>
   <section id="context-groups" class="context-relation-section">
-  {#if context.groups.length}<div class="strata-card">
-      <h2>Organisasi & kelompok</h2>
-      {#each context.groups as g}<a
-          href={'/groups/' + g.id}
-          class="cx-list-row"
-        >
-          <Building2 size={18} />{g.title}<ArrowUpRight size={15} />
-        </a>{/each}
-    </div>{:else}<p class="context-empty">Belum ada organisasi tertaut.</p>{/if}
+    {#if context.groups.length}<div class="strata-card">
+        <h2>Organisasi & kelompok</h2>
+        {#each context.groups as g}<a
+            href={'/groups/' + g.id}
+            class="cx-list-row"
+          >
+            <Building2 size={18} />{g.title}<ArrowUpRight size={15} />
+          </a>{/each}
+      </div>{:else}<p class="context-empty">
+        Belum ada organisasi tertaut.
+      </p>{/if}
   </section>
   <section id="context-wiki" class="context-relation-section">
-  {#if context.pages.length}<div class="strata-card">
-      <h2>Wiki</h2>
-      {#each context.pages as p}<a href={'/wiki/' + p.id} class="cx-list-row">
-          <BookOpen size={18} />{p.title}
-        </a>{/each}
-    </div>{:else}<p class="context-empty">Belum ada halaman wiki tertaut.</p>{/if}
+    {#if context.pages.length}<div class="strata-card">
+        <h2>Wiki</h2>
+        {#each context.pages as p}<a href={'/wiki/' + p.id} class="cx-list-row">
+            <BookOpen size={18} />{p.title}
+          </a>{/each}
+      </div>{:else}<p class="context-empty">
+        Belum ada halaman wiki tertaut.
+      </p>{/if}
   </section>
   <section id="context-work" class="context-relation-section">
-  {#if works.length}<div class="strata-card"><h2>Kerja publik</h2></div>
-    {@render workList(works)}{:else}<p class="context-empty">Belum ada kerja publik tertaut.</p>{/if}
+    {#if works.length}<div class="strata-card"><h2>Kerja publik</h2></div>
+      {@render workList(works)}{:else}<p class="context-empty">
+        Belum ada kerja publik tertaut.
+      </p>{/if}
   </section>
   <div id="context-posts" class="strata-card"><h2>Percakapan</h2></div>
   {#each posts as post}<PostCard
@@ -777,11 +800,24 @@
     </Button>
   </div>
   {#if contexts.length}<div class="context-directory">
-    {#each [['region','Wilayah'],['place','Tempat'],['language','Bahasa'],['topic','Topik']] as [value,label]}
-      {@const rows=contexts.filter(c=>c.kind===value)}
-      {#if rows.length}<section class="context-directory-section"><h2>{label}</h2>{#each rows as c}<a href={'/contexts/'+c.slug}><span><strong>{c.title}</strong>{#if c.description}<small>{c.description}</small>{/if}</span><ArrowUpRight size={17}/></a>{/each}</section>{/if}
-    {/each}
-  </div>{:else}<div class="strata-nodata"><MapPin size={26}/><h2>Tempat, wilayah & topik</h2><Button href="/communities" variant="outline">Jelajahi komunitas</Button></div>{/if}
+      {#each [['region', 'Wilayah'], ['place', 'Tempat'], ['language', 'Bahasa'], ['topic', 'Topik']] as [value, label]}
+        {@const rows = contexts.filter((c) => c.kind === value)}
+        {#if rows.length}<section class="context-directory-section">
+            <h2>{label}</h2>
+            {#each rows as c}<a href={'/contexts/' + c.slug}>
+                <span>
+                  <strong>{c.title}</strong>
+                  {#if c.description}<small>{c.description}</small>{/if}
+                </span>
+                <ArrowUpRight size={17} />
+              </a>{/each}
+          </section>{/if}
+      {/each}
+    </div>{:else}<div class="strata-nodata">
+      <MapPin size={26} />
+      <h2>Tempat, wilayah & topik</h2>
+      <Button href="/communities" variant="outline">Jelajahi komunitas</Button>
+    </div>{/if}
 {/if}
 <Dialog.Root
   open={modal !== null}

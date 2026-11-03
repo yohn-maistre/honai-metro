@@ -139,33 +139,35 @@
     </Dropdown.Root>
   </Sidebar.Header>
   <Sidebar.Content>
-    <Sidebar.Group>
-      <Sidebar.Menu>
-        {#each nav as item}<Sidebar.MenuItem>
-            <Sidebar.MenuButton
-              isActive={active(item.href)}
-              onclick={() => sidebar.setOpenMobile(false)}
-              class="nav-link"
-            >
-              {#snippet child({ props })}<a
-                  {...props}
-                  href={item.href}
-                  aria-label={item.label}
-                  title={item.label}
-                  aria-current={active(item.href) ? 'page' : undefined}
-                >
-                  <item.icon size={20} strokeWidth={1.7} />
-                  <span>{item.label}</span>
-                  {#if item.href === '/notifications' && unread}<span
-                      class="utility-unread"
-                    >
-                      {unread}
-                    </span>{/if}
-                </a>{/snippet}
-            </Sidebar.MenuButton>
-          </Sidebar.MenuItem>{/each}
-      </Sidebar.Menu>
-    </Sidebar.Group>
+    {#each [{ label: 'Jelajahi', items: nav.slice(0, 4) }, { label: 'Pribadi', items: nav.slice(4) }] as group}
+      <Sidebar.Group>
+        <Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
+        <Sidebar.Menu>
+          {#each group.items as item}<Sidebar.MenuItem>
+              <Sidebar.MenuButton
+                isActive={active(item.href)}
+                onclick={() => sidebar.setOpenMobile(false)}
+                class="nav-link"
+              >
+                {#snippet child({ props })}<a
+                    {...props}
+                    href={item.href}
+                    aria-label={item.label}
+                    title={item.label}
+                    aria-current={active(item.href) ? 'page' : undefined}
+                  >
+                    <item.icon size={20} strokeWidth={1.7} />
+                    <span>{item.label}</span>
+                    {#if item.href === '/notifications' && unread}<span
+                        class="utility-unread"
+                      >
+                        {unread}
+                      </span>{/if}
+                  </a>{/snippet}
+              </Sidebar.MenuButton>
+            </Sidebar.MenuItem>{/each}
+        </Sidebar.Menu>
+      </Sidebar.Group>{/each}
     <div class="px-4 pt-2">
       <Button
         class="w-full sidebar-compose"
@@ -200,7 +202,13 @@
       >
         Masuk
       </Button>{/if}
-    <a href="/agents" class="preview-label" onclick={()=>sidebar.setOpenMobile(false)}>Agen & koneksi</a>
+    <a
+      href="/agents"
+      class="preview-label"
+      onclick={() => sidebar.setOpenMobile(false)}
+    >
+      Agen & koneksi
+    </a>
     <span class="preview-label">ETNOS · Alpha</span>
   </Sidebar.Footer>
 </Sidebar.Root>
@@ -347,7 +355,15 @@
     <aside
       class="cx-context"
       aria-label="Konteks terkait"
-      hidden={path === '/board' || (path === '/' && layout !== 'single')}
+      hidden={path === '/board' ||
+        (path === '/' && layout !== 'single') ||
+        [
+          'preferences',
+          'messages',
+          'agents',
+          'login',
+          'recover-messages',
+        ].includes(path.split('/')[1])}
     >
       {@render rail()}
     </aside>
@@ -366,12 +382,15 @@
     aria-current={active('/') ? 'page' : undefined}
   >
     <Home size={21} />
+    <span aria-hidden="true">Beranda</span>
   </Button>
   <Button href="/explore" variant="ghost" size="icon" aria-label="Jelajah">
     <Compass size={21} />
+    <span aria-hidden="true">Jelajah</span>
   </Button>
   <Button size="icon" aria-label="Posting baru" onclick={onCompose}>
     <Plus size={23} />
+    <span aria-hidden="true">Posting</span>
   </Button>
   <Button
     href="/notifications"
@@ -381,7 +400,9 @@
     aria-current={active('/notifications') ? 'page' : undefined}
     class="mobile-activity"
   >
-    <Bell size={21} />{#if unread}<span class="bell-dot"></span>{/if}
+    <Bell size={21} />
+    <span aria-hidden="true">Aktivitas</span>
+    {#if unread}<span class="bell-dot"></span>{/if}
   </Button>
   <Button
     variant="ghost"
@@ -391,5 +412,6 @@
     onclick={() => sidebar.toggle()}
   >
     <Menu size={21} />
+    <span aria-hidden="true">Menu</span>
   </Button>
 </nav>

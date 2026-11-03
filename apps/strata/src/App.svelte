@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { MediaQuery } from "svelte/reactivity"
-  import { tabScroll } from "./tab-scroll"
-  import { onMount, tick } from 'svelte'
+  import { MediaQuery } from 'svelte/reactivity'
+  import { tabScroll } from './tab-scroll'
+  import { onMount, tick, untrack } from 'svelte'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
   import {
     Bookmark,
@@ -29,6 +29,7 @@
   import ContentSkeleton from './ContentSkeleton.svelte'
   import FeedRefresh from './FeedRefresh.svelte'
   import NewsSection from './NewsSection.svelte'
+  import HomeContext from './HomeContext.svelte'
   import VaultTransfer from './messaging/VaultTransfer.svelte'
   import SearchDialog from './SearchDialog.svelte'
   import SearchPage from './SearchPage.svelte'
@@ -43,6 +44,12 @@
   import FeaturePages from './FeaturePages.svelte'
   import { videoEmbed, directVideo } from './markdown'
   import { applyAppearance, restoreAppearance } from './appearance.svelte'
+  import {
+    readWikiDraft,
+    saveWikiDraft,
+    removeWikiDraft,
+    clearWikiDrafts,
+  } from './wiki-drafts'
   import { Button } from '$lib/components/ui/button/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
   import { Textarea } from '$lib/components/ui/textarea/index.js'
@@ -91,7 +98,9 @@
   let following = $state<Actor[]>([])
   let homeLayout = $state('single')
   const desktopLayout = new MediaQuery('(min-width: 768px)')
-  const activeHomeLayout = $derived(desktopLayout.current ? homeLayout : 'single')
+  const activeHomeLayout = $derived(
+    desktopLayout.current ? homeLayout : 'single',
+  )
   function setLayout(value: string) {
     homeLayout = value
     try {
@@ -121,6 +130,13 @@
   let composeState = $state({ dirty: false, busy: false }),
     discardDraft = $state(false)
   function closeModal() {
+    if (modal === 'wiki' || modal === 'proposal') {
+      if (busy) return
+      if (wikiDirty) {
+        discardDraft = true
+        return
+      }
+    }
     if (modal === 'compose') {
       if (composeState.busy) return
       if (composeState.dirty) {
@@ -133,12 +149,74 @@
   let text = $state(''),
     title = $state(''),
     description = $state(''),
-    visibility = $state<Community['visibility']>('public'),
+    visibility = $state<Community['visibility'] | ''>(''),
     communityId = $state(''),
     citations = $state(''),
     language = $state('id'),
     perspective = $state(''),
     modalError = $state('')
+  let wikiDraftPage = $state(''),
+    wikiDraftOwner = $state(''),
+    wikiBase = $state<string | null>(null),
+    wikiBaseline = $state(''),
+    wikiDraftStatus = $state(''),
+    wikiRestored = $state(false)
+  const wikiSignature = $derived(
+    JSON.stringify({
+      text,
+      title,
+      citations,
+      language,
+      perspective,
+      communityId,
+    }),
+  )
+  const wikiDirty = $derived(
+    (modal === 'wiki' || modal === 'proposal') &&
+      wikiSignature !== wikiBaseline,
+  )
+  const wikiConflict = $derived(
+    modal === 'proposal' && wikiBase !== selectedPage?.revision_id,
+  )
+  $effect(() => {
+    if (
+      (modal === 'wiki' || modal === 'proposal') &&
+      wikiDirty &&
+      wikiDraftOwner &&
+      wikiDraftOwner === auth.actor?.id
+    ) {
+      const draft = {
+        page: wikiDraftPage,
+        community: communityId,
+        base: wikiBase,
+        text,
+        title,
+        citations,
+        language,
+        perspective,
+        requestKey: wikiRequestKey,
+        saved: Date.now(),
+      }
+      wikiDraftStatus = saveWikiDraft(wikiDraftOwner, draft)
+        ? 'Draf tersimpan di tab ini · 24 jam'
+        : 'Penyimpanan tab tidak tersedia. Tetap di halaman ini agar draf tidak hilang.'
+    }
+  })
+  let previousDraftActor: string | undefined
+  $effect(() => {
+    const current = auth.actor?.id
+    if (previousDraftActor && previousDraftActor !== current) {
+      clearWikiDrafts(previousDraftActor)
+      untrack(() => {
+        if (modal === 'wiki' || modal === 'proposal') modal = null
+      })
+    }
+    previousDraftActor = current
+  })
+  function forgetWikiDraft() {
+    if (wikiDraftOwner && wikiDraftPage)
+      removeWikiDraft(wikiDraftOwner, wikiDraftPage)
+  }
   let joinRequests = $state<
       { actor_id: string; message: string; state: string }[]
     >([]),
@@ -183,43 +261,45 @@
         : posts,
   )
   const heading = $derived(
-    parts[0] === 'agents' ? 'Agen & koneksi' : parts[0] === 'voices'
-      ? 'Suara komunitas'
-      : parts[0] === 'news'
-        ? 'Kabar'
-        : path === '/board'
-          ? 'Beranda'
-          : path === '/'
+    parts[0] === 'agents'
+      ? 'Agen & koneksi'
+      : parts[0] === 'voices'
+        ? 'Suara komunitas'
+        : parts[0] === 'news'
+          ? 'Kabar'
+          : path === '/board'
             ? 'Beranda'
-            : parts[0] === 'explore'
-              ? 'Jelajah'
-              : parts[0] === 'communities'
-                ? (community?.title ?? 'Komunitas')
-                : parts[0] === 'wiki'
-                  ? 'Wiki'
-                  : parts[0] === 'saved'
-                    ? 'Tersimpan'
-                    : parts[0] === 'preferences'
-                      ? 'Pengaturan'
-                      : parts[0] === 'login'
-                        ? 'Masuk'
-                        : parts[0] === 'find'
-                          ? 'Cari'
-                          : parts[0] === 'square'
-                            ? 'Percakapan'
-                            : parts[0] === 'people'
-                              ? 'Profil'
-                              : parts[0] === 'messages'
-                                ? 'Pesan'
-                                : parts[0] === 'notifications'
-                                  ? 'Aktivitas'
-                                  : parts[0] === 'groups'
-                                    ? 'Organisasi & kelompok'
-                                    : parts[0] === 'work'
-                                      ? 'Kerja publik'
-                                      : parts[0] === 'contexts'
-                                        ? 'Konteks'
-                                        : 'ETNOS',
+            : path === '/'
+              ? 'Beranda'
+              : parts[0] === 'explore'
+                ? 'Jelajah'
+                : parts[0] === 'communities'
+                  ? (community?.title ?? 'Komunitas')
+                  : parts[0] === 'wiki'
+                    ? 'Wiki'
+                    : parts[0] === 'saved'
+                      ? 'Tersimpan'
+                      : parts[0] === 'preferences'
+                        ? 'Pengaturan'
+                        : parts[0] === 'login'
+                          ? 'Masuk'
+                          : parts[0] === 'find'
+                            ? 'Cari'
+                            : parts[0] === 'square'
+                              ? 'Percakapan'
+                              : parts[0] === 'people'
+                                ? 'Profil'
+                                : parts[0] === 'messages'
+                                  ? 'Pesan'
+                                  : parts[0] === 'notifications'
+                                    ? 'Aktivitas'
+                                    : parts[0] === 'groups'
+                                      ? 'Organisasi & kelompok'
+                                      : parts[0] === 'work'
+                                        ? 'Kerja publik'
+                                        : parts[0] === 'contexts'
+                                          ? 'Konteks'
+                                          : 'ETNOS',
   )
   function notify(value: string) {
     message = value
@@ -459,7 +539,49 @@
     citations = ''
     perspective = auth.actor?.name ?? ''
     modalError = ''
-    visibility = 'public'
+    visibility = ''
+    if (kind === 'wiki' || kind === 'proposal') {
+      wikiDraftOwner = auth.actor.id
+      wikiDraftPage = kind === 'proposal' ? selectedPage!.id : 'new'
+      wikiBase =
+        kind === 'proposal' ? (selectedPage?.revision_id ?? null) : null
+      if (kind === 'proposal') {
+        communityId = selectedPage!.community_id
+        text = selectedPage?.revision?.text ?? ''
+        language = selectedPage?.revision?.language ?? 'id'
+        citations = selectedPage?.revision?.citations.join('\n') ?? ''
+      }
+      wikiBaseline = JSON.stringify({
+        text,
+        title,
+        citations,
+        language,
+        perspective,
+        communityId,
+      })
+      wikiRestored = false
+      wikiDraftStatus = ''
+      const draft = readWikiDraft(wikiDraftOwner, wikiDraftPage)
+      if (
+        draft &&
+        communities.some(
+          (c) =>
+            c.id === draft.community &&
+            c.visibility === 'public' &&
+            isMember(c.id),
+        )
+      ) {
+        communityId = draft.community
+        wikiBase = draft.base
+        text = draft.text
+        title = draft.title
+        citations = draft.citations
+        language = draft.language
+        perspective = draft.perspective
+        wikiRequestKey = draft.requestKey
+        wikiRestored = true
+      }
+    }
     if (kind === 'manage') void manage(id)
   }
   async function manage(id: string) {
@@ -484,6 +606,7 @@
         modal = null
         navigate('/square/' + p.id)
       } else if (modal === 'community') {
+        if (!visibility) return
         const c = await request<Community>('/v1/communities', {
           title,
           description,
@@ -516,11 +639,16 @@
             },
           },
         )
+        forgetWikiDraft()
         modal = null
         navigate('/wiki/' + p.id)
       } else if (modal === 'proposal' && selectedPage) {
+        if (wikiConflict)
+          throw Error(
+            'Revisi berubah. Bandingkan draf dengan halaman terbaru sebelum mengirim.',
+          )
         await request(`/v1/wiki/${selectedPage.id}/proposals`, {
-          baseRevision: selectedPage.revision_id,
+          baseRevision: wikiBase,
           text,
           citations: citations
             .split('\n')
@@ -529,6 +657,7 @@
           language,
           perspective,
         })
+        forgetWikiDraft()
         modal = null
         await load()
         notify('Usulan dikirim untuk ditinjau.')
@@ -552,6 +681,7 @@
     })
   }
   async function logout() {
+    if (auth.actor) clearWikiDrafts(auth.actor.id)
     await mutate(async () => {
       generation++
       posts = []
@@ -632,7 +762,14 @@
     }
   }}
   onclick={intercept}
-  onpopstate={restoreEntry}
+  onpopstate={() => {
+    if (modal === 'wiki' || modal === 'proposal') modal = null
+    void restoreEntry()
+  }}
+  onbeforeunload={(event) => {
+    if (wikiDirty || ((modal === 'wiki' || modal === 'proposal') && busy))
+      event.preventDefault()
+  }}
 />
 <PlatformShell
   {path}
@@ -719,12 +856,16 @@
       />
     </section>
   {:else if path === '/agents'}
-    {#await import('./AgentConnections.svelte') then module}<module.default {auth}/>{/await}
+    {#await import('./AgentConnections.svelte') then module}<module.default
+        {auth}
+      />{/await}
   {:else if path === '/preferences'}
     <div class="cx-page-head"><h1>Pengaturan</h1></div>
     <Card.Root class="strata-card strata-preferences">
       <AppearancePanel />
-      <a class="cx-list-row" href="/agents">Agen & koneksi <ChevronRight size={16}/></a>
+      <a class="cx-list-row" href="/agents">
+        Agen & koneksi <ChevronRight size={16} />
+      </a>
       <VaultTransfer actorId={auth.actor?.id} />
       <a class="cx-list-row" href="/labs/spaces">
         AT Spaces · uji protokol alpha <ChevronRight size={16} />
@@ -833,11 +974,6 @@
           onCreate={() => open('wiki')}
           onPropose={() => {
             open('proposal')
-            text = selectedPage?.revision?.text ?? ''
-            language = selectedPage?.revision?.language ?? 'id'
-            perspective =
-              selectedPage?.revision?.perspective ?? auth.actor?.name ?? ''
-            citations = selectedPage?.revision?.citations.join('\n') ?? ''
           }}
           onDecide={decide}
         />{/await}{/if}
@@ -904,17 +1040,23 @@
         </div>
       </div>
       <Tabs.Root bind:value={tab}>
-        <div class="section-tab-scroll" use:tabScroll><Tabs.List variant="line" class="page-tabs" aria-label="Isi komunitas">
-          <Tabs.Trigger value="discussion">Diskusi</Tabs.Trigger><Tabs.Trigger
-            value="wiki"
+        <div class="section-tab-scroll" use:tabScroll>
+          <Tabs.List
+            variant="line"
+            class="page-tabs"
+            aria-label="Isi komunitas"
           >
-            Wiki
-          </Tabs.Trigger><Tabs.Trigger value="media">
-            Media
-          </Tabs.Trigger><Tabs.Trigger value="voices">
-            Suara
-          </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
-        </Tabs.List></div>
+            <Tabs.Trigger value="discussion">Diskusi</Tabs.Trigger><Tabs.Trigger
+              value="wiki"
+            >
+              Wiki
+            </Tabs.Trigger><Tabs.Trigger value="media">
+              Media
+            </Tabs.Trigger><Tabs.Trigger value="voices">
+              Suara
+            </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
+          </Tabs.List>
+        </div>
         <Tabs.Content value={tab}>
           {#if tab === 'voices'}{#await import('./EngagementPage.svelte') then module}<module.default
                 {auth}
@@ -1038,7 +1180,16 @@
               : !p.parent_id),
       )}
       <section class="profile-header">
-        <div class="profile-cover" aria-hidden="true"></div>
+        <div class="profile-cover" aria-hidden="true">
+          <span>
+            {actor.name
+              .split(/[ .]/)
+              .slice(0, 2)
+              .map((n) => n[0] ?? '')
+              .join('')
+              .toUpperCase()}
+          </span>
+        </div>
         <div class="profile-content">
           <div class="profile-topline">
             <span class="cx-avatar sage profile-avatar">
@@ -1108,7 +1259,9 @@
               {actor.name.includes('.')
                 ? '@' + actor.name
                 : actor.kind === 'agent'
-                  ? 'Aksara · AI'
+                  ? actor.agent?.family === 'aksara'
+                    ? 'Aksara · AI'
+                    : 'Agen · AI'
                   : 'Anggota ETNOS'}
             </p>
           </div>
@@ -1131,18 +1284,33 @@
             <summary>Identitas AT</summary>
             <p class="cx-hint">{actor.did}</p>
           </details>
-          {#if actor.kind === 'agent'}<Badge variant="secondary">Agen</Badge>{/if}
-          {#if actor.agent}<p class="agent-attribution">{actor.agent.family==='aksara'?'Aksara':'Agen tamu'}{#if actor.agent.operator} · Dikelola oleh <a href={'/people/'+actor.agent.operator.id}>{actor.agent.operator.name}</a>{/if}{#if actor.agent.group} · <a href={'/groups/'+actor.agent.group.id}>{actor.agent.group.title}</a>{/if}{#if actor.agent.suspended} · Dijeda{/if}</p>{/if}
+          {#if actor.kind === 'agent'}<Badge variant="secondary">
+              Agen
+            </Badge>{/if}
+          {#if actor.agent}<p class="agent-attribution">
+              {actor.agent.family === 'aksara'
+                ? 'Aksara'
+                : 'Agen tamu'}{#if actor.agent.operator}
+                · Dikelola oleh <a href={'/people/' + actor.agent.operator.id}>
+                  {actor.agent.operator.name}
+                </a>{/if}{#if actor.agent.group}
+                · <a href={'/groups/' + actor.agent.group.id}>
+                  {actor.agent.group.title}
+                </a>{/if}{#if actor.agent.suspended}
+                · Dijeda{/if}
+            </p>{/if}
         </div>
       </section>
-      <div class="section-tab-scroll" use:tabScroll><div class="profile-tabs" role="group" aria-label="Isi profil">
-        {#each [['posts', 'Posting'], ['replies', 'Balasan'], ['media', 'Media']] as [value, label]}<button
-            aria-pressed={profileTab === value}
-            onclick={() => (profileTab = value)}
-          >
-            {label}
-          </button>{/each}
-      </div></div>
+      <div class="section-tab-scroll" use:tabScroll>
+        <div class="profile-tabs" role="group" aria-label="Isi profil">
+          {#each [['posts', 'Posting'], ['replies', 'Balasan'], ['media', 'Media']] as [value, label]}<button
+              aria-pressed={profileTab === value}
+              onclick={() => (profileTab = value)}
+            >
+              {label}
+            </button>{/each}
+        </div>
+      </div>
       {#each profilePosts as p}<PostCard
           post={p}
           community={communities.find((c) => c.id === p.community_id)}
@@ -1165,6 +1333,7 @@
         </p>
       </div>{/if}
   {:else if path === '/' || path === '/saved' || path === '/find'}
+    {#if path === '/'}<HomeContext welcome={!auth.actor} />{/if}
     <FeedRefresh
       enabled={path === '/' && modal === null && !searchDialogOpen}
       busy={loading}
@@ -1256,7 +1425,9 @@
     {#if !['explore', 'news', 'communities', 'people', 'wiki', 'board'].includes(parts[0])}<NewsSection
         compact
       />
-    {:else if parts[0] !== 'news'}<div class="cx-context-block rail-context-intro">
+    {:else if parts[0] !== 'news'}<div
+        class="cx-context-block rail-context-intro"
+      >
         <span class="rail-accent-icon"><BookOpen size={20} /></span>
         <h2>
           {parts[0] === 'news'
@@ -1359,13 +1530,13 @@
     class={'platform-dialog' + (modal === 'compose' ? ' compose-dialog' : '')}
     showCloseButton={modal !== 'compose'}
     onEscapeKeydown={(event) => {
-      if (modal === 'compose') {
+      if (modal === 'compose' || modal === 'wiki' || modal === 'proposal') {
         event.preventDefault()
         closeModal()
       }
     }}
     onInteractOutside={(event) => {
-      if (modal === 'compose') {
+      if (modal === 'compose' || modal === 'wiki' || modal === 'proposal') {
         event.preventDefault()
         if (!discardDraft) closeModal()
       }
@@ -1569,10 +1740,12 @@
             Siapa yang dapat membaca?
             <Choice
               bind:value={visibility}
+              required
+              aria-label="Siapa yang dapat membaca?"
               items={[
                 {
                   value: 'public',
-                  label: 'Publik · bergabung dengan persetujuan',
+                  label: 'Semua orang · publik',
                 },
                 {
                   value: 'listed-private',
@@ -1581,7 +1754,21 @@
                 { value: 'hidden-private', label: 'Anggota · disembunyikan' },
               ]}
             />
-          </Label>{/if}
+          </Label>
+          {#if visibility}<div class="audience-notice" role="status">
+              <strong>
+                {visibility === 'public'
+                  ? 'Nama, deskripsi dan percakapan dapat dibaca semua orang.'
+                  : visibility === 'listed-private'
+                    ? 'Hanya anggota membaca percakapan. Nama dan deskripsi terlihat publik.'
+                    : 'Nama, deskripsi dan percakapan hanya terlihat oleh anggota.'}
+              </strong>
+              <p>
+                {visibility === 'public'
+                  ? 'Bergabung perlu persetujuan pengelola. Persetujuan ini tidak membatasi pembaca.'
+                  : 'Anggota baru hanya masuk melalui undangan.'}
+              </p>
+            </div>{/if}{/if}
         {#if modal === 'join'}<Label>
             Pesan untuk pengelola<Textarea
               bind:value={text}
@@ -1591,6 +1778,34 @@
             />
           </Label>{/if}
         {#if modal === 'wiki' || modal === 'proposal'}
+          <div class="wiki-draft-notice">
+            <p>Draf untuk wiki publik · terbit setelah tinjauan manusia.</p>
+            {#if wikiRestored}<strong>
+                Draf dipulihkan dari tab ini.
+              </strong>{/if}
+            {#if wikiDraftStatus}<small role="status">
+                {wikiDraftStatus}
+              </small>{/if}
+            {#if wikiConflict}<p role="alert">
+                Halaman sudah berubah sejak draf ini dibuat. Draf tetap
+                disimpan. Buka halaman terbaru di tab lain untuk membandingkan
+                sebelum melanjutkan.
+              </p>
+              <a
+                href={'/wiki/' + selectedPage?.id}
+                target="_blank"
+                rel="noopener"
+              >
+                Buka revisi terbaru
+              </a>
+              <Button
+                type="button"
+                variant="outline"
+                onclick={() => (wikiBase = selectedPage?.revision_id ?? null)}
+              >
+                Sudah dibandingkan · gunakan revisi terbaru
+              </Button>{/if}
+          </div>
           <div class="wiki-editor-field">
             <Label>
               Isi tulisan
@@ -1601,7 +1816,7 @@
                 disabled={busy}
               />{/await}
           </div>
-          <details class="wiki-draft-details">
+          <details class="wiki-draft-details" open>
             <summary>Sumber, bahasa & atribusi</summary>
             <Label>
               Sumber publik<Textarea
@@ -1627,21 +1842,25 @@
         {#if modalError}<p class="cx-form-error" role="alert">
             {modalError}
           </p>{/if}
-        <Button
-          class="cx-button primary"
-          disabled={busy ||
-            ((modal === 'wiki' || modal === 'proposal') &&
-              (!text.trim() || text.length > 50000)) ||
-            (modal === 'wiki' && !communityId)}
-          type="submit"
-          variant="default"
-        >
-          {#if busy}<LoaderCircle size={15} />{/if}{modal === 'join'
-            ? 'Kirim permintaan'
-            : modal === 'proposal' || modal === 'wiki'
-              ? 'Ajukan untuk tinjauan'
-              : 'Buat'}<Send size={14} />
-        </Button>
+        <div class="creation-submit">
+          <Button
+            class="cx-button primary"
+            disabled={busy ||
+              wikiConflict ||
+              (modal === 'community' && !visibility) ||
+              ((modal === 'wiki' || modal === 'proposal') &&
+                (!text.trim() || text.length > 50000)) ||
+              (modal === 'wiki' && !communityId)}
+            type="submit"
+            variant="default"
+          >
+            {#if busy}<LoaderCircle size={15} />{/if}{modal === 'join'
+              ? 'Kirim permintaan'
+              : modal === 'proposal' || modal === 'wiki'
+                ? 'Ajukan untuk tinjauan'
+                : 'Buat'}<Send size={14} />
+          </Button>
+        </div>
       </form>{/if}
   </Dialog.Content>
 </Dialog.Root>
@@ -1651,11 +1870,14 @@
     <AlertDialog.Header>
       <AlertDialog.Title>Buang draf?</AlertDialog.Title><AlertDialog.Description
       >
-        Tulisan dan lampiran yang belum dikirim akan dilepas.
+        {modal === 'wiki' || modal === 'proposal'
+          ? 'Tulisan, sumber dan atribusi dalam draf ini akan dihapus dari tab ini.'
+          : 'Tulisan dan lampiran yang belum dikirim akan dilepas.'}
       </AlertDialog.Description>
     </AlertDialog.Header><AlertDialog.Footer>
       <AlertDialog.Cancel>Lanjut menulis</AlertDialog.Cancel><AlertDialog.Action
         onclick={() => {
+          if (modal === 'wiki' || modal === 'proposal') forgetWikiDraft()
           composeState = { dirty: false, busy: false }
           modal = null
           discardDraft = false

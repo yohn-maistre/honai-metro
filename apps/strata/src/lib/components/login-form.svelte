@@ -33,7 +33,7 @@
     <KeyRound size={23} class="text-primary mb-3" /><Card.Title class="text-xl">
       Masuk ke ETNOS
     </Card.Title><Card.Description>
-      Gunakan akun AT yang kamu miliki.
+      Gunakan akun Bluesky atau akun lain di jaringan AT Protocol.
     </Card.Description>
   </Card.Header>
   <Card.Content>
@@ -74,20 +74,25 @@
             />{/if}Lanjutkan<ArrowUpRight size={16} />
         </Button>
         <FieldDescription>
-          Pratinjau ini menerima akun yang diundang. Akses komunitas diatur
-          terpisah.
+          Untuk ikut menulis, akunmu perlu undangan ETNOS. Minta undangan kepada
+          pengelola dengan menyebutkan handle akunmu. Bergabung ke komunitas
+          tetap memerlukan izin tersendiri.
         </FieldDescription>
       </FieldGroup>
     </form>
   </Card.Content>
   <Card.Footer class="border-t text-sm text-muted-foreground">
-    Belum punya akun? <a
-      class="cx-text-link ml-1"
-      href="https://bsky.app"
-      target="_blank"
-      rel="noreferrer"
-    >
-      Lihat penyedia AT<ArrowUpRight size={13} />
-    </a>
+    <a href="/explore" class="cx-text-link">Tetap membaca tanpa masuk</a>
+    <span>
+      Belum punya akun? <a
+        class="cx-text-link ml-1"
+        href="https://bsky.app"
+        target="_blank"
+        rel="noreferrer"
+      >
+        Buat akun Bluesky<ArrowUpRight size={13} />
+      </a>
+    </span>
+    <small>Membuat akun belum memberi undangan ETNOS.</small>
   </Card.Footer>
 </Card.Root>

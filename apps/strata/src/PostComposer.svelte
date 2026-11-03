@@ -34,6 +34,7 @@
   import VideoPreview from './VideoPreview.svelte'
   import LinkPreview from './LinkPreview.svelte'
   import * as Dropdown from '$lib/components/ui/dropdown-menu/index.js'
+  import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js'
   import { prepareImage, uploadImages, type ImageDraft } from './media'
   import type DocumentEditor from './DocumentEditor.svelte'
   let documentEditor = $state<DocumentEditor | null>(null)
@@ -110,6 +111,23 @@
     onStateChange?.({ dirty: hasContent, busy: busy || processing })
   })
   const destination = $derived(communities.find((c) => c.id === communityId))
+  let lastCommunity = untrack(() => initialCommunity),
+    audiencePending = $state('')
+  function changeDestination(next: string) {
+    const before = communities.find((c) => c.id === lastCommunity),
+      after = communities.find((c) => c.id === next)
+    if (
+      hasContent &&
+      before &&
+      before.visibility !== 'public' &&
+      after?.visibility === 'public'
+    ) {
+      audiencePending = next
+      return false
+    }
+    lastCommunity = next
+    return true
+  }
   onDestroy(() => images.forEach((image) => URL.revokeObjectURL(image.preview)))
   function remove(key: string) {
     const image = images.find((i) => i.key === key)
@@ -243,6 +261,7 @@
             <Choice
               aria-label="Komunitas"
               bind:value={communityId}
+              onbeforechange={changeDestination}
               disabled={busy || !!pending || images.length > 0}
               items={communities.map((c) => ({
                 value: c.id,
@@ -250,7 +269,19 @@
               }))}
             />
           </span>
-        </div>{/if}
+        </div>
+        <p class="composer-scope">
+          {#if destination?.visibility === 'public'}<Globe size={14} />
+            <span>
+              Publik · semua orang dapat membaca{destination.publication ===
+              'atproto'
+                ? ' · diterbitkan ke AT'
+                : ''}
+            </span>{:else}<LockKeyhole size={14} />
+            <span>
+              Privat · hanya anggota {destination?.title} dapat membaca
+            </span>{/if}
+        </p>{/if}
       {#if showTitle}<Input
           aria-label="Judul posting"
           placeholder="Judul (opsional)"
@@ -541,3 +572,31 @@
     </p>{/if}
   {#if error}<p class="cx-form-error" role="alert">{error}</p>{/if}
 </form>
+<AlertDialog.Root
+  open={!!audiencePending}
+  onOpenChange={(open) => {
+    if (!open) audiencePending = ''
+  }}
+>
+  <AlertDialog.Content>
+    <AlertDialog.Header>
+      <AlertDialog.Title>Pindahkan tulisan ke ruang publik?</AlertDialog.Title>
+      <AlertDialog.Description>
+        Semua orang dapat membaca posting di {communities.find(
+          (c) => c.id === audiencePending,
+        )?.title}. Periksa kembali cerita dan sumber yang boleh dibagikan.
+      </AlertDialog.Description>
+    </AlertDialog.Header>
+    <AlertDialog.Footer>
+      <AlertDialog.Cancel>Tetap privat</AlertDialog.Cancel><AlertDialog.Action
+        onclick={() => {
+          communityId = audiencePending
+          lastCommunity = audiencePending
+          audiencePending = ''
+        }}
+      >
+        Pindahkan ke publik
+      </AlertDialog.Action>
+    </AlertDialog.Footer>
+  </AlertDialog.Content>
+</AlertDialog.Root>

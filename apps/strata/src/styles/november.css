@@ -28,15 +28,8 @@
   background-size: 4px 4px;
 }
 :root[data-texture='grain'] .cx-main {
-  background-image:
-    url('/textures/grain.png'),
-    radial-gradient(
-      color-mix(in srgb, var(--foreground) 3%, transparent) 0.5px,
-      transparent 0.7px
-    );
-  background-size:
-    128px 128px,
-    3px 3px;
+  background-image: url('/textures/grain.png');
+  background-size: 128px 128px;
 }
 .app-load-line {
   position: fixed;

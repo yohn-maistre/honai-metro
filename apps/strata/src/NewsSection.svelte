@@ -28,6 +28,7 @@
           class:news-lead={!compact && i === 0}
           class:news-photo={!compact && !!item.image}
           href={'/news/' + item.id}
+          title={item.title}
         >
           {#if !compact && item.image}<img
               src={item.image}

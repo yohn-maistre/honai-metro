@@ -31,3 +31,6 @@ pnpm-lock.yaml
 
 # Impeccable native engine is checksum-downloaded per host, not source
 /.agents/skills/impeccable/scripts/bin/
+
+# Temporary Impeccable overlay server state
+/.impeccable/live/

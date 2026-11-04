@@ -159,7 +159,7 @@ try {
         if(name==='profile'){for(const label of ['Posting','Balasan','Media'])await page.getByRole('button',{name:label,exact:true}).click()}
         if(name==='home'){await page.evaluate(()=>localStorage.setItem('etnos-home-layout','columns'));await page.reload({waitUntil:'networkidle'});assert.equal(await page.locator('.feed-board').count(),0);await page.evaluate(()=>localStorage.removeItem('etnos-home-layout'))}
       }
-      if(name==='context'){await page.getByRole('navigation',{name:'Terhubung dengan Jayapura'}).waitFor();await page.getByRole('link',{name:'Wiki 0',exact:true}).click();assert.ok(page.url().endsWith('#context-wiki'))}
+      if(name==='context'){await page.getByRole('navigation',{name:'Terhubung dengan Jayapura'}).waitFor();assert.equal(await page.getByRole('link',{name:'Wiki 0',exact:true}).count(),0);await page.locator('.context-relations').getByRole('link',{name:'Percakapan',exact:true}).click();assert.ok(page.url().endsWith('#context-posts'))}
       if(name==='thread'){await page.getByRole('button',{name:'Lihat 1 balasan lain',exact:true}).click();await page.getByText('Second child branch',{exact:true}).waitFor()}
       if(name==='thread'&&width===390){
         assert.equal(decisionCalls,0,'browsing does not trigger inference')

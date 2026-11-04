@@ -55,6 +55,7 @@
   target="_blank"
   rel="noopener noreferrer nofollow"
   referrerpolicy="no-referrer"
+  title={preview?.title || title || url}
 >
   {#if preview?.image}<img
       src={preview.image}

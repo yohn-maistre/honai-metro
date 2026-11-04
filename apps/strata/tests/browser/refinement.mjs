@@ -415,9 +415,8 @@ try {
   await p.screenshot({ path: artifactDir + '/refine-wiki-agent-390.png' })
   guest = true
   await go('/')
-  await p
-    .getByRole('heading', { name: 'Ruang bersama.', exact: true })
-    .waitFor()
+  await p.locator('.cx-post').first().waitFor()
+  assert.equal(await p.locator('.home-context').count(), 0)
   for (const width of [390, 1440]) await snap('guest', width)
   await go('/login')
   await p

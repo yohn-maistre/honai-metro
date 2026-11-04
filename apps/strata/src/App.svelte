@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { MediaQuery } from 'svelte/reactivity'
   import { tabScroll } from './tab-scroll'
   import { onMount, tick, untrack } from 'svelte'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
@@ -29,7 +28,6 @@
   import ContentSkeleton from './ContentSkeleton.svelte'
   import FeedRefresh from './FeedRefresh.svelte'
   import NewsSection from './NewsSection.svelte'
-  import HomeContext from './HomeContext.svelte'
   import VaultTransfer from './messaging/VaultTransfer.svelte'
   import SearchDialog from './SearchDialog.svelte'
   import SearchPage from './SearchPage.svelte'
@@ -43,7 +41,11 @@
   import LoginForm from '$lib/components/login-form.svelte'
   import FeaturePages from './FeaturePages.svelte'
   import { videoEmbed, directVideo } from './markdown'
-  import { applyAppearance, restoreAppearance } from './appearance.svelte'
+  import {
+    applyAppearance,
+    restoreAppearance,
+    startAppearanceClock,
+  } from './appearance.svelte'
   import {
     readWikiDraft,
     saveWikiDraft,
@@ -81,7 +83,7 @@
     composeUrl = $state(''),
     composeKind = $state(''),
     profile = $state<Actor | null>(null)
-  let path = $state(location.pathname),
+  let path = $state(location.pathname === '/board' ? '/' : location.pathname),
     search = $state(location.search),
     loading = $state(true),
     busy = $state(false),
@@ -96,20 +98,6 @@
     saved = $state<Post[]>([]),
     nextCursor = $state<string | null>(null)
   let following = $state<Actor[]>([])
-  let homeLayout = $state('single')
-  const desktopLayout = new MediaQuery('(min-width: 768px)')
-  const activeHomeLayout = $derived(
-    desktopLayout.current ? homeLayout : 'single',
-  )
-  function setLayout(value: string) {
-    homeLayout = value
-    try {
-      localStorage.setItem('etnos-home-layout', value)
-    } catch {
-      /* A blocked preference store does not prevent navigation. */
-    }
-    if (path === '/board') navigate('/')
-  }
   let selectedPost = $state<Post | null>(null),
     replies = $state<Post[]>([]),
     repliesCursor = $state<string | null>(null),
@@ -126,8 +114,9 @@
   let modal = $state<
     null | 'compose' | 'community' | 'wiki' | 'proposal' | 'manage' | 'join'
   >(null)
+  let composerApi = $state<PostComposer | null>(null)
   let wikiRequestKey = $state('')
-  let composeState = $state({ dirty: false, busy: false }),
+  let composeState = $state({ dirty: false, busy: false, canSubmit: false }),
     discardDraft = $state(false)
   function closeModal() {
     if (modal === 'wiki' || modal === 'proposal') {
@@ -267,39 +256,37 @@
         ? 'Suara komunitas'
         : parts[0] === 'news'
           ? 'Kabar'
-          : path === '/board'
+          : path === '/'
             ? 'Beranda'
-            : path === '/'
-              ? 'Beranda'
-              : parts[0] === 'explore'
-                ? 'Jelajah'
-                : parts[0] === 'communities'
-                  ? (community?.title ?? 'Komunitas')
-                  : parts[0] === 'wiki'
-                    ? 'Wiki'
-                    : parts[0] === 'saved'
-                      ? 'Tersimpan'
-                      : parts[0] === 'preferences'
-                        ? 'Pengaturan'
-                        : parts[0] === 'login'
-                          ? 'Masuk'
-                          : parts[0] === 'find'
-                            ? 'Cari'
-                            : parts[0] === 'square'
-                              ? 'Percakapan'
-                              : parts[0] === 'people'
-                                ? 'Profil'
-                                : parts[0] === 'messages'
-                                  ? 'Pesan'
-                                  : parts[0] === 'notifications'
-                                    ? 'Aktivitas'
-                                    : parts[0] === 'groups'
-                                      ? 'Organisasi & kelompok'
-                                      : parts[0] === 'work'
-                                        ? 'Kerja publik'
-                                        : parts[0] === 'contexts'
-                                          ? 'Konteks'
-                                          : 'ETNOS',
+            : parts[0] === 'explore'
+              ? 'Jelajah'
+              : parts[0] === 'communities'
+                ? (community?.title ?? 'Komunitas')
+                : parts[0] === 'wiki'
+                  ? 'Wiki'
+                  : parts[0] === 'saved'
+                    ? 'Tersimpan'
+                    : parts[0] === 'preferences'
+                      ? 'Pengaturan'
+                      : parts[0] === 'login'
+                        ? 'Masuk'
+                        : parts[0] === 'find'
+                          ? 'Cari'
+                          : parts[0] === 'square'
+                            ? 'Percakapan'
+                            : parts[0] === 'people'
+                              ? 'Profil'
+                              : parts[0] === 'messages'
+                                ? 'Pesan'
+                                : parts[0] === 'notifications'
+                                  ? 'Aktivitas'
+                                  : parts[0] === 'groups'
+                                    ? 'Organisasi'
+                                    : parts[0] === 'work'
+                                      ? 'Kerja publik'
+                                      : parts[0] === 'contexts'
+                                        ? 'Tempat & bahasa'
+                                        : 'ETNOS',
   )
   function notify(value: string) {
     message = value
@@ -332,6 +319,7 @@
   }
   function navigate(href: string) {
     const u = new URL(href, location.origin)
+    if (u.pathname === '/board') u.pathname = '/'
     saveScroll()
     window.history.pushState(
       {
@@ -352,6 +340,12 @@
   async function restoreEntry() {
     const entry = location.href,
       top = window.history.state?.etnosScroll ?? 0
+    if (location.pathname === '/board')
+      window.history.replaceState(
+        window.history.state,
+        '',
+        '/' + location.search,
+      )
     path = location.pathname
     search = location.search
     tab = window.history.state?.etnosTab ?? 'discussion'
@@ -416,7 +410,7 @@
         filters.set('q', new SvelteURLSearchParams(search).get('q') ?? '')
       const [cs, feed, pages, roles, features, followed] = await Promise.all([
         request<Community[]>('/v1/communities'),
-        ['news', 'board'].includes(parts[0])
+        ['news'].includes(parts[0])
           ? Promise.resolve({
               items: [] as Post[],
               pinned: [] as Post[],
@@ -427,7 +421,7 @@
               pinned?: Post[]
               nextCursor: string | null
             }>('/v1/feed/page?' + filters),
-        ['news', 'board'].includes(parts[0])
+        ['news'].includes(parts[0])
           ? Promise.resolve([])
           : request<WikiPage[]>('/v1/wiki'),
         identity.actor
@@ -527,7 +521,7 @@
       navigate('/login')
       return
     }
-    composeState = { dirty: false, busy: false }
+    composeState = { dirty: false, busy: false, canSubmit: false }
     composeUrl = ''
     composeKind = ''
     modal = kind
@@ -739,17 +733,26 @@
   })
   onMount(() => {
     try {
-      const saved = localStorage.getItem('etnos-home-layout')
-      if (['single', 'split', 'columns'].includes(saved ?? ''))
-        homeLayout = saved!
+      localStorage.removeItem('etnos-home-layout')
+      localStorage.removeItem('etnos-feed-board')
     } catch {
-      /* Default to the single feed when local storage is unavailable. */
+      /* Optional old layout storage. */
     }
+    if (location.pathname === '/board')
+      window.history.replaceState(
+        window.history.state,
+        '',
+        '/' + location.search,
+      )
     restoreAppearance()
+    const stopClock = startAppearanceClock()
     window.history.scrollRestoration = 'manual'
     window.history.replaceState({ etnosDepth: 0, ...window.history.state }, '')
     void load()
-    return () => clearTimeout(notificationTimer)
+    return () => {
+      clearTimeout(notificationTimer)
+      stopClock()
+    }
   })
 </script>
 
@@ -776,8 +779,6 @@
   {heading}
   {auth}
   {unread}
-  layout={activeHomeLayout}
-  onLayoutChange={setLayout}
   onBack={goBack}
   onCompose={() => open('compose')}
   onRefresh={() => load()}
@@ -796,7 +797,7 @@
   }}
 >
   <RouteProgress />
-  {#if loading && !posts.length && !selectedPost && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore', 'news', 'board', 'login', 'wiki'].includes(parts[0])}<ContentSkeleton
+  {#if loading && !posts.length && !selectedPost && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore', 'news', 'login', 'wiki'].includes(parts[0])}<ContentSkeleton
     />{/if}
   {#if path === '/recover-messages'}<VaultTransfer recovery />
   {:else if error}<div class="strata-card">
@@ -834,14 +835,6 @@
         {search}
         {navigate}
       />{/await}
-  {:else if path === '/board' || (path === '/' && activeHomeLayout !== 'single')}{#key activeHomeLayout}{#await import('./FeedBoard.svelte')}<ContentSkeleton
-        />{:then { default: FeedBoard }}<FeedBoard
-          initialColumns={activeHomeLayout === 'columns' ? 3 : 2}
-          {auth}
-          {communities}
-          {memberships}
-          onError={notify}
-        />{/await}{/key}
   {:else if path === '/labs/spaces'}<SpacesLab />
   {:else if path === '/login'}
     <h1 class="sr-only">Masuk</h1>
@@ -954,7 +947,16 @@
       {auth}
       {communities}
       {memberships}
-      organizations
+      view="organizations"
+      onCreate={() => open('community')}
+      {navigate}
+    />
+  {:else if path === '/contexts' && !search.includes('create=true')}
+    <CommunityDirectory
+      {auth}
+      {communities}
+      {memberships}
+      view="places"
       onCreate={() => open('community')}
       {navigate}
     />
@@ -1135,6 +1137,9 @@
       {auth}
       {communities}
       {memberships}
+      view={new URLSearchParams(search).get('view') === 'joined'
+        ? 'joined'
+        : 'rooms'}
       onCreate={() => open('community')}
       {navigate}
     />
@@ -1180,16 +1185,7 @@
               : !p.parent_id),
       )}
       <section class="profile-header">
-        <div class="profile-cover" aria-hidden="true">
-          <span>
-            {actor.name
-              .split(/[ .]/)
-              .slice(0, 2)
-              .map((n) => n[0] ?? '')
-              .join('')
-              .toUpperCase()}
-          </span>
-        </div>
+        <div class="profile-cover" aria-hidden="true"></div>
         <div class="profile-content">
           <div class="profile-topline">
             <span class="cx-avatar sage profile-avatar">
@@ -1333,7 +1329,6 @@
         </p>
       </div>{/if}
   {:else if path === '/' || path === '/saved' || path === '/find'}
-    {#if path === '/'}<HomeContext welcome={!auth.actor} />{/if}
     <FeedRefresh
       enabled={path === '/' && modal === null && !searchDialogOpen}
       busy={loading}
@@ -1422,7 +1417,7 @@
       <Button href="/" class="cx-button" variant="outline">Beranda</Button>
     </div>{/if}
   {#snippet rail()}
-    {#if !['explore', 'news', 'communities', 'people', 'wiki', 'board'].includes(parts[0])}<NewsSection
+    {#if !['explore', 'news', 'communities', 'people', 'wiki'].includes(parts[0])}<NewsSection
         compact
       />
     {:else if parts[0] !== 'news'}<div
@@ -1544,21 +1539,21 @@
   >
     <Dialog.Header>
       {#if modal === 'compose'}<Button
-          class="compose-cancel"
-          variant="ghost"
-          disabled={composeState.busy}
-          onclick={closeModal}
-        >
-          Batal
-        </Button><Button
-          class="compose-close"
           variant="ghost"
           size="icon"
-          aria-label="Tutup"
+          class="compose-cancel"
+          aria-label="Tutup komposer"
           disabled={composeState.busy}
           onclick={closeModal}
         >
-          <X size={18} />
+          <X size={19} />
+        </Button>
+        <Button
+          class="compose-submit"
+          disabled={!composeState.canSubmit}
+          onclick={() => composerApi?.send()}
+        >
+          Posting
         </Button>{/if}
       <Dialog.Title>
         {modal === 'compose'
@@ -1693,6 +1688,7 @@
           </p>{/if}
       </details>
     {:else if modal === 'compose' && auth.actor}<PostComposer
+        bind:this={composerApi}
         onStateChange={(state) => (composeState = state)}
         actor={auth.actor}
         communities={communities.filter((c) => isMember(c.id))}
@@ -1700,7 +1696,7 @@
         initialUrl={composeUrl}
         initialKind={composeKind}
         onPosted={(post) => {
-          composeState = { dirty: false, busy: false }
+          composeState = { dirty: false, busy: false, canSubmit: false }
           modal = null
           navigate('/square/' + post.id)
         }}
@@ -1878,7 +1874,7 @@
       <AlertDialog.Cancel>Lanjut menulis</AlertDialog.Cancel><AlertDialog.Action
         onclick={() => {
           if (modal === 'wiki' || modal === 'proposal') forgetWikiDraft()
-          composeState = { dirty: false, busy: false }
+          composeState = { dirty: false, busy: false, canSubmit: false }
           modal = null
           discardDraft = false
         }}

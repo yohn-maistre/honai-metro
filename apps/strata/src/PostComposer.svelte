@@ -69,7 +69,11 @@
     replyingTo?: string
     onCancelReply?: () => void
     onPosted: (post: Post) => void | Promise<void>
-    onStateChange?: (state: { dirty: boolean; busy: boolean }) => void
+    onStateChange?: (state: {
+      dirty: boolean
+      busy: boolean
+      canSubmit: boolean
+    }) => void
     initialUrl?: string
     initialKind?: string
     compact?: boolean
@@ -98,7 +102,8 @@
     error = $state(''),
     altKey = $state(''),
     field = $state<HTMLTextAreaElement | null>(null),
-    picker = $state<HTMLInputElement | null>(null)
+    picker = $state<HTMLInputElement | null>(null),
+    form = $state<HTMLFormElement | null>(null)
   const detectedUrl = $derived(
     url.trim() ||
       text.match(/https?:\/\/[^\s<>]+/)?.[0]?.replace(/[.,;!?)]*$/, '') ||
@@ -108,7 +113,11 @@
     !!(text.trim() || title.trim() || url.trim() || images.length || kind),
   )
   $effect(() => {
-    onStateChange?.({ dirty: hasContent, busy: busy || processing })
+    onStateChange?.({
+      dirty: hasContent,
+      busy: busy || processing,
+      canSubmit: hasContent && !!destination && !busy && !processing,
+    })
   })
   const destination = $derived(communities.find((c) => c.id === communityId))
   let lastCommunity = untrack(() => initialCommunity),
@@ -159,6 +168,9 @@
   }
   export function focus() {
     field?.focus()
+  }
+  export function send() {
+    form?.requestSubmit()
   }
   async function submit() {
     if (busy || processing || !hasContent || !destination) return
@@ -232,6 +244,7 @@
 </script>
 
 <form
+  bind:this={form}
   class="post-composer"
   class:compact
   onsubmit={(e) => {

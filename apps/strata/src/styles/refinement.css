@@ -21,7 +21,6 @@ select {
 .news-reader > h1,
 .news-reader header h1,
 .engagement-page > header h1,
-.home-welcome h1,
 .font-specimen h2 {
   font-family: var(--font-editorial);
   font-weight: 400;
@@ -55,42 +54,6 @@ select {
   min-height: 44px !important;
   flex-shrink: 0;
   margin-block: -8px;
-}
-.home-context {
-  border-bottom: 1px solid var(--reading-line);
-  padding: 18px 24px;
-}
-.home-welcome {
-  padding-block: 8px 20px;
-}
-.home-welcome h1 {
-  margin: 0 0 8px;
-  font-size: 2.5rem;
-}
-.home-welcome p {
-  margin: 0;
-  color: var(--muted-foreground);
-  font-size: 16px;
-}
-.home-context nav {
-  display: flex;
-  gap: 8px 20px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.home-context a {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  min-height: 32px;
-  color: var(--muted-foreground);
-}
-.home-context a:first-child {
-  color: var(--foreground);
-}
-.home-context a:hover {
-  color: var(--brand);
 }
 .composer-identity {
   flex-wrap: wrap;
@@ -224,34 +187,6 @@ select {
 .texture-options {
   flex-wrap: wrap;
 }
-.profile-cover {
-  position: relative;
-  height: 104px;
-  overflow: hidden;
-  background-color: color-mix(
-    in srgb,
-    var(--brand) 18%,
-    var(--reading-surface)
-  );
-}
-.profile-cover > span {
-  position: absolute;
-  inset: auto 18px -26px auto;
-  font-family: var(--font-editorial);
-  font-size: 96px;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: color-mix(in srgb, var(--brand) 26%, var(--reading-surface));
-  pointer-events: none;
-}
-.profile-content {
-  padding-bottom: 24px;
-}
-.profile-header .profile-intro h1 {
-  font-size: 32px;
-  letter-spacing: -0.025em;
-}
 .login-card [data-slot='card-footer'] {
   display: flex;
   flex-direction: column;
@@ -266,12 +201,6 @@ select {
   max-width: var(--reading-width);
 }
 @media (max-width: 767px) {
-  .home-context {
-    padding: 14px 16px;
-  }
-  .home-context nav {
-    gap: 4px 16px;
-  }
   .cx-mobile-dock > [data-slot='button'],
   .cx-mobile-dock > [data-slot='button']:nth-child(3) {
     flex-direction: column;
@@ -288,12 +217,6 @@ select {
   }
   .cx-mobile-dock {
     gap: 4px;
-  }
-  .profile-cover {
-    height: 96px;
-  }
-  .profile-header .profile-intro h1 {
-    font-size: 29px;
   }
   .wiki-provenance {
     flex-direction: column;
@@ -328,5 +251,10 @@ select {
   width: 100%;
 }
 /* Reserve the sticky submit area when focusing the final source fields. */
-.platform-dialog:has(.creation-submit) { scroll-padding-bottom:88px; }
-.wiki-draft-details input,.wiki-draft-details textarea { scroll-margin-bottom:88px; }
+.platform-dialog:has(.creation-submit) {
+  scroll-padding-bottom: 88px;
+}
+.wiki-draft-details input,
+.wiki-draft-details textarea {
+  scroll-margin-bottom: 88px;
+}

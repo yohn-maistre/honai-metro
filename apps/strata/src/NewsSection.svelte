@@ -4,6 +4,7 @@
   import { news, loadNews, newsDate } from './news.svelte'
   import ContentSkeleton from './ContentSkeleton.svelte'
   let { compact = false }: { compact?: boolean } = $props()
+  let failedPhotos = $state<string[]>([])
   const items = $derived(news.feed?.items.slice(0, compact ? 4 : 3) ?? [])
   onMount(() => {
     void loadNews()
@@ -23,23 +24,23 @@
   </div>
   {#if news.pending}<ContentSkeleton rows={2} />
   {:else if items.length}<div class="news-grid">
-      {#each items as item, i}<a
+      {#each items as item, i}{@const photo =
+          !!item.image && !failedPhotos.includes(item.id)}
+        <a
           class="news-item"
           class:news-lead={!compact && i === 0}
-          class:news-photo={!compact && !!item.image}
+          class:news-photo={!compact && photo}
+          class:news-text-only={!compact && !photo}
           href={'/news/' + item.id}
           title={item.title}
         >
-          {#if !compact && item.image}<img
+          {#if !compact && photo}<img
               src={item.image}
               alt=""
               loading="lazy"
               decoding="async"
-              onerror={(e) => {
-                e.currentTarget.setAttribute('hidden', '')
-                e.currentTarget
-                  .closest('.news-item')
-                  ?.classList.remove('news-photo')
+              onerror={() => {
+                failedPhotos = [...failedPhotos, item.id]
               }}
             />{/if}
           <div class="news-tile-copy">
@@ -48,13 +49,20 @@
                 class="news-mark"
               />{/if}
             <strong>{item.title}</strong>
+            {#if !compact && !photo && item.summary}<p
+                class="news-fallback-summary"
+              >
+                {item.summary}
+              </p>{/if}
             <span>
               {newsDate(item.publishedAt)}{item.sourceCount
                 ? ` · ${item.sourceCount} sumber`
                 : ''}<ArrowUpRight size={13} />
             </span>
           </div>
-          {#if !compact && item.imageCredit}<small class="news-photo-credit">
+          {#if !compact && photo && item.imageCredit}<small
+              class="news-photo-credit"
+            >
               {item.imageCredit}
             </small>{/if}
         </a>{/each}

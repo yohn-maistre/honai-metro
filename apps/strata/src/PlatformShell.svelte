@@ -16,8 +16,6 @@
     onRefresh,
     feedMode,
     onFeedChange,
-    layout = 'single',
-    onLayoutChange,
   }: {
     children: Snippet
     rail: Snippet
@@ -31,8 +29,6 @@
     onRefresh: () => void
     feedMode: 'new' | 'mine' | 'following'
     onFeedChange: (mode: 'new' | 'mine' | 'following') => void
-    layout?: string
-    onLayoutChange: (value: string) => void
   } = $props()
 </script>
 
@@ -48,8 +44,6 @@
     {onRefresh}
     {feedMode}
     {onFeedChange}
-    {layout}
-    {onLayoutChange}
     {rail}
   >
     {@render children()}

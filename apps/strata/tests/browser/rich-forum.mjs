@@ -242,7 +242,9 @@ try {
     .getByRole('dialog', { name: 'Posting baru' })
     .getByLabel('Posting', { exact: true })
     .fill('Keep this draft while reviewing')
-  await page.getByRole('button', { name: 'Batal', exact: true }).click()
+  await page
+    .getByRole('button', { name: 'Tutup komposer', exact: true })
+    .click()
   await page.getByRole('alertdialog', { name: 'Buang draf?' }).waitFor()
   await page
     .getByRole('button', { name: 'Lanjut menulis', exact: true })
@@ -261,7 +263,7 @@ try {
     .click()
   await page
     .getByRole('dialog', { name: 'Posting baru' })
-    .getByRole('button', { name: 'Tutup', exact: true })
+    .getByRole('button', { name: 'Tutup komposer', exact: true })
     .click()
   await page.getByRole('alertdialog', { name: 'Buang draf?' }).waitFor()
   await page.getByRole('button', { name: 'Buang draf', exact: true }).click()

@@ -37,18 +37,27 @@
     <div role="group" aria-label="Tema" class="appearance-theme">
       <Button
         variant="ghost"
-        aria-pressed={appearance.theme === 'light'}
-        onclick={() => (appearance.theme = 'light')}
+        aria-pressed={appearance.themeMode === 'light'}
+        onclick={() => (appearance.themeMode = 'light')}
       >
         <Sun size={16} />Terang
       </Button><Button
         variant="ghost"
-        aria-pressed={appearance.theme === 'dark'}
-        onclick={() => (appearance.theme = 'dark')}
+        aria-pressed={appearance.themeMode === 'dark'}
+        onclick={() => (appearance.themeMode = 'dark')}
       >
         <Moon size={16} />Gelap
+      </Button><Button
+        variant="ghost"
+        aria-pressed={appearance.themeMode === 'clock'}
+        onclick={() => (appearance.themeMode = 'clock')}
+      >
+        Otomatis
       </Button>
     </div>
+    <p class="cx-hint">
+      Otomatis: terang pukul 06.00–18.00, mengikuti waktu perangkat.
+    </p>
     <div>
       <Label>Warna dasar</Label>
       <div class="base-options" role="group" aria-label="Warna dasar">

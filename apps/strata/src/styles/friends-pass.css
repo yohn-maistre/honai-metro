@@ -49,7 +49,7 @@
   /* A single dock owner; reserve scrollable space for its full safe-area height. */
   .platform-inset .cx-content-grid>.cx-main{padding-bottom:calc(96px + env(safe-area-inset-bottom));}
   html{scroll-padding-bottom:calc(90px + env(safe-area-inset-bottom));}
-  .cx-topbar>.desktop-menu-toggle,.cx-topbar.thread-topbar>.desktop-menu-toggle,.cx-topbar.home-topbar>.desktop-menu-toggle,.cx-topbar .home-layout-switch{display:none;}
+  .cx-topbar>.desktop-menu-toggle,.cx-topbar.thread-topbar>.desktop-menu-toggle,.cx-topbar.home-topbar>.desktop-menu-toggle{display:none;}
   .cx-topbar.home-topbar{display:flex;gap:16px;padding-inline:16px;}
   .cx-topbar.home-topbar .cx-mobile-brand{order:0;margin:0;}
   .cx-topbar.home-topbar .surface-heading{order:1;flex:1;min-width:0;margin:0;}

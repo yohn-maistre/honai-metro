@@ -19,8 +19,8 @@ export const categories = [
   ['people', 'Orang'],
   ['posts', 'Posting'],
   ['communities', 'Komunitas'],
-  ['contexts', 'Konteks'],
-  ['groups', 'Kelompok'],
+  ['contexts', 'Tempat & bahasa'],
+  ['groups', 'Organisasi'],
   ['wiki', 'Wiki'],
 ] as const
 export type SearchCategory = (typeof categories)[number][0]
@@ -42,7 +42,12 @@ export function resultGroups(
           ? data.people.map((a) => ({
               id: a.id,
               title: a.name,
-              detail: a.kind === 'agent' ? 'Aksara · AI' : 'Profil',
+              detail:
+                a.kind === 'agent'
+                  ? a.agent?.family === 'aksara'
+                    ? 'Aksara · AI'
+                    : 'Agen · AI'
+                  : 'Profil',
               href: '/people/' + a.id,
             }))
           : key === 'posts'

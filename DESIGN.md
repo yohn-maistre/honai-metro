@@ -2,7 +2,7 @@
 name: ETNOS
 description: A place-aware public square with quiet reading surfaces and editorial type.
 colors:
-  brand: '#b8b2c1'
+  brand: '#3e96fb'
   brand-foreground: '#000000'
   ground: '#0a0a0a'
   surface: '#171717'
@@ -99,7 +99,7 @@ components:
 
 The Place-Aware Public Square describes ETNOS as a reading-led conversation space: quiet ground and reading surfaces, clear human and agent identity, and editorial serif titles beside familiar sans-serif controls. Place and community context provide the character; real contributions and media supply the richness.
 
-This record describes the connected application in `apps/strata`, excluding legacy Photon. It captures the finished source rather than replacing its identity. Dark Graphite, the Abstraksi accent, Gabarito + Instrument Serif and soft Serat are the initial appearance. Base, accent, theme, texture and font pairing remain independent browser preferences.
+This record describes the connected application in `apps/strata`, excluding legacy Photon. It captures the finished source rather than replacing its identity. Graphite, the Langit sky-blue accent, Gabarito + Instrument Serif and soft Serat are the initial appearance. Fresh preferences use the device-local automatic theme (light 06:00–18:00, dark otherwise); existing explicit selections are preserved. Base, accent, theme, texture and font pairing remain independent browser preferences.
 
 **Key Characteristics:**
 
@@ -110,11 +110,11 @@ This record describes the connected application in `apps/strata`, excluding lega
 
 ## Colors
 
-The initial dark palette combines near-black Graphite surfaces, light ink and a muted Abstraksi accent. Frontmatter records this initial dark state; runtime appearance roles remain authoritative when a preference changes.
+The dark palette combines near-black Graphite surfaces, light ink and a contrast-adjusted sky-blue accent. Frontmatter records this dark reference state; runtime appearance roles remain authoritative when a preference changes.
 
 ### Primary
 
-- **Abstraksi accent** (`brand`): links, focus, selected indicators and the compose action. A seed is adjusted by `accentRoles` for readable accent text and button foregrounds; it is not pasted unchanged onto both themes.
+- **Langit accent** (`brand`, seed `#1680fa`): links, focus, selected indicators and the compose action. A seed is adjusted by `accentRoles` for readable accent text and button foregrounds; it is not pasted unchanged onto both themes.
 - **Ink action** (`ink` on `surface`): the shadcn primary button uses foreground/background inversion. Accent actions are a separate contextual treatment.
 
 ### Neutral
@@ -151,7 +151,7 @@ The default pairing follows the owner's live Abstraksi reference. Editorial titl
 ### Hierarchy
 
 - **Display:** wiki and news-reader titles use the frontmatter display role, reducing to (2.1rem) below the mobile breakpoint.
-- **Headline:** the welcome title uses the headline role. Other major editorial headings share the serif, regular weight, tightened tracking and balanced wrap, with their own source sizes.
+- **Headline:** editorial specimen and reading titles may use the headline role. Home begins with its timeline and composer, without an editorial welcome hero.
 - **Title:** the compact topbar title uses the sans title role. Profile names stay sans, at (32px) desktop and (29px) mobile.
 - **Body:** the page base is the body role. Conversational post copy has the separate conversation role; do not flatten the two into a falsely universal size.
 - **Label:** form labels use the label role. Metadata typically ranges from (12–14px); the mobile dock uses compact (10px) labels within full touch targets.
@@ -164,13 +164,13 @@ The ordinary conversation/document column is (640px) wide at most, centred withi
 
 At (768–1099px), navigation compresses to a (76px) rail. The contextual rail is hidden at intermediate desktop widths (1100–1359px). Below (768px), the reading surface fills the viewport, its upper corners flatten, and a labelled five-destination dock reserves bottom safe-area space. Main mobile content reserves `calc(96px + env(safe-area-inset-bottom))`; horizontal tab strips own their overflow. The drawer has one scrolling surface with grouped destinations and reachable account/footer actions.
 
-Desktop topbars are (72px) high; work-board mode uses its own full-width (64px) toolbar and resizable column layout. Preserve this intentional workspace exception rather than stretching every reading view into a dashboard.
+Desktop topbars are (72px) high. Home uses one reading feed at every width. Lajur and its layout controls are removed; old `/board` links resolve to Home.
 
 ## Elevation & Depth
 
 Ordinary feed rows and object cards are flat, separated by tonal surfaces and thin lines. The main desktop reading container has a soft upper silhouette. Dialogs use the existing ambient shadow (`0 24px 96px #0003`) to establish overlay depth; focus rings communicate interaction rather than permanent elevation.
 
-Serat remains the default grain material. The soft setting overlays the ground colour at (84%) above the tiled grain at (128px × 128px), quieting the field without removing its texture. Full-strength grain, plain and dither choices remain available. Profile covers retain their own texture and soft-light blend. Motion stays near interaction: row/background and action colour transitions use (140ms ease), with action transform feedback at (100ms ease). Reduced-motion overrides remove these transitions and loader animation.
+Serat remains the default grain material. The soft setting overlays the ground colour at (84%) above the tiled grain at (128px × 128px), quieting the field without removing its texture. Full-strength grain, plain and dither choices remain available. Profile covers retain their own texture and soft-light blend. Motion stays near interaction: row/background and action colour transitions use (140ms ease), with action transform feedback at (100ms ease). Reduced-motion overrides remove these transitions and loader animation. Automatic clock boundaries use a (30s) eased palette shift, with intermediate surfaces and ink checked for readable contrast. Reduced-motion preferences skip this prolonged shift. Manual light/dark changes remain immediate, and returning to a visible tab checks the clock again.
 
 **The Quiet Surface Rule.** Use tonal surfaces and thin dividers for ordinary content; reserve the dialog shadow for overlays.
 
@@ -198,11 +198,15 @@ Inputs use a thin role-based border, transparent ground and rounded control shap
 
 ### Navigation
 
-The selected sidebar destination uses raised ground, main ink and stronger weight within a (44px) high rounded target. Inactive destinations use muted ink. Groups distinguish discovery and private tools. The mobile dock keeps icon and visible label together in (48px) high controls; the drawer carries the fuller destination list as one scrollable surface. Tabs keep their own scrolling strip and a visible selected indicator.
+The selected sidebar destination uses raised ground, main ink and stronger weight within a (44px) high rounded target. Inactive destinations use muted ink. Shared destinations precede Posting and personal tools, without section eyebrows. Settings sits above sign-in/profile in the drawer footer. The mobile dock keeps icon and visible label together in (48px) high controls; the drawer carries the fuller destination list as one scrollable surface. Tabs keep their own scrolling strip and a visible selected indicator.
+
+### Directory
+
+One directory links Communities, Organisations, Places & languages and Followed rooms. Tabs scroll locally; search and permission-filtered organisation/kind selectors align in a single column on phones. Visible rooms can be grouped under their actual organisation. Place/language contexts remain discovery relationships, not admission or inherited authority. Empty relation sections stay hidden.
 
 ### Profile Header
 
-The cover remains expressive: accent-tinted material, an editorial initial/monogram at (96px), and a circular (88px) avatar overlapping the cover edge by its existing negative top margin. Cover height is (104px) desktop and (96px) mobile. Public biography, links and optional AT identity remain distinct from the cover and do not imply verified affiliation.
+The cover retains its earlier accent-tinted material (12% accent) and a circular (88px) avatar overlapping the edge. Cover height is (116px) desktop and (96px) mobile. Oversized banner initials are removed; initials remain only in the avatar fallback. Public biography, links and optional AT identity remain distinct from the cover and do not imply verified affiliation.
 
 ### Contribution and Review Context
 
@@ -214,7 +218,7 @@ A compact scope line precedes writing; audience notices use quiet raised ground 
 
 - **Do** preserve the selected font pair and appearance roles across connected screens.
 - **Do** keep the mobile dock labelled, the grouped drawer scrollable and primary touch actions at least 44px.
-- **Do** retain the profile cover, monogram and overlapping avatar as a coherent expressive header.
+- **Do** retain the profile cover and overlapping avatar as a coherent expressive header.
 - **Do** show destination and audience before writing, and separate contributor, agent, attribution and reviewer labels.
 - **Do** preserve real empty, loading, conflict and upstream-unavailable states.
 

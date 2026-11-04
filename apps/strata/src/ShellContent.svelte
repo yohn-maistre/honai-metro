@@ -25,7 +25,6 @@
     ArrowLeft,
     ChevronDown,
     RefreshCw,
-    Columns3,
   } from '@lucide/svelte'
   import { appearance } from './appearance.svelte'
   import { initials, type Auth } from './api'
@@ -42,8 +41,6 @@
     onRefresh,
     feedMode,
     onFeedChange,
-    layout = 'single',
-    onLayoutChange,
   }: {
     children: Snippet
     rail: Snippet
@@ -57,8 +54,6 @@
     onRefresh: () => void
     feedMode: 'new' | 'mine' | 'following'
     onFeedChange: (mode: 'new' | 'mine' | 'following') => void
-    layout?: string
-    onLayoutChange: (value: string) => void
   } = $props()
   const sidebar = Sidebar.useSidebar()
   const nav = [
@@ -66,15 +61,14 @@
     { href: '/explore', label: 'Jelajah', icon: Compass },
     { href: '/communities', label: 'Komunitas', icon: Users },
     { href: '/wiki', label: 'Wiki', icon: BookOpen },
+    { href: '/work', label: 'Kerja publik', icon: ListTodo },
     { href: '/messages', label: 'Pesan', icon: MessageSquare },
     { href: '/notifications', label: 'Aktivitas', icon: Bell },
     { href: '/saved', label: 'Tersimpan', icon: Bookmark },
-    { href: '/work', label: 'Kerja publik', icon: ListTodo },
-    { href: '/preferences', label: 'Pengaturan', icon: Settings2 },
   ]
   function active(href: string) {
     return href === '/'
-      ? path === '/' || path === '/board'
+      ? path === '/'
       : href === '/communities'
         ? path.startsWith('/communities') || path.startsWith('/groups')
         : path.startsWith(href)
@@ -119,7 +113,7 @@
         <ChevronsUpDown size={14} />
       </Dropdown.Trigger>
       <Dropdown.Content align="start" class="w-56">
-        <Dropdown.Label>Jelajahi konteks</Dropdown.Label><Dropdown.Item
+        <Dropdown.Label>Tempat & bahasa</Dropdown.Label><Dropdown.Item
           onSelect={() => {
             sidebar.setOpenMobile(false)
             document.querySelector<HTMLAnchorElement>('.cx-brand')?.click()
@@ -129,7 +123,7 @@
         </Dropdown.Item><Dropdown.Item>
           {#snippet child({ props })}<a
               {...props}
-              href="/explore"
+              href="/contexts"
               onclick={() => sidebar.setOpenMobile(false)}
             >
               Wilayah, tempat & topik
@@ -139,11 +133,10 @@
     </Dropdown.Root>
   </Sidebar.Header>
   <Sidebar.Content>
-    {#each [{ label: 'Jelajahi', items: nav.slice(0, 4) }, { label: 'Pribadi', items: nav.slice(4) }] as group}
+    {#each [nav.slice(0, 5), nav.slice(5)] as items, section}
       <Sidebar.Group>
-        <Sidebar.GroupLabel>{group.label}</Sidebar.GroupLabel>
         <Sidebar.Menu>
-          {#each group.items as item}<Sidebar.MenuItem>
+          {#each items as item}<Sidebar.MenuItem>
               <Sidebar.MenuButton
                 isActive={active(item.href)}
                 onclick={() => sidebar.setOpenMobile(false)}
@@ -167,20 +160,29 @@
               </Sidebar.MenuButton>
             </Sidebar.MenuItem>{/each}
         </Sidebar.Menu>
-      </Sidebar.Group>{/each}
-    <div class="px-4 pt-2">
-      <Button
-        class="w-full sidebar-compose"
-        aria-label="Posting"
-        title="Posting"
-        onclick={compose}
-      >
-        <Plus size={18} />
-        <span>Posting</span>
-      </Button>
-    </div>
+      </Sidebar.Group>{#if section === 0}
+        <div class="px-4 pt-2">
+          <Button
+            class="w-full sidebar-compose"
+            aria-label="Posting"
+            title="Posting"
+            onclick={compose}
+          >
+            <Plus size={18} />
+            <span>Posting</span>
+          </Button>
+        </div>
+      {/if}{/each}
   </Sidebar.Content>
   <Sidebar.Footer class="p-4 gap-3">
+    <Button
+      href="/preferences"
+      variant="ghost"
+      class="sidebar-settings"
+      onclick={() => sidebar.setOpenMobile(false)}
+    >
+      <Settings2 size={18} />Pengaturan
+    </Button>
     {#if auth.actor}<a
         href={'/people/' + auth.actor.id}
         class="account-link"
@@ -212,15 +214,13 @@
     <span class="preview-label">ETNOS · Alpha</span>
   </Sidebar.Footer>
 </Sidebar.Root>
-<Sidebar.Inset
-  class={'platform-inset' +
-    (path === '/board' || (path === '/' && layout !== 'single')
-      ? ' workspace-view'
-      : '')}
->
+<Sidebar.Inset class="platform-inset">
   <header
     class="cx-topbar"
     class:home-topbar={path === '/'}
+    class:directory-topbar={['/communities', '/groups', '/contexts'].includes(
+      path,
+    )}
     class:sidebar-collapsed={sidebar.state === 'collapsed'}
     class:thread-topbar={/^\/(square|people|news|communities|wiki|contexts|groups|work)\/[^/]+/.test(
       path,
@@ -246,7 +246,7 @@
       <PanelLeft size={19} />
     </Button>
     <div class="surface-heading" class:explore-title={path === '/explore'}>
-      {#if path === '/' && layout === 'single'}<Dropdown.Root>
+      {#if path === '/'}<Dropdown.Root>
           <Dropdown.Trigger class="surface-switch" aria-label="Pilih linimasa">
             {feedMode === 'mine'
               ? 'Komunitasku'
@@ -266,9 +266,8 @@
               Mengikuti
             </Dropdown.Item>
           </Dropdown.Content>
-        </Dropdown.Root>{:else if path === '/'}<span>
-          Beranda
-        </span>{:else if path === '/explore'}<h1>
+        </Dropdown.Root>{:else if path === '/explore' || ['/communities', '/groups', '/contexts'].includes(path)}<h1
+        >
           {heading}
         </h1>{:else}<span>{heading}</span>{/if}
     </div>
@@ -308,31 +307,16 @@
     >
       <Bell size={18} />{#if unread}<span class="bell-dot"></span>{/if}
     </Button>
-    {#if path === '/' || path === '/board'}<Dropdown.Root>
-        <Dropdown.Trigger
-          class="home-layout-switch"
-          aria-label="Tata letak beranda"
-          title="Tata letak beranda"
-        >
-          <Columns3 size={19} />
-        </Dropdown.Trigger><Dropdown.Content align="end">
-          <Dropdown.Label>
-            Tata letak
-          </Dropdown.Label>{#each [['single', 'Satu linimasa'], ['split', 'Dua lajur'], ['columns', 'Tiga lajur']] as [value, label]}<Dropdown.Item
-              onSelect={() => onLayoutChange(value)}
-            >
-              {label}{#if layout === value}
-                ·{/if}
-            </Dropdown.Item>{/each}
-        </Dropdown.Content>
-      </Dropdown.Root>{/if}
     <Button
       variant="ghost"
       size="icon"
       class="theme-toggle"
+      title={appearance.themeMode === 'clock'
+        ? 'Tema otomatis · ubah tema'
+        : 'Ubah tema'}
       aria-label={appearance.theme === 'dark' ? 'Tema terang' : 'Tema gelap'}
       onclick={() =>
-        (appearance.theme = appearance.theme === 'dark' ? 'light' : 'dark')}
+        (appearance.themeMode = appearance.theme === 'dark' ? 'light' : 'dark')}
     >
       {#if appearance.theme === 'dark'}<Sun size={18} />{:else}<Moon
           size={18}
@@ -341,8 +325,6 @@
   </header>
   <div
     class="cx-content-grid"
-    class:board-grid={path === '/board' ||
-      (path === '/' && layout !== 'single')}
     data-surface={path.startsWith('/square/')
       ? 'thread'
       : path === '/'
@@ -355,15 +337,13 @@
     <aside
       class="cx-context"
       aria-label="Konteks terkait"
-      hidden={path === '/board' ||
-        (path === '/' && layout !== 'single') ||
-        [
-          'preferences',
-          'messages',
-          'agents',
-          'login',
-          'recover-messages',
-        ].includes(path.split('/')[1])}
+      hidden={[
+        'preferences',
+        'messages',
+        'agents',
+        'login',
+        'recover-messages',
+      ].includes(path.split('/')[1])}
     >
       {@render rail()}
     </aside>

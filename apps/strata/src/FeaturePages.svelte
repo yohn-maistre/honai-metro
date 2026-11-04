@@ -213,6 +213,17 @@
         actorId
       )
         open('group')
+      if (
+        page === 'contexts' &&
+        !id &&
+        location.search.includes('create=true') &&
+        actorId &&
+        auth.steward
+      ) {
+        open('context')
+        kind = 'region'
+        slug = ''
+      }
       if (page === 'contexts' && id) {
         const c = await request<ContextDetail>('/v1/contexts/' + id)
         const feed = await request<{ items: Post[] }>(
@@ -666,7 +677,7 @@
     </Card.Root>{/if}
 {:else if segments[0] === 'contexts' && context}
   <div class="cx-detail-head context-detail-heading">
-    <a class="context-back-link" href="/contexts">Tempat & konteks</a>
+    <a class="context-back-link" href="/contexts">Tempat & bahasa</a>
     <Badge variant="secondary">{kinds[context.kind]}</Badge>
     <h1>{context.title}</h1>
     <p>{context.description}</p>
@@ -676,48 +687,22 @@
     aria-label={'Terhubung dengan ' + context.title}
   >
     <a href="#context-posts"><MessageCircle size={16} />Percakapan</a>
-    <a href="#context-wiki">
-      <BookOpen size={16} />Wiki
-      <span>{context.pages.length}</span>
-    </a>
-    <a href="#context-groups">
-      <Building2 size={16} />Organisasi
-      <span>{context.groups.length}</span>
-    </a>
-    <a href="#context-work">
-      <ListTodo size={16} />Kerja publik
-      <span>{works.length}</span>
-    </a>
+    {#if context.pages.length}
+      <a href="#context-wiki">
+        <BookOpen size={16} />Wiki
+        <span>{context.pages.length}</span>
+      </a>{/if}
+    {#if context.groups.length}
+      <a href="#context-groups">
+        <Building2 size={16} />Organisasi
+        <span>{context.groups.length}</span>
+      </a>{/if}
+    {#if works.length}
+      <a href="#context-work">
+        <ListTodo size={16} />Kerja publik
+        <span>{works.length}</span>
+      </a>{/if}
   </nav>
-  <section id="context-groups" class="context-relation-section">
-    {#if context.groups.length}<div class="strata-card">
-        <h2>Organisasi & kelompok</h2>
-        {#each context.groups as g}<a
-            href={'/groups/' + g.id}
-            class="cx-list-row"
-          >
-            <Building2 size={18} />{g.title}<ArrowUpRight size={15} />
-          </a>{/each}
-      </div>{:else}<p class="context-empty">
-        Belum ada organisasi tertaut.
-      </p>{/if}
-  </section>
-  <section id="context-wiki" class="context-relation-section">
-    {#if context.pages.length}<div class="strata-card">
-        <h2>Wiki</h2>
-        {#each context.pages as p}<a href={'/wiki/' + p.id} class="cx-list-row">
-            <BookOpen size={18} />{p.title}
-          </a>{/each}
-      </div>{:else}<p class="context-empty">
-        Belum ada halaman wiki tertaut.
-      </p>{/if}
-  </section>
-  <section id="context-work" class="context-relation-section">
-    {#if works.length}<div class="strata-card"><h2>Kerja publik</h2></div>
-      {@render workList(works)}{:else}<p class="context-empty">
-        Belum ada kerja publik tertaut.
-      </p>{/if}
-  </section>
   <div id="context-posts" class="strata-card"><h2>Percakapan</h2></div>
   {#each posts as post}<PostCard
       {post}
@@ -729,6 +714,41 @@
   {#if !posts.length}<div class="strata-nodata">
       <h2>Belum ada percakapan di konteks ini</h2>
     </div>{/if}
+  {#if context.groups.length}
+    <section id="context-groups" class="context-relation-section">
+      {#if context.groups.length}<div class="strata-card">
+          <h2>Organisasi</h2>
+          {#each context.groups as g}<a
+              href={'/groups/' + g.id}
+              class="cx-list-row"
+            >
+              <Building2 size={18} />{g.title}<ArrowUpRight size={15} />
+            </a>{/each}
+        </div>{:else}<p class="context-empty">
+          Belum ada organisasi tertaut.
+        </p>{/if}
+    </section>{/if}
+  {#if context.pages.length}
+    <section id="context-wiki" class="context-relation-section">
+      {#if context.pages.length}<div class="strata-card">
+          <h2>Wiki</h2>
+          {#each context.pages as p}<a
+              href={'/wiki/' + p.id}
+              class="cx-list-row"
+            >
+              <BookOpen size={18} />{p.title}
+            </a>{/each}
+        </div>{:else}<p class="context-empty">
+          Belum ada halaman wiki tertaut.
+        </p>{/if}
+    </section>{/if}
+  {#if works.length}
+    <section id="context-work" class="context-relation-section">
+      {#if works.length}<div class="strata-card"><h2>Kerja publik</h2></div>
+        {@render workList(works)}{:else}<p class="context-empty">
+          Belum ada kerja publik tertaut.
+        </p>{/if}
+    </section>{/if}
 {:else if segments[0] === 'work'}
   <div class="cx-page-head">
     <h1>Kerja publik</h1>
@@ -747,7 +767,7 @@
     </div>{/if}
 {:else if segments[0] === 'groups'}
   <div class="cx-page-head">
-    <h1>Organisasi & kelompok</h1>
+    <h1>Organisasi</h1>
     {#if auth.actor}<Button variant="outline" onclick={() => open('group')}>
         <Plus size={15} />Buat
       </Button>{/if}
@@ -794,7 +814,7 @@
     <Button href="/communities" variant="outline">
       <Users size={17} />Komunitas
     </Button><Button href="/groups" variant="outline">
-      <Building2 size={17} />Organisasi & kelompok
+      <Building2 size={17} />Organisasi
     </Button><Button href="/work" variant="outline">
       <ListTodo size={17} />Kerja publik
     </Button>
@@ -822,14 +842,18 @@
 <Dialog.Root
   open={modal !== null}
   onOpenChange={(v) => {
-    if (!v) modal = null
+    if (!v) {
+      modal = null
+      if (!segments[1] && location.search.includes('create=true'))
+        navigate('/' + segments[0])
+    }
   }}
 >
   <Dialog.Content class="platform-dialog">
     <Dialog.Header>
       <Dialog.Title>
         {modal === 'group'
-          ? 'Kelompok baru'
+          ? 'Organisasi baru'
           : modal === 'space'
             ? 'Ruang kelompok'
             : modal === 'context'

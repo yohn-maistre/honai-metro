@@ -137,49 +137,35 @@ try {
     await page.evaluate(() => document.documentElement.dataset.texture),
     'grain',
   )
+  assert.equal(new URL(page.url()).pathname, '/')
   assert.equal(
-    await page.locator('.board-lane.active .feed-column > header').count(),
+    await page.locator('.feed-column, .home-layout-switch').count(),
     0,
   )
-  await page.getByRole('button', { name: 'Atur lajur', exact: true }).click()
-  await page
-    .getByRole('menuitem', { name: 'Fixture room', exact: true })
-    .click()
-  await page
-    .locator('.board-feed-tabs button[aria-pressed=true]')
-    .filter({ hasText: 'Fixture room' })
-    .waitFor()
   const play = page.getByRole('button', { name: 'Putar video', exact: true })
   await play.scrollIntoViewIfNeeded()
-  await page.locator('.board-lane.active .video-cover img').waitFor()
+  await page.locator('.video-cover img').waitFor()
   assert.equal(players.length, 0)
   assert.equal(await page.locator('iframe,video').count(), 0)
-  const media = await page
-    .locator('.board-lane.active .video-card')
-    .evaluate((el) => {
-      const card = el.getBoundingClientRect(),
-        frame = el.querySelector('.video-preview').getBoundingClientRect(),
-        caption = el
-          .querySelector('.video-card-caption')
-          .getBoundingClientRect()
-      return {
-        card: card.height,
-        frame: frame.height,
-        ratio: frame.width / frame.height,
-        captionBottom: caption.bottom,
-        frameBottom: frame.bottom,
-      }
-    })
+  const media = await page.locator('.video-card').evaluate((el) => {
+    const card = el.getBoundingClientRect(),
+      frame = el.querySelector('.video-preview').getBoundingClientRect(),
+      caption = el.querySelector('.video-card-caption').getBoundingClientRect()
+    return {
+      card: card.height,
+      frame: frame.height,
+      ratio: frame.width / frame.height,
+      captionBottom: caption.bottom,
+      frameBottom: frame.bottom,
+    }
+  })
   assert.ok(Math.abs(media.card - media.frame) < 2, JSON.stringify(media))
   assert.ok(Math.abs(media.ratio - 16 / 9) < 0.03, JSON.stringify(media))
   assert.ok(media.captionBottom <= media.frameBottom + 1)
   await page.screenshot({ path: artifactDir + '/mobile-clean-video-390.png' })
   await play.click()
   await page.locator('iframe').waitFor()
-  assert.equal(
-    await page.locator('.board-lane.active .video-card-caption').count(),
-    0,
-  )
+  assert.equal(await page.locator('.video-card-caption').count(), 0)
   await page.getByText(/^Fixture conversation 0\./).scrollIntoViewIfNeeded()
   assert.ok(
     await page.evaluate(() => scrollY > 100),
@@ -258,7 +244,7 @@ try {
       ),
     )
     await page.screenshot({
-      path: artifactDir + '/mobile-board-' + width + '.png',
+      path: artifactDir + '/mobile-home-' + width + '.png',
       fullPage: width < 768,
     })
   }

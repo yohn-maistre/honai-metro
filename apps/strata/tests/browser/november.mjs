@@ -202,15 +202,13 @@ try {
     fullPage: true,
   })
   await page.goto(origin + '/board', { waitUntil: 'networkidle' })
-  await page.locator('.feed-column').first().waitFor()
-  assert.equal(await page.locator('.feed-column').count(), 2)
-  await page.getByRole('button', { name: 'Lajur', exact: true }).click()
-  assert.equal(await page.locator('.feed-column').count(), 3)
+  assert.equal(new URL(page.url()).pathname, '/')
   assert.equal(
-    await page.getByRole('button', { name: 'Lajur', exact: true }).isDisabled(),
-    true,
+    await page.locator('.feed-column, .home-layout-switch').count(),
+    0,
   )
-  await page.screenshot({ path: artifactDir + '/november-board-1440.png' })
+  await page.locator('.cx-post').first().waitFor()
+  await page.screenshot({ path: artifactDir + '/november-home-1440.png' })
   const peer = s.provision('did:web:november-peer.example', 'Synthetic peer')
   s.setMember(owner.actor.id, community.id, peer.actor.id, true)
   for (let i = 0; i < 14; i++)
@@ -318,7 +316,7 @@ try {
       scrollRestored: true,
       nativeNews: true,
       relatedDiscussion: true,
-      threeColumns: true,
+      retiredLanesRedirect: true,
       composerVideoPreview: true,
       pollChoiceRemoval: true,
       widths: [320, 390, 768, 1440],

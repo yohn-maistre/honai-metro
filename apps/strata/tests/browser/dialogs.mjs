@@ -141,7 +141,9 @@ try {
   await page.waitForTimeout(180)
   await page.screenshot({ path: artifactDir + '/dialog-custom-select-390.png' })
   await page.keyboard.press('Escape')
-  await compose.getByRole('button', { name: 'Batal', exact: true }).click()
+  await compose
+    .getByRole('button', { name: 'Tutup komposer', exact: true })
+    .click()
   assert.equal(await page.locator('select:visible').count(), 0)
   assert.deepEqual(errors, [])
   console.log(

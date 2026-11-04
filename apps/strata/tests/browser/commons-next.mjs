@@ -189,7 +189,9 @@ try {
   await page.getByText('Deep focused reply', { exact: true }).waitFor()
   assert.equal(new URL(page.url()).pathname, '/square/' + two.id)
   await page.goto(origin + '/news', { waitUntil: 'networkidle' })
-  await page.getByRole('button',{name:'Tanah & lingkungan',exact:true}).click()
+  await page
+    .getByRole('button', { name: 'Tanah & lingkungan', exact: true })
+    .click()
   await page.waitForURL('**/news?desk=land')
   await page.getByRole('button', { name: 'Berikutnya', exact: true }).click()
   await page.waitForURL('**page=2')
@@ -207,26 +209,12 @@ try {
     fullPage: true,
   })
   await page.goto(origin, { waitUntil: 'networkidle' })
-  await page
-    .getByRole('button', { name: 'Tata letak beranda', exact: true })
-    .click()
-  await page.getByRole('menuitem', { name: 'Tiga lajur', exact: false }).click()
-  await page.waitForFunction(
-    () => document.querySelectorAll('.feed-column').length === 3,
+  assert.equal(
+    await page.locator('.feed-column, .home-layout-switch').count(),
+    0,
   )
-  assert.equal(new URL(page.url()).pathname, '/')
-  const geometry = await page.evaluate(() => ({
-    height: document.documentElement.scrollHeight,
-    viewport: innerHeight,
-    header: document.querySelector('.cx-topbar').getBoundingClientRect().bottom,
-    toolbar: document.querySelector('.board-toolbar').getBoundingClientRect()
-      .top,
-  }))
-  assert.ok(geometry.height <= geometry.viewport + 2, JSON.stringify(geometry))
-  assert.ok(geometry.toolbar >= geometry.header)
-  await page.screenshot({
-    path: artifactDir + '/commons-home-columns-1440.png',
-  })
+  await page.locator('.cx-post').first().waitFor()
+  await page.screenshot({ path: artifactDir + '/commons-home-1440.png' })
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto(origin + '/explore', { waitUntil: 'networkidle' })
   await page.getByRole('button', { name: 'Buka menu', exact: true }).click()
@@ -303,7 +291,7 @@ try {
       inlineImageViewer: true,
       focusedBranch: true,
       newsPaging: true,
-      homeColumns: true,
+      retiredLanesRemoved: true,
       mobileClose: true,
       dragDismissal: true,
       realPublicWrites: 0,

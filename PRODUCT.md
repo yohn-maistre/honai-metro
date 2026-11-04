@@ -73,3 +73,7 @@ Synthetic fixtures in local review screenshots are test evidence only. They are 
 ## Accessibility & Inclusion
 
 Use readable content, visible task labels and meaningful contributor/reviewer names. Keep mobile navigation labelled, preserve usable touch targets and provide a single scrolling grouped drawer. Support reduced motion, readable theme/accent combinations, responsive reading layouts and recoverable writing. These implementation commitments do not constitute a claim of a complete accessibility or physical-device audit.
+
+## Current navigation decisions, 4 November 2026
+
+Home is feed-first; Lajur, the welcome hero and the extra context row are removed. The single directory connects communities, organisations and place/language discovery without merging their authority models. Shared navigation precedes Posting and personal tools; Settings stays above sign-in/profile. Profiles retain the earlier cover without oversized initials. Fresh appearance defaults are Langit sky blue and device-local automatic light/dark (06:00–18:00 light), with a gradual 30-second shift and reduced-motion support. Explicit saved preferences remain intact. Pixel-art noticeboards and solar/location-aware easter eggs are deferred.

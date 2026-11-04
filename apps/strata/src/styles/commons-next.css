@@ -107,88 +107,7 @@ html {
 :focus-within::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--foreground) 32%, transparent);
 }
-.home-layout-switch {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 36px;
-  min-height: 36px;
-  border-radius: 50%;
-  color: var(--muted-foreground);
-}
-.home-layout-switch:hover {
-  color: var(--brand);
-  background: var(--secondary);
-}
-.platform-inset.workspace-view {
-  height: 100dvh;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  padding-right: 0;
-}
-.workspace-view .cx-topbar {
-  width: 100%;
-  max-width: none;
-  margin: 0;
-  flex-shrink: 0;
-  height: 64px;
-  padding-inline: 24px;
-}
-.workspace-view .cx-content-grid.board-grid {
-  width: 100%;
-  max-width: none;
-  flex: 1;
-  min-height: 0;
-  padding: 0 24px 20px;
-  display: flex;
-}
-.workspace-view .cx-main {
-  flex: 1;
-  min-width: 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-.workspace-view .board-toolbar {
-  flex-shrink: 0;
-  padding: 8px 0 16px;
-  min-height: 56px;
-}
 /* available width = workspace - 2*24 gutter; columns share (width-(n-1)*16)/n */
-.workspace-view .feed-board {
-  flex: 1;
-  min-height: 0;
-  align-items: stretch;
-  padding-bottom: 8px;
-  grid-template-columns: repeat(var(--columns), minmax(300px, 1fr));
-}
-.workspace-view .board-lane {
-  min-height: 0;
-  display: flex;
-  min-width: 0;
-}
-.workspace-view .feed-column {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.workspace-view .feed-column > header {
-  flex-shrink: 0;
-}
-.workspace-view .feed-column-scroll {
-  height: auto;
-  min-height: 0;
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-.workspace-view .cx-context[hidden] {
-  display: none;
-}
 .cx-topbar .surface-heading {
   min-width: 0;
 }
@@ -1317,51 +1236,6 @@ html {
   font-size: 11px;
   color: var(--brand);
 }
-@media (max-width: 999px) {
-  .workspace-view .board-toolbar {
-    display: none;
-  }
-  .board-mobile-tabs {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding-bottom: 8px;
-    overflow: visible;
-  }
-  .board-feed-tabs {
-    display: flex;
-    min-width: 0;
-    flex: 1;
-    overflow-x: auto;
-    gap: 4px;
-  }
-  .board-feed-tabs button {
-    min-width: 0;
-    flex: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .board-settings {
-    flex-shrink: 0;
-    width: 44px;
-    height: 44px;
-    display: grid;
-    place-items: center;
-    border-radius: 50%;
-  }
-  .workspace-view .feed-board {
-    display: flex;
-  }
-  .workspace-view .board-lane {
-    flex: 1;
-  }
-  .workspace-view .board-lane:not(.active) {
-    display: none;
-  }
-  .workspace-view .board-mobile-tabs {
-    flex-shrink: 0;
-  }
-}
 @media (max-width: 767px) {
   .discovery-nav {
     padding-top: 16px;
@@ -1387,57 +1261,8 @@ html {
     width: 36px;
     margin: 0;
   }
-  .home-topbar .home-layout-switch {
-    min-width: 32px;
-  }
   .home-topbar .theme-toggle {
     display: none;
-  }
-  .platform-inset.workspace-view {
-    display: block;
-    height: auto;
-    min-height: calc(100dvh - 65px - env(safe-area-inset-bottom));
-    overflow: visible;
-  }
-  .workspace-view .cx-topbar.home-topbar .surface-heading {
-    display: none;
-  }
-  .workspace-view .cx-topbar.home-topbar .cx-mobile-brand {
-    display: inline-flex;
-    margin-right: auto;
-  }
-  .workspace-view .cx-topbar {
-    height: 56px;
-    padding-inline: 12px;
-  }
-  .workspace-view .cx-content-grid.board-grid {
-    display: block;
-    padding: 0;
-  }
-  .workspace-view .cx-main,
-  .workspace-view .board-lane,
-  .workspace-view .feed-column {
-    display: block;
-    height: auto;
-    overflow: visible;
-  }
-  .workspace-view .board-lane:not(.active) {
-    display: none;
-  }
-  .workspace-view .board-mobile-tabs {
-    position: sticky;
-    top: 56px;
-    z-index: 15;
-    background: var(--reading-surface);
-    padding: 8px 12px;
-  }
-  .workspace-view .feed-column {
-    border: 0;
-    border-radius: 0;
-  }
-  .workspace-view .feed-column-scroll {
-    height: auto;
-    overflow: visible;
   }
   .community-directory {
     padding: 20px 16px;

@@ -658,115 +658,6 @@
   font-size: 14px;
   color: var(--muted-foreground);
 }
-/* Lajur is opt-in. Each feed scrolls independently; mobile loads the active one. */
-.board-grid.cx-content-grid {
-  display: block;
-  width: 100%;
-  max-width: none;
-  padding-inline: 20px;
-}
-.board-grid .cx-main {
-  width: 100%;
-  max-width: none;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-}
-.board-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 8px 0 20px;
-}
-.board-toolbar > div {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--muted-foreground);
-}
-.board-toolbar svg {
-  color: var(--brand);
-}
-.feed-board {
-  display: grid;
-  grid-template-columns: repeat(var(--columns), minmax(300px, 1fr));
-  gap: 16px;
-  overflow-x: auto;
-  align-items: start;
-}
-.feed-column {
-  border: 1px solid var(--reading-line);
-  border-radius: 20px;
-  overflow: hidden;
-  background: var(--reading-surface);
-}
-.feed-column > header {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--reading-line);
-}
-.feed-column header > .app-choice {
-  flex: 1;
-  min-width: 0;
-  max-width: none;
-  justify-content: flex-start;
-}
-.feed-column header > button:not(.app-choice) {
-  flex-shrink: 0;
-}
-.feed-column header .app-choice > span {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.feed-column-scroll {
-  height: calc(100dvh - 208px);
-  min-height: 300px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  scrollbar-width: thin;
-}
-.feed-column .cx-post {
-  padding-inline: 16px;
-}
-.board-mobile-tabs {
-  display: none;
-}
-@media (max-width: 999px) {
-  .feed-board {
-    display: block;
-  }
-  .board-lane:not(.active) {
-    display: none;
-  }
-  .board-mobile-tabs {
-    display: flex;
-    overflow-x: auto;
-    gap: 4px;
-    padding: 0 0 12px;
-  }
-  .board-mobile-tabs button {
-    font-size: 13px;
-    font-weight: 600;
-    white-space: nowrap;
-    min-height: 40px;
-    padding: 8px 12px;
-    border-radius: 10px;
-  }
-  .board-mobile-tabs [aria-pressed='true'] {
-    background: var(--brand-soft);
-    color: var(--brand);
-  }
-  .feed-column-scroll {
-    height: auto;
-    max-height: none;
-    overflow: visible;
-  }
-}
 @media (max-width: 767px) {
   .cx-topbar.home-topbar {
     display: grid;
@@ -882,21 +773,6 @@
   }
   .news-reader figure > img {
     border-radius: 12px;
-  }
-  .board-grid.cx-content-grid {
-    padding-inline: 0;
-  }
-  .board-toolbar,
-  .board-mobile-tabs {
-    padding-inline: 12px;
-  }
-  .board-toolbar {
-    padding-top: 12px;
-    padding-bottom: 8px;
-  }
-  .feed-column {
-    border-radius: 0;
-    border-inline: 0;
   }
   .skeleton-post {
     padding: 20px 16px;

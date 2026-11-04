@@ -301,3 +301,27 @@
     padding: 0;
   }
 }
+/* Discovery kinds stay separate from community membership and organisation roles. */
+.directory-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.directory-input-row .directory-search {
+  flex: 1;
+}
+.directory-input-row > button {
+  flex-shrink: 0;
+  min-height: 44px;
+}
+.engagement-compact > .engagement-question:last-of-type {
+  border-bottom: 0;
+}
+.knowledge-dialog .knowledge-source {
+  border-left: 2px solid var(--reading-line);
+  padding-left: 12px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.6;
+}

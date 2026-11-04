@@ -111,6 +111,7 @@
     handle = $state(''),
     publishingConsent = $state(false),
     inviteHandle = $state('')
+  let contextHeading = $state<{ path: string; kind: string } | null>(null)
   let modal = $state<
     null | 'compose' | 'community' | 'wiki' | 'proposal' | 'manage' | 'join'
   >(null)
@@ -284,9 +285,14 @@
                                     ? 'Organisasi'
                                     : parts[0] === 'work'
                                       ? 'Kerja publik'
-                                      : parts[0] === 'contexts'
-                                        ? 'Tempat & bahasa'
-                                        : 'ETNOS',
+                                      : parts[0] === 'topics'
+                                        ? 'Topik'
+                                        : parts[0] === 'contexts'
+                                          ? contextHeading?.path === path &&
+                                            contextHeading.kind === 'topic'
+                                            ? 'Topik'
+                                            : 'Tempat & bahasa'
+                                          : 'ETNOS',
   )
   function notify(value: string) {
     message = value
@@ -797,7 +803,7 @@
   }}
 >
   <RouteProgress />
-  {#if loading && !posts.length && !selectedPost && !['messages', 'notifications', 'groups', 'work', 'contexts', 'explore', 'news', 'login', 'wiki'].includes(parts[0])}<ContentSkeleton
+  {#if loading && !posts.length && !selectedPost && !['messages', 'notifications', 'groups', 'work', 'contexts', 'topics', 'explore', 'news', 'login', 'wiki'].includes(parts[0])}<ContentSkeleton
     />{/if}
   {#if path === '/recover-messages'}<VaultTransfer recovery />
   {:else if error}<div class="strata-card">
@@ -951,6 +957,14 @@
       onCreate={() => open('community')}
       {navigate}
     />
+  {:else if path === '/topics'}<CommunityDirectory
+      {auth}
+      {communities}
+      {memberships}
+      view="topics"
+      onCreate={() => open('community')}
+      {navigate}
+    />
   {:else if path === '/contexts' && !search.includes('create=true')}
     <CommunityDirectory
       {auth}
@@ -961,7 +975,15 @@
       {navigate}
     />
   {:else if ['groups', 'work', 'contexts', 'explore'].includes(parts[0])}
-    <FeaturePages {path} {auth} onError={notify} {navigate} />
+    <FeaturePages
+      {path}
+      {auth}
+      onError={notify}
+      {navigate}
+      onContextResolved={(kind) => {
+        contextHeading = { path, kind }
+      }}
+    />
   {:else if parts[0] === 'wiki'}
     {#if loading}<ContentSkeleton
       />{:else}{#await import('./WikiExperience.svelte') then module}<module.default
@@ -1153,6 +1175,7 @@
         member={isMember(selectedPost.community_id)}
         onError={notify}
         onRefresh={load}
+        reviewRequested={new URLSearchParams(search).get('review') === 'wiki'}
         onWikiDraft={selectedPost &&
         isSteward(selectedPost.community_id) &&
         communities.some(

@@ -5,6 +5,7 @@
     BookOpen,
     MapPin,
     Building2,
+    Hash,
   } from '@lucide/svelte'
   import ContentSkeleton from './ContentSkeleton.svelte'
   import NewsSection from './NewsSection.svelte'
@@ -18,7 +19,9 @@
     error = $state(''),
     facet = $state('all')
   const contexts = $derived(
-    data?.contexts.filter((c) => facet === 'all' || c.kind === facet) ?? [],
+    data?.contexts.filter(
+      (c) => c.kind !== 'topic' && (facet === 'all' || c.kind === facet),
+    ) ?? [],
   )
   const featured = $derived(
     data?.posts
@@ -59,7 +62,7 @@
 
 <nav class="discovery-nav" aria-label="Jelajah ETNOS">
   <a href="/communities"><Users size={17} />Komunitas</a>
-  <a href="/wiki"><BookOpen size={17} />Wiki</a>
+  <a href="/topics"><Hash size={17} />Topik</a>
   <a href="/groups"><Building2 size={17} />Organisasi</a>
 </nav>
 {#if pending}<ContentSkeleton />{:else if error}<div
@@ -129,18 +132,39 @@
       <MapPin size={24} />
       <div>
         <strong>Tempat & bahasa</strong>
-        <span>Wilayah, bahasa, dan topik</span>
+        <span>Wilayah dan bahasa</span>
       </div>
       <ArrowUpRight size={18} />
     </a>
   </section>
-  {#if data.contexts.length}<section class="discovery-section">
+  {#if data.contexts.some((c) => c.kind === 'topic')}<section
+      class="discovery-section"
+    >
+      <div class="discovery-section-head">
+        <h2>Topik</h2>
+        <a href="/topics">Semua <ArrowUpRight size={14} /></a>
+      </div>
+      {#each data.contexts.filter((c) => c.kind === 'topic') as topic}<a
+          class="discovery-row"
+          href={'/contexts/' + topic.slug}
+        >
+          <Hash size={18} />
+          <span>
+            <strong>{topic.title}</strong>
+            {#if topic.description}<small>{topic.description}</small>{/if}
+          </span>
+          <ArrowUpRight size={16} />
+        </a>{/each}
+    </section>{/if}
+  {#if data.contexts.some((c) => c.kind !== 'topic')}<section
+      class="discovery-section"
+    >
       <div class="discovery-section-head">
         <h2>Tempat & bahasa</h2>
         <a href="/contexts">Semua <ArrowUpRight size={14} /></a>
       </div>
-      <div class="search-filters" role="group" aria-label="Jenis konteks">
-        {#each [['all', 'Semua'], ['region', 'Wilayah'], ['place', 'Tempat'], ['language', 'Bahasa'], ['topic', 'Topik']] as [id, label]}<button
+      <div class="search-filters" role="group" aria-label="Tempat dan bahasa">
+        {#each [['all', 'Semua'], ['region', 'Wilayah'], ['place', 'Tempat'], ['language', 'Bahasa']] as [id, label]}<button
             aria-pressed={facet === id}
             onclick={() => (facet = id)}
           >
@@ -160,7 +184,7 @@
           </a>{/each}
       </div>
       {#if !contexts.length}<p class="discovery-note">
-          Belum ada konteks dalam kategori ini.
+          Belum ada tempat atau bahasa dalam pilihan ini.
         </p>{/if}
     </section>{/if}
   <section class="discovery-section">
@@ -217,11 +241,4 @@
           <ArrowUpRight size={16} />
         </a>{/each}
     </section>{/if}
-  {#if !data.contexts.length}<div class="discovery-note">
-      <MapPin size={16} />
-      <p>Tempat dan bahasa akan muncul setelah konteks publik ditambahkan.</p>
-      {#if auth.steward}<a href="/contexts">
-          Tambahkan konteks <ArrowUpRight size={14} />
-        </a>{/if}
-    </div>{/if}
 {/if}

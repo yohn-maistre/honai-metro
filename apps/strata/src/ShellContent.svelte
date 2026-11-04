@@ -221,7 +221,7 @@
   <header
     class="cx-topbar"
     class:home-topbar={path === '/'}
-    class:directory-topbar={['/communities', '/groups', '/contexts'].includes(
+    class:directory-topbar={['/communities', '/groups', '/contexts','/topics'].includes(
       path,
     )}
     class:sidebar-collapsed={sidebar.state === 'collapsed'}
@@ -269,7 +269,7 @@
               Mengikuti
             </Dropdown.Item>
           </Dropdown.Content>
-        </Dropdown.Root>{:else if path === '/explore' || ['/communities', '/groups', '/contexts'].includes(path)}<h1
+        </Dropdown.Root>{:else if path === '/explore' || ['/communities', '/groups', '/contexts','/topics'].includes(path)}<h1
         >
           {heading}
         </h1>{:else}<span>{heading}</span>{/if}

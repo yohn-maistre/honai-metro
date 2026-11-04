@@ -1,14 +1,7 @@
 <script lang="ts">
-  import {
-    FileText,
-    ListTodo,
-    ArrowUpRight,
-    GitPullRequest,
-  } from '@lucide/svelte'
-  import DecisionSuggestions from './DecisionSuggestions.svelte'
+  import { FileText, ListTodo, ArrowUpRight } from '@lucide/svelte'
   import { request } from './api'
-  import { Button } from '$lib/components/ui/button/index.js'
-  let { postId, onDraft }: { postId: string; onDraft?: () => void } = $props()
+  let { postId }: { postId: string } = $props()
   let works = $state<
     {
       id: string
@@ -41,14 +34,11 @@
   })
 </script>
 
-{#if works.length || onDraft}<details class="thread-work">
+{#if works.length}<details class="thread-work">
     <summary>
-      <ListTodo size={15} />{works.length
-        ? 'Karya & tindak lanjut'
-        : 'Jadikan pengetahuan bersama'}
+      <ListTodo size={15} />Karya & tindak lanjut
     </summary>
     <div>
-      {#if onDraft}<DecisionSuggestions {postId} {onDraft}/>{/if}
       {#each works as work}<a
           class="thread-work-card"
           href={'/work/' + work.id}
@@ -62,8 +52,6 @@
             {#if work.result}<p>{work.result.text.slice(0, 180)}</p>{/if}
           </div>
           <ArrowUpRight size={15} />
-        </a>{/each}{#if onDraft}<Button variant="ghost" onclick={onDraft}>
-          <GitPullRequest size={15} />Mulai draf wiki dari percakapan
-        </Button>{/if}
+        </a>{/each}
     </div>
   </details>{/if}

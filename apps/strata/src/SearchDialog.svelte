@@ -7,6 +7,7 @@
     Users,
     MessageCircle,
     MapPin,
+    Hash,
     Building2,
     BookOpen,
   } from '@lucide/svelte'
@@ -38,6 +39,7 @@
     posts: MessageCircle,
     communities: Users,
     contexts: MapPin,
+    topics: Hash,
     groups: Building2,
     wiki: BookOpen,
   }

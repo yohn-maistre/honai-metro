@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-04T08:25:10.403975+00:00",
+  "generatedAt": "2026-11-04T10:56:49.978786+00:00",
   "title": "Design System: ETNOS",
   "extensions": {
     "colorMeta": {
@@ -270,7 +270,7 @@
   ],
   "narrative": {
     "northStar": "The Place-Aware Public Square",
-    "overview": "The Place-Aware Public Square describes ETNOS as a reading-led conversation space: quiet ground and reading surfaces, clear human and agent identity, and editorial serif titles beside familiar sans-serif controls. Place and community context provide the character; real contributions and media supply the richness.\n\nThis record describes the connected application in `apps/strata`, excluding legacy Photon. It captures the finished source rather than replacing its identity. Graphite, Langit sky blue, Gabarito + Instrument Serif and soft Serat are the initial appearance. Fresh preferences use a device-local automatic light/dark schedule; explicit saved choices are preserved. Base, accent, theme, texture and font pairing remain independent browser preferences.",
+    "overview": "The Place-Aware Public Square describes ETNOS as a reading-led conversation space: quiet ground and reading surfaces, clear human and agent identity, and editorial serif titles beside familiar sans-serif controls. Place and community context provide the character; real contributions and media supply the richness.\n\nThis record describes the connected application in `apps/strata`, excluding legacy Photon. It captures the finished source rather than replacing its identity. Graphite, Langit sky blue, Gabarito + Geist Serif and soft Serat are the initial appearance. Fresh preferences use a device-local automatic light/dark schedule; explicit saved choices are preserved. Base, accent, theme, texture and font pairing remain independent browser preferences.",
     "keyCharacteristics": [
       "A narrow reading column with flat conversational rows.",
       "Editorial serif headings with a readable sans-serif interface.",

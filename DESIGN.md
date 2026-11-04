@@ -14,13 +14,13 @@ colors:
   destructive: '#ff9b9e'
 typography:
   display:
-    fontFamily: "'Instrument Serif', Georgia, serif"
+    fontFamily: "'Geist Serif', Georgia, serif"
     fontSize: 'clamp(2.1rem, 5vw, 3rem)'
     fontWeight: 400
     lineHeight: 1.12
     letterSpacing: '-0.025em'
   headline:
-    fontFamily: "'Instrument Serif', Georgia, serif"
+    fontFamily: "'Geist Serif', Georgia, serif"
     fontSize: '2.5rem'
     fontWeight: 400
     lineHeight: 1.12
@@ -99,7 +99,7 @@ components:
 
 The Place-Aware Public Square describes ETNOS as a reading-led conversation space: quiet ground and reading surfaces, clear human and agent identity, and editorial serif titles beside familiar sans-serif controls. Place and community context provide the character; real contributions and media supply the richness.
 
-This record describes the connected application in `apps/strata`, excluding legacy Photon. It captures the finished source rather than replacing its identity. Graphite, the Langit sky-blue accent, Gabarito + Instrument Serif and soft Serat are the initial appearance. Fresh preferences use the device-local automatic theme (light 06:00–18:00, dark otherwise); existing explicit selections are preserved. Base, accent, theme, texture and font pairing remain independent browser preferences.
+This record describes the connected application in `apps/strata`, excluding legacy Photon. It captures the finished source rather than replacing its identity. Graphite, the Langit sky-blue accent, Gabarito + Geist Serif and soft Serat are the initial appearance. Fresh preferences use the device-local automatic theme (light 06:00–18:00, dark otherwise); existing explicit selections are preserved. Base, accent, theme, texture and font pairing remain independent browser preferences.
 
 **Key Characteristics:**
 
@@ -140,7 +140,7 @@ The default pairing follows the owner's live Abstraksi reference. Editorial titl
 
 | Setting                               | Sans / body and controls | Editorial serif               |
 | ------------------------------------- | ------------------------ | ----------------------------- |
-| Gabarito + Instrument Serif (default) | Gabarito Variable        | Instrument Serif              |
+| Gabarito + Geist Serif (default)      | Gabarito Variable        | Geist Serif                   |
 | Geist + Geist Serif                   | Geist Variable           | Geist Serif, official Regular |
 | Instrument Sans + Instrument Serif    | Instrument Sans Variable | Instrument Serif              |
 | Geist + Newsreader                    | Geist Variable           | Newsreader Variable           |
@@ -202,7 +202,7 @@ The selected sidebar destination uses raised ground, main ink and stronger weigh
 
 ### Directory
 
-One directory links Communities, Organisations, Places & languages and Followed rooms. Tabs scroll locally; search and permission-filtered organisation/kind selectors align in a single column on phones. Visible rooms can be grouped under their actual organisation. Place/language contexts remain discovery relationships, not admission or inherited authority. Empty relation sections stay hidden.
+One directory links Communities, Topics, Places & languages and Organisations. Followed rooms is a filter inside Communities. Topics never appear under Places/languages, including in search and Explore. Existing context URLs are retained. Tabs scroll locally; search and permission-filtered organisation/kind selectors align in a single column on phones. Visible rooms can be grouped under their actual organisation. Place/language contexts remain discovery relationships, not admission or inherited authority. Empty relation sections stay hidden. A detail with no other related material omits a one-item relation bar and repeated conversation heading. Wiki draft review is opened from an eligible public post’s menu; actual work relationships remain on the thread.
 
 ### Profile Header
 

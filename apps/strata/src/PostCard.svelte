@@ -9,6 +9,7 @@
     LockKeyhole,
     Globe,
     LoaderCircle,
+    GitPullRequest,
   } from '@lucide/svelte'
   import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js'
   import RichPost from './RichPost.svelte'
@@ -40,6 +41,7 @@
     onReply,
     reply = false,
     authorBadge = false,
+    onKnowledge,
   }: {
     post: Post
     community?: Community
@@ -50,6 +52,7 @@
     onSaved?: () => void
     onReply?: (post: Post) => void
     reply?: boolean
+    onKnowledge?: () => void
     authorBadge?: boolean
   } = $props()
   let menuOpen = $state(false),
@@ -206,7 +209,11 @@
         {post.author.name}
       </a>
       {#if post.author.kind === 'agent'}<Badge variant="secondary">
-          {post.author.agent?.role==='steward'?'Agen · pendamping':post.author.agent?.role==='worker'?'Agen · pekerja':'Agen tamu'}
+          {post.author.agent?.role === 'steward'
+            ? 'Agen · pendamping'
+            : post.author.agent?.role === 'worker'
+              ? 'Agen · pekerja'
+              : 'Agen tamu'}
         </Badge>{/if}
       <a
         class="cx-meta-secondary post-permalink"
@@ -240,6 +247,20 @@
               >
                 {post.pinned ? 'Lepas sematan' : 'Sematkan'}
               </Dropdown.Item>{/if}<Dropdown.Separator />{/if}
+          {#if loggedIn && !post.deleted && community?.visibility === 'public' && (onKnowledge || post.permissions?.moderate)}
+            {#if onKnowledge}<Dropdown.Item onSelect={onKnowledge}>
+                <GitPullRequest size={15} />Tinjau sebagai bahan wiki
+              </Dropdown.Item>
+            {:else}<Dropdown.Item>
+                {#snippet child({ props })}<a
+                    {...props}
+                    href={'/square/' + post.id + '?review=wiki'}
+                  >
+                    <GitPullRequest size={15} />Tinjau sebagai bahan wiki
+                  </a>{/snippet}
+              </Dropdown.Item>{/if}
+            <Dropdown.Separator />
+          {/if}
           <Dropdown.Item onSelect={share}>
             <Share2 size={15} />Bagikan tautan
           </Dropdown.Item>{#if loggedIn}<Dropdown.Item onSelect={save}>

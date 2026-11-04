@@ -19,6 +19,7 @@ export const categories = [
   ['people', 'Orang'],
   ['posts', 'Posting'],
   ['communities', 'Komunitas'],
+  ['topics', 'Topik'],
   ['contexts', 'Tempat & bahasa'],
   ['groups', 'Organisasi'],
   ['wiki', 'Wiki'],
@@ -69,13 +70,19 @@ export function resultGroups(
                       : 'Khusus anggota',
                   href: '/communities/' + c.id,
                 }))
-              : key === 'contexts'
-                ? data.contexts.map((c) => ({
-                    id: c.id,
-                    title: c.title,
-                    detail: compact(c.description),
-                    href: '/contexts/' + c.slug,
-                  }))
+              : key === 'contexts' || key === 'topics'
+                ? data.contexts
+                    .filter((c) =>
+                      key === 'topics'
+                        ? c.kind === 'topic'
+                        : c.kind !== 'topic',
+                    )
+                    .map((c) => ({
+                      id: c.id,
+                      title: c.title,
+                      detail: compact(c.description),
+                      href: '/contexts/' + c.slug,
+                    }))
                 : key === 'groups'
                   ? data.groups.map((g) => ({
                       id: g.id,

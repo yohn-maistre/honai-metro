@@ -5,6 +5,8 @@
   import PostComposer from './PostComposer.svelte'
   import Choice from './Choice.svelte'
   import ThreadWork from './ThreadWork.svelte'
+  import DecisionSuggestions from './DecisionSuggestions.svelte'
+  import * as Dialog from '$lib/components/ui/dialog/index.js'
   import { Button } from '$lib/components/ui/button/index.js'
   import { LoaderCircle, ArrowUpLeft } from '@lucide/svelte'
   import { replyTree } from './thread'
@@ -19,6 +21,7 @@
     onError,
     onRefresh,
     onWikiDraft,
+    reviewRequested = false,
   }: {
     post: Post
     replies: Post[]
@@ -28,8 +31,21 @@
     member: boolean
     onError: (message: string) => void
     onRefresh: () => Promise<void>
+    reviewRequested?: boolean
     onWikiDraft?: () => void
   } = $props()
+  let knowledgeOpen = $state(false),
+    reviewedPost = $state('')
+  $effect(() => {
+    if (reviewRequested && onWikiDraft && reviewedPost !== post.id) {
+      reviewedPost = post.id
+      knowledgeOpen = true
+    }
+  })
+  function draftWiki() {
+    knowledgeOpen = false
+    onWikiDraft?.()
+  }
   let sort = $state<'old' | 'new' | 'top'>('old'),
     target = $state<Post | null>(null),
     composer = $state<PostComposer | null>(null),
@@ -78,6 +94,11 @@
     loggedIn={!!actor}
     canVote={member}
     detail
+    onKnowledge={onWikiDraft
+      ? () => {
+          knowledgeOpen = true
+        }
+      : undefined}
     onReply={replyTo}
     {onError}
   />
@@ -143,8 +164,26 @@
         Mulai percakapan
       </p>{/if}
   </section>
-  {#if community?.visibility === 'public'}<ThreadWork
-      postId={post.id}
-      onDraft={onWikiDraft}
-    />{/if}
+  {#if community?.visibility === 'public'}<ThreadWork postId={post.id} />{/if}
 </div>
+
+{#if onWikiDraft && community?.visibility === 'public'}<Dialog.Root
+    bind:open={knowledgeOpen}
+  >
+    <Dialog.Content class="platform-dialog knowledge-dialog">
+      <Dialog.Header>
+        <Dialog.Title>Bahan wiki</Dialog.Title><Dialog.Description>
+          Pilih bahan dari percakapan ini untuk ditinjau.
+        </Dialog.Description>
+      </Dialog.Header>
+      <blockquote class="knowledge-source">
+        {post.content?.title || post.text.slice(0, 200)}
+      </blockquote>
+      <DecisionSuggestions postId={post.id} onDraft={draftWiki} /><Button
+        variant="outline"
+        onclick={draftWiki}
+      >
+        Mulai draf wiki
+      </Button>
+    </Dialog.Content>
+  </Dialog.Root>{/if}

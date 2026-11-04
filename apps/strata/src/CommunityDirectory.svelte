@@ -8,6 +8,7 @@
     Globe,
     LockKeyhole,
     MapPin,
+    Hash,
   } from '@lucide/svelte'
   import {
     request,
@@ -21,7 +22,7 @@
   import { tabScroll } from './tab-scroll'
   import { Button } from '$lib/components/ui/button/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
-  type View = 'rooms' | 'organizations' | 'places' | 'joined'
+  type View = 'rooms' | 'organizations' | 'places' | 'topics' | 'joined'
   type Place = {
     id: string
     slug: string
@@ -124,7 +125,9 @@
   const placesList = $derived(
     places.filter(
       (p) =>
-        (!placeKind || p.kind === placeKind) && match(p.title, p.description),
+        (view === 'topics' ? p.kind === 'topic' : p.kind !== 'topic') &&
+        (!placeKind || p.kind === placeKind) &&
+        match(p.title, p.description),
     ),
   )
   function create() {
@@ -133,6 +136,7 @@
       return
     }
     if (view === 'organizations') navigate('/groups?create=true')
+    else if (view === 'topics') navigate('/contexts?create=true&kind=topic')
     else if (view === 'places') navigate('/contexts?create=true')
     else onCreate()
   }
@@ -141,39 +145,57 @@
 <section class="community-directory" aria-label="Direktori">
   <div class="directory-controls">
     <nav class="directory-tabs" aria-label="Direktori komunitas" use:tabScroll>
-      {#each [['rooms', 'Komunitas', '/communities'], ['organizations', 'Organisasi', '/groups'], ['places', 'Tempat & bahasa', '/contexts'], ['joined', 'Diikuti', '/communities?view=joined']] as [id, label, url]}
+      {#each [['rooms', 'Komunitas', '/communities'], ['topics', 'Topik', '/topics'], ['places', 'Tempat & bahasa', '/contexts'], ['organizations', 'Organisasi', '/groups']] as [id, label, url]}
         <button
-          aria-current={view === id ? 'page' : undefined}
+          aria-current={view === id || (view === 'joined' && id === 'rooms')
+            ? 'page'
+            : undefined}
           onclick={() => navigate(url)}
         >
           {label}
         </button>
       {/each}
     </nav>
-    {#if view !== 'places' || auth.steward}<Button
+    {#if !['places', 'topics'].includes(view) || auth.steward}<Button
         variant="outline"
         aria-label={view === 'organizations'
           ? 'Buat organisasi'
-          : view === 'places'
-            ? 'Buat tempat atau bahasa'
-            : 'Buat komunitas'}
+          : view === 'topics'
+            ? 'Buat topik'
+            : view === 'places'
+              ? 'Buat tempat atau bahasa'
+              : 'Buat komunitas'}
         onclick={create}
       >
         <Plus size={16} />Buat
       </Button>{/if}
   </div>
   <div class="directory-filters">
-    <label class="directory-search">
-      <Search size={18} /><Input
-        aria-label="Cari di direktori"
-        placeholder={view === 'organizations'
-          ? 'Cari organisasi…'
-          : view === 'places'
-            ? 'Cari tempat atau bahasa…'
-            : 'Cari komunitas…'}
-        bind:value={query}
-      />
-    </label>
+    <div class="directory-input-row">
+      <label class="directory-search">
+        <Search size={18} /><Input
+          aria-label="Cari di direktori"
+          placeholder={view === 'organizations'
+            ? 'Cari organisasi…'
+            : view === 'topics'
+              ? 'Cari topik…'
+              : view === 'places'
+                ? 'Cari tempat atau bahasa…'
+                : 'Cari komunitas…'}
+          bind:value={query}
+        />
+      </label>
+      {#if auth.actor && (view === 'rooms' || view === 'joined')}<Button
+          variant={view === 'joined' ? 'secondary' : 'outline'}
+          aria-pressed={view === 'joined'}
+          onclick={() =>
+            navigate(
+              view === 'joined' ? '/communities' : '/communities?view=joined',
+            )}
+        >
+          Diikuti
+        </Button>{/if}
+    </div>
     {#if (view === 'rooms' || view === 'joined') && groups.length}<Choice
         aria-label="Organisasi komunitas"
         bind:value={organization}
@@ -187,14 +209,16 @@
         bind:value={placeKind}
         items={[
           { value: '', label: 'Semua jenis' },
-          ...Object.entries(kindNames).map(([value, label]) => ({
-            value,
-            label,
-          })),
+          ...Object.entries(kindNames)
+            .filter(([value]) => value !== 'topic')
+            .map(([value, label]) => ({
+              value,
+              label,
+            })),
         ]}
       />{/if}
   </div>
-  {#if pending && (view === 'organizations' || view === 'places')}<ContentSkeleton
+  {#if pending && (view === 'organizations' || view === 'places' || view === 'topics')}<ContentSkeleton
       rows={2}
     />{/if}
   {#if error}<p role="alert" class="search-state">{error}</p>{/if}
@@ -208,7 +232,7 @@
           <strong>{group.title}</strong>
           <p>{group.description}</p>
           <small>
-            {group.kind === 'institution' ? 'Institusi' : 'Kolektif'}
+            {group.kind === 'institution' ? 'Institusi' : 'Kelompok'}
           </small>
         </div>
         <ArrowUpRight size={17} />
@@ -218,16 +242,22 @@
       >
         Belum ada organisasi yang cocok.
       </p>{/if}
-  {:else if view === 'places'}
+  {:else if view === 'places' || view === 'topics'}
     {#each placesList as place}<a
         href={'/contexts/' + place.slug}
         class="directory-row"
       >
-        <span class="directory-avatar"><MapPin size={22} /></span>
+        <span class="directory-avatar">
+          {#if place.kind === 'topic'}<Hash size={22} />{:else}<MapPin
+              size={22}
+            />{/if}
+        </span>
         <div>
           <strong>{place.title}</strong>
           {#if place.description}<p>{place.description}</p>{/if}
-          <small>{kindNames[place.kind] ?? place.kind}</small>
+          {#if view !== 'topics'}<small>
+              {kindNames[place.kind] ?? place.kind}
+            </small>{/if}
         </div>
         <ArrowUpRight size={17} />
       </a>{/each}
@@ -236,9 +266,13 @@
       >
         <MapPin size={24} />
         <p>
-          {query
-            ? 'Belum ada tempat atau bahasa yang cocok.'
-            : 'Belum ada tempat atau bahasa yang ditautkan.'}
+          {view === 'topics'
+            ? query
+              ? 'Belum ada topik yang cocok.'
+              : 'Belum ada topik.'
+            : query
+              ? 'Belum ada tempat atau bahasa yang cocok.'
+              : 'Belum ada tempat atau bahasa yang ditautkan.'}
         </p>
         <a href="/communities">Jelajahi komunitas</a>
       </div>{/if}

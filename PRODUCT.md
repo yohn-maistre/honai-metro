@@ -51,7 +51,7 @@ Wiki contribution drafts are recoverable within the browser tab/account/page/bas
 
 Use the name ETNOS (the wordmark appears as `etnos.`). Keep a conversational Indonesian interface and explain participation and audience consequences in ordinary task language. Papua-focused context comes from real places, sources and voluntary contributions; do not invent geographic taxonomies, sample cultures, endorsements or cultural decoration.
 
-The owner requested a configurable font-pair setting, with Gabarito + Instrument Serif first and default, following the live `https://abstraksi-world.pages.dev` reference. Retain the other implemented pairs, a cleaner Serat texture with user choice, global base/accent/theme controls and expressive profile banners. Exact visual tokens and font provenance live in `DESIGN.md` and `docs/strata/design-tooling.md`.
+The owner requested a configurable font-pair setting, with Gabarito + Geist Serif now the default, following the live `https://abstraksi-world.pages.dev` reference. Retain the other implemented pairs, a cleaner Serat texture with user choice, global base/accent/theme controls and expressive profile banners. Exact visual tokens and font provenance live in `DESIGN.md` and `docs/strata/design-tooling.md`.
 
 ## Evidence on Hand
 
@@ -76,4 +76,6 @@ Use readable content, visible task labels and meaningful contributor/reviewer na
 
 ## Current navigation decisions, 4 November 2026
 
-Home is feed-first; Lajur, the welcome hero and the extra context row are removed. The single directory connects communities, organisations and place/language discovery without merging their authority models. Shared navigation precedes Posting and personal tools; Settings stays above sign-in/profile. Profiles retain the earlier cover without oversized initials. Fresh appearance defaults are Langit sky blue and device-local automatic light/dark (06:00–18:00 light), with a gradual 30-second shift and reduced-motion support. Explicit saved preferences remain intact. Pixel-art noticeboards and solar/location-aware easter eggs are deferred.
+Home is feed-first; Lajur, the welcome hero and the extra context row are removed. The single directory connects communities, topics, organisations and place/language discovery without merging their authority models. Shared navigation precedes Posting and personal tools; Settings stays above sign-in/profile. Profiles retain the earlier cover without oversized initials. Fresh appearance defaults are Langit sky blue and device-local automatic light/dark (06:00–18:00 light), with a gradual 30-second shift and reduced-motion support. Explicit saved preferences remain intact. Pixel-art noticeboards and solar/location-aware easter eggs are deferred.
+
+Topics describe what public contributions concern; communities have members/rules; organisations operate rooms with accountable roles. The interface exposes those distinctions without merging authority. Direct community-topic links, an explicit posting topic picker and provider-started self-service enrollment remain next steps; signup is not enabled by the navigation changes. See [model and onboarding](docs/strata/model-and-onboarding-2026-11-04.md).

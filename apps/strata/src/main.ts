@@ -1,7 +1,6 @@
 import { mount } from 'svelte'
 import '@fontsource-variable/gabarito'
-import '@fontsource/instrument-serif/latin-400.css'
-import '@fontsource/instrument-serif/latin-400-italic.css'
+import './styles/geist-serif.css'
 import './styles/ui.css'
 import './styles/conversation.css'
 import './styles/november.css'

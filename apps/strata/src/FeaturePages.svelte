@@ -86,10 +86,12 @@
     auth,
     onError,
     navigate,
+    onContextResolved,
   }: {
     path: string
     auth: Auth
     onError: (s: string) => void
+    onContextResolved?: (kind: string) => void
     navigate: (s: string) => void
   } = $props()
   let communities = $state<Community[]>([]),
@@ -221,7 +223,10 @@
         auth.steward
       ) {
         open('context')
-        kind = 'region'
+        kind =
+          new URLSearchParams(location.search).get('kind') === 'topic'
+            ? 'topic'
+            : 'region'
         slug = ''
       }
       if (page === 'contexts' && id) {
@@ -231,6 +236,7 @@
         )
         if (mine !== generation) return
         context = c
+        onContextResolved?.(c.kind)
         posts = feed.items
         works = ws.filter((w) => w.contexts.some((x) => x.id === c.id))
       }
@@ -677,43 +683,45 @@
     </Card.Root>{/if}
 {:else if segments[0] === 'contexts' && context}
   <div class="cx-detail-head context-detail-heading">
-    <a class="context-back-link" href="/contexts">Tempat & bahasa</a>
-    <Badge variant="secondary">{kinds[context.kind]}</Badge>
+    {#if context.kind !== 'topic'}<Badge variant="secondary">
+        {kinds[context.kind]}
+      </Badge>{/if}
     <h1>{context.title}</h1>
     <p>{context.description}</p>
   </div>
-  <nav
-    class="context-relations section-tab-scroll"
-    aria-label={'Terhubung dengan ' + context.title}
-  >
-    <a href="#context-posts"><MessageCircle size={16} />Percakapan</a>
-    {#if context.pages.length}
-      <a href="#context-wiki">
-        <BookOpen size={16} />Wiki
-        <span>{context.pages.length}</span>
-      </a>{/if}
-    {#if context.groups.length}
-      <a href="#context-groups">
-        <Building2 size={16} />Organisasi
-        <span>{context.groups.length}</span>
-      </a>{/if}
-    {#if works.length}
-      <a href="#context-work">
-        <ListTodo size={16} />Kerja publik
-        <span>{works.length}</span>
-      </a>{/if}
-  </nav>
-  <div id="context-posts" class="strata-card"><h2>Percakapan</h2></div>
-  {#each posts as post}<PostCard
-      {post}
-      community={communities.find((c) => c.id === post.community_id)}
-      loggedIn={!!auth.actor}
-      canVote={isMember(post.community_id)}
-      {onError}
-    />{/each}
-  {#if !posts.length}<div class="strata-nodata">
-      <h2>Belum ada percakapan di konteks ini</h2>
-    </div>{/if}
+  {#if context.pages.length || context.groups.length || works.length}<nav
+      class="context-relations section-tab-scroll"
+      aria-label={'Terhubung dengan ' + context.title}
+    >
+      <a href="#context-posts"><MessageCircle size={16} />Percakapan</a>
+      {#if context.pages.length}
+        <a href="#context-wiki">
+          <BookOpen size={16} />Wiki
+          <span>{context.pages.length}</span>
+        </a>{/if}
+      {#if context.groups.length}
+        <a href="#context-groups">
+          <Building2 size={16} />Organisasi
+          <span>{context.groups.length}</span>
+        </a>{/if}
+      {#if works.length}
+        <a href="#context-work">
+          <ListTodo size={16} />Kerja publik
+          <span>{works.length}</span>
+        </a>{/if}
+    </nav>{/if}
+  <section id="context-posts" aria-label="Percakapan">
+    {#each posts as post}<PostCard
+        {post}
+        community={communities.find((c) => c.id === post.community_id)}
+        loggedIn={!!auth.actor}
+        canVote={isMember(post.community_id)}
+        {onError}
+      />{/each}
+    {#if !posts.length}<div class="strata-nodata">
+        <p>Belum ada percakapan tentang {context.title}.</p>
+      </div>{/if}
+  </section>
   {#if context.groups.length}
     <section id="context-groups" class="context-relation-section">
       {#if context.groups.length}<div class="strata-card">
@@ -845,7 +853,11 @@
     if (!v) {
       modal = null
       if (!segments[1] && location.search.includes('create=true'))
-        navigate('/' + segments[0])
+        navigate(
+          new URLSearchParams(location.search).get('kind') === 'topic'
+            ? '/topics'
+            : '/' + segments[0],
+        )
     }
   }}
 >
@@ -857,7 +869,9 @@
           : modal === 'space'
             ? 'Ruang kelompok'
             : modal === 'context'
-              ? 'Konteks publik'
+              ? kind === 'topic'
+                ? 'Topik publik'
+                : 'Tempat atau bahasa publik'
               : modal === 'work'
                 ? 'Kerja publik baru'
                 : modal === 'members'
@@ -879,7 +893,7 @@
           bind:value={kind}
           items={[
             { value: 'institution', label: 'Institusi' },
-            { value: 'collective', label: 'Kelompok / komunitas' },
+            { value: 'collective', label: 'Kelompok / perkumpulan' },
           ]}
         />{/if}
       {#if modal === 'space'}<Label for="existing-space">
@@ -1030,18 +1044,19 @@
               { value: 'hidden-private', label: 'Anggota · disembunyikan' },
             ]}
           />{/if}
-        {#if modal === 'context'}<Label for="context-kind">
-            Jenis konteks
-          </Label><Choice
-            id="context-kind"
-            bind:value={kind}
-            items={[
-              { value: 'region', label: 'Wilayah' },
-              { value: 'place', label: 'Tempat' },
-              { value: 'topic', label: 'Topik' },
-              { value: 'language', label: 'Bahasa' },
-            ]}
-          />
+        {#if modal === 'context'}{#if new URLSearchParams(location.search).get('kind') !== 'topic'}<Label
+              for="context-kind"
+            >
+              Jenis
+            </Label><Choice
+              id="context-kind"
+              bind:value={kind}
+              items={[
+                { value: 'region', label: 'Wilayah' },
+                { value: 'place', label: 'Tempat' },
+                { value: 'language', label: 'Bahasa' },
+              ]}
+            />{/if}
           <details class="form-details">
             <summary>Alamat dan bahasa</summary>
             <Label for="context-slug">Alamat singkat</Label><Input

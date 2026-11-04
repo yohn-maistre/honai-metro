@@ -2,9 +2,9 @@
 export const fontPairs = [
   {
     id: 'gabarito',
-    name: 'Gabarito + Instrument Serif',
+    name: 'Gabarito + Geist Serif',
     sans: 'Gabarito Variable',
-    serif: 'Instrument Serif',
+    serif: 'Geist Serif',
     note: 'Akrab, dengan suara editorial yang hangat.',
   },
   {
@@ -42,7 +42,12 @@ export function loadFontPair(id: string) {
       import('@fontsource-variable/geist'),
       import('./styles/geist-serif.css'),
     ])
-  if (id === 'instrument') return import('@fontsource-variable/instrument-sans')
+  if (id === 'instrument')
+    return Promise.all([
+      import('@fontsource-variable/instrument-sans'),
+      import('@fontsource/instrument-serif/latin-400.css'),
+      import('@fontsource/instrument-serif/latin-400-italic.css'),
+    ])
   if (id === 'newsreader')
     return Promise.all([
       import('@fontsource-variable/geist'),

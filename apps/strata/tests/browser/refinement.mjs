@@ -183,7 +183,7 @@ try {
     ['instrument', 'Instrument Sans + Instrument Serif', 'Instrument Serif'],
     ['newsreader', 'Geist + Newsreader', 'Newsreader Variable'],
     ['source', 'Source Sans 3 + Source Serif 4', 'Source Serif 4 Variable'],
-    ['gabarito', 'Gabarito + Instrument Serif', 'Instrument Serif'],
+    ['gabarito', 'Gabarito + Geist Serif', 'Geist Serif'],
   ]) {
     await p
       .getByRole('combobox', { name: 'Pasangan huruf', exact: true })

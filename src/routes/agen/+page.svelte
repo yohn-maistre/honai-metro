@@ -3,7 +3,7 @@
   import CapabilityCard from '$lib/etnos/CapabilityCard.svelte'
   import ToolCard from '$lib/etnos/ToolCard.svelte'
   import { DataChip, PageHeader, SectionHead } from '$lib/etnos/ui'
-  import { CommandLine, DocumentText, Icon } from 'svelte-hero-icons/dist'
+  import { DocumentText, Icon } from 'svelte-hero-icons/dist'
 
   let { data } = $props()
 

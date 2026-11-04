@@ -1,0 +1,327 @@
+/* One directory and one feed. Relationships never change room admission. */
+.directory-controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 24px 0;
+  min-width: 0;
+}
+.directory-controls .directory-tabs {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+}
+.directory-controls > button {
+  flex-shrink: 0;
+  min-height: 44px;
+}
+.directory-filters {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(180px, auto);
+  align-items: center;
+  gap: 12px;
+  padding: 20px 24px;
+}
+.directory-filters .directory-search {
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.directory-filters .directory-search input {
+  width: 100%;
+  min-width: 0;
+}
+.directory-section > h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 18px 24px 8px;
+  font-size: 14px;
+  font-weight: 550;
+  color: var(--muted-foreground);
+}
+.directory-section > h2 a {
+  overflow-wrap: anywhere;
+}
+.directory-empty {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 48px 24px;
+}
+.directory-empty p {
+  margin: 0;
+}
+.directory-empty a {
+  color: var(--brand);
+}
+.directory-row > div {
+  min-width: 0;
+}
+.sidebar-settings {
+  justify-content: flex-start;
+  width: 100%;
+}
+.news-section:not(.compact) .news-item.news-text-only {
+  padding: 20px;
+  min-height: 0;
+  justify-content: flex-start;
+}
+.news-section:not(.compact) .news-text-only .news-tile-copy {
+  padding: 0;
+  width: 100%;
+  position: relative;
+}
+.news-section:not(.compact) .news-text-only strong {
+  color: var(--foreground);
+}
+.news-fallback-summary {
+  margin: 12px 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+.news-text-only .news-tile-copy > span {
+  margin-top: auto;
+  padding-top: 16px;
+}
+.news-section:not(.compact) .news-lead.news-text-only {
+  min-height: 220px;
+}
+.external-preview {
+  min-width: 0;
+}
+.external-preview > div {
+  flex: 1;
+  min-width: 0;
+}
+.external-preview > svg {
+  flex-shrink: 0;
+}
+.compose-dialog [data-slot='dialog-header'] {
+  padding-inline: 56px 100px;
+}
+.compose-dialog .compose-submit {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  min-height: 44px;
+}
+.compose-dialog .compose-cancel {
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  top: 10px;
+  left: 8px;
+}
+.compose-dialog .composer-footer {
+  display: none;
+}
+.compose-dialog .composer-writing {
+  flex: 0 0 auto;
+}
+.compose-dialog .composer-text {
+  min-height: 88px;
+}
+.compose-dialog .post-composer {
+  justify-content: flex-start;
+}
+/* Palette frames keep text contrast; ordinary hover transitions must not lag behind them. */
+:root[data-theme-shifting] *,
+:root[data-theme-shifting] *::before,
+:root[data-theme-shifting] *::after {
+  transition-property: opacity, transform !important;
+}
+@media (max-width: 767px) {
+  .cx-topbar .theme-toggle {
+    display: inline-flex;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+  }
+  .cx-topbar {
+    gap: 4px;
+    padding-inline: 12px;
+  }
+  .cx-topbar .cx-global-search {
+    width: 44px;
+    min-width: 44px;
+  }
+  .directory-topbar .surface-heading {
+    display: flex;
+    min-width: 0;
+    margin: 0;
+  }
+  .directory-topbar .surface-heading h1 {
+    font-size: 20px;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .directory-topbar .cx-mobile-brand {
+    display: none;
+  }
+  .directory-controls {
+    padding: 12px 16px 0;
+    gap: 8px;
+  }
+  .directory-controls .directory-tabs {
+    gap: 4px;
+  }
+  .directory-controls .directory-tabs button {
+    padding-inline: 12px;
+    min-height: 44px;
+  }
+  .directory-filters {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 16px;
+    gap: 10px;
+  }
+  .directory-filters > button {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .directory-section > h2 {
+    padding-inline: 16px;
+  }
+  .external-preview {
+    padding: 12px;
+    gap: 12px;
+    align-items: center;
+  }
+  .external-preview > img {
+    width: 72px;
+    height: 72px;
+    flex: 0 0 72px;
+    object-fit: cover;
+    border-radius: 9px;
+  }
+  .external-preview strong {
+    font-size: 16px;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+    overflow-wrap: break-word;
+  }
+  .external-preview small {
+    font-size: 12px;
+  }
+  .external-preview p {
+    display: none;
+  }
+  .external-preview > svg {
+    width: 14px;
+  }
+  .compose-dialog [data-slot='dialog-header'] {
+    padding-inline: 52px 98px;
+    justify-content: flex-start;
+  }
+  .compose-dialog [data-slot='dialog-title'] {
+    font-size: 15px;
+  }
+  .compose-dialog .compose-submit {
+    top: 6px;
+    right: 8px;
+  }
+  .compose-dialog .compose-cancel {
+    top: 6px;
+    left: 4px;
+  }
+  .compose-dialog .composer-text {
+    min-height: 88px;
+  }
+}
+@media (max-width: 359px) {
+  .home-topbar .cx-mobile-brand {
+    font-size: 26px;
+  }
+  .home-topbar .surface-switch {
+    font-size: 13px;
+    padding-inline: 4px;
+  }
+}
+.news-desk-story:not(.has-photo) {
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--secondary);
+  border-bottom: 0;
+}
+.news-desk-story:not(.has-photo) .news-desk-copy {
+  padding-right: 16px;
+}
+.community-directory {
+  padding: 0;
+}
+.directory-controls .directory-tabs {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  scroll-padding-inline: 12px;
+}
+.directory-controls .directory-tabs button {
+  flex-shrink: 0;
+}
+.directory-row {
+  padding-inline: 24px;
+}
+.news-section:not(.compact) .news-text-only .news-tile-copy {
+  padding: 0;
+}
+@media (max-width: 767px) {
+  .directory-row {
+    padding-inline: 16px;
+  }
+}
+@media (max-width: 767px) {
+  .cx-topbar.home-topbar {
+    gap: 8px;
+  }
+  .cx-topbar.home-topbar .theme-toggle {
+    order: 3;
+  }
+}
+.etnos-sidebar[data-mobile='true'] .sidebar-settings > span {
+  display: inline;
+}
+@media (min-width: 768px) and (max-width: 1099px) {
+  .sidebar-settings {
+    width: 44px;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+  }
+}
+/* Discovery kinds stay separate from community membership and organisation roles. */
+.directory-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.directory-input-row .directory-search {
+  flex: 1;
+}
+.directory-input-row > button {
+  flex-shrink: 0;
+  min-height: 44px;
+}
+.engagement-compact > .engagement-question:last-of-type {
+  border-bottom: 0;
+}
+.knowledge-dialog .knowledge-source {
+  border-left: 2px solid var(--reading-line);
+  padding-left: 12px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.6;
+}

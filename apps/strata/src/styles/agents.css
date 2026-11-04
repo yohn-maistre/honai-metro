@@ -1,0 +1,206 @@
+.agent-connections {
+  padding: 28px 24px 40px;
+}
+.agent-connections > header,
+.agent-entry > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.agent-connections > header {
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-bottom: 28px;
+}
+.agent-connections h1 {
+  font-size: 24px;
+  letter-spacing: -0.035em;
+  font-weight: 650;
+}
+.agent-connections h2 {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+.agent-connections p {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--muted-foreground);
+  margin: 8px 0 16px;
+}
+.agent-public-entry {
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--reading-line);
+}
+.agent-public-entry > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--brand);
+}
+.agent-endpoint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--secondary);
+  padding: 6px 12px;
+  border-radius: 10px;
+  margin: 16px 0;
+}
+.agent-endpoint code {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+.agent-enroll-prompt,
+.agent-entry,
+.agent-register,
+.agent-connection-result {
+  padding-block: 24px;
+  border-bottom: 1px solid var(--reading-line);
+}
+.agent-connections summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  min-height: 44px;
+}
+.agent-connections summary > span {
+  margin-left: auto;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.agent-connections form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 0;
+}
+.agent-connections form > button {
+  align-self: flex-start;
+}
+.agent-entry > header > a,
+.agent-entry > header a {
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.agent-admission {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 20px 0;
+  font-size: 13px;
+}
+.agent-admission small {
+  color: var(--muted-foreground);
+  width: 100%;
+}
+.agent-deployment,
+.agent-grant {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--reading-line);
+}
+.agent-deployment > span,
+.agent-grant > span {
+  min-width: 0;
+}
+.agent-deployment strong,
+.agent-grant strong {
+  font-size: 13px;
+  font-weight: 550;
+}
+.agent-deployment small,
+.agent-grant small {
+  display: block;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+  margin-top: 4px;
+}
+.agent-cli {
+  display: block;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--secondary);
+  font-size: 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.agent-grant-bounds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.agent-grant-bounds > div {
+  min-width: 0;
+}
+.agent-grant-bounds label {
+  display: block;
+  margin-bottom: 8px;
+}
+.agent-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.agent-notice {
+  padding: 12px;
+  background: var(--secondary);
+  border-radius: 8px;
+}
+.agent-empty {
+  padding: 24px 0;
+}
+.agent-pause {
+  margin-top: 12px;
+}
+.agent-connection-result dl {
+  font-size: 12px;
+}
+.agent-connection-result dt {
+  margin-top: 12px;
+  color: var(--muted-foreground);
+}
+.agent-connection-result dd {
+  overflow-wrap: anywhere;
+  margin: 4px 0 16px;
+}
+.agent-attribution {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  margin: 12px 0;
+}
+.agent-attribution a {
+  color: var(--foreground);
+}
+@media (max-width: 767px) {
+  .agent-connections {
+    padding: 20px 16px 32px;
+  }
+  .agent-connections > header {
+    margin-bottom: 20px;
+  }
+  .agent-connections h1 {
+    font-size: 22px;
+  }
+  .agent-grant-bounds {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.etnos-sidebar a.preview-label {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+}

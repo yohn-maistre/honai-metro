@@ -1,0 +1,22 @@
+name: Connected Strata UI
+on:
+  push:
+    paths: ['apps/strata/**', '.github/workflows/strata-ui.yml']
+  pull_request:
+    paths: ['apps/strata/**', '.github/workflows/strata-ui.yml']
+permissions:
+  contents: read
+jobs:
+  connected-ui:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: apps/strata/package-lock.json
+      - run: npm ci --prefix apps/strata --ignore-scripts
+      - run: npm run check --prefix apps/strata
+      - run: npm test --prefix apps/strata
+      - run: npm run build --prefix apps/strata

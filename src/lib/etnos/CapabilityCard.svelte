@@ -7,7 +7,6 @@
   import { Badge } from 'mono-svelte'
 
   interface Capability {
-    id: string
     name: string
     kind: string
     actorType: string

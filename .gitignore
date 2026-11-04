@@ -22,3 +22,15 @@ test-results
 # CUSTOMIZATIONS.md
 # local pnpm convenience (repo is bun-canonical)
 pnpm-lock.yaml
+
+# Independently built Strata surface
+/apps/strata/dist/
+
+# Local design audit captures and generated direction sheets
+.taste-skill/
+
+# Impeccable native engine is checksum-downloaded per host, not source
+/.agents/skills/impeccable/scripts/bin/
+
+# Temporary Impeccable overlay server state
+/.impeccable/live/

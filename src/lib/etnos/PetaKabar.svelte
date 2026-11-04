@@ -907,7 +907,7 @@
               </p>
               <p class="text-xs text-slate-700 dark:text-zinc-300">
                 {#each kabDossier.wajah as e, i (e.id)}
-                  {#if i > 0}{' · '}{/if}
+                  {#if i > 0} · {/if}
                   <a
                     href="/wiki"
                     class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors"

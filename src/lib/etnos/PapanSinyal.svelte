@@ -17,7 +17,7 @@
    * truncate softly instead of slicing. Day-clock seeded so every reader
    * sees the same board on the same day.
    */
-  import { MediaQuery } from 'svelte/reactivity'
+  import { MediaQuery, SvelteSet } from 'svelte/reactivity'
   import { t } from '$lib/app/i18n'
   import directory from '$lib/etnos/data/directory.json'
   import { fetchHotPosts } from '$lib/etnos/hot'
@@ -98,7 +98,7 @@
     fetchHotPosts().then((posts) => {
       // Top post per community: the rotation walks across communities
       // instead of letting one busy community fill every flap.
-      const seen = new Set<number>()
+      const seen = new SvelteSet<number>()
       forumPool = posts
         .filter((p) => {
           if (seen.has(p.community.id)) return false
@@ -226,7 +226,7 @@
             target={item.external ? '_blank' : undefined}
             rel={item.external ? 'noopener' : undefined}
           >
-            {#each Array(segs) as _, j (j)}
+            {#each Array(segs).keys() as j (j)}
               <span
                 class="cell"
                 class:flip={flipping[i]}

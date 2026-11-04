@@ -1,6 +1,6 @@
 # ETNOS: understandable spaces and first-account onboarding
 
-Research and implementation note · 4 November 2026. Exa reviewed 30 search results across six angles (PieFed discovery, ATProto groups, Cloudflare limits, identity signup, custom handles and wildcard routing). Firecrawl retrieved current first-party plan and account-flow documentation. Search hits were treated as leads, not as proof; links below identify the primary evidence used. No donor application code was copied.
+Research and implementation note · 4 November 2026. Exa reviewed 38 search results across seven angles (PieFed discovery, ATProto groups, Cloudflare limits, identity signup, custom handles, wildcard routing and alternative providers). Firecrawl retrieved current first-party plan and account-flow documentation. Search hits were treated as leads, not as proof; links below identify the primary evidence used. No donor application code was copied.
 
 ## The separation people should encounter
 
@@ -121,3 +121,11 @@ The [migration guide](https://atproto.com/guides/account-migration) explains mov
 - Loopback tests use the actual official client and entirely intercepted identity/provider edges to check a confirmed custom handle, rejection of an unconfirmed alias, an invited custom-handle OAuth login, and a fresh PDS location lookup retaining the same DID/handle/local protected-room rights. Refreshing the resolver (`noCache`) matters during a known hosting change. These are provider-location simulations and an invited-login fixture, not a live PDS migration or an implemented pre-account signup flow.
 
 Synthetic visual evidence: [topic directory](topics-2026-11-04/taxonomy-topics-390.png), [empty topic](topics-2026-11-04/taxonomy-empty-topic-390.png), [wiki review](topics-2026-11-04/taxonomy-wiki-review-390.png), [draft](topics-2026-11-04/taxonomy-wiki-draft-390.png).
+
+### Provider candidates
+
+[Eurosky](https://eurosky.tech/faq/) explicitly offers free accounts open globally, hosted in Europe. [Blacksky's hosting guide](https://docs.blacksky.community/info-about-blacksky-the-community/migrating-to-blacksky-pds-complete-guide) identifies general-use domains `myatproto.social` and `cryptoanarchy.network` alongside its community-specific `blacksky.app` namespace. These are candidate providers, not newly enabled ETNOS hosts: each issuer/discovery/OAuth callback and applicable signup/domain policy needs qualification before extending the current provider allowlist. Bluesky remains the initial practical default. A generic application using ATProto is not automatically a separate PDS provider.
+
+The expected signup return is the provider's OAuth web interface → verified callback → ETNOS session. It does not require installing the Bluesky app. That pre-account enrollment path still needs implementation; the existing invited-login path has been tested with a custom-domain fixture. Full test/probe scope and 97 passing core checks are [recorded in Strata](https://github.com/yohn-maistre/strata/blob/feat/connected-oauth/docs/handle-portability-2026-11-04.md).
+
+The UI portion is now deployed; [source/artifact receipt](topics-2026-11-04/README.md) records the final version, live checks and remaining signup scope. The same DID permits a hosting move after verified issuer discovery and provider-host qualification; the existing provider allowlist is not bypassed by choosing a custom domain.

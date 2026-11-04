@@ -179,9 +179,12 @@
       href="/preferences"
       variant="ghost"
       class="sidebar-settings"
+      aria-label="Pengaturan"
+      title="Pengaturan"
       onclick={() => sidebar.setOpenMobile(false)}
     >
-      <Settings2 size={18} />Pengaturan
+      <Settings2 size={18} />
+      <span>Pengaturan</span>
     </Button>
     {#if auth.actor}<a
         href={'/people/' + auth.actor.id}

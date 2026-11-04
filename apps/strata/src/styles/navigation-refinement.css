@@ -290,3 +290,14 @@
     order: 3;
   }
 }
+.etnos-sidebar[data-mobile='true'] .sidebar-settings > span {
+  display: inline;
+}
+@media (min-width: 768px) and (max-width: 1099px) {
+  .sidebar-settings {
+    width: 44px;
+    justify-content: center;
+    gap: 0;
+    padding: 0;
+  }
+}

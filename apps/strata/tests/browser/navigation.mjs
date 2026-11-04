@@ -208,6 +208,13 @@ try {
         ),
         path + ' overflow at ' + width,
       )
+      if (width === 768)
+        assert.equal(
+          await p
+            .locator('.etnos-sidebar .sidebar-settings > span')
+            .isVisible(),
+          false,
+        )
       const theme = p.locator('.cx-topbar .theme-toggle')
       assert.ok(await theme.isVisible())
       const bounds = await theme.boundingBox()

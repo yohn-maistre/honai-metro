@@ -326,6 +326,12 @@
   function navigate(href: string) {
     const u = new URL(href, location.origin)
     if (u.pathname === '/board') u.pathname = '/'
+    if (
+      u.pathname === '/login' &&
+      path !== '/login' &&
+      !u.searchParams.has('returnTo')
+    )
+      u.searchParams.set('returnTo', path + search)
     saveScroll()
     window.history.pushState(
       {
@@ -671,11 +677,19 @@
       busy = false
     }
   }
-  async function login() {
+  async function login(mode: 'login' | 'signup' = 'login', invitation = '') {
     await mutate(async () => {
       const result = await request<{ authorizationUrl: string }>(
         '/auth/start',
-        { handle: handle.trim(), publishing: publishingConsent },
+        {
+          mode,
+          ...(mode === 'signup'
+            ? { invitation }
+            : { handle: handle.trim(), publishing: publishingConsent }),
+          returnTo:
+            new SvelteURLSearchParams(search).get('returnTo') ||
+            (mode === 'signup' ? '/communities?welcome=1' : '/'),
+        },
       )
       location.assign(result.authorizationUrl)
     })
@@ -1155,6 +1169,22 @@
         </Button>
       </div>{/if}
   {:else if path === '/communities'}
+    {#if auth.actor && new SvelteURLSearchParams(search).get('welcome') === '1'}
+      <div class="signup-welcome" role="status">
+        <div>
+          <strong>Selamat datang, {auth.actor.name}</strong>
+          <p>Pilih komunitas untuk mulai ikut berbicara.</p>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Tutup sambutan"
+          onclick={() => navigate('/communities')}
+        >
+          <X size={16} />
+        </Button>
+      </div>
+    {/if}
     <CommunityDirectory
       {auth}
       {communities}

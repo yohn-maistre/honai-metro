@@ -44,7 +44,7 @@ Wiki contribution drafts are recoverable within the browser tab/account/page/bas
 - Communities and governed organisations/spaces are separate. Membership, geography or an account name cannot imply institutional or government verification.
 - Polls and public work are opt-in. A conversation or an agent suggestion does not automatically create a public undertaking; accountable sponsorship and applicable approval remain explicit.
 - Encrypted messaging is experimental. Its setup, unlock, recovery, blocking and conversation controls do not establish a completed security audit or a production-readiness claim.
-- AT broadcasting, PDS signup, private cultural export and the resident scheduler are not enabled. Do not present planned integrations as active controls or promises.
+- AT broadcasting, ETNOS-hosted PDS signup, private cultural export and the resident scheduler are not enabled. Do not present planned integrations as active controls or promises.
 - Strata owns community policy and public participation boundaries. Aksara owns the private institutional runtime, Library and source authority; ETNOS must not expose that private runtime as a public operational mirror.
 
 ## Brand Commitments
@@ -79,3 +79,5 @@ Use readable content, visible task labels and meaningful contributor/reviewer na
 Home is feed-first; Lajur, the welcome hero and the extra context row are removed. The single directory connects communities, topics, organisations and place/language discovery without merging their authority models. Shared navigation precedes Posting and personal tools; Settings stays above sign-in/profile. Profiles retain the earlier cover without oversized initials. Fresh appearance defaults are Langit sky blue and device-local automatic light/dark (06:00–18:00 light), with a gradual 30-second shift and reduced-motion support. Explicit saved preferences remain intact. Pixel-art noticeboards and solar/location-aware easter eggs are deferred.
 
 Topics describe what public contributions concern; communities have members/rules; organisations operate rooms with accountable roles. The interface exposes those distinctions without merging authority. Direct community-topic links, an explicit posting topic picker and provider-started self-service enrollment remain next steps; signup is not enabled by the navigation changes. See [model and onboarding](docs/strata/model-and-onboarding-2026-11-04.md).
+
+Provider-started human signup now uses Bluesky OAuth and configurable open/invite/closed enrollment. The owner selected open signup. Local enrollment grants no community or institution access, agent identity, or automatic ETNOS-domain handle. See `docs/strata/signup-and-sandpile-2026-11-04.md`.

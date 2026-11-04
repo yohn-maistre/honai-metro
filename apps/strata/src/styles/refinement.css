@@ -193,6 +193,15 @@ select {
   align-items: flex-start;
   gap: 14px;
 }
+.signup-welcome {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--line);
+}
+.signup-welcome p { margin: 4px 0 0; color: var(--muted-foreground); font-size: 14px; }
 .cx-context[hidden] {
   display: none !important;
 }

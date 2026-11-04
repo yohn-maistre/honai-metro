@@ -231,3 +231,7 @@ A compact scope line precedes writing; audience notices use quiet raised ground 
 - **Don't** turn fixture identities, decorative cultural motifs or implied institutional verification into product content.
 
 Source of truth: `apps/strata/src/appearance.svelte.ts`, `appearance-bases.ts`, `appearance-color.ts`, `font-pairs.ts`, `styles/ui.css`, `styles/conversation.css`, `styles/commons-next.css`, `styles/friends-pass.css`, `styles/agents.css`, `styles/refinement.css` and `ShellContent.svelte`. The later imported refinement stylesheet wins where earlier baseline rules differ.
+
+## Pull-to-refresh signature
+
+An optional accent-colored pixel mound appears only during a deliberate top-of-feed pull. Release starts an original 37 × 14 falling-sand automaton in a 148 × 56px field; it exits when the refresh request completes. Reduced motion retains a still mound and status text. No ambient feed animation or additional runtime library is introduced. Signup uses the existing card/form grammar and a provider-owned OAuth journey; see `docs/strata/signup-and-sandpile-2026-11-04.md`.

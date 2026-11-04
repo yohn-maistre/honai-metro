@@ -1,5 +1,7 @@
 # ETNOS: understandable spaces and first-account onboarding
 
+**Follow-up:** the owner subsequently selected open signup through Bluesky. The provider-started enrollment described as a next step below is now implemented; see [signup and sandpile delivery](signup-and-sandpile-2026-11-04.md) for current scope and release evidence. Optional handle claiming and community/topic assignment remain separate.
+
 Research and implementation note · 4 November 2026. Exa reviewed 38 search results across seven angles (PieFed discovery, ATProto groups, Cloudflare limits, identity signup, custom handles, wildcard routing and alternative providers). Firecrawl retrieved current first-party plan and account-flow documentation. Search hits were treated as leads, not as proof; links below identify the primary evidence used. No donor application code was copied.
 
 ## The separation people should encounter

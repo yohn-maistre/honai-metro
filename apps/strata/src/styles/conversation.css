@@ -2377,7 +2377,8 @@ body {
 }
 .pull-refresh {
   display: flex;
-  gap: 8px;
+  flex-direction: column;
+  gap: 0;
   align-items: center;
   justify-content: center;
   overflow: hidden;

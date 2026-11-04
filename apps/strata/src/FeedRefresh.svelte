@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount, type Snippet } from 'svelte'
-  import PixelLoader from './PixelLoader.svelte'
+  import Sandpile from './Sandpile.svelte'
   let {
     enabled,
     busy,
@@ -17,6 +17,7 @@
     startX = 0,
     tracking = false,
     decided = false
+  let refreshing = $state(false)
   function reset() {
     distance = 0
     tracking = false
@@ -27,6 +28,7 @@
     if (
       !enabled ||
       busy ||
+      refreshing ||
       window.scrollY > 0 ||
       e.touches.length !== 1 ||
       !target.closest('#commons-main') ||
@@ -41,7 +43,7 @@
     decided = false
   }
   function move(e: TouchEvent) {
-    if (!tracking || !enabled || busy || e.touches.length !== 1) {
+    if (!tracking || !enabled || busy || refreshing || e.touches.length !== 1) {
       reset()
       return
     }
@@ -59,9 +61,18 @@
     distance = Math.min(84, Math.max(0, dy * 0.5))
   }
   function end() {
-    const refresh = distance >= 64 && enabled && !busy
+    const refresh = distance >= 64 && enabled && !busy && !refreshing
     reset()
-    if (refresh) void onRefresh()
+    if (refresh) {
+      refreshing = true
+      void onRefresh()
+        .catch(() => {
+          /* The parent reports request errors. */
+        })
+        .finally(() => {
+          refreshing = false
+        })
+    }
   }
   $effect(() => {
     if (!enabled) reset()
@@ -73,21 +84,30 @@
 </script>
 
 <svelte:window ontouchstart={start} ontouchend={end} ontouchcancel={reset} />
-{#if distance > 8}<div
+{#if enabled && (distance > 8 || refreshing)}<div
     class="pull-refresh"
-    style={`height:${distance}px`}
-    aria-live="polite"
+    class:is-refreshing={refreshing}
+    style={`height:${refreshing ? 84 : distance}px`}
+    data-state={refreshing
+      ? 'refreshing'
+      : distance >= 64
+        ? 'ready'
+        : 'pulling'}
   >
-    <PixelLoader
-      active={false}
-      label={distance >= 64
-        ? 'Lepaskan untuk memuat ulang'
-        : 'Tarik untuk memuat ulang'}
-    />
-    <span>
-      {distance >= 64
-        ? 'Lepaskan untuk memuat ulang'
-        : 'Tarik untuk memuat ulang'}
+    <Sandpile active={refreshing} />
+    <span
+      role="status"
+      aria-label={refreshing
+        ? 'Memuat ulang…'
+        : distance >= 64
+          ? 'Lepaskan untuk memuat ulang'
+          : 'Tarik untuk memuat ulang'}
+    >
+      {refreshing
+        ? 'Memuat ulang…'
+        : distance >= 64
+          ? 'Lepaskan untuk memuat ulang'
+          : 'Tarik untuk memuat ulang'}
     </span>
   </div>{/if}
 {@render children()}

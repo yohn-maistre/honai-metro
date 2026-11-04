@@ -1,6 +1,6 @@
 # Bluesky signup and pull-to-refresh sand
 
-The owner selected **open signup through Bluesky**, and explicitly requested an accent-colored pixel pile that disintegrates downward. These are implemented in the connected Svelte client and Strata's OAuth boundary; deployment evidence is recorded below after release.
+The owner selected **open signup through Bluesky**, and explicitly requested an accent-colored pixel pile that disintegrates downward. Both are deployed at https://etnos.space. [Try signup](https://etnos.space/login?mode=signup).
 
 ## Signup
 
@@ -25,3 +25,13 @@ The loopback browser journey uses the actual BrowserAuth routes and official OAu
 The broader existing UI journeys and actual-workerd contract protect community/privacy, wiki, agents, encrypted messaging and prior navigation. Exact final results and production checks belong in the deployment receipt; a successful provider-start smoke test does not by itself prove real account creation, CAPTCHA or email recovery.
 
 Source research and tooling: [native signup/handle research](model-and-onboarding-2026-11-04.md), [AppLlama reference study](appllama-research-2026-11-04.md). AppLlama inspired the scale of an optional pixel detail, not its implementation or ETNOS's identity policy.
+
+## Deployment receipt
+
+Deployed 4 November 2026, **16:00:10.340529 UTC / 23:00 Bangkok**, at 100%. UI source `327aeb3ddd4787af627b678138c3c8a6c89ae4eb`; engine `bfa708b7bae1683aaa0a41690e5b412386b235c7`; Worker version `2497d144-11ab-497b-ab0d-eb21c89393fc`; deployment `6120bf15-8227-4db5-985e-2fa2a37cf50b`. Assets: 75 files / 3,058,314 bytes. Module: 3,773,603 bytes, SHA-256 `21eb4edf263157b468e40db4a4bc6f82827ade42db63e89403f7634d684a338e`. Schema 19 retains the current node, namespace, keys, memberships and data; no new Cloudflare service or billing change.
+
+Final validation: zero Svelte diagnostics, 9 UI unit checks, production build, all 16 browser journeys, 103 engine checks and actual-workerd/minified-runtime contract. Live provider entry and cancellation passed without creating a real account. Final public health/options/capabilities/metadata and anonymous MCP checks passed. A real newcomer still needs to exercise provider account creation and anti-abuse checks. Existing bundler/chunk notices and physical-device keyboard qualification remain.
+
+Synthetic screenshots: [signup](signup-2026-11-04/signup-390.png), [signed-in return](signup-2026-11-04/signup-return-390.png), [pull preview](signup-2026-11-04/sandpile-pull-390.png), [falling sand](signup-2026-11-04/sandpile-falling-390.png). These do not depict production activity. The existing clock-theme behavior is unchanged.
+
+[Engine release/recovery receipt](https://github.com/yohn-maistre/strata/blob/feat/connected-oauth/docs/release-2026-11-04-signup.md) identifies the schema-19-compatible closed-registration fallback. Do not activate an older schema-18 Worker against the migrated database. Optional ETNOS-domain handle claiming and community/topic assignment remain separate work.

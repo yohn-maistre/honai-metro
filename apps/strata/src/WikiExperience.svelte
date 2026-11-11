@@ -67,6 +67,10 @@
       { id: string; slug: string; title: string; kind: string }[]
     >([]),
     contextPages = $state<string[] | null>(null)
+  type Growing={id:string;community_id:string;title:string;excerpt:string;updated:number;citationCount:number;author:{id:string;name:string;kind:string};evidenceStatus:string}
+  let growing=$state<Growing[]>([]),growingError=$state('')
+  const growingMatches=$derived(growing.filter(p=>p.title.toLocaleLowerCase().includes(query.toLocaleLowerCase())&&(!communityFilter||p.community_id===communityFilter)&&!context))
+  $effect(()=>{const controller=new AbortController();request<Growing[]>('/v1/wiki/growing',undefined,controller.signal).then(rows=>{if(!controller.signal.aborted)growing=rows}).catch(()=>{if(!controller.signal.aborted)growingError='Halaman dalam pengembangan belum dapat dimuat.'});return()=>controller.abort()})
   type Preview={id:string;community_id:string;title:string;revision_id:string;excerpt:string;updated:number;language:string;citationCount:number;sectionCount:number}
   let discoveries=$state<Preview[]>([]),discovering=$state(true),discoveryError=$state(''),communityFilter=$state(''),lastReadId=$state(''),readingSize=$state('normal')
   const accepted=$derived(discoveries.filter(p=>p.title.toLocaleLowerCase().includes(query.toLocaleLowerCase())&&(!contextPages||contextPages.includes(p.id))&&(!communityFilter||communityFilter===p.community_id)))
@@ -356,7 +360,7 @@
       <div class="wiki-atlas-mark"><BookOpen size={22}/><span>Wiki ETNOS</span></div>
       <h1>Pengetahuan bersama</h1>
       <p>Cerita, tempat & pengetahuan yang terus tumbuh.</p>
-      <div class="wiki-discovery-actions"><a class="commons-quiet-link" href="/knowledge">Catatan bersama <ArrowUpRight size={14}/></a>{#if memberships.some(m=>m.role!=='member')}<Button variant="outline" onclick={onCreate}><Plus size={15}/>Tulis halaman</Button>{/if}</div>
+      <div class="wiki-discovery-actions">{#if memberships.length}<a class="commons-quiet-link" href="/wiki/notes/new">Tambah catatan <Plus size={14}/></a>{/if}{#if memberships.some(m=>m.role!=='member')}<Button variant="outline" onclick={onCreate}><Plus size={15}/>Tulis halaman</Button>{/if}</div>
     </header>
     <div class="wiki-discovery-controls"><label class="atlas-search"><Search size={18}/><Input bind:value={query} aria-label="Cari pengetahuan" placeholder="Cari dalam Wiki…"/></label>
       {#if contexts.length}<nav class="atlas-lenses" aria-label="Jelajahi pengetahuan"><button aria-pressed={!context} onclick={()=>context=''}>Semua</button>{#each contexts as c}<button aria-pressed={context===c.slug} onclick={()=>context=c.slug}>{#if c.kind==='place'||c.kind==='region'}<MapPin size={14}/>{/if}{c.title}</button>{/each}</nav>{/if}
@@ -367,7 +371,8 @@
         <a class="wiki-featured-article" href={'/wiki/'+featured.id}><span class="wiki-featured-scope">{communities.find(c=>c.id===featured.community_id)?.title??'Pengetahuan bersama'}</span><h2>{featured.title}</h2>{#if featured.excerpt}<p>{featured.excerpt}{featured.excerpt.length===360?'…':''}</p>{/if}<span class="wiki-featured-meta">{languageName(featured.language)}{featured.citationCount?' · '+featured.citationCount+' sumber':''}</span><span class="wiki-read-link">Baca halaman<ArrowRight size={17}/></span></a>
       </section>
       {#if recent.length}<section class="wiki-recent"><div class="wiki-module-heading"><h2>Baru dirawat</h2><span>Revisi diterima</span></div>{#each recent as p}<a class="wiki-recent-row" href={'/wiki/'+p.id}><BookOpen size={19}/><div><h3>{p.title}</h3><p>{p.excerpt}</p><small>{relativeDate(p.updated)} · {communities.find(c=>c.id===p.community_id)?.title}</small></div><ArrowUpRight size={17}/></a>{/each}</section>{/if}
-      {:else}<div class="wiki-draft-state"><BookOpen size={27}/><h2>{query||context||communityFilter?'Belum ada halaman yang cocok':'Cerita pertama dimulai dari kita.'}</h2><p>{query||context||communityFilter?'Coba kata atau pilihan lain.':'Halaman yang ditinjau bersama akan hadir di sini.'}</p></div>{/if}
+      {:else if !growingMatches.length}<div class="wiki-draft-state"><BookOpen size={27}/><h2>{query||context||communityFilter?'Belum ada halaman yang cocok':'Cerita pertama dimulai dari kita.'}</h2><p>{query||context||communityFilter?'Coba kata atau pilihan lain.':'Halaman yang ditinjau bersama akan hadir di sini.'}</p></div>{/if}
+      {#if growingMatches.length}<section class="wiki-growing" aria-label="Dalam pengembangan"><div class="wiki-module-heading"><h2>Dalam pengembangan</h2><span>Belum ditinjau menyeluruh</span></div><p class="wiki-growing-intro">Bacaan awal untuk diperiksa dan dilengkapi bersama.</p>{#each growingMatches as p}<a class="wiki-recent-row" href={'/wiki/notes/'+p.id}><FileText size={19}/><div><h3>{p.title}</h3><p>{p.excerpt}</p><small>{p.author.name}{p.author.kind==='agent'?' · Agen AI':''} · {p.citationCount?p.citationCount+' sumber':'Sumber belum ditautkan'}{p.evidenceStatus!=='current'?' · Sumber perlu ditinjau':''}</small></div><ArrowUpRight size={17}/></a>{/each}</section>{:else if growingError}<p class="commons-alert" role="status">{growingError}</p>{/if}
       {#if groups.length>1}<section class="wiki-browse"><div class="wiki-module-heading"><h2>Jelajahi komunitas</h2>{#if communityFilter}<button onclick={()=>communityFilter=''}>Lihat semua</button>{/if}</div><div class="wiki-community-grid">{#each groups as c}<button aria-pressed={communityFilter===c.id} onclick={()=>communityFilter=communityFilter===c.id?'':c.id}><BookOpen size={18}/><strong>{c.title}</strong><span>{c.count} halaman</span></button>{/each}</div></section>{/if}
       {#if drafts.length}<section class="wiki-drafts"><div class="wiki-module-heading"><h2>Dalam tinjauan</h2></div>{#each drafts as p}<a href={'/wiki/'+p.id}>{p.title}<span>Draf</span><ArrowUpRight size={15}/></a>{/each}</section>{/if}
     {/if}

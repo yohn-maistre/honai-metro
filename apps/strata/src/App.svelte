@@ -91,6 +91,7 @@
     composeUrl = $state(''),
     composeKind = $state(''),
     profile = $state<Actor | null>(null)
+  function commonsPath(value:string){return value==='/knowledge'?'/wiki':value.startsWith('/knowledge/')?'/wiki/notes/'+value.slice('/knowledge/'.length):value}
   const firstWelcome = location.pathname === '/' && !hasSeenWelcome()
   const initialBoot = location.pathname === '/' && (firstWelcome || !hasBootedThisSession())
   let bootExitTimer: ReturnType<typeof setTimeout> | undefined
@@ -100,7 +101,7 @@
     authDialogError = $state(''),
     welcomeIntro = $state(initialBoot),
     authDialogLeaving = $state(false)
-  let path = $state(['/board', '/login'].includes(location.pathname) ? '/' : location.pathname),
+  let path = $state(['/board', '/login'].includes(location.pathname) ? '/' : commonsPath(location.pathname)),
     search = $state(location.pathname === '/login' ? '' : location.search),
     loading = $state(true),
     busy = $state(false),
@@ -335,6 +336,7 @@
   }
   function navigate(href: string) {
     const u = new URL(href, location.origin)
+    u.pathname = commonsPath(u.pathname)
     if (u.pathname === '/board') u.pathname = '/'
     if (
       u.pathname === '/login' &&
@@ -394,7 +396,9 @@
         '',
         '/' + location.search,
       )
-    path = location.pathname
+    const canonicalPath=commonsPath(location.pathname)
+    if(canonicalPath!==location.pathname)window.history.replaceState(window.history.state,'',canonicalPath+location.search)
+    path = canonicalPath
     search = location.search
     tab = window.history.state?.etnosTab ?? 'discussion'
     profileTab = window.history.state?.etnosProfileTab ?? 'posts'
@@ -524,7 +528,7 @@
         replies = thread.items
         repliesCursor = thread.nextCursor
       }
-      if (parts[0] === 'wiki' && parts[1]) {
+      if (parts[0] === 'wiki' && parts[1] && parts[1] !== 'notes') {
         const p = await request<WikiPage>('/v1/wiki/' + parts[1])
         const h = await request<typeof history>('/v1/wiki/' + p.id + '/history')
         if (mine !== generation) return
@@ -820,6 +824,7 @@
         '',
         '/' + location.search,
       )
+    if(commonsPath(location.pathname)!==location.pathname)window.history.replaceState(window.history.state,'',commonsPath(location.pathname)+location.search)
     restoreAppearance()
     const stopClock = startAppearanceClock()
     window.history.scrollRestoration = 'manual'
@@ -921,7 +926,7 @@
         {navigate}
       />{/await}
   {:else if path === '/labs/spaces'}<SpacesLab />
-  {:else if parts[0] === 'knowledge'}
+  {:else if parts[0] === 'knowledge' || (parts[0] === 'wiki' && parts[1] === 'notes')}
     {#await import('./KnowledgePage.svelte') then module}<module.default {auth} {path} {navigate}/>{/await}
   {:else if path === '/studio'}
     {#await import('./StudioPage.svelte') then module}<module.default {auth}/>{/await}

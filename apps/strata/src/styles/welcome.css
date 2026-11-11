@@ -227,3 +227,19 @@ body:has(.welcome-dialog[data-exiting='true']) [data-slot='dialog-overlay'] { op
   .app-load-line i, .app-load-line.complete i { animation: none; transition: none; }
   .explore-conversation { transition: none; }
 }
+
+/* Provisional pages share the Wiki's reading route and typography, with honest labels. */
+.wiki-growing { border-top: 1px solid var(--reading-line); padding-top: 8px; }
+.wiki-growing-intro { margin: 0; padding: 0 28px 16px; font-size: 13px; color: var(--muted-foreground); }
+.wiki-note-breadcrumb { align-items: center; padding-block: 18px; font-size: 12px; }
+.wiki-note-breadcrumb > span { color: var(--muted-foreground); }
+.wiki-provisional-reader { padding: 24px 28px 32px; }
+.wiki-provisional-reader > h1 { font-family: var(--font-editorial); font-size: clamp(30px, 3vw, 42px); font-weight: 500; line-height: 1.2; margin: 16px 0 12px; }
+.wiki-provisional-label { color: var(--muted-foreground); font-size: 12px; margin-bottom: 12px; }
+.wiki-provisional-reader .wiki-body { padding-inline: 0; }
+.wiki-provisional-reader .wiki-sources { margin-inline: 0; }
+.wiki-note-contents { margin-top: 22px; padding: 12px 0; border-block: 1px solid var(--reading-line); font-size: 13px; }
+.wiki-note-contents summary { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.wiki-note-contents nav { display: grid; gap: 10px; padding-top: 14px; }
+.wiki-note-contents a { color: var(--brand); }
+@media (max-width:699px) { .wiki-provisional-reader { padding-inline: 20px; } .wiki-growing-intro { padding-inline: 20px; } }

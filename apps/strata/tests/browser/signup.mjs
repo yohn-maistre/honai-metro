@@ -169,6 +169,7 @@ try {
     .getByRole('link', { name: 'Create test account and authorize' })
     .click()
   await p.waitForURL(origin + '/')
+  await p.locator('.welcome-dialog').waitFor({ state: 'detached' })
   await p
     .getByText('Synthetic conversation for refresh', { exact: true })
     .waitFor()
@@ -234,8 +235,10 @@ try {
   // The same refresh action remains keyboard accessible without a gesture.
   await p.setViewportSize({ width: 1440, height: 900 })
   await p.getByRole('button', { name: 'Muat ulang', exact: true }).focus()
-  await p.keyboard.press('Enter')
-  await p.waitForTimeout(150)
+  await Promise.all([
+    p.waitForResponse((response) => new URL(response.url()).pathname === '/v1/feed/page'),
+    p.keyboard.press('Enter'),
+  ])
   assert.equal(feedCalls, before + 2)
   assert.deepEqual(errors, [])
   console.log(

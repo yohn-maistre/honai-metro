@@ -19,7 +19,7 @@
     RefreshCw,
     LoaderCircle,
     MessageCircle,
-    MessageSquare,
+    MessagesSquare,
     ChevronRight,
     LogOut,
     MapPin,
@@ -41,7 +41,11 @@
   import SpacesLab from './SpacesLab.svelte'
   import ActivityPage from './ActivityPage.svelte'
   import AppearancePanel from './AppearancePanel.svelte'
-  import LoginForm from '$lib/components/login-form.svelte'
+  import WelcomeDialog from './WelcomeDialog.svelte'
+  import LandscapePrint from './LandscapePrint.svelte'
+  import ThreadEnd from './ThreadEnd.svelte'
+  import { profileArtwork } from './site-branding'
+  import { hasSeenWelcome, rememberWelcome, safeBrowsePath, hasBootedThisSession, rememberBoot } from './welcome'
   import FeaturePages from './FeaturePages.svelte'
   import { videoEmbed, directVideo } from './markdown'
   import {
@@ -86,8 +90,17 @@
     composeUrl = $state(''),
     composeKind = $state(''),
     profile = $state<Actor | null>(null)
-  let path = $state(location.pathname === '/board' ? '/' : location.pathname),
-    search = $state(location.search),
+  const firstWelcome = location.pathname === '/' && !hasSeenWelcome()
+  const initialBoot = location.pathname === '/' && (firstWelcome || !hasBootedThisSession())
+  let bootExitTimer: ReturnType<typeof setTimeout> | undefined
+  let authDialogOpen = $state(location.pathname === '/login' || initialBoot),
+    authDialogMode = $state<'welcome' | 'login' | 'signup'>(initialBoot ? 'welcome' : new URLSearchParams(location.search).get('mode') === 'signup' ? 'signup' : 'login'),
+    authSearch = $state(location.pathname === '/login' ? location.search : ''),
+    authDialogError = $state(''),
+    welcomeIntro = $state(initialBoot),
+    authDialogLeaving = $state(false)
+  let path = $state(['/board', '/login'].includes(location.pathname) ? '/' : location.pathname),
+    search = $state(location.pathname === '/login' ? '' : location.search),
     loading = $state(true),
     busy = $state(false),
     error = $state('')
@@ -328,6 +341,18 @@
       !u.searchParams.has('returnTo')
     )
       u.searchParams.set('returnTo', path + search)
+    if (u.pathname === '/login') {
+      saveScroll()
+      window.history.pushState({ ...window.history.state, etnosAuthDialog: true }, '', u)
+      authSearch = u.search
+      authDialogError = ''
+      authDialogLeaving = false
+      authDialogMode = u.searchParams.get('mode') === 'signup' ? 'signup' : 'login'
+      welcomeIntro = false
+      authDialogOpen = true
+      return
+    }
+    authDialogOpen = false
     saveScroll()
     window.history.pushState(
       {
@@ -344,6 +369,20 @@
     void load()
     document.getElementById('commons-main')?.focus({ preventScroll: true })
     window.scrollTo({ top: 0, behavior: 'instant' })
+  }
+  function closeAuth() {
+    if (busy) return
+    rememberWelcome()
+    clearTimeout(bootExitTimer)
+    authDialogLeaving = false
+    authDialogOpen = false
+    if (location.pathname !== '/login') return
+    if (window.history.state?.etnosAuthDialog) window.history.back()
+    else {
+      const target = safeBrowsePath(new URLSearchParams(authSearch).get('returnTo'))
+      window.history.replaceState({ ...window.history.state, etnosAuthDialog: false }, '', target)
+      void restoreEntry()
+    }
   }
   async function restoreEntry() {
     const entry = location.href,
@@ -403,6 +442,9 @@
       const identity = await request<Auth>('/auth/me')
       if (mine !== generation) return
       auth = identity
+      if (authDialogOpen && authDialogMode === 'welcome') {
+        rememberWelcome()
+      }
       setCsrf(identity.csrf)
       profile = null
       const filters = new SvelteURLSearchParams({ roots: 'true', limit: '30' })
@@ -510,7 +552,16 @@
         }
       }
     } finally {
-      if (mine === generation) loading = false
+      if (mine === generation) {
+        loading = false
+        if (authDialogOpen && authDialogMode === 'welcome' && (auth.actor || !firstWelcome)) {
+          authDialogLeaving = true
+          bootExitTimer = setTimeout(() => {
+            authDialogOpen = false
+            authDialogLeaving = false
+          }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 220)
+        }
+      }
     }
   }
   async function mutate(action: () => Promise<void>) {
@@ -674,7 +725,9 @@
     }
   }
   async function login(mode: 'login' | 'signup' = 'login', invitation = '') {
+    authDialogError = ''
     await mutate(async () => {
+      try {
       const result = await request<{ authorizationUrl: string }>(
         '/auth/start',
         {
@@ -683,11 +736,15 @@
             ? { invitation }
             : { handle: handle.trim(), publishing: publishingConsent }),
           returnTo:
-            new SvelteURLSearchParams(search).get('returnTo') ||
+            new SvelteURLSearchParams(authSearch).get('returnTo') ||
             (mode === 'signup' ? '/communities?welcome=1' : '/'),
         },
       )
       location.assign(result.authorizationUrl)
+      } catch (e) {
+        authDialogError = e instanceof Error ? e.message : 'Masuk belum dapat dilanjutkan. Coba lagi.'
+        throw e
+      }
     })
   }
   async function logout() {
@@ -749,6 +806,7 @@
     applyAppearance()
   })
   onMount(() => {
+    if (initialBoot) rememberBoot()
     try {
       localStorage.removeItem('etnos-home-layout')
       localStorage.removeItem('etnos-feed-board')
@@ -768,6 +826,7 @@
     void load()
     return () => {
       dismissNotifications()
+      clearTimeout(bootExitTimer)
       stopClock()
     }
   })
@@ -784,10 +843,18 @@
   onclick={intercept}
   onpopstate={() => {
     if (modal === 'wiki' || modal === 'proposal') modal = null
-    void restoreEntry()
+    if (location.pathname === '/login') {
+      authSearch = location.search
+      authDialogMode = new URLSearchParams(authSearch).get('mode') === 'signup' ? 'signup' : 'login'
+      welcomeIntro = false
+      authDialogOpen = true
+    } else {
+      authDialogOpen = false
+      void restoreEntry()
+    }
   }}
   onbeforeunload={(event) => {
-    if (wikiDirty || ((modal === 'wiki' || modal === 'proposal') && busy))
+    if (wikiDirty || ((modal === 'wiki' || modal === 'proposal') && busy) || (modal === 'compose' && (composeState.dirty || composeState.busy)))
       event.preventDefault()
   }}
 />
@@ -853,18 +920,6 @@
         {navigate}
       />{/await}
   {:else if path === '/labs/spaces'}<SpacesLab />
-  {:else if path === '/login'}
-    <h1 class="sr-only">Masuk</h1>
-    <section class="strata-narrow">
-      <LoginForm
-        bind:handle
-        bind:publishing={publishingConsent}
-        livePublishing={!!cap?.publication.liveAT}
-        {busy}
-        failed={new SvelteURLSearchParams(search).has('error')}
-        onsubmit={login}
-      />
-    </section>
   {:else if parts[0] === 'knowledge'}
     {#await import('./KnowledgePage.svelte') then module}<module.default {auth} {path} {navigate}/>{/await}
   {:else if path === '/studio'}
@@ -1240,7 +1295,7 @@
               : !p.parent_id),
       )}
       <section class="profile-header">
-        <div class="profile-cover" aria-hidden="true"></div>
+        <div class="profile-cover" aria-hidden="true">{#if profileArtwork(actor.id)}<LandscapePrint artwork={profileArtwork(actor.id)!} decorative/>{/if}</div>
         <div class="profile-content">
           <div class="profile-topline">
             <span class="cx-avatar sage profile-avatar avatar-tinted" style={avatarTone(actor.id)}>
@@ -1296,7 +1351,7 @@
                   variant="outline"
                   aria-label="Kirim pesan"
                 >
-                  <MessageSquare size={17} />
+                  <MessagesSquare size={17} />
                 </Button>{/if}
             </div>
           </div>
@@ -1316,7 +1371,7 @@
                   : 'Anggota ETNOS'}
             </p>
           </div>
-          {#if actor.bio}<p class="profile-bio">{actor.bio}</p>{/if}
+          {#if actor.bio}<p class="profile-bio">{actor.bio}</p>{:else if auth.actor?.id === actor.id && actor.kind === 'human'}<p class="profile-bio-hint">Tambahkan bio singkat lewat Edit profil.</p>{/if}
           {#if actor.website || actor.location}<div
               class="profile-public-fields"
             >
@@ -1377,6 +1432,7 @@
       {#if !profilePosts.length && !loading}<p class="search-state">
           Belum ada posting yang dapat kamu lihat.
         </p>{/if}
+      <ThreadEnd/>
     {:else if !loading}<div class="strata-nodata">
         <h2>Profil tidak tersedia</h2>
         <p>
@@ -1385,7 +1441,7 @@
       </div>{/if}
   {:else if path === '/' || path === '/saved' || path === '/find'}
     <FeedRefresh
-      enabled={path === '/' && modal === null && !searchDialogOpen}
+      enabled={path === '/' && modal === null && !searchDialogOpen && !authDialogOpen}
       busy={loading}
       onRefresh={load}
     >
@@ -1466,6 +1522,7 @@
             Muat posting lain
           </Button>
         </div>{/if}
+      {#if !loading}<ThreadEnd/>{/if}
     </FeedRefresh>
   {:else}<div class="strata-nodata">
       <h2>Halaman tidak tersedia</h2>
@@ -1559,6 +1616,9 @@
   {/snippet}
 </PlatformShell>
 <NotificationHost />
+{#if authDialogOpen}
+  <WelcomeDialog exiting={authDialogLeaving} ready={(authDialogMode !== 'welcome' || !loading) && !authDialogLeaving} mode={authDialogMode} intro={welcomeIntro} bind:handle bind:publishing={publishingConsent} livePublishing={!!cap?.publication.liveAT} {busy} failed={new URLSearchParams(authSearch).has('error')} submitError={authDialogError} onsubmit={login} onclose={closeAuth}/>
+{/if}
 <Dialog.Root
   open={modal !== null}
   onOpenChange={(value) => {
@@ -1568,6 +1628,7 @@
   <Dialog.Content
     class={'platform-dialog' + (modal === 'compose' ? ' compose-dialog' : '')}
     showCloseButton={modal !== 'compose'}
+    springEntrance={modal === 'compose'}
     onEscapeKeydown={(event) => {
       if (modal === 'compose' || modal === 'wiki' || modal === 'proposal') {
         event.preventDefault()

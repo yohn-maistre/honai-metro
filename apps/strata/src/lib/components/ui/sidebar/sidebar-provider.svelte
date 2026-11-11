@@ -23,7 +23,7 @@
     onOpenChange?: (open: boolean) => void
   } = $props()
 
-  const sidebar = setSidebar({
+  setSidebar({
     open: () => open,
     setOpen: (value: boolean) => {
       open = value
@@ -34,8 +34,6 @@
     },
   })
 </script>
-
-<svelte:window onkeydown={sidebar.handleShortcutKeydown} />
 
 <Tooltip.Provider delayDuration={0}>
   <div

@@ -6,6 +6,7 @@
   import DialogOverlay from './dialog-overlay.svelte'
   import DialogPortal from './dialog-portal.svelte'
   import type { Snippet } from 'svelte'
+  import { springSurface } from '$lib/spring-surface'
   import type { ComponentProps } from 'svelte'
 
   let {
@@ -14,12 +15,19 @@
     portalProps,
     children,
     showCloseButton = true,
+    springEntrance = false,
     ...restProps
   }: WithoutChildrenOrChild<DialogPrimitive.ContentProps> & {
     portalProps?: WithoutChildrenOrChild<ComponentProps<typeof DialogPortal>>
     children: Snippet
     showCloseButton?: boolean
+    springEntrance?: boolean
   } = $props()
+  $effect(() => {
+    if (!ref || !springEntrance) return
+    const motion = springSurface(ref)
+    return () => motion.destroy()
+  })
 </script>
 
 <DialogPortal {...portalProps}>

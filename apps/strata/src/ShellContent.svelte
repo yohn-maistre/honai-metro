@@ -9,7 +9,7 @@
     Home,
     Compass,
     Bell,
-    MessageSquare,
+    MessagesSquare,
     Users,
     Bookmark,
     BookOpen,
@@ -62,7 +62,7 @@
     { href: '/communities', label: 'Komunitas', icon: Users },
     { href: '/wiki', label: 'Wiki', icon: BookOpen },
     { href: '/work', label: 'Kerja publik', icon: ListTodo },
-    { href: '/messages', label: 'Pesan', icon: MessageSquare },
+    { href: '/messages', label: 'Pesan', icon: MessagesSquare },
     { href: '/notifications', label: 'Aktivitas', icon: Bell },
     { href: '/saved', label: 'Tersimpan', icon: Bookmark },
   ]

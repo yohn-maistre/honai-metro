@@ -1,19 +1,18 @@
-# Honai connected interface
+# Strata connected web interface
 
-The maintained Honai UI is available on this repository's main branch in `apps/strata`. It is a frontend mirror of the canonical connected app in [Strata](https://github.com/yohn-maistre/strata), `apps/web`. Changes are authored and integrated there, then synced here for frontend inspection; do not maintain divergent implementations.
+Canonical Svelte/Vite frontend for Strata. It was imported from `yohn-maistre/honai-metro`, branch `feat/strata-connected`, commit `7a35e99` (runtime source at `f489846`), directory `apps/strata`. The legacy Photon/PieFed fork remains a moderation/media behavior donor. See `UPSTREAM.md`, `licenses/` and `public/third-party-notices.txt`; application code is AGPL-3.0-only. No legacy backend/JWT transport is imported.
+
+From the engine root:
 
 ```
-npm ci --prefix apps/strata --ignore-scripts
-npm run check --prefix apps/strata
-npm test --prefix apps/strata
-npm run dev --prefix apps/strata
-npm run build --prefix apps/strata
+npm ci --prefix apps/web --ignore-scripts
+npm run check:ui
+npm run test:ui
+npm run build:ui
 ```
 
-Build output: `apps/strata/dist`. The app needs the same-origin Strata API/OAuth Worker for authentication and mutations. Uploading these static assets to a standalone Pages project does not supply that backend. ETNOS's connected deployment is built from Strata's integrated Worker/assets profile.
+The output is `apps/web/dist`, consumed by `wrangler.web.jsonc`. Authentication and mutations require the same-origin Strata Worker; static hosting alone does not provide them. Local preferences hold appearance, not session credentials. Experimental DM vault boundaries remain documented in `UPSTREAM.md`.
 
-Geist + Geist Serif is the default; saved choices persist. Other self-hosted pairs include Plus Jakarta Sans + Geist Serif and Gabarito. Shared Ding notifications have spring motion, local synthesized sound and device mute/volume. Appearance, current private access and agent identity are independent concerns.
+Use `STRATA_REPO` pointing at the engine and a loopback `STRATA_UI_URL` for browser fixtures. Those fixtures never provision a deployed account. The UI defaults to Geist + Geist Serif, with Gabarito, Plus Jakarta Sans and other selectable pairs, user-selectable accents and gradual clock-based themes.
 
-Legacy Photon/PieFed source is retained at the repository root as a media/moderation behavior donor. See `UPSTREAM.md`, `licenses/` and generated `public/third-party-notices.txt` for attribution. Application source is AGPL-3.0-only. Public frontend source is not a copy of private institutional content or the full private Strata repository.
-
-Browser journeys require an explicit local `STRATA_REPO` checkout, loopback `STRATA_UI_URL` and Playwright installation; fixtures do not mutate deployed accounts.
+The living implementation ledger is at `../../docs/foundation/README.md`. Update it with actual code/check/release evidence. The old connected app checkout is a frozen donor snapshot; new connected UI implementation belongs here.

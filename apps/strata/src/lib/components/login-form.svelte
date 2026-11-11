@@ -11,7 +11,7 @@
   import { Input } from '$lib/components/ui/input/index.js'
   import { Checkbox } from '$lib/components/ui/checkbox/index.js'
   import { ArrowUpRight, LoaderCircle, KeyRound } from '@lucide/svelte'
-  import { onMount } from 'svelte'
+  import { onMount, untrack } from 'svelte'
   import { request } from '../../api'
   let {
     handle = $bindable(''),
@@ -19,17 +19,25 @@
     livePublishing = false,
     busy = false,
     failed = false,
+    submitError = '',
     onsubmit,
+    initialMode,
+    embedded = false,
+    onbrowse,
   }: {
     handle?: string
     publishing?: boolean
     livePublishing?: boolean
     busy?: boolean
     failed?: boolean
+    submitError?: string
+    initialMode?: 'login' | 'signup'
+    embedded?: boolean
+    onbrowse?: () => void
     onsubmit: (mode: 'login' | 'signup', invitation: string) => void
   } = $props()
   let signup = $state(
-    new URLSearchParams(location.search).get('mode') === 'signup',
+    untrack(() => initialMode ? initialMode === 'signup' : new URLSearchParams(location.search).get('mode') === 'signup'),
   )
   let invitation = $state('')
   let enrollment = $state<'open' | 'invite' | 'closed' | null>(null)
@@ -50,7 +58,7 @@
   })
 </script>
 
-<Card.Root class="login-card">
+<Card.Root class={'login-card' + (embedded ? ' login-card-embedded' : '')}>
   <Card.Header>
     <KeyRound size={23} class="text-primary mb-3" /><Card.Title class="text-xl">
       {signup ? 'Bergabung dengan ETNOS' : 'Masuk ke ETNOS'}
@@ -116,7 +124,7 @@
               Izinkan penerbitan ke AT
             </FieldLabel>
           </Field>{/if}
-        {#if failed}<p role="alert" class="cx-form-error">
+        {#if submitError}<p role="alert" class="cx-form-error">{submitError}</p>{:else if failed}<p role="alert" class="cx-form-error">
             Masuk belum selesai. Jika akun Blueskymu sudah dibuat, gunakan akun
             itu saat mencoba lagi.
           </p>{/if}
@@ -139,7 +147,7 @@
     </form>
   </Card.Content>
   <Card.Footer class="border-t text-sm text-muted-foreground">
-    <a href="/explore" class="cx-text-link">Tetap membaca tanpa masuk</a>
+    <a href="/explore" class="cx-text-link" onclick={(event) => { if (onbrowse) { event.preventDefault(); event.stopPropagation(); onbrowse() } }}>Tetap membaca tanpa masuk</a>
     <Button
       type="button"
       variant="link"

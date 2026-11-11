@@ -14,7 +14,8 @@
     "prebuild": "node scripts/notices.mjs",
     "test": "node --test tests/*.test.ts",
     "test:browser:commons": "node tests/browser/living-commons.mjs && node tests/browser/commons-design.mjs",
-    "test:browser:reading": "node tests/browser/reading-pass.mjs"
+    "test:browser:reading": "node tests/browser/reading-pass.mjs",
+    "test:browser:welcome": "node tests/browser/welcome.mjs"
   },
   "dependencies": {
     "@fontsource-variable/gabarito": "5.3.0",

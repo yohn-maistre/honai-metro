@@ -14,7 +14,7 @@ export const appearance = $state({
   theme: 'dark' as 'dark' | 'light',
   themeMode: 'clock' as ThemeMode,
   accent: '#1680fa',
-  base: 'graphite',
+  base: 'paper',
   texture: 'grain',
   textureStrength: 'soft',
   fontPair: 'jakarta',
@@ -64,7 +64,7 @@ export function applyAppearance() {
   }
   if (!shift) finishTheme()
   root.dataset.themeMode = appearance.themeMode
-  if (!bases.some((b) => b.id === appearance.base)) appearance.base = 'graphite'
+  if (!bases.some((b) => b.id === appearance.base)) appearance.base = 'paper'
   if (!['none', 'grain', 'dither'].includes(appearance.texture))
     appearance.texture = 'grain'
   root.dataset.texture = appearance.texture

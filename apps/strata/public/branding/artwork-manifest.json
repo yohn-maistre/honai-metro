@@ -1,0 +1,31 @@
+{
+  "date": "2026-11-11",
+  "assets": [
+    {
+      "id": "tigi",
+      "file": "tigi-print.webp",
+      "sha256": "d899149bf17dd588edcd19d7641e68449abb822687d0d4ffcc30d15c0a13f219",
+      "width": 840,
+      "height": 1260,
+      "bytes": 422374,
+      "generation": "image_gen, original illustrative composition inspired by owner-supplied place reference",
+      "reference_file": "danau-tigi.jfif",
+      "original_generated_file": "exec-be745edc-dd4e-47d0-a4a2-ec35d0862914.png",
+      "treatment": "Cobalt/ivory engraving, stipple and grain; runtime ink tint follows accent; location is coded text, not baked into pixels."
+    },
+    {
+      "id": "raja-ampat",
+      "file": "raja-ampat-print.webp",
+      "sha256": "706fc82956b572871237d6b5c08911ab0bfc851589d702b3fb6b21dcfdd0d48d",
+      "width": 840,
+      "height": 1260,
+      "bytes": 366026,
+      "generation": "image_gen, original illustrative composition inspired by owner-supplied place reference",
+      "reference_file": "RajaAmpat24_CS_MosaicStudios_A-265 (1).jpg",
+      "original_generated_file": "exec-ca258f60-bcc6-4642-ab33-d886f8936157.png",
+      "treatment": "Cobalt/ivory engraving, stipple and grain; runtime ink tint follows accent; location is coded text, not baked into pixels."
+    }
+  ],
+  "source_photographs": "Owner-supplied reference ZIP; originals not included in this distribution. Illustrations are not documentary photographs or a statement of a profile owner’s location.",
+  "runtime": "Static local WebP assets; no visitor image-generation request, autoplay carousel or required image-provider account."
+}

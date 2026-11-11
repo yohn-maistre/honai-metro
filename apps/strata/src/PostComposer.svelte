@@ -3,6 +3,7 @@
   import { onDestroy, untrack } from 'svelte'
   import {
     ImagePlus,
+    Bold,
     Globe,
     LockKeyhole,
     X,
@@ -318,7 +319,7 @@
           placeholder={compact ? 'Tulis balasan…' : 'Apa yang terjadi?'}
           rows={compact ? 1 : 4}
           maxlength={destination?.publication === 'atproto' ? 6000 : 20000}
-          disabled={!!pending}
+          disabled={busy || !!pending}
           oninput={resize}
           onkeydown={(e) => {
             if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -458,6 +459,10 @@
             </div>{/each}
         </div>{/if}
       <div class="composer-tools">
+        {#if !compact && destination?.publication === 'local'}<Button
+          variant="ghost" size="icon" aria-label="Format tulisan" title="Format tulisan: tebal, miring, daftar dan Markdown"
+          aria-pressed={format} disabled={busy || !!pending} onclick={() => format = !format}
+        ><Bold size={20}/><span class="composer-tool-label">Format</span></Button>{/if}
         <input
           bind:this={picker}
           type="file"
@@ -482,7 +487,7 @@
           {#if processing}<LoaderCircle
               size={20}
               class="animate-spin"
-            />{:else}<ImagePlus size={20} />{/if}
+            />{:else}<ImagePlus size={20} />{/if}<span class="composer-tool-label">Media</span>
         </Button>
         {#if !compact && destination?.publication === 'local'}<Button
             variant="ghost"
@@ -493,7 +498,7 @@
             disabled={busy || !!pending}
             onclick={() => (showUrl = !showUrl)}
           >
-            <Link size={20} />
+            <Link size={20} /><span class="composer-tool-label">Tautan</span>
           </Button>{#if !parentId}<Button
               variant="ghost"
               size="icon"
@@ -503,8 +508,8 @@
               disabled={busy || !!pending}
               onclick={() => (kind = kind === 'poll' ? '' : 'poll')}
             >
-              <Vote size={20} />
-            </Button>{/if}{/if}
+              <Vote size={20} /><span class="composer-tool-label">Polling</span>
+            </Button><Button variant="ghost" size="icon" aria-label="Tambahkan acara" title="Acara" aria-pressed={kind === 'event'} disabled={busy || !!pending} onclick={() => kind = kind === 'event' ? '' : 'event'}><CalendarDays size={20}/><span class="composer-tool-label">Acara</span></Button>{/if}{/if}
         {#if destination?.publication === 'local'}<Dropdown.Root>
             <Dropdown.Trigger
               class="composer-tool"

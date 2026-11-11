@@ -243,3 +243,9 @@ body:has(.welcome-dialog[data-exiting='true']) [data-slot='dialog-overlay'] { op
 .wiki-note-contents nav { display: grid; gap: 10px; padding-top: 14px; }
 .wiki-note-contents a { color: var(--brand); }
 @media (max-width:699px) { .wiki-provisional-reader { padding-inline: 20px; } .wiki-growing-intro { padding-inline: 20px; } }
+
+.explore-ranking-controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: -4px 0 18px; }
+.explore-ranking-controls button { min-height: 40px; padding: 7px 12px; border-radius: 10px; font-size: 12px; color: var(--muted-foreground); }
+.explore-ranking-controls button[aria-pressed='true'] { color: var(--foreground); background: var(--secondary); }
+.explore-ranking-controls small { margin-left: auto; font-size: 11px; color: var(--muted-foreground); }
+@media (hover:hover) { .explore-ranking-controls button:hover { color: var(--foreground); background: var(--surface-hover); } }

@@ -269,6 +269,8 @@
   const heading = $derived(
     parts[0] === 'studio'
       ? 'Studio'
+      : parts[0] === 'offers'
+        ? 'Penawaran'
       : parts[0] === 'knowledge'
         ? 'Catatan bersama'
         : parts[0] === 'agents'
@@ -465,7 +467,7 @@
         filters.set('q', new SvelteURLSearchParams(search).get('q') ?? '')
       const [cs, feed, pages, roles, features, followed] = await Promise.all([
         request<Community[]>('/v1/communities'),
-        ['news','studio','knowledge'].includes(parts[0])
+        ['news','studio','knowledge','offers'].includes(parts[0])
           ? Promise.resolve({
               items: [] as Post[],
               pinned: [] as Post[],
@@ -476,7 +478,7 @@
               pinned?: Post[]
               nextCursor: string | null
             }>('/v1/feed/page?' + filters),
-        ['news','studio','knowledge'].includes(parts[0])
+        ['news','studio','knowledge','offers'].includes(parts[0])
           ? Promise.resolve([])
           : request<WikiPage[]>('/v1/wiki'),
         identity.actor
@@ -579,6 +581,12 @@
     } finally {
       busy = false
     }
+  }
+  function startOffering(id=''){
+    const eligible=communities.filter(c=>c.publication==='local'&&memberships.some(m=>m.community_id===c.id))
+    const room=id?eligible.find(c=>c.id===id):eligible.find(c=>c.visibility==='public')??eligible[0]
+    if(!room){fail('Gabung ke komunitas dengan penerbitan lokal untuk berbagi penawaran.');return}
+    open('compose',room.id);composeKind='offering'
   }
   function open(kind: typeof modal, id = '') {
     if (!auth.actor) {
@@ -928,6 +936,8 @@
   {:else if path === '/labs/spaces'}<SpacesLab />
   {:else if parts[0] === 'knowledge' || (parts[0] === 'wiki' && parts[1] === 'notes')}
     {#await import('./KnowledgePage.svelte') then module}<module.default {auth} {path} {navigate}/>{/await}
+  {:else if path === '/offers'}
+    {#await import('./OfferingCatalog.svelte') then module}<module.default {auth} {communities} {memberships} onCreate={()=>startOffering()}/>{/await}
   {:else if path === '/studio'}
     {#await import('./StudioPage.svelte') then module}<module.default {auth}/>{/await}
   {:else if path === '/agents'}
@@ -1156,11 +1166,11 @@
               Media
             </Tabs.Trigger><Tabs.Trigger value="voices">
               Suara
-            </Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
+            </Tabs.Trigger><Tabs.Trigger value="offers">Penawaran</Tabs.Trigger><Tabs.Trigger value="about">Tentang</Tabs.Trigger>
           </Tabs.List>
         </div>
         <Tabs.Content value={tab}>
-          {#if tab === 'voices'}{#await import('./EngagementPage.svelte') then module}<module.default
+          {#if tab==='offers'}{#await import('./OfferingCatalog.svelte') then module}<module.default {auth} {communities} {memberships} communityId={community.id} compact onCreate={()=>startOffering(community.id)}/>{/await}{:else if tab === 'voices'}{#await import('./EngagementPage.svelte') then module}<module.default
                 {auth}
                 communityId={community.id}
                 onAsk={() => {
@@ -1416,7 +1426,7 @@
       </section>
       <div class="section-tab-scroll" use:tabScroll>
         <div class="profile-tabs" role="group" aria-label="Isi profil">
-          {#each [['posts', 'Posting'], ['replies', 'Balasan'], ['media', 'Media']] as [value, label]}<button
+          {#each [['posts', 'Posting'], ['replies', 'Balasan'], ['media', 'Media'], ['offerings','Penawaran']] as [value, label]}<button
               aria-pressed={profileTab === value}
               onclick={() => (profileTab = value)}
             >
@@ -1424,6 +1434,7 @@
             </button>{/each}
         </div>
       </div>
+      {#if profileTab==='offerings'}{#await import('./OfferingCatalog.svelte') then module}<module.default {auth} {communities} {memberships} authorId={actor.id} compact onCreate={auth.actor?.id===actor.id?()=>startOffering():undefined}/>{/await}{:else}
       {#each profilePosts as p}<PostCard
           post={p}
           community={communities.find((c) => c.id === p.community_id)}
@@ -1439,7 +1450,7 @@
       {#if !profilePosts.length && !loading}<p class="search-state">
           Belum ada posting yang dapat kamu lihat.
         </p>{/if}
-      <ThreadEnd/>
+      {/if}<ThreadEnd/>
     {:else if !loading}<div class="strata-nodata">
         <h2>Profil tidak tersedia</h2>
         <p>

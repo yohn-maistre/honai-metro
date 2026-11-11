@@ -103,7 +103,7 @@
     onReply={replyTo}
     {onError}
   />
-  <div class="thread-reply-dock">
+  <div class="thread-reply-dock" id="reply">
     {#if post.locked}<p class="thread-empty">
         Percakapan dikunci oleh moderator.
       </p>{:else if actor && member && community}{#key post.id}<PostComposer

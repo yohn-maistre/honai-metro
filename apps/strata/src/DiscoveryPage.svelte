@@ -1,5 +1,6 @@
 <script lang="ts">
   import {
+    ShoppingBag,
     ArrowUpRight,
     Users,
     BookOpen,
@@ -68,6 +69,7 @@
   <a href="/communities"><Users size={17} />Komunitas</a>
   <a href="/topics"><Hash size={17} />Topik</a>
   <a href="/groups"><Building2 size={17} />Organisasi</a>
+  <a href="/offers"><ShoppingBag size={17}/>Penawaran</a>
   <a href="/wiki"><BookOpen size={17}/>Wiki</a>
   <a href="/contexts"><MapPin size={17}/>Tempat & bahasa</a>
 </nav>
@@ -187,7 +189,8 @@
   {#if data.wiki.length}<section class="discovery-section">
       <div class="discovery-section-head">
         <h2>Wiki bersama</h2>
-        <a href="/wiki">Semua <ArrowUpRight size={14} /></a>
+        <a href="/offers"><ShoppingBag size={17}/>Penawaran</a>
+  <a href="/wiki">Semua <ArrowUpRight size={14} /></a>
       </div>
       {#each data.wiki as page}<a
           class="discovery-row"

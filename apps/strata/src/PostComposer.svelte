@@ -2,6 +2,7 @@
   import {avatarTone} from './avatar-tone'
   import { onDestroy, untrack } from 'svelte'
   import {
+    ShoppingBag,
     ImagePlus,
     Bold,
     Globe,
@@ -85,7 +86,7 @@
     title = $state(''),
     url = $state(untrack(() => initialUrl)),
     warning = $state(''),
-    showTitle = $state(false),
+    showTitle = $state(untrack(()=>initialKind==='offering')),
     showUrl = $state(false),
     showWarning = $state(false),
     format = $state(false),
@@ -93,6 +94,7 @@
     kind = $state(untrack(() => initialKind)),
     pollOptions = $state(['', '']),
     pollDays = $state('3'),
+    offerKind = $state('offer'),offerPrice = $state(''),offerUnit = $state(''),offerDays = $state('30'),
     eventTime = $state(''),
     eventLocation = $state(''),
     pending = $state<{ key: string; payload: Record<string, unknown> } | null>(
@@ -212,10 +214,11 @@
             ...(parentId ? { parentId } : {}),
             mediaIds,
             content,
+            ...(kind==='offering'?{kind:offerKind,price:String(offerPrice??'').trim()?Number(offerPrice):null,unit:offerUnit,durationDays:Number(offerDays)}:{}),
           },
         }
       }
-      const post = await request<Post>('/v1/posts', {
+      const post = await request<Post>(kind==='offering'?'/v1/offerings':'/v1/posts', {
         ...pending.payload,
         requestKey: pending.key,
       })
@@ -224,6 +227,7 @@
       url = ''
       warning = ''
       kind = ''
+      offerKind='offer';offerPrice='';offerUnit='';offerDays='30'
       pollOptions = ['', '']
       format = false
       preview = false
@@ -351,6 +355,7 @@
           maxlength={160}
           disabled={busy || !!pending}
         />{/if}
+      {#if kind === 'offering'}<fieldset class="composer-extras offering-create" disabled={busy||!!pending}><legend>Penawaran atau kebutuhan</legend><Choice aria-label="Menawarkan atau mencari" bind:value={offerKind} items={[{value:'offer',label:'Menawarkan'},{value:'request',label:'Mencari'}]}/><div class="offering-form-pair"><Input aria-label={offerKind==='request'?'Anggaran (Rp)':'Harga (Rp)'} type="number" min="0" step="1" bind:value={offerPrice} placeholder={offerKind==='request'?'Anggaran (opsional)':'Harga (opsional)'}/><Input aria-label="Satuan harga" bind:value={offerUnit} maxlength={60} placeholder="Misalnya per ikat"/></div><Choice aria-label="Masa penawaran" bind:value={offerDays} items={[{value:'7',label:'Berlaku 7 hari'},{value:'30',label:'Berlaku 30 hari'},{value:'90',label:'Berlaku 90 hari'}]}/><p class="cx-hint">Kosongkan harga untuk dibicarakan langsung. Kontak melalui pesan atau diskusi; belum ada pembayaran di ETNOS.</p><Button variant="ghost" size="sm" onclick={()=>kind=''}>Hapus penawaran</Button></fieldset>{/if}
       {#if kind === 'poll'}<fieldset
           class="composer-extras"
           disabled={busy || !!pending}
@@ -459,6 +464,7 @@
             </div>{/each}
         </div>{/if}
       <div class="composer-tools">
+        {#if !compact && !parentId && destination?.publication === 'local'}<Button variant="ghost" size="icon" aria-label="Tambahkan penawaran" title="Penawaran atau kebutuhan" aria-pressed={kind==='offering'} disabled={busy||!!pending} onclick={()=>{kind=kind==='offering'?'':'offering';if(kind==='offering')showTitle=true}}><ShoppingBag size={20}/><span class="composer-tool-label">Penawaran</span></Button>{/if}
         {#if !compact && destination?.publication === 'local'}<Button
           variant="ghost" size="icon" aria-label="Format tulisan" title="Format tulisan: tebal, miring, daftar dan Markdown"
           aria-pressed={format} disabled={busy || !!pending} onclick={() => format = !format}

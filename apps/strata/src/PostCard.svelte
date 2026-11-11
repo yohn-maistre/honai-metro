@@ -13,6 +13,7 @@
     GitPullRequest,
   } from '@lucide/svelte'
   import * as AlertDialog from '$lib/components/ui/alert-dialog/index.js'
+  import OfferingCard from './OfferingCard.svelte'
   import RichPost from './RichPost.svelte'
   import * as Card from '$lib/components/ui/card/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
@@ -292,6 +293,7 @@
       {onError}
       externalPreview={community?.visibility === 'public'}
     />
+    {#if post.offering}<OfferingCard {post} {community} {loggedIn} onUpdated={value=>post=value} {onError}/>{/if}
     {#if post.contexts?.length}<div class="context-links mt-3">
         {#each post.contexts as context}<Badge
             href={'/contexts/' + context.slug}

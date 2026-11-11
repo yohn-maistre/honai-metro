@@ -41,7 +41,9 @@ export type PostContent = {
   poll?: { options: string[]; closesAt: number }
   event?: { startsAt: number; endsAt?: number; location: string }
 }
+export type OfferingView={kind:'offer'|'request';price:number|null;currency:'IDR';unit:string;status:'open'|'paused'|'fulfilled'|'withdrawn'|'expired';expiresAt:number|null;place:{id:string;title:string}|null;revision:number;updated:number;canManage:boolean;canContact:boolean}
 export type Post = {
+  offering?: OfferingView|null
   content?: PostContent
   revision?: number
   updated?: number | null

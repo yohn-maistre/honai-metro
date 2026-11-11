@@ -13,6 +13,7 @@
   import { Textarea } from '$lib/components/ui/textarea/index.js'
   import { Label } from '$lib/components/ui/label/index.js'
   import { Badge } from '$lib/components/ui/badge/index.js'
+  import { notify } from './notifications.svelte'
   import Choice from './Choice.svelte'
   import { request, type Auth, type Community, type Membership } from './api'
   let { auth }: { auth: Auth } = $props()
@@ -56,7 +57,6 @@
     memberships = $state<Membership[]>([]),
     busy = $state(false),
     error = $state(''),
-    message = $state(''),
     loaded = $state(false),
     name = $state(''),
     community = $state(''),
@@ -124,7 +124,6 @@
     if (busy) return
     busy = true
     error = ''
-    message = ''
     try {
       await fn()
       await load()
@@ -141,7 +140,6 @@
     memberships = []
     connect = null
     error = ''
-    message = ''
     loaded = false
     load(id).catch((e) => {
       if (id === auth.actor?.id) {
@@ -153,7 +151,7 @@
   async function copy(value: string) {
     try {
       await navigator.clipboard.writeText(value)
-      message = 'Disalin'
+      notify('Disalin')
     } catch {
       error = 'Salin alamat secara manual.'
     }
@@ -191,8 +189,6 @@
   </div>
   {#if error}<p class="agent-notice" role="alert">
       {error}
-    </p>{/if}{#if message}<p class="agent-notice" role="status">
-      {message}
     </p>{/if}
   {#if !auth.actor}<div class="agent-enroll-prompt">
       <h2>Bawa agenmu</h2>
@@ -217,8 +213,7 @@
               ...(groupId ? { groupId } : {}),
             })
             name = ''
-            message =
-              'Agen terdaftar. Hubungkan perangkat, lalu atur izin komunitas.'
+            notify('Agen terdaftar. Hubungkan perangkat, lalu atur izin komunitas.')
           })
         }}
       >
@@ -305,8 +300,7 @@
             onclick={() =>
               act(async () => {
                 await request('/v1/agents/' + entry.agent_id + '/resume', {})
-                message =
-                  'Daftarkan kunci perangkat baru dan buat mandat baru untuk melanjutkan.'
+                notify('Daftarkan kunci perangkat baru dan buat mandat baru untuk melanjutkan.')
               })}
           >
             Aktifkan kembali
@@ -329,8 +323,7 @@
                 onclick={() =>
                   act(async () => {
                     await request('/v1/agents/' + entry.agent_id + '/admit', {})
-                    message =
-                      'Agen diterima. Mandat tetap diperlukan untuk menulis.'
+                    notify('Agen diterima. Mandat tetap diperlukan untuk menulis.')
                   })}
               >
                 <Check size={15} />Terima sebagai anggota
@@ -366,7 +359,7 @@
                             '/revoke',
                           {},
                         )
-                        message = 'Koneksi perangkat dicabut.'
+                        notify('Koneksi perangkat dicabut.')
                       })}
                   >
                     Cabut
@@ -388,8 +381,7 @@
                   )
                   keyText = ''
                   keyLabel = ''
-                  message =
-                    'Perangkat terhubung. Simpan Client ID pada konfigurasi klienmu.'
+                  notify('Perangkat terhubung. Simpan Client ID pada konfigurasi klienmu.')
                 })
               }}
             >
@@ -533,8 +525,7 @@
             onclick={() =>
               act(async () => {
                 await request('/v1/agents/' + entry.agent_id + '/suspend', {})
-                message =
-                  'Agen dijeda. Semua koneksinya berhenti mendapat akses.'
+                notify('Agen dijeda. Semua koneksinya berhenti mendapat akses.')
               })}
           >
             <Pause size={15} />Jeda agen

@@ -1,9 +1,9 @@
 name: Deploy ETNOS to Cloudflare Pages
 
 # Triggers:
-#   - push to main → production deploy
-#   - manual run (workflow_dispatch) → on-demand deploy
-#   - push to any non-main branch → preview deploy on that branch
+#   - main pushes validate connected Honai in connected-ui.yml
+#   - explicit manual run → historical donor deployment
+# Connected ETNOS deployment remains in the Strata repository.
 #
 # Required GitHub Actions secrets (Settings → Secrets and variables → Actions):
 #   CLOUDFLARE_API_TOKEN   — token with "Cloudflare Pages: Edit" + "Account → User Details: Read"
@@ -13,10 +13,15 @@ name: Deploy ETNOS to Cloudflare Pages
 # `env:` block on the build step to change production values (they are
 # public by definition — not secrets).
 
+# Historical donor deployment only. The connected UI ships with Strata's Worker.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
+    inputs:
+      legacy_client:
+        description: 'Deploy the historical Photon/PieFed donor client, not connected Honai'
+        required: true
+        type: boolean
+        default: false
 
 concurrency:
   group: deploy-cf-pages-${{ github.ref }}
@@ -24,6 +29,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: ${{ inputs.legacy_client }}
     runs-on: ubuntu-latest
     permissions:
       contents: read

@@ -1,0 +1,196 @@
+/* One bounded desktop composition: navigation, conversation, context. */
+@media (min-width: 1100px) {
+  [data-slot='sidebar-wrapper'] {
+    --commons-shell-width: 1240px;
+    max-width: var(--commons-shell-width);
+    margin-inline: auto;
+  }
+  .etnos-sidebar[data-slot='sidebar-container'][data-side='left'] {
+    inset-inline-start: max(0px, calc((100% - 1240px) / 2));
+  }
+  .platform-inset { padding-inline: 20px 0; }
+  .cx-content-grid, .cx-topbar { margin-inline: 0; }
+  .cx-context { left: calc(100% + 24px); width: 240px; }
+}
+.etnos-sidebar [data-slot='sidebar-content'] { padding-inline: 8px; }
+.etnos-sidebar [data-slot='sidebar-menu'] { gap: 2px; }
+.etnos-sidebar [data-slot='sidebar-menu-button'] {
+  height: 42px;
+  min-height: 42px;
+  font-size: 15px;
+  font-weight: 550;
+}
+.etnos-sidebar [data-slot='sidebar-menu-button'][data-active] {
+  font-weight: 650;
+}
+.news-section.compact .news-section-head {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.news-section.compact .news-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 52px;
+  align-items: start;
+  column-gap: 12px;
+  padding-block: 12px;
+}
+.news-section.compact .news-tile-copy {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+  padding: 0;
+  gap: 6px;
+}
+.news-section.compact .news-compact-thumbnail,
+.news-section.compact .news-compact-fallback {
+  grid-column: 2;
+  grid-row: 1;
+  position: static;
+  width: 52px;
+  height: 52px;
+  aspect-ratio: 1;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.news-section.compact .news-compact-fallback {
+  display: grid;
+  place-items: center;
+  background: var(--brand-soft);
+  color: var(--brand);
+}
+.news-section.compact .news-item strong {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.45;
+}
+/* The contents trigger is at the start of the reader; right alignment clipped
+   the first part of every section name against the reading frame. */
+.wiki-contents .wiki-history-popover {
+  inset-inline: 0 auto;
+  width: min(280px, calc(100vw - 80px));
+  min-width: 0;
+}
+.wiki-contents .wiki-history-popover a {
+  min-height: 40px;
+  overflow-wrap: anywhere;
+}
+/* Quiet depth rather than additional decoration. These colors follow the
+   selected base and its gradual day/night interpolation. */
+:root {
+  --commons-shadow: 0 2px 6px color-mix(in srgb, var(--foreground) 3%, transparent),
+    0 14px 40px -24px color-mix(in srgb, var(--foreground) 16%, transparent);
+  --commons-hairline: color-mix(in srgb, var(--border) 76%, transparent);
+}
+.cx-main {
+  border-color: var(--commons-hairline);
+  box-shadow: var(--commons-shadow);
+}
+.cx-topbar {
+  background: color-mix(in srgb, var(--page-ground) 94%, transparent);
+  backdrop-filter: blur(12px);
+}
+.cx-composer-bar { gap: 12px; padding-block: 18px; }
+.cx-composer-bar > [data-slot='button']:first-of-type {
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--secondary) 65%, transparent);
+  padding-inline: 14px;
+  min-height: 44px;
+}
+.cx-composer-bar > [data-slot='button']:last-child {
+  min-height: 40px;
+  border-radius: 14px;
+  border-color: var(--commons-hairline);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+.cx-post { border-bottom-color: var(--commons-hairline); }
+.cx-author, .cx-community-mini strong { letter-spacing: -.015em; }
+.cx-post-actions { color: var(--muted-foreground); }
+.etnos-sidebar [data-slot='sidebar-menu-button'] {
+  border-radius: 13px;
+  padding-inline: 12px;
+  gap: 12px;
+}
+.etnos-sidebar [data-slot='sidebar-menu-button'][data-active] {
+  background: var(--secondary);
+  box-shadow: inset 0 1px color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+.etnos-sidebar .sidebar-compose {
+  border-radius: 15px;
+  box-shadow: 0 3px 10px -5px color-mix(in srgb, var(--brand) 65%, transparent);
+}
+.etnos-sidebar .account-link { border-radius: 14px; }
+.news-section.compact .news-item { border-bottom-color: var(--commons-hairline); }
+.discovery-nav a, .explore-feature-tile, .news-desk-photo {
+  border-radius: 18px;
+}
+.explore-feature-tile, .news-section:not(.compact) .news-photo {
+  box-shadow: var(--commons-shadow);
+}
+.discovery-nav a { border: 1px solid var(--commons-hairline); }
+.directory-avatar { border-radius: 16px; }
+.directory-row { gap: 16px; }
+.wiki-body :is(h2,h3) {
+  font-family: var(--font-editorial);
+  font-weight: 400;
+  letter-spacing: -.02em;
+  line-height: 1.25;
+}
+.wiki-sources a { overflow-wrap: anywhere; }
+.platform-dialog { box-shadow: var(--commons-shadow), 0 24px 90px #0003; }
+@media (hover: hover) {
+  .cx-composer-bar > [data-slot='button']:first-of-type:hover,
+  .directory-row:hover { background: var(--muted); }
+  .etnos-sidebar .account-link:hover { background: var(--secondary); }
+  .news-section.compact .news-item:hover .news-compact-thumbnail {
+    outline: 2px solid var(--brand-soft);
+    outline-offset: 2px;
+  }
+}
+@media (max-width: 767px) {
+  .cx-main { box-shadow: none; }
+  .cx-composer-bar { padding: 16px; gap: 10px; }
+  .cx-composer-bar > [data-slot='button']:first-of-type {
+    padding-inline: 10px;
+    font-size: 14px;
+  }
+  .etnos-sidebar [data-slot='sidebar-menu-button'] { height: 44px; min-height: 44px; font-size: 16px; }
+  .cx-mobile-dock:not(.thread-dock) {
+    inset-inline: 12px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    height: 68px;
+    padding: 6px;
+    gap: 3px;
+    border: 1px solid var(--commons-hairline);
+    border-radius: 26px;
+    background: color-mix(in srgb, var(--reading-surface) 95%, transparent);
+    backdrop-filter: blur(16px);
+    box-shadow: var(--commons-shadow), 0 8px 30px #0002;
+  }
+  .cx-mobile-dock:not(.thread-dock) > [data-slot='button'] {
+    min-width: 44px;
+    height: 54px;
+    min-height: 54px;
+    border-radius: 19px;
+  }
+  .cx-mobile-dock:not(.thread-dock) > [aria-current='page'] {
+    background: var(--secondary);
+    color: var(--foreground);
+  }
+  .cx-mobile-dock:not(.thread-dock) > [data-slot='button']:nth-child(3) {
+    background: var(--brand);
+    color: var(--brand-foreground);
+  }
+  .platform-inset .cx-content-grid > .cx-main {
+    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
+  }
+  html { scroll-padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .cx-topbar { background: var(--page-ground); backdrop-filter: none; }
+  .cx-mobile-dock:not(.thread-dock) { background: var(--reading-surface); backdrop-filter: none; }
+}

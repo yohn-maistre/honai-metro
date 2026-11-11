@@ -34,7 +34,8 @@
           href={'/news/' + item.id}
           title={item.title}
         >
-          {#if !compact && photo}<img
+          {#if photo}<img
+              class:news-compact-thumbnail={compact}
               src={item.image}
               alt=""
               loading="lazy"
@@ -42,7 +43,7 @@
               onerror={() => {
                 failedPhotos = [...failedPhotos, item.id]
               }}
-            />{/if}
+            />{:else if compact}<span class="news-compact-fallback" aria-hidden="true"><Newspaper size={20} /></span>{/if}
           <div class="news-tile-copy">
             {#if !compact && i === 0}<Newspaper
                 size={19}

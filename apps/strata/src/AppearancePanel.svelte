@@ -8,6 +8,7 @@
   import { bases } from './appearance-bases'
   import { fontPairs } from './font-pairs'
   import Choice from './Choice.svelte'
+  import NotificationPreferences from './NotificationPreferences.svelte'
   let custom = $state(appearance.accent),
     invalid = $state(false)
 </script>
@@ -177,6 +178,7 @@
         {appearance.externalMedia ? 'Otomatis' : 'Saat diketuk'}
       </Button>
     </div>
+    <NotificationPreferences />
     <p class="cx-hint">
       Disimpan di perangkat ini. Kontras teks menyesuaikan tema.
     </p>

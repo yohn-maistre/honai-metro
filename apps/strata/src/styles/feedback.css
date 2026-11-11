@@ -1,0 +1,24 @@
+/* Ding supplies the spring physics and reduced-motion behavior. ETNOS supplies
+   type, theme tokens (including the slow clock shift), and header clearance. */
+.etnos-feedback .tst-viewport {
+  --tst-pad: 16px;
+  --tst-bg: var(--popover);
+  --tst-fg: var(--foreground);
+  --tst-ring: var(--border);
+  --tst-info: var(--brand);
+  font-family: var(--font-sans);
+}
+.etnos-feedback .tst-viewport[data-position^='top'] .tst-slot {
+  top: calc(5.25rem + env(safe-area-inset-top, 0px));
+}
+.etnos-feedback .tst-copy { max-width: min(340px, calc(100vw - 108px)); }
+.etnos-feedback .tst-close { min-width: 2.5rem; min-height: 2.5rem; }
+.notification-preferences { display: grid; gap: .65rem; padding-block: .6rem; }
+.notification-preferences p { margin: 0; }
+.notification-preferences input[type='range'] { width: 100%; min-height: 2.5rem; accent-color: var(--brand); }
+.notification-preferences > button { justify-self: start; }
+@media (max-width: 767px) {
+  .etnos-feedback .tst-viewport[data-position^='top'] .tst-slot {
+    top: calc(4.25rem + env(safe-area-inset-top, 0px));
+  }
+}

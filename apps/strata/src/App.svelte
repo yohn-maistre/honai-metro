@@ -1,4 +1,6 @@
 <script lang="ts">
+  import NotificationHost from './NotificationHost.svelte'
+  import { notify, notifyError, dismissNotifications } from './notifications.svelte'
   import { tabScroll } from './tab-scroll'
   import { onMount, tick, untrack } from 'svelte'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
@@ -87,7 +89,6 @@
     search = $state(location.search),
     loading = $state(true),
     busy = $state(false),
-    message = $state(''),
     error = $state('')
   let auth = $state<Auth>({ actor: null, csrf: null, steward: false }),
     cap = $state<Capabilities | null>(null)
@@ -229,8 +230,7 @@
     }[]
   }>({ posts: [], events: [] })
   let unread = $state(0)
-  let generation = 0,
-    notificationTimer: ReturnType<typeof setTimeout> | undefined
+  let generation = 0
   const parts = $derived(path.split('/').filter(Boolean)),
     community = $derived(communities.find((c) => c.id === parts[1])),
     isMember = (id: string) => memberships.some((m) => m.community_id === id)
@@ -251,7 +251,11 @@
         : posts,
   )
   const heading = $derived(
-    parts[0] === 'agents'
+    parts[0] === 'studio'
+      ? 'Studio'
+      : parts[0] === 'knowledge'
+        ? 'Catatan bersama'
+        : parts[0] === 'agents'
       ? 'Agen & koneksi'
       : parts[0] === 'voices'
         ? 'Suara komunitas'
@@ -294,17 +298,8 @@
                                             : 'Tempat & bahasa'
                                           : 'ETNOS',
   )
-  function notify(value: string) {
-    message = value
-    clearTimeout(notificationTimer)
-    notificationTimer = setTimeout(() => (message = ''), 6500)
-  }
   function fail(value: unknown) {
-    notify(
-      value instanceof Error
-        ? value.message
-        : 'Permintaan belum dapat diselesaikan.',
-    )
+    notifyError(value)
   }
   function saveScroll() {
     window.history.replaceState(
@@ -422,7 +417,7 @@
         filters.set('q', new SvelteURLSearchParams(search).get('q') ?? '')
       const [cs, feed, pages, roles, features, followed] = await Promise.all([
         request<Community[]>('/v1/communities'),
-        ['news'].includes(parts[0])
+        ['news','studio','knowledge'].includes(parts[0])
           ? Promise.resolve({
               items: [] as Post[],
               pinned: [] as Post[],
@@ -433,7 +428,7 @@
               pinned?: Post[]
               nextCursor: string | null
             }>('/v1/feed/page?' + filters),
-        ['news'].includes(parts[0])
+        ['news','studio','knowledge'].includes(parts[0])
           ? Promise.resolve([])
           : request<WikiPage[]>('/v1/wiki'),
         identity.actor
@@ -708,6 +703,7 @@
       selectedPost = null
       await request('/auth/logout', {})
       auth = { actor: null, csrf: null, steward: false }
+      dismissNotifications()
       setCsrf(null)
       navigate('/')
     })
@@ -770,7 +766,7 @@
     window.history.replaceState({ etnosDepth: 0, ...window.history.state }, '')
     void load()
     return () => {
-      clearTimeout(notificationTimer)
+      dismissNotifications()
       stopClock()
     }
   })
@@ -838,7 +834,7 @@
         {auth}
         {communities}
         {memberships}
-        onError={notify}
+        onError={fail}
         onShare={(url) => {
           open('compose')
           composeUrl = url
@@ -868,6 +864,10 @@
         onsubmit={login}
       />
     </section>
+  {:else if parts[0] === 'knowledge'}
+    {#await import('./KnowledgePage.svelte') then module}<module.default {auth} {path} {navigate}/>{/await}
+  {:else if path === '/studio'}
+    {#await import('./StudioPage.svelte') then module}<module.default {auth}/>{/await}
   {:else if path === '/agents'}
     {#await import('./AgentConnections.svelte') then module}<module.default
         {auth}
@@ -876,6 +876,7 @@
     <div class="cx-page-head"><h1>Pengaturan</h1></div>
     <Card.Root class="strata-card strata-preferences">
       <AppearancePanel />
+      <a class="cx-list-row" href="/studio">Studio komunitas <ChevronRight size={16}/></a>
       <a class="cx-list-row" href="/agents">
         Agen & koneksi <ChevronRight size={16} />
       </a>
@@ -959,7 +960,7 @@
     <ActivityPage
       {auth}
       {navigate}
-      onError={notify}
+      onError={fail}
       onUnread={(n) => (unread = n)}
     />
   {:else if path === '/groups' && !search.includes('create=true')}
@@ -992,7 +993,7 @@
     <FeaturePages
       {path}
       {auth}
-      onError={notify}
+      onError={fail}
       {navigate}
       onContextResolved={(kind) => {
         contextHeading = { path, kind }
@@ -1136,7 +1137,7 @@
                 {community}
                 loggedIn={!!auth.actor}
                 canVote={!!currentMembership}
-                onError={notify}
+                onError={fail}
               />{/each}{#if nextCursor}<div class="profile-more">
                 <Button variant="outline" disabled={busy} onclick={more}>
                   Muat posting lain
@@ -1203,7 +1204,7 @@
         community={communities.find((c) => c.id === selectedPost!.community_id)}
         actor={auth.actor}
         member={isMember(selectedPost.community_id)}
-        onError={notify}
+        onError={fail}
         onRefresh={load}
         reviewRequested={new URLSearchParams(search).get('review') === 'wiki'}
         onWikiDraft={selectedPost &&
@@ -1257,7 +1258,7 @@
                     )
                     notify('Tautan profil disalin.')
                   } catch {
-                    notify('Tautan belum dapat disalin.')
+                    notifyError('Tautan belum dapat disalin.')
                   }
                 }}
               >
@@ -1365,7 +1366,7 @@
           community={communities.find((c) => c.id === p.community_id)}
           loggedIn={!!auth.actor}
           canVote={isMember(p.community_id)}
-          onError={notify}
+          onError={fail}
         />{/each}
       {#if nextCursor}<div class="profile-more">
           <Button variant="outline" disabled={busy} onclick={more}>
@@ -1418,7 +1419,7 @@
           community={communities.find((c) => c.id === p.community_id)}
           loggedIn={!!auth.actor}
           canVote={isMember(p.community_id)}
-          onError={notify}
+          onError={fail}
           onSaved={() => {
             if (path === '/saved') saved = saved.filter((x) => x.bookmarked)
           }}
@@ -1556,18 +1557,7 @@
     </div>
   {/snippet}
 </PlatformShell>
-{#if message}<div class="cx-toast" role="status">
-    <span>{message}</span>
-    <Button
-      class="cx-icon-button"
-      aria-label="Tutup notifikasi"
-      onclick={() => (message = '')}
-      type="button"
-      variant="outline"
-    >
-      <X size={16} />
-    </Button>
-  </div>{/if}
+<NotificationHost />
 <Dialog.Root
   open={modal !== null}
   onOpenChange={(value) => {

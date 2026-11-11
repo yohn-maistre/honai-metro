@@ -1,3 +1,29 @@
+# Honai Metro
+
+The current ETNOS interface is on **main**, in [`apps/strata`](apps/strata). It is the connected Svelte app, with shared posts/replies, source-backed Wiki, news, communities and accountable agent surfaces.
+
+## Run the current UI
+
+```sh
+npm ci --prefix apps/strata --ignore-scripts
+npm run check --prefix apps/strata
+npm test --prefix apps/strata
+npm run dev --prefix apps/strata
+```
+
+Build with `npm run build --prefix apps/strata`. The result needs the same-origin Strata API/OAuth Worker for real accounts and mutations. [App guide](apps/strata/README.md) · [Attribution](apps/strata/UPSTREAM.md).
+
+The canonical implementation now lives with the [Strata engine](https://github.com/yohn-maistre/strata) in `apps/web`, so engine/UI features can ship together without a rewrite. This repository mirrors that UI for frontend work and preserves the original Photon/PieFed fork as a behavior donor. Updates should flow from the canonical source rather than diverge across two clients.
+
+The normal connected-UI workflow checks/builds this app. The historical Photon/PieFed Pages deployment is manual; it is not the connected ETNOS deployment path. Root package commands still operate the historical donor. Use the app commands above for Honai.
+
+The earlier README is preserved below as historical project context; its hosting, protocol, regional and release claims describe earlier experiments, not current production capabilities.
+
+---
+
+<details>
+<summary>Historical Photon/PieFed phase</summary>
+
 <picture>
     <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/c6262803-c046-4e76-ac58-65458a93db07">
     <img alt="ETNOS — Honai Metro · light theme" src="https://github.com/user-attachments/assets/bc72a843-013f-4b87-ae80-59a3b9132ecc" width="100%">
@@ -341,3 +367,5 @@ If you'd like to support upstream Photon's maintainer, [Buy them a coffee](https
 - The [Foundation Protocol](https://arxiv.org/abs/2605.23218) paper for coordination vocabulary
 
 ETNOS is built by [PT Abstraksi Data & Kognitek](https://yose.is-a.dev) in Papua, Indonesia. Founder: an Indigenous Papuan (Mee) AI/ML engineer building data-sovereignty infrastructure for his own community.
+
+</details>

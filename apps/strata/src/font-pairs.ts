@@ -1,6 +1,13 @@
 /** Self-hosted, presentation-only choices. Optional faces load when selected. */
 export const fontPairs = [
   {
+    id: 'geist',
+    name: 'Geist + Geist Serif',
+    sans: 'Geist Variable',
+    serif: 'Geist Serif',
+    note: 'Rapi dan tenang, dengan kontras serif yang tegas.',
+  },
+  {
     id: 'gabarito',
     name: 'Gabarito + Geist Serif',
     sans: 'Gabarito Variable',
@@ -8,11 +15,11 @@ export const fontPairs = [
     note: 'Akrab, dengan suara editorial yang hangat.',
   },
   {
-    id: 'geist',
-    name: 'Geist + Geist Serif',
-    sans: 'Geist Variable',
+    id: 'jakarta',
+    name: 'Plus Jakarta Sans + Geist Serif',
+    sans: 'Plus Jakarta Sans Variable',
     serif: 'Geist Serif',
-    note: 'Rapi dan tenang, dengan kontras serif yang tegas.',
+    note: 'Terbuka dan bersahabat, dengan serif untuk membaca.',
   },
   {
     id: 'instrument',
@@ -37,6 +44,10 @@ export const fontPairs = [
   },
 ] as const
 export function loadFontPair(id: string) {
+  if (id === 'gabarito')
+    return import('@fontsource-variable/gabarito')
+  if (id === 'jakarta')
+    return import('@fontsource-variable/plus-jakarta-sans')
   if (id === 'geist')
     return Promise.all([
       import('@fontsource-variable/geist'),

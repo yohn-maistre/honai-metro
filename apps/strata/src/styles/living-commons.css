@@ -1,0 +1,32 @@
+/* Shared native surfaces; same fonts, accent, semantics and automatic themes. */
+.commons-page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;padding:1.35rem 1.5rem 1rem;border-bottom:1px solid var(--border)}
+.commons-page-head h1{font-size:1.35rem;font-weight:700;line-height:1.25;margin:0 0 .4rem}
+.commons-page-head p{margin:0;max-width:38ch}
+.commons-quiet-link{display:inline-flex;align-items:center;gap:.4rem;color:var(--primary);font-size:.88rem;line-height:1.4;text-decoration:none;min-height:2.5rem;flex-shrink:0}
+.commons-quiet-link:hover{text-decoration:underline}
+.commons-alert,.commons-notice{margin:1rem 1.5rem;padding:.85rem 1rem;border:1px solid var(--border);border-radius:.8rem;background:var(--muted);font-size:.9rem;overflow-wrap:anywhere}
+.commons-notice{border-color:color-mix(in srgb,var(--primary),transparent 65%)}
+.commons-tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.25rem 1.5rem;border-bottom:1px solid var(--border)}
+.commons-tabs button{display:flex;align-items:center;gap:.5rem;min-height:2.75rem;padding:.5rem .85rem;white-space:nowrap;border-bottom:2px solid transparent;color:var(--muted-foreground)}
+.commons-tabs button.active{border-bottom-color:var(--primary);color:var(--foreground)}
+.commons-editor{display:grid;gap:.7rem;padding:1.3rem 1.5rem;border-bottom:1px solid var(--border);min-width:0}
+.commons-editor label,.commons-scope label,.commons-run label{font-size:.88rem;font-weight:600;line-height:1.4;display:block}
+.commons-editor details{padding:.4rem 0}.commons-editor details summary{cursor:pointer;min-height:2.5rem;color:var(--muted-foreground);font-size:.9rem}
+.commons-editor input,.commons-editor textarea{background:var(--background)}
+.commons-editor select,.commons-scope select,.commons-run select{width:100%;min-width:0;max-width:100%;border:1px solid var(--border);border-radius:.65rem;padding:.7rem .85rem;min-height:2.75rem;background:var(--background);color:var(--foreground);font:inherit;font-size:.94rem}
+.commons-scope,.commons-run{display:grid;gap:.6rem;padding:1rem 1.5rem}
+.commons-form-pair{display:grid;grid-template-columns:1fr 1fr;gap:1rem}.commons-form-pair>div{min-width:0;display:grid;gap:.5rem}
+.commons-section-heading{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1.1rem 1.5rem .6rem}.commons-section-heading h2{font-size:1.05rem;font-weight:650}
+.commons-actions{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;padding:.6rem 0}
+.commons-note-list{display:grid}.commons-note-row{display:block;text-decoration:none;color:inherit;padding:1.15rem 1.5rem;border-bottom:1px solid var(--border);min-width:0}
+.commons-note-row:hover{background:var(--muted)}.commons-note-row h2{font-weight:650;font-size:1.15rem;line-height:1.35;margin:.45rem 0}.commons-note-row p{color:var(--muted-foreground);line-height:1.5;margin:.4rem 0;overflow-wrap:anywhere}.commons-note-row small,.commons-byline{color:var(--muted-foreground);font-size:.84rem}
+.commons-note-meta{display:flex;align-items:center;gap:.8rem;font-size:.78rem;color:var(--muted-foreground);flex-wrap:wrap}.commons-note-meta>span{display:inline-flex;align-items:center;gap:.25rem}
+.commons-working-note{padding:1.5rem;min-width:0}.commons-working-note h2{font-size:1.65rem;font-weight:650;line-height:1.25;margin:.9rem 0 .5rem;overflow-wrap:anywhere}.commons-working-note .strata-body{margin:1.3rem 0;overflow-wrap:anywhere;line-height:1.7}.commons-working-note .commons-alert{margin:1rem 0}
+.commons-source-links{padding:1rem 0;border-block:1px solid var(--border);list-style:none;display:flex;gap:1rem;flex-wrap:wrap}.commons-source-links a{display:flex;align-items:center;gap:.35rem;font-size:.88rem;color:var(--primary)}
+.commons-source-row,.commons-job-row{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:1rem 1.5rem;border-bottom:1px solid var(--border)}
+.commons-source-row>div:first-child,.commons-job-row>div:first-child{min-width:0;flex:1 1 16rem}.commons-source-row h3,.commons-job-row h3{font-weight:650;line-height:1.4;margin:.25rem 0;font-size:1rem;overflow-wrap:anywhere}.commons-source-row h3 a{color:inherit}.commons-source-row a{display:inline-flex;gap:.35rem;align-items:center;overflow-wrap:anywhere;font-size:.9rem}.commons-source-row small,.commons-job-row small{display:block;font-size:.8rem;color:var(--muted-foreground);margin-top:.35rem}.commons-source-row p{font-size:.9rem;line-height:1.55;max-width:65ch}.commons-inline-error{color:var(--muted-foreground);font-size:.85rem;overflow-wrap:anywhere;margin-top:.5rem}
+.commons-status{font-size:.76rem;display:inline-flex;align-items:center;padding:.25rem .55rem;border:1px solid var(--border);border-radius:2rem;color:var(--muted-foreground)}.commons-status.ready{color:var(--primary);border-color:color-mix(in srgb,var(--primary),transparent 65%)}
+.commons-empty{padding:2rem 1.5rem;color:var(--muted-foreground);display:grid;justify-items:start;gap:.8rem}.commons-empty h3{color:var(--foreground);font-size:1.05rem;font-weight:600}.commons-empty p{max-width:46ch;line-height:1.55}
+.commons-history{display:grid;gap:1rem;padding:1rem 0;list-style:none}.commons-history li{padding:1rem;border:1px solid var(--border);border-radius:.8rem}.commons-history time{font-size:.8rem;color:var(--muted-foreground);display:block}.commons-history p{white-space:pre-wrap;line-height:1.6;margin-top:.6rem}
+.etnos-sidebar [data-slot='sidebar-header']{padding:1rem 1rem .4rem}.etnos-sidebar [data-slot='sidebar-footer']{padding:.65rem 1rem;gap:.35rem}.etnos-sidebar [data-slot='sidebar-group']{padding:.4rem .8rem}.etnos-sidebar .sidebar-compose{min-height:2.75rem}.sidebar-studio{min-height:2.2rem;display:flex;align-items:center}
+@media(max-width:767px){.commons-page-head{padding:1rem;flex-wrap:wrap}.commons-page-head h1{font-size:1.25rem}.commons-page-head .commons-quiet-link{min-height:2rem}.commons-editor,.commons-working-note{padding:1rem}.commons-source-row,.commons-job-row,.commons-section-heading,.commons-scope,.commons-run{padding:1rem}.commons-tabs{padding-inline:1rem}.commons-alert,.commons-notice{margin:1rem}.commons-note-row{padding:1rem}.commons-form-pair{gap:.6rem}.commons-note-row h2{font-size:1.05rem}.commons-working-note h2{font-size:1.5rem}.etnos-sidebar [data-slot='sidebar-header']{padding:1rem 1rem .4rem}}

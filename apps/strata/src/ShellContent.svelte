@@ -20,7 +20,6 @@
     PanelLeft,
     Menu,
     X,
-    ChevronsUpDown,
     ListTodo,
     ArrowLeft,
     ChevronDown,
@@ -102,35 +101,6 @@
         <X size={19} />
       </Button>
     </div>
-    <Dropdown.Root>
-      <Dropdown.Trigger
-        class="workspace-picker"
-        aria-label="Jelajahi wilayah"
-        title="Jelajahi wilayah"
-      >
-        <span class="workspace-mark"><Compass size={16} /></span>
-        <span>Semua wilayah</span>
-        <ChevronsUpDown size={14} />
-      </Dropdown.Trigger>
-      <Dropdown.Content align="start" class="w-56">
-        <Dropdown.Label>Tempat & bahasa</Dropdown.Label><Dropdown.Item
-          onSelect={() => {
-            sidebar.setOpenMobile(false)
-            document.querySelector<HTMLAnchorElement>('.cx-brand')?.click()
-          }}
-        >
-          Semua wilayah
-        </Dropdown.Item><Dropdown.Item>
-          {#snippet child({ props })}<a
-              {...props}
-              href="/contexts"
-              onclick={() => sidebar.setOpenMobile(false)}
-            >
-              Wilayah, tempat & topik
-            </a>{/snippet}
-        </Dropdown.Item>
-      </Dropdown.Content>
-    </Dropdown.Root>
   </Sidebar.Header>
   <Sidebar.Content>
     {#each [nav.slice(0, 5), nav.slice(5)] as items, section}
@@ -175,6 +145,7 @@
       {/if}{/each}
   </Sidebar.Content>
   <Sidebar.Footer class="p-4 gap-3">
+    {#if auth.actor}<a href="/studio" class="preview-label sidebar-studio" onclick={() => sidebar.setOpenMobile(false)}>Studio komunitas</a>{/if}
     <Button
       href="/preferences"
       variant="ghost"
@@ -344,6 +315,7 @@
         'preferences',
         'messages',
         'agents',
+        'studio',
         'login',
         'recover-messages',
       ].includes(path.split('/')[1])}

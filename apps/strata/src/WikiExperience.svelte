@@ -341,6 +341,7 @@
       <div class="wiki-atlas-mark"><BookOpen size={22} /></div>
       <h1>Pengetahuan bersama</h1>
       <p>Tempat, cerita & pengetahuan yang terus tumbuh.</p>
+      <a class="commons-quiet-link" href="/knowledge">Catatan bersama <ArrowUpRight size={14}/></a>
       {#if memberships.some((m) => m.role !== 'member')}<Button
           variant="outline"
           onclick={onCreate}

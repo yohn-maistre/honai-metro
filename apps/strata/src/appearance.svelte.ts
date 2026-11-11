@@ -17,7 +17,7 @@ export const appearance = $state({
   base: 'graphite',
   texture: 'grain',
   textureStrength: 'soft',
-  fontPair: 'gabarito',
+  fontPair: 'geist',
   externalMedia: true,
 })
 import { accentRoles } from './appearance-color'

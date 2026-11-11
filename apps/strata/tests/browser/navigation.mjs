@@ -139,7 +139,7 @@ try {
     })
   })
   const go = async (path) => p.goto(origin + path, { waitUntil: 'networkidle' })
-  await p.clock.install({ time: new Date('2026-11-03T20:59:59Z') }) // 05:59:59 device local.
+  await p.clock.install({ time: new Date('2026-11-03T20:59:00Z') }) // 05:59 local; allow cold UI loading before sunrise.
   await go('/')
   assert.deepEqual(
     await p.evaluate(() => ({

@@ -1,5 +1,6 @@
 <script lang="ts">
   import VaultTransfer from './messaging/VaultTransfer.svelte'
+  import NotificationHost from './NotificationHost.svelte'
 </script>
 
 <main class="recovery-page">
@@ -9,6 +10,7 @@
   </a>
   <VaultTransfer recovery />
 </main>
+<NotificationHost />
 
 <style>
   .recovery-page {

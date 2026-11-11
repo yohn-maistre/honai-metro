@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { notify } from './notifications.svelte'
   import { request } from './api'
   import Choice from './Choice.svelte'
   import { Button } from '$lib/components/ui/button/index.js'
@@ -51,7 +52,7 @@
         contributorGroupId: contributor || null,
         reviewerGroupId: reviewer || null,
       })
-      message = 'Aturan disimpan.'
+      notify('Aturan disimpan.')
     } catch (e) {
       message = e instanceof Error ? e.message : 'Belum tersimpan.'
     } finally {
@@ -86,5 +87,5 @@
     </label>
     <Button variant="outline" disabled={busy} onclick={save}>
       Simpan aturan
-    </Button>{/if}{#if message}<p role="status">{message}</p>{/if}
+    </Button>{/if}{#if message}<p role="alert">{message}</p>{/if}
 </details>

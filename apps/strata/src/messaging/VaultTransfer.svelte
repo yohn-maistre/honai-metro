@@ -4,6 +4,7 @@
   import { Button } from '$lib/components/ui/button/index.js'
   import { Input } from '$lib/components/ui/input/index.js'
   import Choice from '../Choice.svelte'
+  import { notify } from '../notifications.svelte'
   let { actorId, recovery = false }: { actorId?: string; recovery?: boolean } =
     $props()
   let ids = $state<string[]>([]),
@@ -36,6 +37,7 @@
       a.download = 'etnos-encrypted-messages.json'
       a.click()
       setTimeout(() => URL.revokeObjectURL(url), 1000)
+      notify('Cadangan terenkripsi diunduh.')
       status =
         'Cadangan terenkripsi diunduh. Impor di etnos.space dengan frasa sandi pesanmu.'
     } catch (e) {
@@ -54,6 +56,7 @@
       await v.importVault(actorId, await file.text(), passphrase)
       ids = await v.localVaultIds()
       status = 'Kunci dipulihkan. Buka Pesan untuk melanjutkan.'
+      notify('Kunci pesan dipulihkan.')
       passphrase = ''
       file = null
     } catch (e) {

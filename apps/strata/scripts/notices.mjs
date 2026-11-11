@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const lock = JSON.parse(readFileSync(join(root, 'package-lock.json'), 'utf8'))
 const output = [
-  'ETNOS / Honai connected app — third-party notices',
+  'ETNOS / Strata connected app — third-party notices',
   'Application: AGPL-3.0-only. This inventory includes client and build dependencies.',
   'Package source references and original license texts follow.',
 ]

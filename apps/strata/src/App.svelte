@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {avatarTone} from './avatar-tone'
   import NotificationHost from './NotificationHost.svelte'
   import { notify, notifyError, dismissNotifications } from './notifications.svelte'
   import { tabScroll } from './tab-scroll'
@@ -1001,7 +1002,7 @@
     />
   {:else if parts[0] === 'wiki'}
     {#if loading}<ContentSkeleton
-      />{:else}{#await import('./WikiExperience.svelte') then module}<module.default
+      />{:else}{#await import('./WikiExperience.svelte')}<ContentSkeleton/>{:then module}<module.default
           page={selectedPage}
           pages={wiki}
           {proposals}
@@ -1019,7 +1020,7 @@
   {:else if parts[0] === 'communities' && parts[1]}
     {#if community}<div class="cx-detail-head community-profile">
         <div class="cx-between">
-          <span class="cx-avatar sage">{initials(community.title)}</span>
+          <span class="cx-avatar sage avatar-tinted" style={avatarTone(community.id)}>{initials(community.title)}</span>
           {#if currentMembership}<Badge variant="secondary">
               {currentMembership.role === 'member'
                 ? 'Anggota'
@@ -1242,7 +1243,7 @@
         <div class="profile-cover" aria-hidden="true"></div>
         <div class="profile-content">
           <div class="profile-topline">
-            <span class="cx-avatar sage profile-avatar">
+            <span class="cx-avatar sage profile-avatar avatar-tinted" style={avatarTone(actor.id)}>
               {initials(actor.name)}
             </span>
             <div class="profile-actions">
@@ -1395,7 +1396,7 @@
           <h1>Hasil pencarian</h1>
         </div>{:else}<h1 class="sr-only">Beranda</h1>
         <div class="cx-composer-bar">
-          <span class="cx-avatar sage">
+          <span class="cx-avatar sage avatar-tinted" style={avatarTone(auth.actor?.id??'visitor')}>
             {auth.actor ? initials(auth.actor.name) : '+'}
           </span>
           <Button
@@ -1519,7 +1520,7 @@
           href={'/communities/' + c.id}
           class="cx-community-mini"
         >
-          <span class="cx-avatar sage small">{initials(c.title)}</span>
+          <span class="cx-avatar sage small avatar-tinted" style={avatarTone(c.id)}>{initials(c.title)}</span>
           <span>
             <strong>{c.title}</strong>
             <small>

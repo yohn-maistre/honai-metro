@@ -1,6 +1,6 @@
 <script lang="ts">
   import { SvelteURLSearchParams } from 'svelte/reactivity'
-  import { ArrowUpRight, Share2, MessageCircle, MapPin } from '@lucide/svelte'
+  import { ArrowUpRight, Share2, MessageCircle, MapPin, BookOpen } from '@lucide/svelte'
   import { Button } from '$lib/components/ui/button/index.js'
   import ContentSkeleton from './ContentSkeleton.svelte'
   import PostCard from './PostCard.svelte'
@@ -33,7 +33,8 @@
     pending = $state(true),
     error = $state(''),
     cursor = $state<string | null>(null),
-    moreBusy = $state(false)
+    moreBusy = $state(false),
+    failedImage = $state('')
   const links = $derived(
     story
       ? [
@@ -139,16 +140,16 @@
       <span>{newsDate(story.publishedAt)} · {story.sourceCount} sumber</span>
     </div>
     <h1>{story.title}</h1>
-    {#if story.image}<figure>
+    {#if story.image && failedImage !== story.image}<figure>
         <img
           src={story.image}
           alt=""
           onerror={(e) => {
-            e.currentTarget.closest('figure')?.setAttribute('hidden', '')
+            failedImage = story!.image ?? ''
           }}
         />
         <figcaption>{story.imageCredit}</figcaption>
-      </figure>{/if}
+      </figure>{:else}<div class="news-reader-photo-fallback"><BookOpen size={24}/><span>Foto belum tersedia</span></div>{/if}
     <div class="news-reader-summary">
       <span class="news-summary-label">Ringkasan WPW</span>
       <p>{story.summary}</p>
@@ -168,9 +169,7 @@
         <NewsMap places={story.places} />
       </section>{/if}
     <div class="news-reader-actions">
-      <Button onclick={() => onShare(story!.url)}>
-        <MessageCircle size={16} />Bahas di komunitas
-      </Button><Button
+      <Button
         variant="ghost"
         aria-label="Salin tautan kabar"
         onclick={async () => {
@@ -209,7 +208,7 @@
   <section class="news-discussion">
     <div class="thread-toolbar">
       <h2>Percakapan terkait</h2>
-      <MessageCircle size={17} />
+      <Button onclick={() => onShare(story!.url)}><MessageCircle size={16}/>Bahas di komunitas</Button>
     </div>
     {#each posts as post}<PostCard
         {post}
@@ -221,9 +220,7 @@
         rows={1}
       />{:else if !posts.length}<div class="news-discussion-empty">
         <p>Belum ada yang membahas kabar ini.</p>
-        <Button variant="outline" onclick={() => onShare(story!.url)}>
-          Mulai percakapan
-        </Button>
+
       </div>{/if}{#if cursor}<Button
         variant="ghost"
         disabled={moreBusy}

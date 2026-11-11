@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {avatarTone} from './avatar-tone'
   import {
     ArrowUp,
     ArrowDown,
@@ -196,7 +197,7 @@
     aria-label={post.author.name}
   >
     <Avatar.Root class="size-10">
-      <Avatar.Fallback>{initials(post.author.name)}</Avatar.Fallback>
+      <Avatar.Fallback class="avatar-tinted" style={avatarTone(post.author.id)}>{initials(post.author.name)}</Avatar.Fallback>
     </Avatar.Root>
   </a>
   <div class="cx-post-content">
@@ -450,7 +451,7 @@
     >
       <div class="edit-author">
         <Avatar.Root>
-          <Avatar.Fallback>{initials(post.author.name)}</Avatar.Fallback>
+          <Avatar.Fallback class="avatar-tinted" style={avatarTone(post.author.id)}>{initials(post.author.name)}</Avatar.Fallback>
         </Avatar.Root>
         <span>
           <strong>{post.author.name}</strong>

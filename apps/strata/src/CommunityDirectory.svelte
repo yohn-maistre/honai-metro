@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {avatarTone} from './avatar-tone'
   import {
     Users,
     Building2,
@@ -227,7 +228,7 @@
         href={'/groups/' + group.id}
         class="directory-row"
       >
-        <span class="directory-avatar"><Building2 size={22} /></span>
+        <span class="directory-avatar avatar-tinted" style={avatarTone(group.id)}><Building2 size={22} /></span>
         <div>
           <strong>{group.title}</strong>
           <p>{group.description}</p>
@@ -247,7 +248,7 @@
         href={'/contexts/' + place.slug}
         class="directory-row"
       >
-        <span class="directory-avatar">
+        <span class="directory-avatar avatar-tinted" style={avatarTone(place.id)}>
           {#if place.kind === 'topic'}<Hash size={22} />{:else}<MapPin
               size={22}
             />{/if}
@@ -303,7 +304,7 @@
 </section>
 {#snippet roomRow(room: Community)}
   <a href={'/communities/' + room.id} class="directory-row">
-    <span class="directory-avatar">{initials(room.title)}</span>
+    <span class="directory-avatar avatar-tinted" style={avatarTone(room.id)}>{initials(room.title)}</span>
     <div>
       <strong>{room.title}</strong>
       <p>{room.description}</p>

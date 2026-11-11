@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {avatarTone} from './avatar-tone'
   import { type Snippet } from 'svelte'
   import * as Sidebar from '$lib/components/ui/sidebar/index.js'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
@@ -115,16 +116,16 @@
                 {#snippet child({ props })}<a
                     {...props}
                     href={item.href}
-                    aria-label={item.label}
+                    aria-label={item.href === '/notifications' && unread ? `${item.label}, ${unread} belum dibaca` : item.label}
                     title={item.label}
                     aria-current={active(item.href) ? 'page' : undefined}
                   >
                     <item.icon size={20} strokeWidth={1.7} />
                     <span>{item.label}</span>
                     {#if item.href === '/notifications' && unread}<span
-                        class="utility-unread"
+                        class="utility-unread notification-count" aria-hidden="true"
                       >
-                        {unread}
+                        {unread>99?'99+':unread}
                       </span>{/if}
                   </a>{/snippet}
               </Sidebar.MenuButton>
@@ -165,7 +166,7 @@
         onclick={() => sidebar.setOpenMobile(false)}
       >
         <Avatar.Root>
-          <Avatar.Fallback>{initials(auth.actor.name)}</Avatar.Fallback>
+          <Avatar.Fallback class="avatar-tinted" style={avatarTone(auth.actor.id)}>{initials(auth.actor.name)}</Avatar.Fallback>
         </Avatar.Root>
         <span>
           <strong>{auth.actor.name}</strong>
@@ -279,7 +280,7 @@
       class="activity-bell"
       aria-label={unread ? `Aktivitas, ${unread} belum dibaca` : 'Aktivitas'}
     >
-      <Bell size={18} />{#if unread}<span class="bell-dot"></span>{/if}
+      <Bell size={18} />{#if unread}<span class="notification-count" aria-hidden="true">{unread>99?'99+':unread}</span>{/if}
     </Button>
     <Button
       variant="ghost"
@@ -357,7 +358,7 @@
   >
     <Bell size={21} />
     <span aria-hidden="true">Aktivitas</span>
-    {#if unread}<span class="bell-dot"></span>{/if}
+    {#if unread}<span class="notification-count" aria-hidden="true">{unread>99?'99+':unread}</span>{/if}
   </Button>
   <Button
     variant="ghost"

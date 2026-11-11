@@ -5,6 +5,7 @@
   import PostComposer from './PostComposer.svelte'
   import Choice from './Choice.svelte'
   import ThreadWork from './ThreadWork.svelte'
+  import ThreadEnd from './ThreadEnd.svelte'
   import DecisionSuggestions from './DecisionSuggestions.svelte'
   import * as Dialog from '$lib/components/ui/dialog/index.js'
   import { Button } from '$lib/components/ui/button/index.js'
@@ -165,6 +166,7 @@
       </p>{/if}
   </section>
   {#if community?.visibility === 'public'}<ThreadWork postId={post.id} />{/if}
+  <ThreadEnd/>
 </div>
 
 {#if onWikiDraft && community?.visibility === 'public'}<Dialog.Root

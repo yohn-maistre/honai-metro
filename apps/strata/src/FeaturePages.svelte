@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {avatarTone} from './avatar-tone'
   import { markdown } from './markdown'
   import { tabScroll } from './tab-scroll'
   import { untrack } from 'svelte'
@@ -396,7 +397,7 @@
   <div class="cx-detail-head">
     <div class="cx-between">
       <Avatar.Root class="size-14">
-        <Avatar.Fallback>{initials(group.title)}</Avatar.Fallback>
+        <Avatar.Fallback class="avatar-tinted" style={avatarTone(group.id)}>{initials(group.title)}</Avatar.Fallback>
       </Avatar.Root><Badge variant="outline">
         {group.visibility === 'public' ? 'Publik' : 'Privat'}
       </Badge>
@@ -785,7 +786,7 @@
         <Card.Content>
           <div class="cx-between">
             <Avatar.Root>
-              <Avatar.Fallback>{initials(g.title)}</Avatar.Fallback>
+              <Avatar.Fallback class="avatar-tinted" style={avatarTone(g.id)}>{initials(g.title)}</Avatar.Fallback>
             </Avatar.Root>{#if g.visibility !== 'public'}<LockKeyhole
                 size={15}
               />{:else}<ArrowUpRight size={16} />{/if}
@@ -983,7 +984,7 @@
             onclick={() => (memberId = person.id)}
           >
             <Avatar.Root>
-              <Avatar.Fallback>{initials(person.name)}</Avatar.Fallback>
+              <Avatar.Fallback class="avatar-tinted" style={avatarTone(person.id)}>{initials(person.name)}</Avatar.Fallback>
             </Avatar.Root>{person.name}{#if person.kind === 'agent'}<Badge
                 variant="secondary"
               >

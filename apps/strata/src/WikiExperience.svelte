@@ -9,6 +9,10 @@
     Search,
     MapPin,
     ChevronDown,
+    ArrowRight,
+    Clock3,
+    Shuffle,
+    Type,
   } from '@lucide/svelte'
   import { markdown } from './markdown'
   import { wikiDiff, languageName } from './wiki-diff'
@@ -63,6 +67,15 @@
       { id: string; slug: string; title: string; kind: string }[]
     >([]),
     contextPages = $state<string[] | null>(null)
+  type Preview={id:string;community_id:string;title:string;revision_id:string;excerpt:string;updated:number;language:string;citationCount:number;sectionCount:number}
+  let discoveries=$state<Preview[]>([]),discovering=$state(true),discoveryError=$state(''),communityFilter=$state(''),lastReadId=$state(''),readingSize=$state('normal')
+  const accepted=$derived(discoveries.filter(p=>p.title.toLocaleLowerCase().includes(query.toLocaleLowerCase())&&(!contextPages||contextPages.includes(p.id))&&(!communityFilter||communityFilter===p.community_id)))
+  const featured=$derived(accepted[0]),continued=$derived(discoveries.find(p=>p.id===lastReadId)),recent=$derived(accepted.slice(1,7)),groups=$derived(communities.map(c=>({...c,count:discoveries.filter(p=>p.community_id===c.id).length})).filter(c=>c.count))
+  function surprise(){if(accepted.length)location.assign('/wiki/'+accepted[Math.floor(Math.random()*accepted.length)].id)}
+  function resize(size:string){readingSize=size;try{localStorage.setItem('strata.ui.wiki-text',size)}catch{/* Optional device preference. */}}
+  async function discover(signal:AbortSignal|undefined=undefined){discovering=true;discoveryError='';try{const rows=await request<Preview[]>('/v1/wiki/discover',undefined,signal);if(!signal?.aborted)discoveries=rows}catch{if(!signal?.aborted)discoveryError='Halaman belum dapat dimuat.'}finally{if(!signal?.aborted)discovering=false}}
+  $effect(()=>{const controller=new AbortController();void discover(controller.signal);try{lastReadId=localStorage.getItem('strata.ui.wiki-last')??'';readingSize=localStorage.getItem('strata.ui.wiki-text')==='large'?'large':'normal'}catch{};return()=>controller.abort()})
+  $effect(()=>{if(page?.revision){try{localStorage.setItem('strata.ui.wiki-last',page.id)}catch{}}})
   const headings = $derived.by(() => {
     if (!page?.revision) return []
     const template = document.createElement('template')
@@ -87,6 +100,7 @@
         (!contextPages || contextPages.includes(p.id)),
     ),
   )
+  const drafts=$derived(filtered.filter(p=>!p.revision_id&&(!communityFilter||communityFilter===p.community_id)))
   $effect(() => {
     const actor = auth.actor?.id,
       abort = new AbortController()
@@ -123,7 +137,7 @@
 </script>
 
 {#if page}
-  <article class="wiki-reader">
+  <article class="wiki-reader" class:wiki-large-text={readingSize==='large'}>
     <header class="wiki-page-header">
       <small>
         {communities.find((c) => c.id === page.community_id)?.title}
@@ -158,6 +172,7 @@
                 </a>{/each}
             </div>
           </details>{/if}
+        <details class="wiki-reading-options"><summary><Type size={15}/>Teks</summary><div class="wiki-history-popover"><p>Ukuran tulisan</p><button aria-pressed={readingSize==='normal'} onclick={()=>resize('normal')}>Nyaman</button><button aria-pressed={readingSize==='large'} onclick={()=>resize('large')}>Lebih besar</button></div></details>
         {#if member}<Button variant="outline" onclick={onPropose}>
             <GitPullRequest size={15} />Usulkan perubahan
           </Button>{/if}
@@ -336,66 +351,26 @@
     {#if steward}<WikiPolicy communityId={page.community_id} />{/if}
   </article>
 {:else}
-  <section class="knowledge-atlas">
-    <header>
-      <div class="wiki-atlas-mark"><BookOpen size={22} /></div>
+  <section class="knowledge-atlas wiki-discovery">
+    <header class="wiki-discovery-header">
+      <div class="wiki-atlas-mark"><BookOpen size={22}/><span>Wiki ETNOS</span></div>
       <h1>Pengetahuan bersama</h1>
-      <p>Tempat, cerita & pengetahuan yang terus tumbuh.</p>
-      <a class="commons-quiet-link" href="/knowledge">Catatan bersama <ArrowUpRight size={14}/></a>
-      {#if memberships.some((m) => m.role !== 'member')}<Button
-          variant="outline"
-          onclick={onCreate}
-        >
-          <Plus size={16} />Tulis halaman
-        </Button>{/if}
+      <p>Cerita, tempat & pengetahuan yang terus tumbuh.</p>
+      <div class="wiki-discovery-actions"><a class="commons-quiet-link" href="/knowledge">Catatan bersama <ArrowUpRight size={14}/></a>{#if memberships.some(m=>m.role!=='member')}<Button variant="outline" onclick={onCreate}><Plus size={15}/>Tulis halaman</Button>{/if}</div>
     </header>
-    <label class="atlas-search">
-      <Search size={18} /><Input
-        bind:value={query}
-        aria-label="Cari pengetahuan"
-        placeholder="Cari halaman…"
-      />
-    </label>
-    {#if contexts.length}<nav
-        class="atlas-lenses"
-        aria-label="Jelajahi pengetahuan"
-      >
-        <button aria-pressed={!context} onclick={() => (context = '')}>
-          Semua
-        </button>
-        {#each contexts as c}<button
-            aria-pressed={context === c.slug}
-            onclick={() => (context = c.slug)}
-          >
-            {#if c.kind === 'place' || c.kind === 'region'}<MapPin
-                size={14}
-              />{/if}{c.title}
-          </button>{/each}
-      </nav>{/if}
-    <div class="atlas-page-list">
-      {#each filtered as p}<a href={'/wiki/' + p.id}>
-          <BookOpen size={20} />
-          <div>
-            <h2>{p.title}</h2>
-            <small>
-              {communities.find((c) => c.id === p.community_id)?.title} · {p.revision_id
-                ? 'Revisi diterima'
-                : 'Draf'}
-            </small>
-          </div>
-          <ArrowUpRight size={17} />
-        </a>{/each}{#if !filtered.length}<div class="wiki-draft-state">
-          <BookOpen size={27} />
-          <h2>
-            {query || context
-              ? 'Belum ada halaman yang cocok'
-              : 'Mulai dari cerita yang kamu kenal'}
-          </h2>
-          <p>
-            Halaman yang diterima menjadi pengetahuan bersama. Draf tetap dalam
-            tinjauan.
-          </p>
-        </div>{/if}
+    <div class="wiki-discovery-controls"><label class="atlas-search"><Search size={18}/><Input bind:value={query} aria-label="Cari pengetahuan" placeholder="Cari dalam Wiki…"/></label>
+      {#if contexts.length}<nav class="atlas-lenses" aria-label="Jelajahi pengetahuan"><button aria-pressed={!context} onclick={()=>context=''}>Semua</button>{#each contexts as c}<button aria-pressed={context===c.slug} onclick={()=>context=c.slug}>{#if c.kind==='place'||c.kind==='region'}<MapPin size={14}/>{/if}{c.title}</button>{/each}</nav>{/if}
     </div>
+    {#if discovering}<div class="wiki-discovery-loading" role="status">Menyiapkan bacaan…</div>{:else if discoveryError}<div class="wiki-draft-state"><p>{discoveryError}</p><Button variant="outline" onclick={()=>discover()}>Coba lagi</Button></div>{:else}
+      {#if continued&&!query&&!context&&!communityFilter}<a class="wiki-continue" href={'/wiki/'+continued.id}><Clock3 size={17}/><div><small>Lanjutkan membaca · di perangkat ini</small><strong>{continued.title}</strong></div><ArrowRight size={18}/></a>{/if}
+      {#if featured}<section class="wiki-featured" aria-label="Untuk dibaca"><div class="wiki-module-heading"><h2>Untuk dibaca</h2>{#if accepted.length>1}<button onclick={surprise}><Shuffle size={15}/>Halaman acak</button>{/if}</div>
+        <a class="wiki-featured-article" href={'/wiki/'+featured.id}><span class="wiki-featured-scope">{communities.find(c=>c.id===featured.community_id)?.title??'Pengetahuan bersama'}</span><h2>{featured.title}</h2>{#if featured.excerpt}<p>{featured.excerpt}{featured.excerpt.length===360?'…':''}</p>{/if}<span class="wiki-featured-meta">{languageName(featured.language)}{featured.citationCount?' · '+featured.citationCount+' sumber':''}</span><span class="wiki-read-link">Baca halaman<ArrowRight size={17}/></span></a>
+      </section>
+      {#if recent.length}<section class="wiki-recent"><div class="wiki-module-heading"><h2>Baru dirawat</h2><span>Revisi diterima</span></div>{#each recent as p}<a class="wiki-recent-row" href={'/wiki/'+p.id}><BookOpen size={19}/><div><h3>{p.title}</h3><p>{p.excerpt}</p><small>{relativeDate(p.updated)} · {communities.find(c=>c.id===p.community_id)?.title}</small></div><ArrowUpRight size={17}/></a>{/each}</section>{/if}
+      {:else}<div class="wiki-draft-state"><BookOpen size={27}/><h2>{query||context||communityFilter?'Belum ada halaman yang cocok':'Cerita pertama dimulai dari kita.'}</h2><p>{query||context||communityFilter?'Coba kata atau pilihan lain.':'Halaman yang ditinjau bersama akan hadir di sini.'}</p></div>{/if}
+      {#if groups.length>1}<section class="wiki-browse"><div class="wiki-module-heading"><h2>Jelajahi komunitas</h2>{#if communityFilter}<button onclick={()=>communityFilter=''}>Lihat semua</button>{/if}</div><div class="wiki-community-grid">{#each groups as c}<button aria-pressed={communityFilter===c.id} onclick={()=>communityFilter=communityFilter===c.id?'':c.id}><BookOpen size={18}/><strong>{c.title}</strong><span>{c.count} halaman</span></button>{/each}</div></section>{/if}
+      {#if drafts.length}<section class="wiki-drafts"><div class="wiki-module-heading"><h2>Dalam tinjauan</h2></div>{#each drafts as p}<a href={'/wiki/'+p.id}>{p.title}<span>Draf</span><ArrowUpRight size={15}/></a>{/each}</section>{/if}
+    {/if}
+    <footer class="wiki-discovery-footer"><BookOpen size={19}/><p>Pengetahuan terus tumbuh.<br/><a href="/knowledge">Bawa sumber atau catatan baru <ArrowRight size={13}/></a></p></footer>
   </section>
 {/if}

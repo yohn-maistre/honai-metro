@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {avatarTone} from './avatar-tone'
   import { onDestroy, untrack } from 'svelte'
   import {
     ImagePlus,
@@ -265,7 +266,7 @@
     </div>{/if}
   <div class="composer-writing">
     <Avatar.Root class="composer-avatar">
-      <Avatar.Fallback>{initials(actor.name)}</Avatar.Fallback>
+      <Avatar.Fallback class="avatar-tinted" style={avatarTone(actor.id)}>{initials(actor.name)}</Avatar.Fallback>
     </Avatar.Root>
     <div class="composer-content">
       {#if !compact}<div class="composer-identity">

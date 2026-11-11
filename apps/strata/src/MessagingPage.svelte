@@ -1,4 +1,5 @@
 <script lang="ts">
+  import {avatarTone} from './avatar-tone'
   import { onMount, onDestroy, untrack, tick } from 'svelte'
   import { SvelteURLSearchParams } from 'svelte/reactivity'
   import {
@@ -552,7 +553,7 @@
     >
       <ArrowLeft size={18} />
     </Button><Avatar.Root>
-      <Avatar.Fallback>{initials(peer?.name ?? '?')}</Avatar.Fallback>
+      <Avatar.Fallback class="avatar-tinted" style={avatarTone(peer?.id??'unknown')}>{initials(peer?.name ?? '?')}</Avatar.Fallback>
     </Avatar.Root>
     <div class="dm-peer">
       <h2>{peer?.name}</h2>
@@ -678,7 +679,7 @@
     )}<Card.Root class="dm-inbox-row">
       <a href={'/messages/' + thread.id}>
         <Avatar.Root>
-          <Avatar.Fallback>{initials(other?.name ?? '?')}</Avatar.Fallback>
+          <Avatar.Fallback class="avatar-tinted" style={avatarTone(other?.id??'unknown')}>{initials(other?.name ?? '?')}</Avatar.Fallback>
         </Avatar.Root>
         <span>
           <strong>{other?.name}</strong>
@@ -746,7 +747,7 @@
         onclick={() => begin(contact.id)}
       >
         <Avatar.Root>
-          <Avatar.Fallback>{initials(contact.name)}</Avatar.Fallback>
+          <Avatar.Fallback class="avatar-tinted" style={avatarTone(contact.id)}>{initials(contact.name)}</Avatar.Fallback>
         </Avatar.Root>
         <span>{contact.name}</span>
       </Button>{/each}{#if contactSearched && !contacts.length}<p

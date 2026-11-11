@@ -13,7 +13,8 @@
     "test:browser": "node tests/browser/forum.mjs && node tests/browser/governance.mjs && node tests/browser/messaging.mjs && node tests/browser/rich-forum.mjs && node tests/browser/discovery.mjs && node tests/browser/dialogs.mjs && node tests/browser/polish.mjs && node tests/browser/november.mjs && node tests/browser/commons-next.mjs && node tests/browser/mobile-refinement.mjs && node tests/browser/friends-pass.mjs && node tests/browser/agents.mjs && node tests/browser/refinement.mjs && node tests/browser/navigation.mjs && node tests/browser/taxonomy.mjs && node tests/browser/signup.mjs",
     "prebuild": "node scripts/notices.mjs",
     "test": "node --test tests/*.test.ts",
-    "test:browser:commons": "node tests/browser/living-commons.mjs && node tests/browser/commons-design.mjs"
+    "test:browser:commons": "node tests/browser/living-commons.mjs && node tests/browser/commons-design.mjs",
+    "test:browser:reading": "node tests/browser/reading-pass.mjs"
   },
   "dependencies": {
     "@fontsource-variable/gabarito": "5.3.0",

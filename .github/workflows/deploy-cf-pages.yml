@@ -1,7 +1,7 @@
 name: Deploy ETNOS to Cloudflare Pages
 
 # Triggers:
-#   - main pushes validate connected Honai in connected-ui.yml
+#   - main pushes validate connected Honai in strata-ui.yml
 #   - explicit manual run → historical donor deployment
 # Connected ETNOS deployment remains in the Strata repository.
 #

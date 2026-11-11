@@ -10,7 +10,6 @@
   import ContentSkeleton from './ContentSkeleton.svelte'
   import NewsSection from './NewsSection.svelte'
   import EngagementPage from './EngagementPage.svelte'
-  import { news } from './news.svelte'
   import { request, initials, type Auth } from './api'
   import type { SearchResult } from './search'
   let { auth }: { auth: Auth } = $props()
@@ -28,12 +27,12 @@
       .filter(
         (post) =>
           !post.content?.warning &&
-          (post.media?.length || post.content?.event) &&
+          !post.parent_id &&
           data?.communities.some(
             (c) => c.id === post.community_id && c.visibility === 'public',
           ),
       )
-      .slice(0, 3) ?? [],
+      .slice(0, 4) ?? [],
   )
   const kinds: Record<string, string> = {
     region: 'Wilayah',
@@ -64,6 +63,8 @@
   <a href="/communities"><Users size={17} />Komunitas</a>
   <a href="/topics"><Hash size={17} />Topik</a>
   <a href="/groups"><Building2 size={17} />Organisasi</a>
+  <a href="/wiki"><BookOpen size={17}/>Wiki</a>
+  <a href="/contexts"><MapPin size={17}/>Tempat & bahasa</a>
 </nav>
 {#if pending}<ContentSkeleton />{:else if error}<div
     class="search-state"
@@ -73,70 +74,20 @@
   </div>{:else if data}
   <NewsSection />
   <EngagementPage {auth} compact />
-  <section class="explore-featured" aria-label="Pilihan jelajah">
-    {#if featured.length}{#each featured as post, i}<a
-          class="explore-feature-tile"
-          class:lead={i === 0}
-          class:with-image={!!post.media?.length}
-          href={'/square/' + post.id}
-        >
-          {#if post.media?.[0]}<img
-              src={post.media[0].url}
-              alt={post.media[0].alt}
-              loading="lazy"
-            />{/if}
-          <div>
-            <small>
-              {data.communities.find((c) => c.id === post.community_id)?.title}
-            </small>
-            <strong>{post.content?.title ?? post.text.slice(0, 100)}</strong>
-            {#if post.content?.event}<span>
-                {post.content.event.location}
-              </span>{/if}
-          </div>
-          <ArrowUpRight size={18} />
-        </a>{/each}{:else if !news.pending && !news.feed?.items.length}
-      <a
-        class="explore-feature-tile lead"
-        href={data.communities[0]
-          ? '/communities/' + data.communities[0].id
-          : '/communities'}
-      >
-        <Users size={24} />
-        <div>
-          <small>Ruang percakapan</small>
-          <strong>{data.communities[0]?.title ?? 'Temukan komunitasmu'}</strong>
-          <span>
-            {data.communities[0]?.description ??
-              'Percakapan, cerita, dan kabar bersama'}
-          </span>
+  {#if featured.length}<section class="discovery-section explore-conversations" aria-label="Percakapan terbaru">
+    <div class="discovery-section-head"><h2>Percakapan terbaru</h2><a href="/">Ke beranda <ArrowUpRight size={14}/></a></div>
+    <div class="explore-conversation-grid">
+      {#each featured as post}<a class="explore-conversation" class:with-image={!!post.media?.length} href={'/square/' + post.id}>
+        {#if post.media?.[0]}<img src={post.media[0].url} alt={post.media[0].alt} loading="lazy" decoding="async"/>{/if}
+        <div class="explore-conversation-copy">
+          <small>{data.communities.find(c => c.id === post.community_id)?.title}</small>
+          <strong>{post.content?.title || post.text.slice(0, 280) || (post.content?.event ? 'Acara komunitas' : 'Posting bergambar')}</strong>
+          {#if post.content?.event}<span>{post.content.event.location}</span>{/if}
+          <footer><span>{post.author.name}</span><ArrowUpRight size={16}/></footer>
         </div>
-        <ArrowUpRight size={18} />
-      </a>
-    {/if}
-    <a
-      class="explore-feature-tile knowledge-tile"
-      href={data.wiki[0] ? '/wiki/' + data.wiki[0].id : '/wiki'}
-    >
-      <BookOpen size={24} />
-      <div>
-        {#if data.wiki[0]}<small>Wiki bersama</small>{/if}
-        <strong>
-          {data.wiki[0]?.title ?? 'Wiki bersama'}
-        </strong>
-        <span>Catatan, sumber, dan revisi</span>
-      </div>
-      <ArrowUpRight size={18} />
-    </a>
-    <a class="explore-feature-tile places-tile" href="/contexts">
-      <MapPin size={24} />
-      <div>
-        <strong>Tempat & bahasa</strong>
-        <span>Wilayah dan bahasa</span>
-      </div>
-      <ArrowUpRight size={18} />
-    </a>
-  </section>
+      </a>{/each}
+    </div>
+  </section>{/if}
   {#if data.contexts.some((c) => c.kind === 'topic')}<section
       class="discovery-section"
     >

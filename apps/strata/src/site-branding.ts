@@ -35,10 +35,10 @@ export function chooseWelcomeArtwork(): WelcomeArtwork | null {
   }
   return visitArtwork
 }
-/** Decorative selection only: an actor ID is not a place/ethnicity inference. */
-export function profileArtwork(actorId: string): WelcomeArtwork | null {
+/** Decorative selection only: a community ID is not a geographic or cultural attribution. */
+export function communityArtwork(communityId: string): WelcomeArtwork | null {
   let hash = 0
-  for (const char of actorId) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0
+  for (const char of communityId) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0
   const artworks = siteBranding.welcomeArtworks
   return artworks[hash % artworks.length] ?? null
 }

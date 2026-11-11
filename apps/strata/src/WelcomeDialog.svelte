@@ -5,6 +5,7 @@
   import * as Dialog from '$lib/components/ui/dialog/index.js'
   import { Button } from '$lib/components/ui/button/index.js'
   import LoginForm from '$lib/components/login-form.svelte'
+  import BrandWordmark from './BrandWordmark.svelte'
   import LandscapePrint from './LandscapePrint.svelte'
   import { chooseWelcomeArtwork, type WelcomeArtwork } from './site-branding'
   let {
@@ -88,7 +89,7 @@
   >
     <Dialog.Title class="sr-only">{stage === 'welcome' ? 'Selamat datang di ETNOS' : 'Bergabung atau masuk ke ETNOS'}</Dialog.Title>
     <Dialog.Description class="sr-only">Percakapan, kabar sekitar dan pengetahuan bersama. Kamu dapat menjelajahi ETNOS tanpa akun.</Dialog.Description>
-    <div class="welcome-wordmark" aria-hidden="true">etnos<span>.</span></div>
+    <div class="welcome-wordmark" aria-hidden="true"><BrandWordmark animate={intro}/></div>
     <Button class="welcome-close" variant="ghost" size="icon" aria-label="Tutup sambutan" disabled={busy} onclick={onclose}><X size={20}/></Button>
     <div class="welcome-form-pane" inert={arriving && morph.current < .65}>
       {#if stage === 'welcome'}

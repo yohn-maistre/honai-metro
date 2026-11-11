@@ -48,7 +48,6 @@
 .welcome-browse[data-slot='button'] { margin-top: 18px; padding: 0; min-height: 44px; color: var(--muted-foreground); font-size: 13px; }
 .welcome-art { position: absolute; inset: 0 0 0 auto; width: 42%; margin: 0; background: #e7e4d7; overflow: hidden; opacity: clamp(0, calc((var(--arrival) - .35) * 1.7), 1); }
 .welcome-art img { display: block; width: 100%; height: 100%; object-fit: cover; }
-.welcome-art figcaption { position: absolute; bottom: 0; width: 100%; padding: 28px 18px 16px; background: linear-gradient(transparent, #f4f0e5e6); color: #183c76; font-size: 10px; line-height: 1.5; }
 .login-card-embedded[data-slot='card'] { gap: 22px; border: 0; border-radius: 0; background: transparent; box-shadow: none; padding: 0; animation: welcome-content-in 220ms ease-out; }
 .login-card-embedded [data-slot='card-header'], .login-card-embedded [data-slot='card-content'], .login-card-embedded [data-slot='card-footer'] { padding-inline: 0; }
 .login-card-embedded [data-slot='card-header'] > svg { display: none; }
@@ -60,19 +59,19 @@
 .login-card-embedded [data-slot='card-footer'] a { min-height: 40px; display: inline-flex; align-items: center; font-size: 12px; }
 .login-card-embedded [data-slot='card-footer'] button { min-height: 40px; height: auto; white-space: normal; text-align: left; font-size: 12px; }
 .login-card-embedded form button[type='submit'] { min-height: 46px; border-radius: 12px; }
-@keyframes welcome-content-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
-/* Solid accent actions, with a compact desktop compose entry. */
+@keyframes welcome-content-in { from { opacity: 0; transform: translateX(4px); } to { opacity: 1; transform: none; } }
+/* Solid neutral actions, with a compact desktop compose entry. */
 .etnos-sidebar .sidebar-compose[data-slot='button'],
 .cx-mobile-dock > [data-slot='button'][aria-label='Posting baru']:nth-child(3),
 .cx-composer-bar > [data-slot='button']:last-child {
-  background: var(--brand); color: var(--brand-foreground);
+  background: var(--foreground); color: var(--background);
   border: 1px solid transparent;
-  box-shadow: 0 3px 10px -5px color-mix(in srgb, var(--brand) 55%, transparent);
+  box-shadow: none;
 }
 @media (hover:hover) {
   .etnos-sidebar .sidebar-compose[data-slot='button']:hover,
   .cx-mobile-dock > [data-slot='button'][aria-label='Posting baru']:nth-child(3):hover,
-  .cx-composer-bar > [data-slot='button']:last-child:hover { background: var(--brand); box-shadow: 0 4px 12px -5px color-mix(in srgb, var(--brand) 65%, transparent); }
+  .cx-composer-bar > [data-slot='button']:last-child:hover { background: color-mix(in srgb, var(--foreground) 90%, var(--background)); box-shadow: none; }
 }
 /* Composer: a clear author/destination, an open writing area and a grounded toolbar. */
 .compose-dialog.platform-dialog[data-slot='dialog-content'] { width: min(700px, calc(100vw - 40px)); border-radius: 26px; box-shadow: 0 28px 100px -30px #0005; }
@@ -136,10 +135,9 @@
 }
 .landscape-filter { position: absolute; overflow: hidden; pointer-events: none; }
 .welcome-art { background: var(--reading-surface); }
-.welcome-art figcaption { background: linear-gradient(transparent, var(--reading-surface)); color: var(--foreground); }
 .cx-main { margin-bottom: 56px; }
 .cx-main[data-route^='/people/'] .profile-cover { height: 180px; position: relative; overflow: hidden; background: var(--brand-soft); background-image: none; }
-.profile-cover > .landscape-print { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 48%; opacity: .72; }
+.profile-linework { display: block; width: 100%; height: 100%; color: var(--brand); opacity: .38; mask-image: linear-gradient(#000 50%, transparent); }
 .cx-main[data-route^='/people/'] .profile-content { padding: 0 28px 22px; }
 .cx-main[data-route^='/people/'] .profile-topline { min-height: 70px; margin-bottom: 6px; }
 .cx-main[data-route^='/people/'] .profile-avatar.cx-avatar { width: 96px; height: 96px; font-size: 30px; border-width: 6px; }
@@ -158,10 +156,74 @@
 }
 
 .login-card-embedded [data-slot='card-footer'] { background: transparent; border-radius: 0; }
-.welcome-art figcaption { background: linear-gradient(transparent, #f4f0e5ee); color: #24221e; }
 .welcome-dialog[data-exiting='true'] { opacity: 0; pointer-events: none; transition: opacity 220ms ease-out; }
 @media (prefers-reduced-motion: reduce) { .welcome-dialog[data-exiting='true'] { transition: none; } }
 body:has(.welcome-dialog[data-exiting='true']) [data-slot='dialog-overlay'] { opacity: 0; backdrop-filter: blur(0); transition: opacity 220ms ease-out, backdrop-filter 220ms ease-out; }
 @media (prefers-reduced-motion: reduce) { body:has(.welcome-dialog[data-exiting='true']) [data-slot='dialog-overlay'] { transition: none; } }
 
 @media (min-width: 1280px) { .etnos-sidebar .sidebar-compose[data-slot='button'] { width: min(100%, 168px); min-height: 44px; padding-inline: 20px; } }
+
+/* Shared semantic roles: image overlays and surface interactions keep their ink. */
+:root {
+  --surface-hover: color-mix(in srgb, var(--foreground) 5%, var(--reading-surface));
+  --image-ink: #fff;
+  --image-scrim: #101317;
+}
+.welcome-art figcaption {
+  position: absolute; bottom: 14px; left: 14px; width: calc(100% - 28px);
+  padding: 10px 12px; border-radius: 10px; font-size: 10px; line-height: 1.5;
+  background: color-mix(in srgb, var(--reading-surface) 94%, transparent);
+  color: var(--foreground); border: 1px solid var(--border);
+}
+.welcome-signin[data-slot='button'] { background: var(--card); }
+[data-slot='button'][data-variant='default'] { box-shadow: none; }
+.cx-main[data-route^='/people/'] .profile-tabs { position: static; background: transparent; gap: 24px; padding-inline: 28px; }
+.cx-main[data-route^='/people/'] .profile-tabs button { flex: 0 0 auto; padding-inline: 0; }
+.cx-main[data-route^='/people/'] .profile-tabs [aria-pressed='true']::after { inset-inline: 0; }
+.community-profile { position: relative; isolation: isolate; background: none; }
+.community-profile:has(.community-cover) { padding-top: 152px; }
+.community-cover { position: absolute; z-index: -1; inset: 0 0 auto; height: 200px; pointer-events: none; mask-image: linear-gradient(#000 30%, transparent 100%); }
+.community-cover .landscape-print { width: 100%; height: 100%; object-fit: cover; object-position: 50% 48%; opacity: .7; }
+.community-profile > p { margin-top: 10px; }
+.news-section .news-lead.news-photo { color: var(--image-ink); }
+.news-section .news-lead.news-photo .news-tile-copy :is(strong, .news-mark, span) { color: inherit; }
+.news-section .news-lead.news-photo::after { background: linear-gradient(transparent, color-mix(in srgb, var(--image-scrim) 92%, transparent)); }
+@media (hover:hover) {
+  .news-section .news-item:hover strong { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+  .discovery-row:hover, .discovery-nav a:hover, .explore-conversation:hover { background: var(--surface-hover); color: var(--foreground); }
+}
+/* Activity width is monotonic within each batch; the colours move independently. */
+.app-load-line { height: 2px; background: transparent; }
+.app-load-line i, .app-load-line.complete i {
+  width: var(--activity-progress, 0%); margin: 0; transform: none;
+  background: linear-gradient(100deg, var(--activity-colors)); background-size: 300% 100%;
+  animation: activity-colours 9s ease-in-out infinite alternate;
+  transition: width 200ms linear;
+}
+.app-load-line.complete { opacity: 0; transition: opacity 200ms 180ms ease; }
+.app-load-line.complete i { transition: width 160ms ease-out; }
+@keyframes activity-colours { to { background-position: 100% 0; } }
+.explore-conversation-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.explore-conversation { display: flex; flex-direction: column; min-width: 0; overflow: hidden; border: 1px solid var(--reading-line); border-radius: 18px; background: color-mix(in srgb, var(--brand-soft) 35%, var(--reading-surface)); transition: background 160ms ease; }
+.explore-conversation > img { display: block; width: 100%; height: auto; }
+.explore-conversation-copy { display: flex; flex: 1; flex-direction: column; padding: 22px; min-height: 210px; }
+.explore-conversation-copy > small { font-size: 11px; color: var(--muted-foreground); }
+.explore-conversation-copy > strong { font-size: clamp(18px, 1.5vw, 24px); font-weight: 550; line-height: 1.45; letter-spacing: -.035em; margin-block: 20px 24px; display: -webkit-box; -webkit-line-clamp: 6; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: anywhere; }
+.explore-conversation.with-image .explore-conversation-copy { min-height: 0; }
+.explore-conversation-copy > span { font-size: 12px; color: var(--muted-foreground); padding-bottom: 16px; }
+.explore-conversation-copy footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; font-size: 11px; color: var(--muted-foreground); }
+.explore-conversation-copy footer > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.explore-conversation-copy footer > svg { flex-shrink: 0; }
+@media (max-width: 699px) {
+  .cx-main[data-route^='/people/'] .profile-tabs { padding-inline: 18px; }
+  .community-profile:has(.community-cover) { padding-top: 120px; }
+  .community-cover { height: 165px; }
+  .explore-conversation-grid { grid-template-columns: 1fr; }
+  .explore-conversation-copy { min-height: 180px; padding: 20px; }
+  .explore-conversation-copy > strong { font-size: 21px; margin-top: 16px; }
+  .welcome-dialog[data-stage='welcome'] .welcome-art figcaption { bottom: 10px; left: 14px; width: auto; max-width: calc(100% - 28px); padding: 7px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-load-line i, .app-load-line.complete i { animation: none; transition: none; }
+  .explore-conversation { transition: none; }
+}

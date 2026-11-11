@@ -44,7 +44,8 @@
   import WelcomeDialog from './WelcomeDialog.svelte'
   import LandscapePrint from './LandscapePrint.svelte'
   import ThreadEnd from './ThreadEnd.svelte'
-  import { profileArtwork } from './site-branding'
+  import ProfileCover from './ProfileCover.svelte'
+  import { communityArtwork } from './site-branding'
   import { hasSeenWelcome, rememberWelcome, safeBrowsePath, hasBootedThisSession, rememberBoot } from './welcome'
   import FeaturePages from './FeaturePages.svelte'
   import { videoEmbed, directVideo } from './markdown'
@@ -1074,6 +1075,7 @@
         />{/await}{/if}
   {:else if parts[0] === 'communities' && parts[1]}
     {#if community}<div class="cx-detail-head community-profile">
+        {#if community.visibility === 'public' && communityArtwork(community.id)}<div class="community-cover" aria-hidden="true"><LandscapePrint artwork={communityArtwork(community.id)!} decorative/></div>{/if}
         <div class="cx-between">
           <span class="cx-avatar sage avatar-tinted" style={avatarTone(community.id)}>{initials(community.title)}</span>
           {#if currentMembership}<Badge variant="secondary">
@@ -1295,7 +1297,7 @@
               : !p.parent_id),
       )}
       <section class="profile-header">
-        <div class="profile-cover" aria-hidden="true">{#if profileArtwork(actor.id)}<LandscapePrint artwork={profileArtwork(actor.id)!} decorative/>{/if}</div>
+        <div class="profile-cover" aria-hidden="true"><ProfileCover/></div>
         <div class="profile-content">
           <div class="profile-topline">
             <span class="cx-avatar sage profile-avatar avatar-tinted" style={avatarTone(actor.id)}>

@@ -25,6 +25,20 @@ export type Community = {
   publication: 'local' | 'atproto'
   automation: number
 }
+export type ResidentChoice = {
+  actor: {id:string;name:string}
+  operator: {id:string;name:string}
+  scope: 'community'|'sitewide'
+  available: boolean
+  choiceKey: string|null
+  description: string
+}
+export type ResidentRequest = {
+  postId:string
+  agentId:string
+  state:'queued'|'running'|'answered'|'cancelled'|'unavailable'
+  replyId:string|null
+}
 export type MediaAttachment = {
   id: string
   url: string
@@ -152,8 +166,9 @@ export async function request<T>(
   path: string,
   body?: unknown,
   signal?: AbortSignal,
+  background = false,
 ): Promise<T> {
-  const done = beginRequest()
+  const done = background ? () => {} : beginRequest()
   try {
     const response = await fetch(path, {
       method: body === undefined ? 'GET' : 'POST',

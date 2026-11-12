@@ -5,6 +5,8 @@
   import StarterKit from '@tiptap/starter-kit'
   import { Markdown } from '@tiptap/markdown'
   import Image from '@tiptap/extension-image'
+  import type {ResidentChoice} from './api'
+  import AksaraPicker from './AksaraPicker.svelte'
   const ownImage = (src: unknown) =>
     typeof src === 'string' && /^\/v1\/media\/[-a-f0-9]{36}$/.test(src)
   const ScopedImage = Image.extend({
@@ -45,6 +47,7 @@
     label = 'Isi tulisan',
     max = 20000,
     disabled = false, toolbar = true, compact = false, placeholder = '', autofocus = false, onSubmit,
+    mentionChoices, mentionLoading=false, mentionError='', onMentionSelect,
   }: {
     value?: string
     label?: string
@@ -55,12 +58,43 @@
     placeholder?: string
     autofocus?: boolean
     onSubmit?: () => void
+    mentionChoices?: ResidentChoice[]
+    mentionLoading?: boolean
+    mentionError?: string
+    onMentionSelect?: (choice:ResidentChoice)=>void
   } = $props()
   let element: HTMLDivElement,
     editor = $state<Editor | undefined>(),
     revision = $state(0),
     source = $state(false), linkEditing = $state(false), linkValue = $state(''), linkError = $state(''), editorError = $state(''), linkInput = $state<HTMLInputElement|null>(null)
   const advanced = $derived(/<\/?[a-z]|^\|.*\|\s*$|!\[[^\]]*\]/im.test(value))
+  let mention=$state<{from:number;to:number;top:number;left:number}|null>(null),mentionIndex=$state(0)
+  let mentionDismissedAt=''
+  const id=$props.id()
+  const mentionId=id+'-aksara'
+  function closeMention(){if(mention)mentionDismissedAt=mention.from+':'+mention.to;mention=null}
+  function syncMention(current:Editor){
+    const {selection}=current.state
+    if(disabled||source||!mentionChoices||!selection.empty||current.isActive('code')||current.isActive('codeBlock')||current.isActive('blockquote')||current.isActive('link')){mention=null;return}
+    const before=selection.$from.parent.textBetween(0,selection.$from.parentOffset,'\n','\ufffc'),match=before.match(/(?:^|\s)(@(?:a(?:k(?:s(?:a(?:r(?:a)?)?)?)?)?)?)$/i)
+    if(!match){mention=null;mentionDismissedAt='';return}
+    const from=selection.from-match[1].length,to=selection.from
+    if(mentionDismissedAt===from+':'+to)return
+    const anchor=current.view.coordsAtPos(selection.from),bounds=element.parentElement!.getBoundingClientRect(),below=anchor.bottom-bounds.top+8,available=Math.min(innerHeight,element.closest('form')?.getBoundingClientRect().bottom??innerHeight)
+    if(mention?.from!==from)mentionIndex=Math.max(0,mentionChoices.findIndex(c=>c.available))
+    mention={from,to,top:anchor.bottom+220<available?below:Math.max(0,anchor.top-bounds.top-220),left:Math.max(0,Math.min(anchor.left-bounds.left,bounds.width-330))}
+  }
+  function chooseMention(choice:ResidentChoice){
+    if(!editor||!mention||disabled||!choice.available||!choice.choiceKey)return
+    const range={from:mention.from,to:mention.to};mention=null
+    editor.chain().focus().insertContentAt(range,[{type:'text',text:'@'+choice.actor.name,marks:[{type:'link',attrs:{href:'/people/'+choice.actor.id}}]},{type:'text',text:' '}]).run()
+    onMentionSelect?.(choice)
+  }
+  export function openMention(){
+    if(!editor||source||disabled||!mentionChoices)return false
+    mentionDismissedAt='';editor.chain().focus().insertContent(' @aksara').run()
+    return true
+  }
   let lastMarkdown = ''
   onMount(() => {
     let active = true
@@ -93,6 +127,15 @@
           'data-placeholder': placeholder,
         },
         handleKeyDown: (_view,event) => {
+          if(mention&&!event.isComposing){
+            if(event.key==='Escape'){event.preventDefault();event.stopPropagation();closeMention();return true}
+            if(event.key==='Tab'){closeMention();return false}
+            if(event.key==='ArrowDown'||event.key==='ArrowUp'){
+              event.preventDefault();event.stopPropagation();const choices=mentionChoices??[],step=event.key==='ArrowDown'?1:-1
+              for(let n=1;n<=choices.length;n++){const next=(mentionIndex+step*n+choices.length)%choices.length;if(choices[next].available){mentionIndex=next;break}}return true
+            }
+            if(event.key==='Enter'&&!event.ctrlKey&&!event.metaKey&&mentionChoices?.[mentionIndex]?.available){event.preventDefault();event.stopPropagation();chooseMention(mentionChoices[mentionIndex]);return true}
+          }
           if(!disabled&&(event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==='k'){event.preventDefault();event.stopPropagation();void openLink();return true}
           if((event.ctrlKey||event.metaKey)&&event.key==='Enter'&&onSubmit&&!event.isComposing){event.preventDefault();event.stopPropagation();onSubmit();return true}
           return false
@@ -107,8 +150,8 @@
           return false
         },
       },
-      onTransaction: () => {
-        if (active) revision++
+      onTransaction: ({editor}) => {
+        if (active) {revision++;syncMention(editor)}
       },
       onUpdate: ({ editor }) => {
         if (active) {lastMarkdown=editor.getMarkdown();value=lastMarkdown;editorError=''}
@@ -130,6 +173,14 @@
     editor?.setEditable(!disabled)
     editor?.view.dom.setAttribute('data-placeholder',placeholder)
   })
+  $effect(()=>{
+    if(!editor)return
+    const open=!!mention&&!disabled&&!!mentionChoices
+    if(!open)mention=null
+    editor.view.dom.setAttribute('aria-autocomplete',mentionChoices?'list':'none')
+    if(open){editor.view.dom.setAttribute('aria-controls',mentionId);const index=mentionChoices?.[mentionIndex]?.available?mentionIndex:-1;if(index>=0)editor.view.dom.setAttribute('aria-activedescendant',mentionId+'-'+index);else editor.view.dom.removeAttribute('aria-activedescendant')}
+    else{editor.view.dom.removeAttribute('aria-controls');editor.view.dom.removeAttribute('aria-activedescendant')}
+  })
   $effect(() => {
     // External resets (not ordinary typing) must clear the still-mounted editor.
     if(editor&&!source&&lastMarkdown!==value){
@@ -146,6 +197,7 @@
       })
     }
     source = !source
+    mention=null
     linkEditing=false
     void tick().then(()=>focus())
   }
@@ -198,7 +250,6 @@
     })
     editor.view.dispatch(transaction)
   }
-  const id = $props.id()
 </script>
 
 <div
@@ -231,6 +282,7 @@
   </div>{/if}
   {#if linkEditing}<div class="document-link-editor" role="group" aria-label="Sisipkan tautan"><label for={id+'-link'}>Alamat tautan</label><div><input id={id+'-link'} bind:this={linkInput} bind:value={linkValue} maxlength="2000" placeholder="https://…" inputmode="url" onkeydown={e=>{if(e.key==='Enter'){e.preventDefault();applyLink()}else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();linkEditing=false;focus()}}}/><button type="button" onclick={applyLink}>Terapkan</button><button type="button" aria-label="Tutup pengaturan tautan" onclick={()=>{linkEditing=false;focus()}}><X size={16}/></button></div>{#if linkError}<p role="alert">{linkError}</p>{/if}{#if editor?.isActive('link')}<button type="button" onclick={()=>{editor?.chain().focus().unsetLink().run();linkEditing=false}}>Hapus tautan</button>{/if}</div>{/if}
   <div bind:this={element} hidden={source}></div>
+  {#if mention&&mentionChoices}<AksaraPicker id={mentionId} choices={mentionChoices} loading={mentionLoading} error={mentionError} index={mentionIndex} top={mention.top} left={mention.left} onChoose={chooseMention} onClose={closeMention}/>{/if}
   {#if source}<textarea
       {id}
       aria-label={label}

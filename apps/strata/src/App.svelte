@@ -598,7 +598,8 @@
     composeKind = ''
     modal = kind
     wikiRequestKey = crypto.randomUUID()
-    communityId = id || memberships[0]?.community_id || communities[0]?.id || ''
+    const contextual=kind==='compose'?(parts[0]==='communities'?community?.id:parts[0]==='square'?selectedPost?.community_id:undefined):undefined
+    communityId = id || (contextual&&isMember(contextual)?contextual:'') || memberships[0]?.community_id || communities[0]?.id || ''
     text = ''
     title = ''
     description = ''

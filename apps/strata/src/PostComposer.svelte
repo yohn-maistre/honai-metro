@@ -18,6 +18,7 @@
     Code,
     Plus,
     ArrowUp,
+    AtSign, Bot,
   } from '@lucide/svelte'
   import * as Avatar from '$lib/components/ui/avatar/index.js'
   import Choice from './Choice.svelte'
@@ -32,6 +33,7 @@
     type Community,
     type Post,
     type PostContent,
+    type ResidentChoice,
   } from './api'
   import PostText from './PostText.svelte'
   import { markdown, videoEmbed, directVideo } from './markdown'
@@ -115,7 +117,16 @@
       firstPostUrl(text,format),
   )
   const destination = $derived(communities.find((c) => c.id === communityId))
-  const textLimit=$derived(destination?.publication==='atproto'?6000:20000)
+  let mentionChoices=$state<ResidentChoice[]>([]),mentionLoading=$state(false),mentionError=$state(''),selectedMention=$state<(ResidentChoice&{communityId:string})|null>(null)
+  const mentionEligible=$derived(destination?.visibility==='public'&&destination?.publication==='local'&&actor.kind==='human'&&kind!=='offering'&&!warning.trim())
+  const textLimit=$derived(selectedMention?4000:destination?.publication==='atproto'?6000:20000)
+  $effect(()=>{
+    const id=communityId,enabled=mentionEligible,controller=new AbortController()
+    mentionChoices=[];mentionError='';mentionLoading=enabled
+    if(enabled)request<ResidentChoice[]>('/v1/resident/choices?community='+encodeURIComponent(id),undefined,controller.signal,true).then(result=>{if(!controller.signal.aborted)mentionChoices=result}).catch(()=>{if(!controller.signal.aborted)mentionError='Aksara belum dapat diperiksa. Kamu tetap dapat menulis.'}).finally(()=>{if(!controller.signal.aborted)mentionLoading=false})
+    return()=>controller.abort()
+  })
+  $effect(()=>{if(selectedMention&&(!mentionEligible||selectedMention.communityId!==communityId||!text.includes('](/people/'+selectedMention.actor.id+')')))selectedMention=null})
   const hasContent = $derived(
     !!(text.trim() || title.trim() || url.trim() || images.length || kind),
   )
@@ -180,6 +191,7 @@
   export function send() {
     form?.requestSubmit()
   }
+  function callAksara(){if(!documentEditor?.openMention())error='Pilih Aksara dari editor visual. Markdown lanjutan tetap dipertahankan di mode sumber.'}
   async function submit() {
     if (busy || processing || !hasContent || !destination || text.length>textLimit) return
     busy = true
@@ -218,6 +230,7 @@
             ...(parentId ? { parentId } : {}),
             mediaIds,
             content,
+            ...(selectedMention?{agentMention:{actorId:selectedMention.actor.id,choiceKey:selectedMention.choiceKey}}:{}),
             ...(kind==='offering'?{kind:offerKind,price:String(offerPrice??'').trim()?Number(offerPrice):null,unit:offerUnit,durationDays:Number(offerDays)}:{}),
           },
         }
@@ -236,6 +249,7 @@
       format = destination?.publication==='local'
       preview = false
       text = ''
+      selectedMention=null
       images.forEach((image) => URL.revokeObjectURL(image.preview))
       images = []
       resize()
@@ -313,11 +327,12 @@
           disabled={busy || !!pending}
         />{/if}
       <div class="composer-editor" hidden={preview}>
-      {#if format}{#await import('./DocumentEditor.svelte')}<p role="status" class="composer-editor-loading">Menyiapkan editor…</p>{:then module}<module.default bind:this={documentEditor} bind:value={text} label={compact?'Tulis balasan':'Posting'} max={textLimit} disabled={busy||!!pending} toolbar={showFormatting} {compact} autofocus={!compact} placeholder={compact?'Tulis balasan…':kind==='offering'?'Ceritakan yang kamu tawarkan atau butuhkan…':'Apa yang terjadi?'} onSubmit={send}/>{/await}
+      {#if format}{#await import('./DocumentEditor.svelte')}<p role="status" class="composer-editor-loading">Menyiapkan editor…</p>{:then module}<module.default bind:this={documentEditor} bind:value={text} label={compact?'Tulis balasan':'Posting'} max={textLimit} disabled={busy||!!pending} toolbar={showFormatting} {compact} autofocus={!compact} placeholder={compact?'Tulis balasan…':kind==='offering'?'Ceritakan yang kamu tawarkan atau butuhkan…':'Apa yang terjadi?'} onSubmit={send} mentionChoices={mentionEligible?mentionChoices:undefined} {mentionLoading} {mentionError} onMentionSelect={choice=>selectedMention={...choice,communityId}}/>{/await}
       {:else}<Textarea bind:ref={field} bind:value={text} class="composer-text" aria-label={compact?'Tulis balasan':'Posting'} placeholder={compact?'Tulis balasan…':'Apa yang terjadi?'} rows={compact?1:4} maxlength={textLimit} disabled={busy||!!pending} oninput={resize} onkeydown={e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter'&&!e.isComposing){e.preventDefault();send()}}}/>{/if}
       </div>
       {#if preview}<div class="composer-preview post-markdown">{#if format}{@html markdown(text)}{:else}<PostText {text}/>{/if}</div>{/if}
       {#if text.length>textLimit}<p role="alert" class="document-editor-error">Tulisan melewati batas {textLimit.toLocaleString('id')} karakter.</p>{/if}
+      {#if selectedMention}<div class="composer-aksara-request" role="group" aria-label="Permintaan balasan Aksara"><Bot size={16}/><span><strong>{selectedMention.actor.name}</strong><small>{selectedMention.scope==='sitewide'?'Aksara ETNOS':'Aksara komunitas'} akan diminta membalas di sini · publik</small></span><button type="button" disabled={busy||!!pending} aria-label="Kirim tanpa meminta balasan Aksara" title="Kirim tanpa meminta balasan Aksara" onclick={()=>selectedMention=null}><X size={16}/></button></div>{/if}
       {#if showUrl}<Input
           aria-label="Tautan posting"
           type="url"
@@ -448,6 +463,7 @@
             </div>{/each}
         </div>{/if}
       <div class="composer-tools">
+        {#if format&&mentionEligible}<Button variant="ghost" size="icon" aria-label="Panggil Aksara" title="Panggil Aksara · atau ketik @aksara" disabled={busy||!!pending||!documentEditor} onclick={callAksara}><AtSign size={20}/><span class="composer-tool-label">Aksara</span></Button>{/if}
         {#if !compact && !parentId && destination?.publication === 'local'}<Button variant="ghost" size="icon" aria-label="Tambahkan penawaran" title="Penawaran atau kebutuhan" aria-pressed={kind==='offering'} disabled={busy||!!pending} onclick={()=>{kind=kind==='offering'?'':'offering';if(kind==='offering')showTitle=true}}><ShoppingBag size={20}/><span class="composer-tool-label">Penawaran</span></Button>{/if}
         {#if !compact && destination?.publication === 'local'}<Button
           variant="ghost" size="icon" aria-label="Format tulisan" title="Format tulisan: tebal, miring, daftar dan Markdown"

@@ -205,7 +205,7 @@
     </Avatar.Root>
   </a>
   <div class="cx-post-content">
-    <div class="cx-post-meta">
+    <div class="cx-post-meta" class:agent-meta={post.author.kind==='agent'}>
       <a
         href={'/people/' + post.author.id}
         class="cx-author"
@@ -213,7 +213,7 @@
       >
         {post.author.name}
       </a>
-      {#if post.author.kind === 'agent'}<Badge variant="secondary">
+      {#if post.author.kind === 'agent'}<Badge variant="secondary" class="post-agent-badge">
           {post.author.agent?.role === 'steward'
             ? 'Agen · pendamping'
             : post.author.agent?.role === 'worker'

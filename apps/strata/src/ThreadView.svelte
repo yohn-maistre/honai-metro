@@ -7,6 +7,7 @@
   import ThreadWork from './ThreadWork.svelte'
   import ThreadEnd from './ThreadEnd.svelte'
   import DecisionSuggestions from './DecisionSuggestions.svelte'
+  import ResidentRequests from './ResidentRequests.svelte'
   import * as Dialog from '$lib/components/ui/dialog/index.js'
   import { Button } from '$lib/components/ui/button/index.js'
   import { LoaderCircle, ArrowUpLeft } from '@lucide/svelte'
@@ -129,6 +130,7 @@
       </Button>{/if}
   </div>
   <section id="replies" aria-label="Balasan" class="thread-discussion">
+    {#if community?.visibility==='public'&&community?.publication==='local'}<ResidentRequests postId={post.id} replyCount={post.replies} onAnswered={onRefresh}/>{/if}
     <div class="thread-toolbar">
       <h2>
         Balasan <span>

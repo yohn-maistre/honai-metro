@@ -872,6 +872,7 @@
       event.preventDefault()
   }}
 />
+<RouteProgress />
 <PlatformShell
   {path}
   {heading}
@@ -894,7 +895,6 @@
     searchDialogOpen = true
   }}
 >
-  <RouteProgress />
   {#if loading && !posts.length && !selectedPost && !['messages', 'notifications', 'groups', 'work', 'contexts', 'topics', 'explore', 'news', 'login', 'wiki'].includes(parts[0])}<ContentSkeleton
     />{/if}
   {#if path === '/recover-messages'}<VaultTransfer recovery />

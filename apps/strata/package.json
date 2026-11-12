@@ -19,7 +19,8 @@
     "test:browser:refinement": "node tests/browser/commons-refinement.mjs",
     "test:browser:steward": "node tests/browser/steward-demo.mjs",
     "test:browser:offerings": "node tests/browser/offerings.mjs",
-    "test:browser:writing": "node tests/browser/writing.mjs"
+    "test:browser:writing": "node tests/browser/writing.mjs",
+    "test:browser:shell": "node tests/browser/app-shell.mjs"
   },
   "dependencies": {
     "@fontsource-variable/gabarito": "5.3.0",

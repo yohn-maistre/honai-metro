@@ -56,6 +56,8 @@
     onFeedChange: (mode: 'new' | 'mine' | 'following') => void
   } = $props()
   const sidebar = Sidebar.useSidebar()
+  let contextScroll=$state<HTMLDivElement|null>(null)
+  $effect(()=>{void path;if(contextScroll)contextScroll.scrollTop=0})
   const nav = [
     { href: '/', label: 'Beranda', icon: Home },
     { href: '/explore', label: 'Jelajah', icon: Compass },
@@ -321,10 +323,12 @@
         'recover-messages',
       ].includes(path.split('/')[1])}
     >
-      {@render rail()}
+      <!-- svelte-ignore a11y_no_noninteractive_tabindex (A named overflow region needs keyboard scrolling; focus can leave normally.) -->
+      <div class="context-scroll" bind:this={contextScroll} tabindex="0" role="region" aria-label="Gulir konteks terkait">{@render rail()}</div>
     </aside>
   </div>
 </Sidebar.Inset>
+<div class="mobile-dock-vignette" aria-hidden="true" hidden={path.startsWith('/square/')}></div>
 <nav
   class="cx-mobile-dock"
   class:thread-dock={path.startsWith('/square/')}

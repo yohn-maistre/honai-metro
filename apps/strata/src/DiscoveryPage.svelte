@@ -20,8 +20,9 @@
     facet = $state('all')
   type RankedPost=Post&{discovery?:{reason:string;communityTitle:string}}
   let sort=$state('balanced'),ranked=$state<{items:RankedPost[];sort:string;recipe:string}|null>(null),rankingPending=$state(false)
-  const rankingTitle=$derived(ranked?.sort==='balanced'?'Pilihan percakapan':ranked?.sort==='active'?'Sedang dibahas':'Percakapan terbaru')
-  $effect(()=>{const method=sort,controller=new AbortController();rankingPending=true;request<{items:RankedPost[];sort:string;recipe:string}>('/v1/discovery/posts?limit=4&sort='+method,undefined,controller.signal).then(result=>{if(!controller.signal.aborted)ranked=result}).catch(()=>{if(!controller.signal.aborted)ranked=null}).finally(()=>{if(!controller.signal.aborted)rankingPending=false});return()=>controller.abort()})
+  let failedImages=$state<string[]>([])
+  const rankingTitle=$derived(ranked?.sort==='balanced'?'Sorotan':ranked?.sort==='active'?'Sedang dibahas':'Postingan terbaru')
+  $effect(()=>{const method=sort,controller=new AbortController();rankingPending=true;request<{items:RankedPost[];sort:string;recipe:string}>('/v1/discovery/posts?limit=9&sort='+method,undefined,controller.signal).then(result=>{if(!controller.signal.aborted)ranked=result}).catch(()=>{if(!controller.signal.aborted)ranked=null}).finally(()=>{if(!controller.signal.aborted)rankingPending=false});return()=>controller.abort()})
   function preview(post:Post){let text=post.text;if(post.content?.format==='markdown')text=text.replace(/!\[[^\]]*\]\([^)]*\)/g,'').replace(/\[([^\]]+)\]\([^)]*\)/g,'$1').replace(/(^|\n)\s{0,3}#{1,6}\s/g,' ').replace(/[*_`~]+/g,'');return text.replace(/\s+/g,' ').trim().slice(0,280)}
   const contexts = $derived(
     data?.contexts.filter(
@@ -38,7 +39,7 @@
             (c) => c.id === post.community_id && c.visibility === 'public',
           ),
       )
-      .slice(0, 4) ?? [],
+      .slice(0, 9) ?? [],
   )
   const kinds: Record<string, string> = {
     region: 'Wilayah',
@@ -83,13 +84,13 @@
   <EngagementPage {auth} compact />
   {#if featured.length}<section class="discovery-section explore-conversations" aria-label="Percakapan untuk dijelajahi" aria-busy={rankingPending}>
     <div class="discovery-section-head"><h2>{rankingTitle}</h2><a href="/">Ke beranda <ArrowUpRight size={14}/></a></div>
-    <div class="explore-ranking-controls" role="group" aria-label="Urutan percakapan">{#each [['balanced','Pilihan'],['active','Aktif'],['new','Terbaru']] as [value,label]}<button aria-pressed={sort===value} onclick={()=>sort=value}>{label}</button>{/each}<small>{rankingPending?'Memuat pilihan…':ranked?'Dari aktivitas publik':'Urutan terbaru'}</small></div>
+    <div class="explore-ranking-controls" role="group" aria-label="Urutan percakapan">{#each [['balanced','Sorotan'],['active','Aktif'],['new','Terbaru']] as [value,label]}<button aria-pressed={sort===value} onclick={()=>sort=value}>{label}</button>{/each}<small>{rankingPending?'Memuat postingan…':ranked?'Dari aktivitas publik':'Urutan terbaru'}</small></div>
     <div class="explore-conversation-grid">
-      {#each featured as post}<a class="explore-conversation" class:with-image={!!post.media?.length} href={'/square/' + post.id}>
-        {#if post.media?.[0]}<img src={post.media[0].url} alt={post.media[0].alt} loading="lazy" decoding="async"/>{/if}
+      {#each featured as post}<a class="explore-conversation" class:with-image={!!post.media?.length&&!failedImages.includes(post.id)} href={'/square/' + post.id}>
+        {#if post.media?.[0]&&!failedImages.includes(post.id)}<img src={post.media[0].url} alt={post.media[0].alt} width={post.media[0].width} height={post.media[0].height} loading="lazy" decoding="async" onerror={()=>failedImages.push(post.id)}/>{/if}
         <div class="explore-conversation-copy">
           <small>{post.discovery?.communityTitle??data.communities.find(c => c.id === post.community_id)?.title??'Komunitas'}</small>
-          <strong>{post.content?.title || preview(post) || (post.content?.event ? 'Acara komunitas' : 'Posting bergambar')}</strong>
+          <strong>{post.content?.title || preview(post) || (post.content?.event ? 'Acara komunitas' : post.media?.[0]?.alt || 'Posting bergambar')}</strong>
           {#if post.content?.event}<span>{post.content.event.location}</span>{/if}
           <footer><span>{post.author.name}</span><ArrowUpRight size={16}/></footer>
         </div>

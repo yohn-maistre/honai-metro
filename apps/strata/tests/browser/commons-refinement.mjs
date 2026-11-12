@@ -35,7 +35,7 @@ try {
  assert.ok(pending.every((x,i)=>!i||x.progress>=pending[i-1].progress),'activity never moves backwards while requests overlap')
  assert.ok(pending.at(-1).progress-pending[0].progress<45,'slow progress, not repeated laser sweeps')
  await p.locator('.app-load-line').waitFor({state:'detached'})
- await p.getByRole('button',{name:'Terbaru',exact:true}).click();await p.getByRole('heading',{name:'Percakapan terbaru',exact:true}).waitFor()
+ await p.getByRole('button',{name:'Terbaru',exact:true}).click();await p.getByRole('heading',{name:'Postingan terbaru',exact:true}).waitFor()
  assert.match(await p.locator('.explore-conversations').innerText(),/thoughtful text-only/)
  assert.doesNotMatch(await p.locator('.explore-conversations').innerText(),/Protected text/)
  assert.equal(await p.locator('.explore-conversations .knowledge-tile').count(),0)

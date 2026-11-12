@@ -1,0 +1,34 @@
+/* One viewport-level activity line, outside every clipped reading surface. */
+#app > .app-load-line { inset: 0 0 auto; width: auto; height: 3px; }
+/* The rail keeps the backdrop treatment; its inner viewport sticks and scrolls. */
+@media (min-width: 1360px) {
+  .cx-context { top: 0; bottom: 0; }
+  .context-scroll { position: sticky; top: 88px; max-height: calc(100dvh - 104px); overflow-y: auto; overflow-x: hidden; padding: 4px 4px 20px; margin-inline: -4px; }
+  .context-scroll:focus-visible { outline: 1px solid var(--ring); outline-offset: 4px; border-radius: 10px; }
+}
+/* Native column flow makes a compact mosaic without stretching short posts. */
+.explore-conversation-grid { display: block; columns: 3; column-gap: 10px; }
+.explore-conversation { display: inline-flex; width: 100%; break-inside: avoid; margin-bottom: 10px; border-radius: 16px; vertical-align: top; }
+.explore-conversation:nth-child(4n + 2) { background: var(--secondary); }
+.explore-conversation-copy { padding: 15px; min-height: 148px; }
+.explore-conversation-copy > small { font-size: 10px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.explore-conversation-copy > strong { font-size: 16px; line-height: 1.45; margin: 10px 0 16px; -webkit-line-clamp: 3; letter-spacing: -.025em; color: var(--foreground); }
+.explore-conversation-copy footer { margin-top: auto; gap: 8px; font-size: 10px; }
+.explore-conversation-copy footer > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.explore-conversation-copy footer > svg { flex-shrink: 0; width: 14px; height: 14px; }
+.explore-conversation.with-image > img { width: 100%; height: auto; max-height: 180px; object-fit: contain; background: var(--secondary); }
+.explore-conversation.with-image .explore-conversation-copy { min-height: 108px; }
+.thread-landscape { height: 136px; padding-top: 16px; opacity: .85; }
+.mobile-dock-vignette { display: none; }
+@media (max-width: 600px) {
+  .explore-conversation-grid { columns: 2; gap: 10px; }
+  .explore-conversation-copy { min-height: 140px; padding: 13px; }
+  .explore-conversation-copy > strong { font-size: 15px; }
+}
+@media (max-width: 767px) {
+  .thread-landscape { height: 112px; padding-top: 12px; }
+  .mobile-dock-vignette { display: block; position: fixed; inset: auto 0 0; height: calc(114px + env(safe-area-inset-bottom, 0px)); z-index: 29; pointer-events: none; background: linear-gradient(to top, var(--page-ground), color-mix(in srgb, var(--page-ground) 94%, transparent) 24%, transparent 85%); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); mask-image: linear-gradient(to top, #000 24%, transparent 87%); -webkit-mask-image: linear-gradient(to top, #000 24%, transparent 87%); }
+  .mobile-dock-vignette[hidden] { display: none; }
+}
+@media (prefers-reduced-transparency: reduce) { .mobile-dock-vignette { backdrop-filter: none; -webkit-backdrop-filter: none; } }
+@media (forced-colors: active) { .mobile-dock-vignette { display: none; } }

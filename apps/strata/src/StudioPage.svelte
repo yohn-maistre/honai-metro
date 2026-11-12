@@ -2,7 +2,8 @@
  import {notify} from './notifications.svelte'
  import {untrack} from 'svelte'
  import {Radio,Rss,Bot,Pause,Play,Plus,ArrowUpRight,RefreshCw,BookOpen,CheckCircle2} from '@lucide/svelte'
- import {request,relativeDate,type Auth,type Community} from './api'
+ import {request,ApiError,relativeDate,type Auth,type Community} from './api'
+ import {residentJobMessage} from './resident-job-ui'
  import {Button} from '$lib/components/ui/button/index.js'
  import {Input} from '$lib/components/ui/input/index.js'
  import ContentSkeleton from './ContentSkeleton.svelte'
@@ -29,6 +30,16 @@
   if(!id)return
   try{const [ss,is,rs,js,as]=await Promise.all([request<Source[]>('/v1/discovery/sources?community='+id),request<Item[]>('/v1/discovery/items?review=true&community='+id),request<ResidentState>('/v1/resident/config?community='+id),request<Job[]>('/v1/resident/jobs?community='+id),request<Entry[]>('/v1/agents')]);if(mine!==generation)return;sources=ss;items=is;resident=rs;jobs=js;entries=as;agentId=rs?.config?.agent_id??as.find(a=>a.community.id===id&&a.family==='aksara')?.agent_id??'';postingId=rs?.config?.posting_mandate_id??'';editorialId=rs?.config?.editorial_mandate_id??'';dailyLimit=String(rs?.config?.daily_limit??3);intervalMinutes=String(rs?.config?.interval_minutes??360);announceKnowledge=!!rs?.config?.announce_knowledge;mentionsEnabled=!!rs?.config?.mentions_enabled}catch(e){if(mine===generation)error=e instanceof Error?e.message:'Data komunitas belum tersedia.'}}
  $effect(()=>{void auth.actor?.id;untrack(()=>{if(auth.actor)void load();else loading=false});return()=>{generation++}})
+ $effect(()=>{
+  const id=scope
+  if(!id||busy||section==='sources'||!jobs.some(j=>['queued','running'].includes(j.state)))return
+  const controller=new AbortController(),timer=setTimeout(()=>{void request<Job[]>('/v1/resident/jobs?community='+encodeURIComponent(id),undefined,controller.signal,true).then(next=>{if(!controller.signal.aborted)jobs=next}).catch(()=>{/* Keep the existing status and manual refresh when offline. */})},5000)
+  return()=>{clearTimeout(timer);controller.abort()}
+ })
+ async function runJob(job:Job){await act(async()=>{
+  try{await request('/v1/resident/jobs/'+job.id+'/run',{});notify('Tugas diperiksa.')}
+  catch(e){if(e instanceof ApiError&&e.status===409){const current=await request<Job>('/v1/resident/jobs/'+job.id);if(current.state!=='queued'){notify('Tugas sudah diproses. Status terbaru dimuat.');return}}throw e}
+ })}
  async function act(fn:()=>Promise<void>){if(busy)return;busy=true;error='';let failure='';try{await fn()}catch(e){failure=e instanceof Error?e.message:'Permintaan belum berhasil.'}finally{await loadScope(scope);if(failure)error=failure;busy=false}}
  async function saveSource(){await act(async()=>{await request('/v1/discovery/sources',{communityId:scope,title,url,kind:sourceKind,mode,rights,language:'id',requestKey:crypto.randomUUID()});sourceForm=false;title='';url='';notify('Sumber ditambahkan. Periksa contoh sebelum menerbitkan.')})}
  async function setup(){await act(async()=>{const result=await request<{sourceId:string|null}>('/v1/resident/setup',{communityId:scope,consent:true,includeSource:includeDefaultSource,enableAutomation,requestKey:crypto.randomUUID()});notify('Aksara siap. Izin berlaku 24 jam.');if(result.sourceId){await request('/v1/discovery/sources/'+result.sourceId+'/refresh',{});await request('/v1/resident/jobs',{communityId:scope,skill:'source-digest',requestKey:crypto.randomUUID()})}})}
@@ -62,7 +73,7 @@
  {#if resident?.ready}<div class="commons-run"><label for="resident-skill">Tugas berikutnya</label><select id="resident-skill" bind:value={skill}>{#each Object.entries(skillLabels).filter(([value])=>value!=='thread-reply') as [value,label]}<option {value}>{label}</option>{/each}</select><Button disabled={busy} onclick={()=>act(async()=>{await request('/v1/resident/jobs',{communityId:scope,skill,requestKey:crypto.randomUUID()});notify('Tugas masuk antrean.')})}><Plus size={15}/>Jadwalkan tugas</Button></div>{/if}{/if}
  <ResidentParticipation {auth} {scope} {rooms} agentId={resident?.config?.agent_id??''} ready={!!resident?.ready}/>
  {:else}<div class="commons-section-heading"><h2>Aktivitas penghuni</h2><Button variant="ghost" onclick={()=>loadScope(scope)}><RefreshCw size={15}/>Muat ulang</Button></div><p class="cx-hint">Hasil dan alasan berhenti tersimpan bersama tugasnya.</p>{/if}
- {#if section!=='sources'}{#if !jobs.length}<p class="commons-empty">Belum ada tugas penghuni.</p>{/if}{#each jobs as job}<article class="commons-job-row"><div><span class="commons-status" class:ready={job.state==='succeeded'}>{jobLabels[job.state]??job.state}</span><h3>{skillLabels[job.skill]??job.skill}</h3><small>{relativeDate(job.created)}{job.model?' · '+job.model:''}</small>{#if job.error}<p class="commons-inline-error">{job.error}</p>{/if}{#if job.result_id}<a class="commons-quiet-link" href={(job.result_kind==='post'?'/square/':'/wiki/notes/')+job.result_id}>Lihat hasil<ArrowUpRight size={14}/></a>{/if}</div><div class="commons-actions">{#if job.state==='queued'}<Button variant="outline" disabled={busy} onclick={()=>act(async()=>{await request('/v1/resident/jobs/'+job.id+'/run',{});notify('Tugas diperiksa.')})}><Play size={14}/>Jalankan</Button>{/if}{#if ['queued','running'].includes(job.state)}<Button variant="ghost" disabled={busy} onclick={()=>act(async()=>{await request('/v1/resident/jobs/'+job.id+'/cancel',{})})}>Hentikan</Button>{/if}</div></article>{/each}{/if}
+ {#if section!=='sources'}{#if !jobs.length}<p class="commons-empty">Belum ada tugas penghuni.</p>{/if}{#each jobs as job}<article class="commons-job-row"><div><span class="commons-status" class:ready={job.state==='succeeded'}>{jobLabels[job.state]??job.state}</span><h3>{skillLabels[job.skill]??job.skill}</h3><small>{relativeDate(job.created)}{job.model?' · '+job.model:''}</small>{#if job.error}<p class="commons-inline-error">{residentJobMessage(job.error)}</p>{#if job.error.startsWith('resident:')}<details class="resident-error-code"><summary>Detail teknis</summary><code>{job.error}</code></details>{/if}{/if}{#if job.result_id}<a class="commons-quiet-link" href={(job.result_kind==='post'?'/square/':'/wiki/notes/')+job.result_id}>Lihat hasil<ArrowUpRight size={14}/></a>{/if}</div><div class="commons-actions">{#if job.state==='queued'}<Button variant="outline" disabled={busy} onclick={()=>runJob(job)}><Play size={14}/>Jalankan</Button>{/if}{#if ['queued','running'].includes(job.state)}<Button variant="ghost" disabled={busy} onclick={()=>act(async()=>{await request('/v1/resident/jobs/'+job.id+'/cancel',{})})}>Hentikan</Button>{/if}</div></article>{/each}{/if}
  {:else}<div class="commons-empty"><h2>Pilih komunitas publik untuk mengelola sumber dan penghuni.</h2><a href="/wiki">Buka catatan bersama</a></div>{/if}
  {/if}
 {/if}

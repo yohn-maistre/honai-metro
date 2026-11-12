@@ -849,7 +849,7 @@
 <svelte:head><title>{heading} · ETNOS</title></svelte:head>
 <svelte:window
   onkeydown={(e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k' && !e.defaultPrevented && !(e.target instanceof Element && e.target.closest('input,textarea,[contenteditable="true"],.document-editor'))) {
       e.preventDefault()
       searchDialogOpen = !searchDialogOpen
     }

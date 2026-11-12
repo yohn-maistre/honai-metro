@@ -1,5 +1,6 @@
 <script lang="ts">
   import {avatarTone} from './avatar-tone'
+  import {autosizeText} from './autosize-text'
   import {
     ArrowUp,
     ArrowDown,
@@ -65,6 +66,7 @@
     if (editDirty) discardEdit = true
     else editing = false
   }
+  function submitEdit(){const form=document.getElementById('edit-form-'+post.id);if(form instanceof HTMLFormElement)form.requestSubmit()}
   let busy = $state(false),
     reporting = $state(false),
     editing = $state(false),
@@ -76,6 +78,7 @@
     modAction = $state(''),
     modReason = $state(''),
     reason = $state('')
+  const editLimit=$derived(community?.publication==='atproto'?6000:20000)
   const editDirty = $derived(
     editText !== post.text ||
       editTitle !== (post.content?.title ?? '') ||
@@ -423,7 +426,7 @@
       <Button
         type="submit"
         form={'edit-form-' + post.id}
-        disabled={busy || !editDirty}
+        disabled={busy || !editDirty || editText.length>editLimit}
       >
         {#if busy}<LoaderCircle size={15} class="animate-spin" />{/if}Simpan
       </Button>
@@ -436,6 +439,7 @@
       class="edit-form"
       onsubmit={(event) => {
         event.preventDefault()
+        if(editText.length>editLimit)return
         void mutate('edit', {
           revision: post.revision,
           text: editText,
@@ -460,15 +464,17 @@
           <small>{community?.title ?? 'Percakapan'}</small>
         </span>
       </div>
-      <Label class="sr-only" for={'edit-text-' + post.id}>
+      {#if post.content?.format==='markdown'}{#await import('./DocumentEditor.svelte') then module}<module.default bind:value={editText} label="Posting" max={editLimit} disabled={busy} placeholder="Apa yang terjadi?" onSubmit={submitEdit}/>{/await}
+      {:else}<Label class="sr-only" for={'edit-text-' + post.id}>
         Posting
-      </Label><Textarea
+      </Label><textarea data-slot="textarea"
         id={'edit-text-' + post.id}
         bind:value={editText}
-        maxlength={20000}
+        maxlength={editLimit}
         class="edit-writing"
         placeholder="Apa yang terjadi?"
-      />
+        use:autosizeText={editText}
+      ></textarea>{/if}
       <div class="edit-tools">
         <Button
           variant="ghost"
@@ -478,7 +484,7 @@
         >
           Rincian posting
         </Button>
-        <small>{editText.length.toLocaleString('id')} / 20.000</small>
+        <small>{editText.length.toLocaleString('id')} / {editLimit.toLocaleString('id')}</small>
       </div>
       {#if extraEdit}<div class="edit-details">
           <Label for={'edit-title-' + post.id}>Judul (opsional)</Label><Input

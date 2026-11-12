@@ -199,8 +199,10 @@ try {
     .getByRole('button', { name: 'Opsi konten', exact: true })
     .click()
   await page
-    .getByRole('menuitemcheckbox', { name: 'Editor tulisan', exact: true })
+    .getByRole('menuitem', { name: 'Sumber Markdown', exact: true })
     .click()
+  await composer.getByRole('textbox', { name: 'Posting', exact: true }).fill('**A real composer contribution**')
+  await composer.getByRole('button', { name: 'Opsi konten', exact: true }).click()
   await page
     .getByRole('menuitem', { name: 'Jajak pendapat', exact: true })
     .click()
@@ -214,6 +216,7 @@ try {
     .feed(owner.actor.id)
     .find((p) => p.content.title === 'Posting dari composer')
   assert.equal(created.content.format, 'markdown')
+  assert.equal(created.text, '**A real composer contribution**')
   assert.equal(created.poll.options.length, 2)
   await page.evaluate(() => {
     document.activeElement?.blur()
@@ -253,7 +256,7 @@ try {
     await page
       .getByRole('dialog', { name: 'Posting baru' })
       .getByLabel('Posting', { exact: true })
-      .inputValue(),
+      .innerText(),
     'Keep this draft while reviewing',
   )
   await page.keyboard.press('Escape')
@@ -270,15 +273,9 @@ try {
   await page
     .getByRole('dialog', { name: 'Posting baru' })
     .waitFor({ state: 'hidden' })
+  const sidebarState = await page.locator('[data-slot=sidebar]').first().getAttribute('data-state')
   await page.keyboard.press('Control+b')
-  await page
-    .getByRole('button', { name: 'Semua ruang', exact: true })
-    .first()
-    .click()
-  await page
-    .getByRole('link', { name: 'Beranda', exact: true })
-    .first()
-    .waitFor()
+  assert.equal(await page.locator('[data-slot=sidebar]').first().getAttribute('data-state'), sidebarState)
   await page.setViewportSize({ width: 390, height: 844 })
   await page
     .getByRole('button', { name: 'Pilih linimasa', exact: true })
@@ -298,7 +295,7 @@ try {
       draftDiscardAndResume: true,
       escapeAndClosePreserveDraft: true,
       mobileTimelineSwitch: true,
-      sidebarRestore: true,
+      sidebarShortcutLeavesLayoutUnchanged: true,
       markdownSanitized: true,
       noAutomaticVideoRequests: true,
       pollVoted: true,

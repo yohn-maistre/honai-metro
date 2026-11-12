@@ -147,10 +147,6 @@ try {
     .first()
     .click()
   dialog = page.getByRole('dialog', { name: 'Posting baru' })
-  await dialog.getByRole('button', { name: 'Opsi konten', exact: true }).click()
-  await page
-    .getByRole('menuitemcheckbox', { name: 'Editor tulisan', exact: true })
-    .click()
   await dialog
     .getByRole('textbox', { name: 'Posting', exact: true })
     .fill('Catatan panjang dengan gambar di dalam tulisan.')
@@ -277,7 +273,7 @@ try {
   for (const name of ['Aktivitas', 'Tersimpan', 'Kerja publik']) {
     const box = await page
       .locator('[data-slot=sidebar-content]')
-      .getByRole('link', { name, exact: true })
+      .getByRole('link', { name: new RegExp('^'+name+'(?:,|$)') })
       .boundingBox()
     assert.ok(box && box.x >= 0 && box.x + box.width <= 76, name)
   }

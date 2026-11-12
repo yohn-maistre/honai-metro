@@ -1,5 +1,6 @@
 <script lang="ts">
   import {avatarTone} from './avatar-tone'
+  import {firstPostUrl} from './post-links'
   import { onDestroy, untrack } from 'svelte'
   import {
     ShoppingBag,
@@ -89,7 +90,8 @@
     showTitle = $state(untrack(()=>initialKind==='offering')),
     showUrl = $state(false),
     showWarning = $state(false),
-    format = $state(false),
+    format = $state(untrack(()=>communities.find(c=>c.id===initialCommunity)?.publication==='local')),
+    showFormatting = $state(true),
     preview = $state(false),
     kind = $state(untrack(() => initialKind)),
     pollOptions = $state(['', '']),
@@ -110,9 +112,10 @@
     form = $state<HTMLFormElement | null>(null)
   const detectedUrl = $derived(
     url.trim() ||
-      text.match(/https?:\/\/[^\s<>]+/)?.[0]?.replace(/[.,;!?)]*$/, '') ||
-      '',
+      firstPostUrl(text,format),
   )
+  const destination = $derived(communities.find((c) => c.id === communityId))
+  const textLimit=$derived(destination?.publication==='atproto'?6000:20000)
   const hasContent = $derived(
     !!(text.trim() || title.trim() || url.trim() || images.length || kind),
   )
@@ -120,15 +123,15 @@
     onStateChange?.({
       dirty: hasContent,
       busy: busy || processing,
-      canSubmit: hasContent && !!destination && !busy && !processing,
+      canSubmit: hasContent && text.length<=textLimit && !!destination && !busy && !processing,
     })
   })
-  const destination = $derived(communities.find((c) => c.id === communityId))
   let lastCommunity = untrack(() => initialCommunity),
     audiencePending = $state('')
   function changeDestination(next: string) {
     const before = communities.find((c) => c.id === lastCommunity),
       after = communities.find((c) => c.id === next)
+    if(after?.publication==='atproto'&&format&&text.trim()){error='Tulisan berformat disimpan di komunitas lokal. Pilih komunitas lokal atau mulai tulisan teks baru untuk AT.';return false}
     if (
       hasContent &&
       before &&
@@ -138,6 +141,7 @@
       audiencePending = next
       return false
     }
+    if(!hasContent)format=after?.publication==='local'
     lastCommunity = next
     return true
   }
@@ -167,17 +171,17 @@
   function resize() {
     if (field) {
       field.style.height = 'auto'
-      field.style.height = Math.min(field.scrollHeight, 300) + 'px'
+      field.style.height = field.scrollHeight + 'px'
     }
   }
   export function focus() {
-    field?.focus()
+    if(format)documentEditor?.focus();else field?.focus()
   }
   export function send() {
     form?.requestSubmit()
   }
   async function submit() {
-    if (busy || processing || !hasContent || !destination) return
+    if (busy || processing || !hasContent || !destination || text.length>textLimit) return
     busy = true
     error = ''
     try {
@@ -229,7 +233,7 @@
       kind = ''
       offerKind='offer';offerPrice='';offerUnit='';offerDays='30'
       pollOptions = ['', '']
-      format = false
+      format = destination?.publication==='local'
       preview = false
       text = ''
       images.forEach((image) => URL.revokeObjectURL(image.preview))
@@ -308,32 +312,12 @@
           maxlength={180}
           disabled={busy || !!pending}
         />{/if}
-      {#if !preview && format && !compact}{#await import('./DocumentEditor.svelte') then module}<module.default
-            bind:this={documentEditor}
-            bind:value={text}
-            label="Posting"
-            max={destination?.publication === 'atproto' ? 6000 : 20000}
-            disabled={busy || !!pending}
-          />{/await}
-      {:else if !preview}<Textarea
-          bind:ref={field}
-          bind:value={text}
-          class="composer-text"
-          aria-label={compact ? 'Tulis balasan' : 'Posting'}
-          placeholder={compact ? 'Tulis balasan…' : 'Apa yang terjadi?'}
-          rows={compact ? 1 : 4}
-          maxlength={destination?.publication === 'atproto' ? 6000 : 20000}
-          disabled={busy || !!pending}
-          oninput={resize}
-          onkeydown={(e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
-              e.preventDefault()
-              void submit()
-            }
-          }}
-        />{:else}<div class="composer-preview post-markdown">
-          {#if format}{@html markdown(text)}{:else}<PostText {text} />{/if}
-        </div>{/if}
+      <div class="composer-editor" hidden={preview}>
+      {#if format}{#await import('./DocumentEditor.svelte')}<p role="status" class="composer-editor-loading">Menyiapkan editor…</p>{:then module}<module.default bind:this={documentEditor} bind:value={text} label={compact?'Tulis balasan':'Posting'} max={textLimit} disabled={busy||!!pending} toolbar={showFormatting} {compact} autofocus={!compact} placeholder={compact?'Tulis balasan…':kind==='offering'?'Ceritakan yang kamu tawarkan atau butuhkan…':'Apa yang terjadi?'} onSubmit={send}/>{/await}
+      {:else}<Textarea bind:ref={field} bind:value={text} class="composer-text" aria-label={compact?'Tulis balasan':'Posting'} placeholder={compact?'Tulis balasan…':'Apa yang terjadi?'} rows={compact?1:4} maxlength={textLimit} disabled={busy||!!pending} oninput={resize} onkeydown={e=>{if((e.metaKey||e.ctrlKey)&&e.key==='Enter'&&!e.isComposing){e.preventDefault();send()}}}/>{/if}
+      </div>
+      {#if preview}<div class="composer-preview post-markdown">{#if format}{@html markdown(text)}{:else}<PostText {text}/>{/if}</div>{/if}
+      {#if text.length>textLimit}<p role="alert" class="document-editor-error">Tulisan melewati batas {textLimit.toLocaleString('id')} karakter.</p>{/if}
       {#if showUrl}<Input
           aria-label="Tautan posting"
           type="url"
@@ -446,11 +430,11 @@
                 onclick={() => (altKey = altKey === image.key ? '' : image.key)}
               >
                 ALT{image.alt ? ' ✓' : ''}
-              </Button>{#if format && !compact}<Button
+              </Button>{#if format}<Button
                   class="draft-insert"
                   variant="secondary"
                   size="sm"
-                  disabled={busy || processing || !!pending}
+                  disabled={busy || processing || !!pending || !documentEditor}
                   onclick={() => insertImage(image)}
                 >
                   Sisipkan
@@ -467,7 +451,7 @@
         {#if !compact && !parentId && destination?.publication === 'local'}<Button variant="ghost" size="icon" aria-label="Tambahkan penawaran" title="Penawaran atau kebutuhan" aria-pressed={kind==='offering'} disabled={busy||!!pending} onclick={()=>{kind=kind==='offering'?'':'offering';if(kind==='offering')showTitle=true}}><ShoppingBag size={20}/><span class="composer-tool-label">Penawaran</span></Button>{/if}
         {#if !compact && destination?.publication === 'local'}<Button
           variant="ghost" size="icon" aria-label="Format tulisan" title="Format tulisan: tebal, miring, daftar dan Markdown"
-          aria-pressed={format} disabled={busy || !!pending} onclick={() => format = !format}
+          aria-pressed={format&&showFormatting} disabled={busy || !!pending} onclick={() => {if(!format)format=true;else showFormatting=!showFormatting}}
         ><Bold size={20}/><span class="composer-tool-label">Format</span></Button>{/if}
         <input
           bind:this={picker}
@@ -543,12 +527,7 @@
                 >
                   <CalendarDays size={16} />Acara
                 </Dropdown.Item>{/if}<Dropdown.Separator
-              /><Dropdown.CheckboxItem
-                checked={format}
-                onCheckedChange={(v) => (format = v)}
-              >
-                <Code size={16} />Editor tulisan
-              </Dropdown.CheckboxItem>
+              /><Dropdown.Item onSelect={()=>documentEditor?.toggleSource()}><Code size={16}/>Sumber Markdown</Dropdown.Item>
             </Dropdown.Content>
           </Dropdown.Root>{/if}
         {#if text.trim()}<Button
@@ -558,7 +537,7 @@
           >
             {preview ? 'Tulis' : 'Pratinjau'}
           </Button>{/if}
-        {#if text.length > 19500}<span class="composer-count">
+        {#if !format && text.length > textLimit-500}<span class="composer-count">
             {(destination?.publication === 'atproto' ? 6000 : 20000) -
               text.length}
           </span>{/if}
@@ -569,7 +548,7 @@
         aria-label="Kirim balasan"
         type="submit"
         size="sm"
-        disabled={busy || processing || !hasContent}
+        disabled={busy || processing || !hasContent || text.length>textLimit}
       >
         {#if busy}<LoaderCircle size={16} class="animate-spin" />{:else}<ArrowUp
             size={20}
@@ -586,7 +565,7 @@
       </span>
       <Button
         type="submit"
-        disabled={busy || processing || !hasContent || !destination}
+        disabled={busy || processing || !hasContent || !destination || text.length>textLimit}
       >
         {#if busy}<LoaderCircle size={16} class="animate-spin" />{/if}Posting
       </Button>{/if}
